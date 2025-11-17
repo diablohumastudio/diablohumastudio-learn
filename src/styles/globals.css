@@ -1,0 +1,344 @@
+/* ==================== */
+/* CSS Reset & Base     */
+/* ==================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Lexend', sans-serif;
+    font-weight: 400;
+    background-color: #000000;
+    color: #F4F4F4;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.3s ease;
+}
+
+ul {
+    list-style: none;
+}
+
+/* ==================== */
+/* Header & Navigation  */
+/* ==================== */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #0a0502e6;
+    padding: 10px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(244, 244, 244, 0.1);
+}
+.nav{
+    display: flex;
+}
+
+.site-pages-nav{
+    display: flex;
+    padding-right: 20px;
+}
+.site-page-link{
+    padding-left: 20px;
+    color: #e7945e;
+}
+
+.logo{
+    padding-left: 20px;
+}
+
+.logo img {
+    height: 40px;
+}
+
+
+/* ==================== */
+/* Hero Section         */
+/* ==================== */
+
+.hero-section {
+    background: linear-gradient(180deg, #5A2703 0%, #000000 100%);
+    padding: 60px 0;
+    text-align: center;
+    margin: 0 auto;
+    overflow: visible;
+}
+.hero-section-courses{
+    background: linear-gradient(180deg, #3e1338 0%, #14021d 100%);
+}
+
+.hero-image{
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    transition: transform 0.4s ease;
+}
+
+.hero-image-courses{
+    max-height: 727px;
+    width: 80%;
+    max-width: 744px;
+}
+
+.hero-image:hover{
+    transform: scale(1.1);
+}
+
+/* ==================== */
+/* Main Content         */
+/* ==================== */
+
+.main-content {
+    padding: 40px 0;
+}
+
+.games-section {
+    padding: 40px 0;
+}
+
+.games-section h2{
+    text-align: center;
+    font-weight: 200;
+    font-family: "Lexend", Sans-serif;
+    line-height: 40px;
+    font-size: 40px;
+    color: #D5D5D5;
+}
+
+.game-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+
+    text-align: center;
+    overflow: visible;
+    border-radius: 8px;
+    margin: 0 auto;
+    max-width: 900px;
+}
+
+.game-logo img {
+    padding-top: 40px;
+    transition: transform 0.4s ease;
+    margin: 0 auto;
+}
+
+.game-logo img:hover {
+    transform: scale(1.1);
+}
+.game-platform-icons{
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+}
+.platform-icon{
+    padding: 20px;
+}
+
+.learn-process-section{
+
+}
+.learn-process-section h1 {
+    text-align: center;
+    font-family: "Lexend", Sans-serif;
+    font-weight: 200;
+    color: #FFD0E4;
+    font-size: 67px;
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+.learn-process-section p {
+    text-align: center;
+    font-family: monospace, monospace;
+    font-size: 1.2rem;
+    margin-bottom: 40px;
+    line-height: 1.5;
+    }
+.learn-process-items{
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    margin-right: 0px;
+    margin-bottom: 88px;
+    margin-left: 0px;
+}
+.learn-process-item{
+    max-width: 200px;
+}
+.learn-process-item h3{
+  font-family: "Roboto", Sans-serif;
+  font-size: 23px;
+  font-weight: 400;
+  color: white;
+}
+.courses-buttons{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 80px;
+}
+.btn{
+    padding: 10px;
+    border-radius: 10px;
+    margin-right: 20px;
+    background-color: #FFD0E4;
+    color: #000000;
+}
+
+/* ==================== */
+/* Footer               */
+/* ==================== */
+
+.footer {
+    color: #e7945e;
+    background-color: #000000;
+    padding: 20px;
+    border-top: 1px solid rgba(244, 244, 244, 0.1);
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.footer-branding{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.footer-branding p {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+.social-icons{
+    display: flex;
+    align-items: center;
+}
+
+.social-icon{
+    height: 20px;
+    padding-left: 5px;
+}
+.footer-copyright p {
+    font-size: 0.9rem;
+}
+
+
+/* ==================== */
+/* Responsive Design    */
+/* ==================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .hero-image img {
+        width: 100%;
+        max-width: 100%;
+    }
+
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .header {
+        padding: 10px 15px;
+    }
+
+    .site-pages-nav {
+        flex-direction: column;
+        padding-right: 10px;
+    }
+
+    .site-page-link {
+        padding: 5px 10px;
+        font-size: 0.9rem;
+    }
+
+    .logo {
+        padding-left: 10px;
+    }
+
+    .logo img {
+        height: 30px;
+    }
+    .hero {
+        padding: 40px 0;
+    }
+
+    .hero-image img {
+        width: 90%;
+        max-width: 90%;
+    }
+
+    .games-section {
+        padding: 30px 0;
+    }
+
+    .game-logo {
+        max-width: 80%;
+    }
+    .social-icon{
+        max-width: 80%;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+
+    .header {
+        padding: 10px 15px;
+    }
+
+    .logo {
+        padding-left: 10px;
+    }
+
+    .logo img {
+        height: 30px;
+    }
+
+    .site-pages-nav {
+        padding-right: 10px;
+    }
+
+    .site-page-link {
+        padding-left: 10px;
+        font-size: 0.9rem;
+    }
+   .games-section h2{
+        font-size: 30px;
+    }
+
+}
