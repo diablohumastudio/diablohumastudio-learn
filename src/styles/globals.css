@@ -375,8 +375,9 @@ ul {
 }
 
 .social-icon{
-    height: 20px;
-    padding-left: 5px;
+    height: 25px;
+    width: 25px;
+    margin-left: 5px;
 }
 .footer-copyright p {
     font-size: 0.9rem;
