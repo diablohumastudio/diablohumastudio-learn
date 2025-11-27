@@ -267,6 +267,135 @@ ul {
 }
 
 /* ==================== */
+/* NvC Game Page        */
+/* ==================== */
+
+.hero-section-nvc {
+    position: relative;
+    height: 70vh;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+}
+
+.hero-content-nvc {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 20px;
+}
+
+.nvc-logo {
+    max-width: 90%;
+    height: auto;
+    filter: drop-shadow(3px 3px 12px rgba(0, 0, 0, 0.9));
+    margin-bottom: 20px;
+}
+
+.game-tagline {
+    font-family: 'Lexend', sans-serif;
+    font-weight: 300;
+    font-size: 1.5rem;
+    color: #FFFFFF;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    margin-top: 10px;
+}
+
+.symbol-section {
+    padding: 60px 20px;
+    text-align: center;
+    background-color: #000000;
+}
+
+.giratory-symbol {
+    display: inline-block;
+    max-width: 300px;
+    height: auto;
+}
+
+.screenshots-section {
+    padding: 80px 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.screenshots-section h2 {
+    text-align: center;
+    font-weight: 200;
+    font-family: "Lexend", Sans-serif;
+    line-height: 40px;
+    font-size: 40px;
+    color: #D5D5D5;
+    margin-bottom: 60px;
+}
+
+.screenshots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.screenshot-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    background-color: #000;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.screenshot-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(231, 148, 94, 0.3);
+}
+
+.screenshot-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+}
+
+.download-section {
+    padding: 80px 20px;
+    background: linear-gradient(180deg, #000000 0%, #1a0a00 100%);
+    text-align: center;
+}
+
+.download-section h2 {
+    font-weight: 200;
+    font-family: "Lexend", Sans-serif;
+    line-height: 40px;
+    font-size: 40px;
+    color: #D5D5D5;
+    margin-bottom: 60px;
+}
+
+.download-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.download-link {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.download-link:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.download-button-image {
+    height: auto;
+    max-width: 250px;
+}
+
+/* ==================== */
 /* Main Content         */
 /* ==================== */
 
@@ -481,6 +610,27 @@ ul {
     .video-showcase-grid {
         grid-template-columns: 1fr;
         gap: 30px;
+    }
+
+    .nvc-logo {
+        max-width: 95%;
+    }
+
+    .game-tagline {
+        font-size: 1.2rem;
+    }
+
+    .screenshots-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .download-buttons {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .download-button-image {
+        max-width: 200px;
     }
 }
 
