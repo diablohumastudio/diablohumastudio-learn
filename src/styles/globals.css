@@ -523,6 +523,219 @@ ul {
 }
 
 /* ==================== */
+/* Contact Page         */
+/* ==================== */
+
+.contact-hero-section {
+    background: linear-gradient(180deg, #5A2703 0%, #000000 100%);
+    padding: 80px 20px 60px;
+    text-align: center;
+}
+
+.contact-hero-section h1 {
+    font-weight: 200;
+    font-family: "Lexend", Sans-serif;
+    line-height: 1.2;
+    font-size: 3.5rem;
+    color: #D5D5D5;
+    margin-bottom: 20px;
+}
+
+.contact-hero-section p {
+    font-size: 1.2rem;
+    color: #e7945e;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.contact-form-section {
+    padding: 80px 20px;
+    background-color: #000000;
+}
+
+.contact-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+}
+
+.contact-form-wrapper h2 {
+    font-weight: 300;
+    font-family: "Lexend", Sans-serif;
+    font-size: 2rem;
+    color: #e7945e;
+    margin-bottom: 30px;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-family: "Lexend", Sans-serif;
+    font-size: 0.95rem;
+    color: #D5D5D5;
+    font-weight: 400;
+}
+
+.form-input,
+.form-textarea {
+    font-family: "Lexend", Sans-serif;
+    padding: 12px 16px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(231, 148, 94, 0.3);
+    border-radius: 8px;
+    color: #F4F4F4;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #e7945e;
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(231, 148, 94, 0.1);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+    color: rgba(244, 244, 244, 0.4);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.submit-button {
+    font-family: "Lexend", Sans-serif;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #e7945e 0%, #d67d45 100%);
+    color: #000000;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.submit-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(231, 148, 94, 0.4);
+}
+
+.submit-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.submit-message {
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-family: "Lexend", Sans-serif;
+    font-size: 0.95rem;
+    margin-top: 10px;
+}
+
+.submit-message.success {
+    background-color: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    color: #81c784;
+}
+
+.submit-message.error {
+    background-color: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    color: #e57373;
+}
+
+.contact-info {
+    background-color: rgba(255, 255, 255, 0.02);
+    padding: 40px;
+    border-radius: 12px;
+    border: 1px solid rgba(231, 148, 94, 0.1);
+}
+
+.contact-info h2 {
+    font-weight: 300;
+    font-family: "Lexend", Sans-serif;
+    font-size: 2rem;
+    color: #e7945e;
+    margin-bottom: 30px;
+}
+
+.contact-info-item {
+    margin-bottom: 30px;
+}
+
+.contact-info-item:last-child {
+    margin-bottom: 0;
+}
+
+.contact-info-item h3 {
+    font-family: "Lexend", Sans-serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: #D5D5D5;
+    margin-bottom: 10px;
+}
+
+.contact-info-item p {
+    font-family: "Lexend", Sans-serif;
+    font-size: 1rem;
+    color: rgba(244, 244, 244, 0.7);
+    line-height: 1.6;
+}
+
+.contact-info-item a {
+    color: #e7945e;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.contact-info-item a:hover {
+    color: #f4a56e;
+    text-decoration: underline;
+}
+
+.contact-info-item ul {
+    list-style: none;
+    padding: 0;
+}
+
+.contact-info-item ul li {
+    font-family: "Lexend", Sans-serif;
+    font-size: 1rem;
+    color: rgba(244, 244, 244, 0.7);
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(231, 148, 94, 0.1);
+}
+
+.contact-info-item ul li:last-child {
+    border-bottom: none;
+}
+
+/* ==================== */
 /* Footer               */
 /* ==================== */
 
@@ -692,6 +905,23 @@ ul {
 
     .download-button-image {
         max-width: 200px;
+    }
+
+    .contact-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .contact-hero-section h1 {
+        font-size: 2.5rem;
+    }
+
+    .contact-hero-section p {
+        font-size: 1rem;
+    }
+
+    .contact-info {
+        padding: 30px 20px;
     }
 }
 
