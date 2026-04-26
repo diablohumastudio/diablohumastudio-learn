@@ -396,7 +396,13 @@ ul {
     margin-bottom: 60px;
 }
 
-.download-buttons {
+.direct-download-button {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.platform-download-buttons {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -405,6 +411,8 @@ ul {
 }
 
 .download-link {
+    position: relative;
+    display: inline-flex;
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
@@ -413,9 +421,79 @@ ul {
     opacity: 0.9;
 }
 
+.download-link-disabled {
+    cursor: not-allowed;
+}
+
+.download-link-disabled:hover {
+    transform: none;
+    opacity: 1;
+}
+
 .download-button-image {
+    display: block;
     height: auto;
     max-width: 250px;
+}
+
+.download-link-disabled .download-button-image {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+
+.coming-soon-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-34deg);
+    padding: 6px 18px;
+    border: 2px solid #000000;
+    border-radius: 999px;
+    background: rgba(195, 186, 173, 0.88);
+    color: #000000;
+    font-family: "Lexend", Sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+/* ==================== */
+/* Trailer Section      */
+/* ==================== */
+
+.trailer-section {
+    padding: 80px 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.trailer-section h2 {
+    font-weight: 200;
+    font-family: "Lexend", Sans-serif;
+    line-height: 40px;
+    font-size: 40px;
+    color: #D5D5D5;
+    margin-bottom: 60px;
+}
+
+.trailer-video-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #000;
+}
+
+.trailer-video {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
 }
 
 /* ==================== */
