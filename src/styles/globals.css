@@ -1031,6 +1031,93 @@ ul {
     }
 }
 
+/* ==================== */
+/* Download Modal       */
+/* ==================== */
+
+.download-link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-box {
+    background-color: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 12px;
+    padding: 36px 32px;
+    max-width: 480px;
+    width: 90%;
+    color: #F4F4F4;
+}
+
+.modal-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.modal-list {
+    list-style: disc;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 28px;
+}
+
+.modal-list code {
+    background-color: #333;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.modal-btn {
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s ease;
+}
+
+.modal-btn:hover {
+    opacity: 0.85;
+}
+
+.modal-btn-confirm {
+    background-color: #c8a84b;
+    color: #000;
+}
+
+.modal-btn-cancel {
+    background-color: #444;
+    color: #F4F4F4;
+}
+
 /* Small Mobile */
 @media (max-width: 480px) {
 
