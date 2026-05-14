@@ -399,6 +399,7 @@ ul {
 .direct-download-button {
     display: flex;
     justify-content: center;
+    gap: 24px;
     margin-bottom: 40px;
 }
 
