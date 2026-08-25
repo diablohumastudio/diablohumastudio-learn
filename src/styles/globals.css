@@ -581,9 +581,56 @@ ul {
     padding: 20px;
 }
 
+/* Horizontal padding keeps the content inside the under-development panel
+   (24px inset + 3px border + breathing room) so no text pokes past it. */
 .learn-process-section{
-
+    position: relative;
+    overflow: hidden;
+    padding: 0 48px;
 }
+
+/* Inset from the section edges so the untouched page background shows
+   around the panel, making it read as a filter laid over the content rather
+   than the content's own background. Pure black would vanish against the
+   black page, hence the slightly lighter tint. overflow:hidden clips the
+   rotated band to the panel. Anything outside the inset is padding only, so
+   nothing clickable escapes the overlay. */
+.under-development-overlay {
+    position: absolute;
+    inset: 24px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: rgba(35, 35, 35, 0.8);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    border: 3px solid #c3baad;
+    border-radius: 12px;
+}
+
+/* Wider than the section so the rotated ends run past both edges; the
+   section's overflow:hidden clips them. flex-shrink:0 is required — as a
+   flex child the band would otherwise be squashed back to 100% width. */
+.under-development-banner {
+    flex-shrink: 0;
+    width: 200%;
+    transform: rotate(-12deg);
+    padding: 14px 0;
+    border-top: 2px solid #000000;
+    border-bottom: 2px solid #000000;
+    background: rgba(195, 186, 173, 0.88);
+    color: #000000;
+    font-family: "Lexend", Sans-serif;
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    font-weight: 700;
+    letter-spacing: 8px;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+}
+
 .learn-process-section h1 {
     text-align: center;
     font-family: "Lexend", Sans-serif;
@@ -623,6 +670,8 @@ ul {
 .courses-buttons{
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
+    row-gap: 12px;
     margin-bottom: 80px;
 }
 .btn{
@@ -1043,6 +1092,14 @@ ul {
 
     .download-link {
         width: 260px;
+    }
+
+    .learn-process-section {
+        padding: 0 40px;
+    }
+
+    .learn-process-section h1 {
+        font-size: 2.5rem;
     }
 
     .contact-container {
