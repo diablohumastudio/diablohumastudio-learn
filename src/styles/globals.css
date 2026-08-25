@@ -941,6 +941,104 @@ ul {
     margin-bottom: 20px;
 }
 
+.portfolio-intro {
+    max-width: 860px;
+    margin: 0 auto 36px;
+    text-align: center;
+}
+
+.portfolio-intro p {
+    font-family: "Lexend", Sans-serif;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: rgba(244, 244, 244, 0.75);
+}
+
+/* Two columns so 1920px-wide tool screenshots stay legible; flex-wrap keeps
+   an odd last figure centred, same trick as the NvC screenshots grid. */
+.portfolio-figure-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+}
+
+.portfolio-figure {
+    flex: 0 1 calc(50% - 12px);
+    margin: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(231, 148, 94, 0.1);
+}
+
+.portfolio-figure img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.portfolio-figure figcaption {
+    padding: 14px 18px;
+    font-family: "Lexend", Sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: rgba(244, 244, 244, 0.75);
+}
+
+.portfolio-cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.portfolio-cta {
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #e7945e 0%, #d67d45 100%);
+    color: #000000;
+    font-family: "Lexend", Sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.portfolio-cta:hover {
+    color: #000000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(231, 148, 94, 0.4);
+}
+
+.portfolio-list {
+    max-width: 860px;
+    margin: 0 auto 40px;
+}
+
+.portfolio-list li {
+    font-family: "Lexend", Sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba(244, 244, 244, 0.75);
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(231, 148, 94, 0.1);
+}
+
+.portfolio-list li:last-child {
+    border-bottom: none;
+}
+
+.portfolio-list strong {
+    color: #e7945e;
+    font-weight: 400;
+}
+
+iframe.showcase-video {
+    border: 0;
+}
+
 .portfolio-contact {
     text-align: center;
 }
@@ -1166,6 +1264,10 @@ ul {
 
     .learn-process-section h1 {
         font-size: 2.5rem;
+    }
+
+    .portfolio-figure {
+        flex-basis: 100%;
     }
 
     .contact-container {
