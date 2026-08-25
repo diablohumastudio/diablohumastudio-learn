@@ -354,15 +354,19 @@ ul {
     margin-bottom: 60px;
 }
 
+/* Flex rather than grid: grid pins a partial last row to its leftmost tracks,
+   flex-wrap + justify-content centres it (5 items over 3 columns = 3 + 2). */
 .screenshots-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 30px;
     margin-top: 40px;
 }
 
 .screenshot-item {
     position: relative;
+    flex: 0 1 calc(33.333% - 20px);
     overflow: hidden;
     border-radius: 12px;
     background-color: #000;
@@ -396,24 +400,50 @@ ul {
     margin-bottom: 60px;
 }
 
-.direct-download-button {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    margin-bottom: 40px;
+.download-group {
+    margin-bottom: 50px;
 }
 
-.platform-download-buttons {
+.download-group:last-of-type {
+    margin-bottom: 0;
+}
+
+.download-group-title {
+    font-family: "Lexend", Sans-serif;
+    font-weight: 300;
+    font-size: 1.1rem;
+    letter-spacing: 4px;
+    color: #e7945e;
+    margin-bottom: 24px;
+}
+
+.download-group-title::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #e7945e, transparent);
+    margin: 10px auto 0;
+}
+
+.download-buttons-row {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 30px;
-    flex-wrap: wrap;
+    gap: 24px;
 }
 
+/* Explicit width: the Image's width prop would otherwise pin the button to
+   its intrinsic 250px, and a max-width alone can never grow it. max-width
+   100% lets it shrink below that on screens narrower than the button. */
 .download-link {
     position: relative;
     display: inline-flex;
+    flex: 0 1 auto;
+    min-width: 0;
+    width: 310px;
+    max-width: 100%;
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
@@ -431,10 +461,12 @@ ul {
     opacity: 1;
 }
 
+/* Sized by .download-link so the button can shrink on narrow screens; a
+   max-width here would stop the image scaling down with its container. */
 .download-button-image {
     display: block;
+    width: 100%;
     height: auto;
-    max-width: 250px;
 }
 
 .download-link-disabled .download-button-image {
@@ -896,6 +928,10 @@ ul {
         max-width: 100%;
     }
 
+    /* 2 per row: 5 screenshots become 2 + 2 + 1, last one centred */
+    .screenshot-item {
+        flex-basis: calc(50% - 15px);
+    }
 }
 
 /* Mobile */
@@ -1001,17 +1037,12 @@ ul {
         font-size: 1.2rem;
     }
 
-    .screenshots-grid {
-        grid-template-columns: 1fr;
+    .screenshot-item {
+        flex-basis: 100%;
     }
 
-    .download-buttons {
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .download-button-image {
-        max-width: 200px;
+    .download-link {
+        width: 260px;
     }
 
     .contact-container {
