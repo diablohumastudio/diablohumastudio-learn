@@ -896,6 +896,72 @@ ul {
 }
 
 /* ==================== */
+/* Portfolio Page       */
+/* ==================== */
+
+.portfolio-section {
+    padding: 60px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.portfolio-bio {
+    max-width: 760px;
+    margin: 0 auto 30px;
+    text-align: center;
+}
+
+.portfolio-bio p {
+    font-family: "Lexend", Sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: rgba(244, 244, 244, 0.75);
+}
+
+.portfolio-skills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.portfolio-skills li {
+    font-family: "Lexend", Sans-serif;
+    font-size: 0.9rem;
+    color: #e7945e;
+    padding: 8px 18px;
+    border: 1px solid rgba(231, 148, 94, 0.3);
+    border-radius: 999px;
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.portfolio-game-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.portfolio-contact {
+    text-align: center;
+}
+
+.portfolio-contact p {
+    font-family: "Lexend", Sans-serif;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: rgba(244, 244, 244, 0.75);
+}
+
+.portfolio-contact a {
+    color: #e7945e;
+}
+
+.portfolio-contact a:hover {
+    color: #f4a56e;
+    text-decoration: underline;
+}
+
+/* ==================== */
 /* Footer               */
 /* ==================== */
 
