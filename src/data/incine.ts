@@ -28,6 +28,11 @@ export const INCINE_COURSES: IncineCourse[] = [
         title: 'Intro a Wwise: ¿Qué es un motor de audio?',
         component: dynamic(() => import('../presentations/wwise-unreal/que-es-un-motor-de-audio')),
       },
+      {
+        slug: 'wwise-por-adentro',
+        title: 'Wwise por adentro',
+        component: dynamic(() => import('../presentations/wwise-unreal/wwise-por-adentro')),
+      },
     ],
   },
 ];
