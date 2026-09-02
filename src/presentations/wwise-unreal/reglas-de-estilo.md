@@ -1,6 +1,6 @@
-# Reglas de estilo — "¿Qué es un motor de audio?"
+# Reglas de estilo — curso Wwise + Unreal
 
-Reglas de este deck (`que-es-un-motor-de-audio.tsx`). Otros decks pueden tener las suyas.
+Reglas de todas las presentaciones de este curso (`src/presentations/wwise-unreal/`). Si una presentación necesita apartarse de algo, su override va en la sección [Por presentación](#por-presentación) de este mismo documento — no en un archivo aparte.
 
 ## Principio
 
@@ -52,7 +52,7 @@ Cajas:
 - El texto SVG hereda la mono por defecto; para la tipografía de cuerpo usa `className={s.svgSans}` (solo en etiquetas sueltas tipo "el juego", "AUDIO", "comportamiento").
 - No pongas `font-family` a mano: lo maneja `Deck.module.css`.
 
-Flechas — **siempre rectas o en codo, nunca diagonales**. Cada SVG declara su propio `marker` con id único:
+Flechas — **siempre rectas o en codo, nunca diagonales**, y nunca cruzadas entre sí (elige los puntos de salida para que no se toquen). Cada SVG declara su propio `marker` con id único:
 
 ```tsx
 <marker id="arrSN" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -77,6 +77,17 @@ Alinea las cajas para que las flechas salgan rectas siempre que se pueda; el cod
 - Lo que entra a un motor se dice "programas programados/configurados", con "recursos · código · configuraciones" debajo.
 - Lo externo al flujo (los recursos) va arriba y separado, alimentando hacia abajo con codos.
 
-## El arco de la clase
+## Por presentación
 
-Portada → compilados vs interpretados → el OS corre los compilados → un motor corre los interpretados → qué es un motor → game engines → motores de audio. Cada slide nuevo debe encajar en esa progresión de lo general a lo específico.
+### que-es-un-motor-de-audio
+
+- El arco de la clase: Portada → compilados vs interpretados → el OS corre los compilados → un motor corre los interpretados → qué es un motor → game engines → motores de audio. Cada slide nuevo debe encajar en esa progresión de lo general a lo específico.
+
+### wwise-por-adentro
+
+- Abre sin portada: el primer slide es un recap del último slide de `que-es-un-motor-de-audio` (mismo diagrama), con eyebrow "Recap · donde quedamos".
+- El arco de la clase: recap del patrón del motor de audio → Wwise de punta a punta → (por definir; mantener la progresión de lo general a lo específico).
+
+### wwise-inside-out
+
+- Es anterior a estas reglas y no las sigue; no re-estilizarla sin que se pida explícitamente.

@@ -2,13 +2,11 @@
 
 Each class presentation is one React component built with `Deck` / `Slide`, registered in `src/data/incine.ts` and served under `/incine`. The mechanics (how to add a course, a class or a slide, which CSS classes exist, the `Slide` props) are in [docs/incine-courses-and-slides.md](../../docs/incine-courses-and-slides.md).
 
-## Per-deck style rules
+## Per-course style rules
 
-Style is **per deck, not global**. A deck may have a sibling file named `<deck-slug>_reglas-de-estilo.md` — read it before writing or editing that deck's slides, and follow it over any general instinct about how slides should look.
+Style is **per course, not global**. Each course folder has a single file named `reglas-de-estilo.md` (e.g. `wwise-unreal/reglas-de-estilo.md`) — read it before writing or editing any deck in that course, and follow it over any general instinct about how slides should look. When one presentation needs to deviate, its overrides go in that same file, in a per-presentation section at the end — never in a separate file.
 
-Example: `wwise-unreal/que-es-un-motor-de-audio.tsx` → `wwise-unreal/que-es-un-motor-de-audio_reglas-de-estilo.md`.
-
-When a deck has no such file and its slides need a consistent look, propose creating one rather than inventing conventions per slide.
+When a course has no such file and its slides need a consistent look, propose creating one rather than inventing conventions per slide.
 
 ## Checking a slide change
 
