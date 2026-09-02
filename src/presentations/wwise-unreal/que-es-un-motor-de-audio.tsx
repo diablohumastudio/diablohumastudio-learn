@@ -4,7 +4,7 @@ import s from '../../components/incine/Deck.module.css';
 export default function QueEsUnMotorDeAudio() {
   return (
     <Deck name="¿Qué es un motor de audio?" context="Intro a Wwise · Wwise + Unreal">
-      <Slide z="▶" label="intro">
+      <Slide z="▶" label="intro" backgroundImage="/assets/presentations/wwise-unreal/Cover.jpg">
         <div className={s.eyebrow}>Intro a Wwise · de lenguajes a motores</div>
         <h1>
           ¿Qué es un motor
@@ -17,13 +17,13 @@ export default function QueEsUnMotorDeAudio() {
       <Slide z="1" label="lenguajes">
         <div className={s.eyebrow}>Concepto 1</div>
         <h2>
-          Compilados <span className={s.teal}>vs</span> interpretados
+          Programas compilados <span className={s.teal}>vs</span> interpretados
         </h2>
         <figure>
           <svg
             viewBox="0 0 900 300"
             role="img"
-            aria-label="Un programa compilado se traduce una vez a binario antes de correr; un programa interpretado sigue siendo texto y alguien tiene que leerlo en vivo."
+            aria-label="Un programa compilado se traduce una vez a binario (juego.exe) antes de correr; un programa interpretado sigue siendo texto y alguien tiene que leerlo en vivo."
           >
             <defs>
               <marker id="arrS2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -34,7 +34,7 @@ export default function QueEsUnMotorDeAudio() {
 
             <text x="230" y="32" fontSize="13" fill="#f2a33c" letterSpacing="3" textAnchor="middle">COMPILADO</text>
             <rect x="150" y="50" width="160" height="52" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-            <text x="230" y="72" fontSize="13" fill="currentColor" textAnchor="middle">main.c</text>
+            <text x="230" y="72" fontSize="13" fill="currentColor" textAnchor="middle">juego.c</text>
             <text x="230" y="91" fontSize="10.5" fill="currentColor" opacity=".55" textAnchor="middle">texto</text>
             <line x1="230" y1="102" x2="230" y2="124" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS2)" />
             <rect x="130" y="128" width="200" height="52" rx="8" fill="#1d2026" stroke="#f2a33c" strokeOpacity=".9" />
@@ -42,8 +42,8 @@ export default function QueEsUnMotorDeAudio() {
             <text x="230" y="169" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">una vez · antes de correr</text>
             <line x1="230" y1="180" x2="230" y2="202" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS2)" />
             <rect x="150" y="206" width="160" height="52" rx="8" fill="#232730" stroke="#f2a33c" />
-            <text x="230" y="228" fontSize="13" fill="currentColor" textAnchor="middle">0110 1001</text>
-            <text x="230" y="247" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">binario</text>
+            <text x="230" y="228" fontSize="13" fill="currentColor" textAnchor="middle">juego.exe</text>
+            <text x="230" y="247" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">0110 1001 · binario</text>
             <text x="230" y="286" fontSize="12" fill="currentColor" opacity=".6" textAnchor="middle">listo para la CPU</text>
 
             <text x="670" y="32" fontSize="13" fill="#63b6a4" letterSpacing="3" textAnchor="middle">INTERPRETADO</text>
@@ -70,7 +70,7 @@ export default function QueEsUnMotorDeAudio() {
           <svg
             viewBox="0 0 900 270"
             role="img"
-            aria-label="El binario corre sobre el OS y el OS sobre la CPU; el OS solo lanza el binario, que ya habla el idioma de la máquina."
+            aria-label="El binario juego.exe corre sobre el OS y el OS sobre la CPU; el OS solo lanza el binario, que ya habla el idioma de la máquina."
           >
             <defs>
               <marker id="arrS3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -78,8 +78,8 @@ export default function QueEsUnMotorDeAudio() {
               </marker>
             </defs>
             <rect x="170" y="26" width="560" height="54" rx="8" fill="#232730" stroke="#f2a33c" />
-            <text x="450" y="49" fontSize="14" fill="currentColor" textAnchor="middle">game.exe</text>
-            <text x="450" y="68" fontSize="11" fill="currentColor" opacity=".6" textAnchor="middle">binario compilado</text>
+            <text x="450" y="49" fontSize="14" fill="currentColor" textAnchor="middle">juego.exe</text>
+            <text x="450" y="68" fontSize="11" fill="currentColor" opacity=".6" textAnchor="middle">0110 1001 · binario compilado</text>
             <line x1="450" y1="80" x2="450" y2="108" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS3)" />
             <text x="470" y="98" fontSize="11.5" fill="#f2a33c">el OS solo lo lanza</text>
             <rect x="170" y="112" width="560" height="54" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
@@ -142,21 +142,20 @@ export default function QueEsUnMotorDeAudio() {
           <svg
             viewBox="0 0 900 190"
             role="img"
-            aria-label="El motor recibe programas en código o en configuraciones de datos, y produce comportamiento."
+            aria-label="El motor recibe programas, programados o configurados, hechos de recursos, código y configuraciones, y produce comportamiento."
           >
             <defs>
               <marker id="arrS5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                 <path d="M0,0 L10,5 L0,10 z" fill="#f2a33c" />
               </marker>
             </defs>
-            <rect x="40" y="26" width="240" height="56" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-            <text x="160" y="49" fontSize="12" fill="#f2a33c" textAnchor="middle">PROGRAMADOS</text>
-            <text x="160" y="68" fontSize="11" fill="currentColor" opacity=".6" textAnchor="middle">código · scripts</text>
-            <rect x="40" y="108" width="240" height="56" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-            <text x="160" y="131" fontSize="12" fill="#f2a33c" textAnchor="middle">CONFIGURADOS</text>
-            <text x="160" y="150" fontSize="11" fill="currentColor" opacity=".6" textAnchor="middle">solo datos · sin código</text>
-            <line x1="280" y1="54" x2="368" y2="86" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS5)" />
-            <line x1="280" y1="136" x2="368" y2="104" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS5)" />
+            <rect x="40" y="66" width="280" height="58" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
+            <text x="180" y="89" fontSize="11.5" fill="#f2a33c" textAnchor="middle">programas programados/configurados</text>
+            <text x="180" y="107" fontSize="10.5" fill="currentColor" fillOpacity=".6" textAnchor="middle">
+              <tspan fill="#63b6a4" fillOpacity="1">recursos</tspan>
+              {' · código · configuraciones'}
+            </text>
+            <line x1="320" y1="95" x2="368" y2="95" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS5)" />
             <rect x="374" y="66" width="220" height="58" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
             <text x="484" y="90" fontSize="15" fill="#f2a33c" textAnchor="middle">MOTOR</text>
             <text x="484" y="110" fontSize="10.5" fill="currentColor" opacity=".65" textAnchor="middle">un programa corriendo</text>
@@ -199,9 +198,9 @@ export default function QueEsUnMotorDeAudio() {
         </h2>
         <figure>
           <svg
-            viewBox="0 0 910 260"
+            viewBox="0 0 910 330"
             role="img"
-            aria-label="Las configuraciones y el código usan recursos; el game engine corre todo junto y produce el juego."
+            aria-label="Los recursos, externos y arriba, alimentan a las configuraciones y al código; el game engine corre todo junto y produce el juego."
           >
             <defs>
               <marker id="arrS6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -211,26 +210,26 @@ export default function QueEsUnMotorDeAudio() {
                 <path d="M0,0 L10,5 L0,10 z" fill="#63b6a4" />
               </marker>
             </defs>
-            <rect x="30" y="98" width="210" height="64" rx="8" fill="#1d2026" stroke="#63b6a4" />
-            <text x="135" y="123" fontSize="12" fill="#63b6a4" textAnchor="middle">RECURSOS</text>
-            <text x="135" y="142" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">texturas · modelos · audios</text>
-            <line x1="240" y1="112" x2="294" y2="76" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrS6t)" />
-            <line x1="240" y1="148" x2="294" y2="184" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrS6t)" />
-            <text x="262" y="66" fontSize="10.5" fill="#63b6a4">usan</text>
-            <text x="262" y="200" fontSize="10.5" fill="#63b6a4">usan</text>
-            <rect x="300" y="40" width="250" height="64" rx="8" fill="#1d2026" stroke="#f2a33c" strokeOpacity=".9" />
-            <text x="425" y="65" fontSize="12" fill="#f2a33c" textAnchor="middle">CONFIGURACIONES</text>
-            <text x="425" y="84" fontSize="11" fill="currentColor" opacity=".6" textAnchor="middle">escenas · maps · prefabs</text>
-            <rect x="300" y="156" width="250" height="64" rx="8" fill="#1d2026" stroke="#f2a33c" strokeOpacity=".9" />
-            <text x="425" y="181" fontSize="12" fill="#f2a33c" textAnchor="middle">CÓDIGO</text>
-            <text x="425" y="200" fontSize="11" fill="currentColor" opacity=".6" textAnchor="middle">scripts · gameplay</text>
-            <line x1="550" y1="72" x2="614" y2="112" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS6)" />
-            <line x1="550" y1="188" x2="614" y2="148" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS6)" />
-            <rect x="620" y="96" width="200" height="68" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-            <text x="720" y="123" fontSize="13" fill="#f2a33c" textAnchor="middle">GAME ENGINE</text>
-            <text x="720" y="142" fontSize="10.5" fill="currentColor" opacity=".65" textAnchor="middle">los corre juntos</text>
-            <line x1="820" y1="130" x2="876" y2="130" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS6)" />
-            <text className={s.svgSans} x="848" y="118" fontSize="12" fill="currentColor" textAnchor="middle">el juego</text>
+            <rect x="40" y="20" width="230" height="56" rx="8" fill="#1d2026" stroke="#63b6a4" />
+            <text x="155" y="44" fontSize="12" fill="#63b6a4" textAnchor="middle">RECURSOS</text>
+            <text x="155" y="63" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">texturas · modelos · audios</text>
+            <path d="M 100 76 L 100 128 Q 100 140 112 140 L 292 140" fill="none" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrS6t)" />
+            <path d="M 210 76 L 210 238 Q 210 250 222 250 L 292 250" fill="none" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrS6t)" />
+            <text x="88" y="112" fontSize="10.5" fill="#63b6a4" textAnchor="end">usan</text>
+            <text x="198" y="214" fontSize="10.5" fill="#63b6a4" textAnchor="end">usan</text>
+            <rect x="300" y="110" width="250" height="60" rx="8" fill="#1d2026" stroke="#f2a33c" strokeOpacity=".9" />
+            <text x="425" y="134" fontSize="12" fill="#f2a33c" textAnchor="middle">CONFIGURACIONES</text>
+            <text x="425" y="153" fontSize="11" fill="currentColor" opacity=".6" textAnchor="middle">escenas · maps · prefabs</text>
+            <rect x="300" y="220" width="250" height="60" rx="8" fill="#1d2026" stroke="#f2a33c" strokeOpacity=".9" />
+            <text x="425" y="244" fontSize="12" fill="#f2a33c" textAnchor="middle">CÓDIGO</text>
+            <text x="425" y="263" fontSize="11" fill="currentColor" opacity=".6" textAnchor="middle">scripts · gameplay</text>
+            <path d="M 550 140 L 738 140 Q 750 140 750 152 L 750 154" fill="none" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS6)" />
+            <path d="M 550 250 L 738 250 Q 750 250 750 238 L 750 236" fill="none" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS6)" />
+            <rect x="650" y="160" width="200" height="70" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
+            <text x="750" y="189" fontSize="13" fill="#f2a33c" textAnchor="middle">GAME ENGINE</text>
+            <text x="750" y="208" fontSize="10.5" fill="currentColor" opacity=".65" textAnchor="middle">los corre juntos</text>
+            <line x1="850" y1="195" x2="884" y2="195" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS6)" />
+            <text className={s.svgSans} x="860" y="183" fontSize="12" fill="currentColor" textAnchor="middle">el juego</text>
           </svg>
           <figcaption>Configuras y programas; el engine junta todo con los recursos y lo corre.</figcaption>
         </figure>
@@ -245,7 +244,7 @@ export default function QueEsUnMotorDeAudio() {
           <svg
             viewBox="0 0 960 430"
             role="img"
-            aria-label="Los audio clips y las configuraciones del diseñador entran al Wwise editor, que genera SoundBanks hacia el proyecto del engine; en el build, el juego hace Wwise calls al Wwise engine, que corre los SoundBanks y produce el audio."
+            aria-label="Los audio clips entran al Wwise project y las configuraciones del diseñador a los Wwise Objects; el Wwise editor genera SoundBanks hacia el proyecto del engine; en el build, el juego hace Wwise calls al Wwise engine, que corre los SoundBanks cargados y produce el audio."
           >
             <defs>
               <marker id="arrS7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -253,18 +252,19 @@ export default function QueEsUnMotorDeAudio() {
               </marker>
             </defs>
 
-            <text x="24" y="98" fontSize="12" fill="currentColor">audio clips</text>
-            <line x1="24" y1="108" x2="144" y2="108" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
+            <text x="24" y="110" fontSize="12" fill="currentColor">audio clips</text>
+            <line x1="24" y1="120" x2="160" y2="120" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
             <text x="24" y="158" fontSize="12" fill="currentColor">configs del diseñador</text>
-            <line x1="24" y1="168" x2="144" y2="168" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
+            <line x1="24" y1="168" x2="174" y2="168" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
 
-            <rect x="150" y="60" width="210" height="160" rx="10" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
+            <rect x="150" y="60" width="210" height="170" rx="10" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
             <text x="166" y="88" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">WWISE EDITOR</text>
-            <rect x="170" y="104" width="170" height="60" rx="8" fill="#232730" stroke="#f2a33c" strokeOpacity=".8" />
-            <text x="255" y="130" fontSize="12" fill="currentColor" textAnchor="middle">Wwise project</text>
-            <text x="255" y="148" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">todas las decisiones</text>
-            <line x1="360" y1="180" x2="430" y2="318" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
-            <text x="352" y="262" fontSize="11" fill="#f2a33c" textAnchor="end">genera SoundBanks</text>
+            <rect x="170" y="104" width="170" height="110" rx="8" fill="#232730" stroke="#f2a33c" strokeOpacity=".8" />
+            <text x="255" y="126" fontSize="12" fill="currentColor" textAnchor="middle">Wwise project</text>
+            <rect x="184" y="142" width="142" height="52" rx="8" fill="#1d2026" stroke="#f2a33c" strokeOpacity=".8" />
+            <text x="255" y="172" fontSize="11.5" fill="currentColor" textAnchor="middle">Wwise Objects</text>
+            <path d="M 255 214 L 255 316 Q 255 328 267 328 L 444 328" fill="none" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
+            <text x="355" y="318" fontSize="11" fill="#f2a33c" textAnchor="middle">genera SoundBanks</text>
 
             <rect x="430" y="40" width="240" height="360" rx="10" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
             <text x="446" y="68" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">ENGINE EDITOR</text>
@@ -282,26 +282,26 @@ export default function QueEsUnMotorDeAudio() {
             <text x="550" y="342" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">.bnk · estructura + media</text>
 
             <rect x="700" y="40" width="210" height="360" rx="10" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-            <text x="716" y="68" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">WRAPPER · BUILD</text>
-            <rect x="716" y="84" width="178" height="120" rx="8" fill="none" stroke="currentColor" strokeOpacity=".5" />
-            <text x="728" y="106" fontSize="11" fill="currentColor" opacity=".65">GAME</text>
-            <rect x="728" y="120" width="154" height="52" rx="8" fill="#232730" stroke="#f2a33c" />
-            <text x="805" y="142" fontSize="12" fill="currentColor" textAnchor="middle">Wwise calls</text>
-            <text x="805" y="159" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">tu código</text>
+            <text x="716" y="64" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">WRAPPER · BUILD</text>
+            <rect x="716" y="76" width="178" height="96" rx="8" fill="none" stroke="currentColor" strokeOpacity=".5" />
+            <text x="728" y="94" fontSize="11" fill="currentColor" opacity=".65">GAME</text>
+            <rect x="728" y="102" width="154" height="52" rx="8" fill="#232730" stroke="#f2a33c" />
+            <text x="805" y="124" fontSize="12" fill="currentColor" textAnchor="middle">Wwise calls</text>
+            <text x="805" y="141" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">tu código</text>
             <rect x="716" y="232" width="178" height="140" rx="8" fill="none" stroke="#f2a33c" strokeOpacity=".9" />
             <text x="728" y="254" fontSize="11" fill="#f2a33c">WWISE ENGINE</text>
-            <rect x="728" y="286" width="154" height="52" rx="8" fill="#1d2026" stroke="#f2a33c" strokeOpacity=".8" />
-            <text x="805" y="308" fontSize="12" fill="currentColor" textAnchor="middle">SoundBanks</text>
-            <text x="805" y="325" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">cargados</text>
-            <line x1="785" y1="176" x2="785" y2="280" stroke="#f2a33c" strokeWidth="1.5" markerEnd="url(#arrS7)" />
-            <line x1="825" y1="176" x2="825" y2="280" stroke="#f2a33c" strokeWidth="1.5" markerEnd="url(#arrS7)" />
+            <rect x="728" y="302" width="154" height="52" rx="8" fill="#1d2026" stroke="#f2a33c" strokeOpacity=".8" />
+            <text x="805" y="324" fontSize="12" fill="currentColor" textAnchor="middle">SoundBanks</text>
+            <text x="805" y="341" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">cargados</text>
+            <line x1="785" y1="158" x2="785" y2="296" stroke="#f2a33c" strokeWidth="1.5" markerEnd="url(#arrS7)" />
+            <line x1="825" y1="158" x2="825" y2="296" stroke="#f2a33c" strokeWidth="1.5" markerEnd="url(#arrS7)" />
 
-            <line x1="650" y1="128" x2="722" y2="144" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
-            <line x1="650" y1="224" x2="710" y2="258" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
-            <line x1="650" y1="328" x2="722" y2="312" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
+            <line x1="650" y1="128" x2="722" y2="128" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
+            <path d="M 650 224 L 736 224 Q 748 224 748 232" fill="none" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
+            <line x1="650" y1="328" x2="722" y2="328" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
 
-            <line x1="894" y1="302" x2="946" y2="302" stroke="#f2a33c" strokeWidth="2.5" markerEnd="url(#arrS7)" />
-            <text className={s.svgSans} x="920" y="290" fontSize="13" fill="currentColor" textAnchor="middle">AUDIO</text>
+            <line x1="894" y1="302" x2="944" y2="302" stroke="#f2a33c" strokeWidth="2.5" markerEnd="url(#arrS7)" />
+            <text className={s.svgSans} x="919" y="290" fontSize="13" fill="currentColor" textAnchor="middle">AUDIO</text>
           </svg>
           <figcaption>
             Objects configurados + audios → SoundBanks · el juego solo usa la interface: los calls.
