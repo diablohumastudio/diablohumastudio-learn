@@ -1,0 +1,12 @@
+.theme {
+  --bg: #14161a;
+  --panel: #1d2026;
+  --panel-2: #232730;
+  --line: #31363f;
+  --ink: #e9e6dd;
+  --muted: #8b909b;
+  --amber: #f2a33c;
+  --amber-dim: #a97a3a;
+  --teal: #63b6a4;
+  --red: #d4685f;
+}
