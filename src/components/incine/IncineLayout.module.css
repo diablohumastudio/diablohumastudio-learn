@@ -1,0 +1,134 @@
+.shell {
+  composes: theme from './theme.module.css';
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--ink);
+  color-scheme: dark;
+}
+
+.header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono, Menlo, Consolas, monospace);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.led {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 8px rgba(242, 163, 60, 0.7);
+}
+
+.brand {
+  color: var(--ink);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.selectGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selectLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 10px;
+}
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  background-color: var(--panel);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='5'><path d='M0 0l4 5 4-5z' fill='%238b909b'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 26px 6px 10px;
+  max-width: 260px;
+  cursor: pointer;
+}
+
+.select:hover {
+  border-color: var(--amber);
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.fullscreenBtn {
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  width: 34px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.fullscreenBtn:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.fullscreenBtn:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.main {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+.missing {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--font-mono, Menlo, Consolas, monospace);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.missing a {
+  color: var(--amber);
+}
+
+@media (max-width: 560px) {
+  .brand {
+    display: none;
+  }
+}
