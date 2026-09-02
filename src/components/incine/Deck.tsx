@@ -7,12 +7,18 @@ import s from './Deck.module.css';
 type SlideProps = {
   z: string;
   label: string;
+  backgroundImage?: string;
   children: ReactNode;
 };
 
-export function Slide({ z, label, children }: SlideProps) {
+export function Slide({ z, label, backgroundImage, children }: SlideProps) {
+  const backgroundStyle = backgroundImage
+    ? {
+        backgroundImage: `linear-gradient(180deg, rgba(20, 22, 26, 0.45) 0%, rgba(20, 22, 26, 0.85) 100%), url(${backgroundImage})`,
+      }
+    : undefined;
   return (
-    <section className={s.slide}>
+    <section className={s.slide} style={backgroundStyle}>
       <div className={s.rail}>
         <span className={s.z}>{z}</span>
         <span className={s.zl}>{label}</span>

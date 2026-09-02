@@ -66,6 +66,7 @@ The course dropdown is generated from `INCINE_COURSES`; switching course navigat
 
 - `z` — the big amber character in the left rail (a zoom level, number or symbol).
 - `label` — the small vertical text in the rail, also shown uppercase in the footer.
+- `backgroundImage` (optional) — URL of a full-bleed background image for the slide, automatically darkened with a gradient so text stays readable (used for cover slides). Put slide images under `public/assets/presentations/<course-slug>/` and reference them as `/assets/presentations/<course-slug>/<file>`.
 
 Content goes inside `Slide` as JSX. Plain `h1`, `h2`, `strong`, `code`, `figure`/`figcaption` and `svg text` are already styled by `Deck.module.css`; for the rest import the module (`import s from '../../components/incine/Deck.module.css'`):
 
