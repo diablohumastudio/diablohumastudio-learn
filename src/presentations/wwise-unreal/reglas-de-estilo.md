@@ -71,6 +71,19 @@ Flechas — **siempre rectas o en codo, nunca diagonales**, y nunca cruzadas ent
 
 Alinea las cajas para que las flechas salgan rectas siempre que se pueda; el codo es para cuando el origen y el destino están en ejes distintos.
 
+## Animaciones y transiciones
+
+### Diagramas que continúan el slide anterior (morph)
+
+Cuando un slide es *el mismo diagrama* del slide anterior con piezas menos o textos nuevos, se anima la transición al entrar: el SVG copia el `viewBox` y las coordenadas del diagrama anterior, se dibuja en su **estado final**, y las clases de `Deck.module.css` reproducen el estado previo al montarse el slide:
+
+- `s.morphOut` — el elemento empieza visible (estado del slide anterior) y se desvanece.
+- `s.morphIn` — el elemento aparece.
+- `s.morphGlide` — el elemento viaja desde `--morph-from` (un `transform`) hasta su posición final.
+- `s.morphPulse` — énfasis: el grupo escala brevemente desde su centro (envuelve al `morphIn` del elemento a destacar).
+
+Siempre sobre `<g>` envolventes (opacidad natural 1), nunca sobre elementos con atributo `opacity`. Los pasos se escalonan con `animation-delay` inline en pasos de 0.6s; el primer paso arranca al entrar el slide (delay 0), salvo que el slide pida una pausa inicial en su estado previo. Un crossfade de texto son dos `<g>` (viejo `morphOut`, nuevo `morphIn`) con el mismo delay. Con `prefers-reduced-motion` el slide queda directo en su estado final.
+
 ## Convenciones de contenido ya establecidas
 
 - Los ejemplos de programa se llaman `juego.c` / `juego.exe` (no `main.c` ni `game.exe`), y el binario muestra sus unos y ceros junto a la etiqueta: `0110 1001 · binario`.
@@ -82,10 +95,12 @@ Alinea las cajas para que las flechas salgan rectas siempre que se pueda; el cod
 ### que-es-un-motor-de-audio
 
 - El arco de la clase: Portada → compilados vs interpretados → el OS corre los compilados → un motor corre los interpretados → qué es un motor → game engines → motores de audio. Cada slide nuevo debe encajar en esa progresión de lo general a lo específico.
+- El slide "audio engines" (z=6) hace morph desde el diagrama de "game engines" (z=5): CÓDIGO y sus flechas se desvanecen, el engine sube a alinearse con las configuraciones y los textos cruzan al dominio de audio. Si cambia la geometría del z=5, hay que actualizar el estado inicial del z=6.
 
 ### wwise-por-adentro
 
 - Abre sin portada: el primer slide es un recap del último slide de `que-es-un-motor-de-audio` (mismo diagrama), con eyebrow "Recap · donde quedamos".
+- El recap hace morph desde el estado final de ese slide (misma geometría, `viewBox` incluido) al entrar: la caja central cruza hacia WWISE OBJECT con un `morphPulse` de énfasis y pasa a estilo protagonista, y aparece el label "SoundBanks". Si cambia aquel diagrama, este estado inicial se actualiza con él.
 - El arco de la clase: recap del patrón del motor de audio → Wwise de punta a punta → (por definir; mantener la progresión de lo general a lo específico).
 
 ### wwise-inside-out

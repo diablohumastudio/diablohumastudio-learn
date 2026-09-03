@@ -201,6 +201,82 @@
 }
 
 /* ==================== */
+/* Diagram morphs       */
+/* ==================== */
+
+/* A slide that continues the previous slide's diagram is drawn in its FINAL
+   state; these classes replay the transition when the slide mounts (Deck
+   remounts slideHost on every navigation, so they fire on entry). Apply them
+   to <g> wrappers (natural opacity 1), never to elements with an opacity
+   attribute, and stagger the steps with inline animation-delay. */
+.morphOut {
+  opacity: 0;
+  animation: morphOut 0.6s ease both;
+}
+
+.morphIn {
+  animation: morphIn 0.6s ease both;
+}
+
+.morphGlide {
+  animation: morphGlide 0.6s ease both;
+}
+
+.morphPulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: morphPulse 0.9s ease both;
+}
+
+@keyframes morphOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes morphIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes morphGlide {
+  from {
+    transform: var(--morph-from);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes morphPulse {
+  0% {
+    transform: none;
+  }
+  35% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .morphOut,
+  .morphIn,
+  .morphGlide,
+  .morphPulse {
+    animation: none;
+  }
+}
+
+/* ==================== */
 /* Code & lists         */
 /* ==================== */
 

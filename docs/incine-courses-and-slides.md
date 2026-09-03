@@ -81,6 +81,7 @@ Content goes inside `Slide` as JSX. Plain `h1`, `h2`, `strong`, `code`, `figure`
 | `s.tight` | Bulleted `<ul>` with amber markers |
 | `s.plain` | Data table (first column mono + amber); use `<thead>`/`<tbody>` |
 | `s.svgSans` | On an SVG `<text>` to use the body font (SVG text defaults to mono) |
+| `s.morphOut` / `s.morphIn` / `s.morphGlide` / `s.morphPulse` | On SVG `<g>` wrappers, replay a transition from the previous slide's diagram when the slide mounts (draw the final state; stagger steps with inline `animation-delay`; `morphGlide` reads its start `transform` from `--morph-from`; `morphPulse` scales briefly for emphasis) |
 
 Gotchas:
 
