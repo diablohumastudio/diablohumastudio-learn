@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import Deck, { Slide } from '../../components/incine/Deck';
 import s from '../../components/incine/Deck.module.css';
 
@@ -242,9 +243,9 @@ export default function QueEsUnMotorDeAudio() {
         </h2>
         <figure>
           <svg
-            viewBox="0 0 910 220"
+            viewBox="0 0 910 330"
             role="img"
-            aria-label="Los recursos —canciones, sonidos y voces— alimentan las configuraciones de sonido interactivo; el sound engine las corre y produce el audio."
+            aria-label="El diagrama del game engine se reduce: quedan los recursos —canciones, sonidos y voces— alimentando las configuraciones de sonido interactivo, y el sound engine que las corre y produce el audio."
           >
             <defs>
               <marker id="arrS7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -254,21 +255,58 @@ export default function QueEsUnMotorDeAudio() {
                 <path d="M0,0 L10,5 L0,10 z" fill="#63b6a4" />
               </marker>
             </defs>
+
+            {/* Igual que el slide 5 */}
             <rect x="40" y="20" width="230" height="56" rx="8" fill="#1d2026" stroke="#63b6a4" />
             <text x="155" y="44" fontSize="12" fill="#63b6a4" textAnchor="middle">RECURSOS</text>
-            <text x="155" y="63" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">canciones · sonidos · voces</text>
-            <path d="M 155 76 L 155 138 Q 155 150 167 150 L 292 150" fill="none" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrS7t)" />
-            <text x="143" y="112" fontSize="10.5" fill="#63b6a4" textAnchor="end">usan</text>
-            <rect x="300" y="120" width="250" height="60" rx="8" fill="#1d2026" stroke="#f2a33c" strokeOpacity=".9" />
-            <text x="425" y="139" fontSize="11.5" fill="#f2a33c" textAnchor="middle">Configuraciones de</text>
-            <text x="425" y="153" fontSize="11.5" fill="#f2a33c" textAnchor="middle">Sonido Interactivo</text>
-            <text x="425" y="170" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">tracks · buses · events</text>
-            <line x1="550" y1="150" x2="644" y2="150" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
-            <rect x="650" y="115" width="200" height="70" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-            <text x="750" y="144" fontSize="13" fill="#f2a33c" textAnchor="middle">SOUND ENGINE</text>
-            <text x="750" y="163" fontSize="10.5" fill="currentColor" opacity=".65" textAnchor="middle">los corre</text>
-            <line x1="850" y1="150" x2="884" y2="150" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
-            <text className={s.svgSans} x="860" y="138" fontSize="12" fill="currentColor" textAnchor="middle">audio</text>
+            <path d="M 210 76 L 210 128 Q 210 140 222 140 L 292 140" fill="none" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrS7t)" />
+            <text x="198" y="112" fontSize="10.5" fill="#63b6a4" textAnchor="end">usan</text>
+            <rect x="300" y="110" width="250" height="60" rx="8" fill="#1d2026" stroke="#f2a33c" strokeOpacity=".9" />
+
+            {/* Paso 1 (al entrar): CÓDIGO y sus flechas desaparecen */}
+            <g className={s.morphOut}>
+              <path d="M 100 76 L 100 238 Q 100 250 112 250 L 292 250" fill="none" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrS7t)" />
+              <text x="88" y="214" fontSize="10.5" fill="#63b6a4" textAnchor="end">usan</text>
+              <rect x="300" y="220" width="250" height="60" rx="8" fill="#1d2026" stroke="#f2a33c" strokeOpacity=".9" />
+              <text x="425" y="244" fontSize="12" fill="#f2a33c" textAnchor="middle">CÓDIGO</text>
+              <text x="425" y="263" fontSize="11" fill="currentColor" opacity=".6" textAnchor="middle">scripts · gameplay</text>
+              <path d="M 550 250 L 738 250 Q 750 250 750 238 L 750 236" fill="none" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
+            </g>
+
+            {/* Paso 2 (0.6s): el engine sube y el codo se vuelve flecha recta */}
+            <g className={s.morphOut} style={{ animationDelay: '0.6s' }}>
+              <path d="M 550 140 L 738 140 Q 750 140 750 152 L 750 154" fill="none" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
+            </g>
+            <g className={s.morphIn} style={{ animationDelay: '0.6s' }}>
+              <line x1="550" y1="140" x2="644" y2="140" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
+            </g>
+            <g className={s.morphGlide} style={{ animationDelay: '0.6s', '--morph-from': 'translateY(55px)' } as CSSProperties}>
+              <rect x="650" y="105" width="200" height="70" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
+              <line x1="850" y1="140" x2="884" y2="140" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrS7)" />
+              <g className={s.morphOut} style={{ animationDelay: '1.2s' }}>
+                <text x="750" y="134" fontSize="13" fill="#f2a33c" textAnchor="middle">GAME ENGINE</text>
+                <text x="750" y="153" fontSize="10.5" fill="currentColor" opacity=".65" textAnchor="middle">los corre juntos</text>
+                <text className={s.svgSans} x="860" y="128" fontSize="12" fill="currentColor" textAnchor="middle">el juego</text>
+              </g>
+              <g className={s.morphIn} style={{ animationDelay: '1.2s' }}>
+                <text x="750" y="134" fontSize="13" fill="#f2a33c" textAnchor="middle">SOUND ENGINE</text>
+                <text x="750" y="153" fontSize="10.5" fill="currentColor" opacity=".65" textAnchor="middle">los corre</text>
+                <text className={s.svgSans} x="860" y="128" fontSize="12" fill="currentColor" textAnchor="middle">audio</text>
+              </g>
+            </g>
+
+            {/* Paso 3 (1.2s): los textos cambian al dominio de audio */}
+            <g className={s.morphOut} style={{ animationDelay: '1.2s' }}>
+              <text x="155" y="63" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">texturas · modelos · audios</text>
+              <text x="425" y="134" fontSize="12" fill="#f2a33c" textAnchor="middle">CONFIGURACIONES</text>
+              <text x="425" y="153" fontSize="11" fill="currentColor" opacity=".6" textAnchor="middle">escenas · maps · prefabs</text>
+            </g>
+            <g className={s.morphIn} style={{ animationDelay: '1.2s' }}>
+              <text x="155" y="63" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">canciones · sonidos · voces</text>
+              <text x="425" y="129" fontSize="11.5" fill="#f2a33c" textAnchor="middle">Configuraciones de</text>
+              <text x="425" y="143" fontSize="11.5" fill="#f2a33c" textAnchor="middle">Sonido Interactivo</text>
+              <text x="425" y="160" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">tracks · buses · events</text>
+            </g>
           </svg>
           <figcaption>Mismo patrón: recursos afuera, sonido configurado, un engine que lo corre.</figcaption>
         </figure>
