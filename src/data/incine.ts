@@ -25,7 +25,7 @@ export const INCINE_COURSES: IncineCourse[] = [
       },
       {
         slug: 'que-es-un-motor-de-audio',
-        title: 'Intro a Wwise: ¿Qué es un motor de audio?',
+        title: '¿Qué es un motor de audio?',
         component: dynamic(() => import('../presentations/wwise-unreal/que-es-un-motor-de-audio')),
       },
       {
