@@ -45,6 +45,15 @@ export function findClass(course: IncineCourse, slug: string | undefined): Incin
   return course.classes.find((incineClass) => incineClass.slug === slug);
 }
 
+export function neighborClass(
+  course: IncineCourse,
+  classSlug: string | undefined,
+  offset: number
+): IncineClass | undefined {
+  const index = course.classes.findIndex((incineClass) => incineClass.slug === classSlug);
+  return index === -1 ? undefined : course.classes[index + offset];
+}
+
 export function latestClass(course: IncineCourse): IncineClass {
   return course.classes[course.classes.length - 1];
 }

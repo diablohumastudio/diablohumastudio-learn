@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import { Children, isValidElement, useEffect } from 'react';
 import type { ReactElement, ReactNode } from 'react';
+import { findCourse, neighborClass, querySlug } from '../../data/incine';
 import { INCINE_FONT_VARS } from './fonts';
 import s from './Deck.module.css';
 
@@ -46,25 +47,56 @@ export default function Deck({ name, context, children }: DeckProps) {
   const total = slides.length;
 
   const rawSlideParam = Array.isArray(router.query.s) ? router.query.s[0] : router.query.s;
-  const requestedSlide = Number(rawSlideParam ?? '1');
+  // '?s=last' lands on the final slide without the sender knowing the count
+  // (used when stepping back into the previous class).
+  const requestedSlide = rawSlideParam === 'last' ? total : Number(rawSlideParam ?? '1');
   const currentIndex = Math.min(
     Math.max(Number.isFinite(requestedSlide) ? Math.round(requestedSlide) - 1 : 0, 0),
     Math.max(total - 1, 0)
   );
 
+  function goToNeighborClass(offset: number) {
+    const course = findCourse(querySlug(router.query.curso));
+    if (!course) return;
+    const target = neighborClass(course, querySlug(router.query.clase), offset);
+    if (!target) return;
+    router.push({
+      pathname: `/incine/${course.slug}/${target.slug}`,
+      query: offset < 0 ? { s: 'last' } : undefined,
+    });
+  }
+
   function goTo(index: number) {
-    const clamped = Math.max(0, Math.min(total - 1, index));
-    if (clamped === currentIndex) return;
+    if (index < 0) {
+      goToNeighborClass(-1);
+      return;
+    }
+    if (index > total - 1) {
+      goToNeighborClass(1);
+      return;
+    }
+    if (index === currentIndex) return;
     const query = { ...router.query };
-    if (clamped === 0) {
+    if (index === 0) {
       delete query.s;
     } else {
-      query.s = String(clamped + 1);
+      query.s = String(index + 1);
     }
     // Shallow push: every slide becomes a history entry, so browser
     // back/forward walk the slides (and cross back to the previous class).
     router.push({ pathname: router.pathname, query }, undefined, { shallow: true });
   }
+
+  useEffect(() => {
+    if (rawSlideParam !== 'last' || total === 0) return;
+    const query = { ...router.query };
+    if (total === 1) {
+      delete query.s;
+    } else {
+      query.s = String(total);
+    }
+    router.replace({ pathname: router.pathname, query }, undefined, { shallow: true });
+  });
 
   useEffect(() => {
     function handleKeydown(event: KeyboardEvent) {
