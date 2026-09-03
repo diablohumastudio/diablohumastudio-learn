@@ -82,7 +82,7 @@ Cuando un slide es *el mismo diagrama* del slide anterior con piezas menos o tex
 - `s.morphGlide` — el elemento viaja desde `--morph-from` (un `transform`) hasta su posición final.
 - `s.morphPulse` — énfasis: el grupo escala brevemente desde su centro (envuelve al `morphIn` del elemento a destacar).
 
-Siempre sobre `<g>` envolventes (opacidad natural 1), nunca sobre elementos con atributo `opacity`. Los pasos se escalonan con `animation-delay` inline en pasos de 0.6s; el primer paso arranca al entrar el slide (delay 0), salvo que el slide pida una pausa inicial en su estado previo. Un crossfade de texto son dos `<g>` (viejo `morphOut`, nuevo `morphIn`) con el mismo delay. Con `prefers-reduced-motion` el slide queda directo en su estado final.
+Siempre sobre `<g>` envolventes (opacidad natural 1), nunca sobre elementos con atributo `opacity`. Los pasos se escalonan con `animation-delay` inline en pasos de 0.6s; la espera antes de la primera animación es **0s** — el primer paso arranca justo al entrar el slide, sin pausa inicial. Un crossfade de texto son dos `<g>` (viejo `morphOut`, nuevo `morphIn`) con el mismo delay. Con `prefers-reduced-motion` el slide queda directo en su estado final.
 
 ## Convenciones de contenido ya establecidas
 
