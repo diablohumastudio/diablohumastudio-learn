@@ -38,6 +38,11 @@ export const INCINE_COURSES: IncineCourse[] = [
         title: 'Wwise por adentro',
         component: dynamic(() => import('../presentations/wwise-unreal/wwise-por-adentro')),
       },
+      {
+        slug: 'el-editor-wwise',
+        title: 'El editor Wwise',
+        component: dynamic(() => import('../presentations/wwise-unreal/el-editor-wwise')),
+      },
     ],
   },
 ];

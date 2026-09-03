@@ -112,6 +112,13 @@ Siempre sobre `<g>` envolventes (opacidad natural 1), nunca sobre elementos con 
 - El recap hace morph desde el estado final de ese slide (misma geometría, `viewBox` incluido) al entrar: la caja central cruza hacia WWISE OBJECT con un `morphPulse` de énfasis y pasa a estilo protagonista, y aparece el label "SoundBanks". Si cambia aquel diagrama, este estado inicial se actualiza con él.
 - El arco de la clase: recap del patrón del motor de audio → Wwise de punta a punta → (por definir; mantener la progresión de lo general a lo específico).
 
+### el-editor-wwise
+
+- El arco de la clase: Portada → los views (el menú Views tal cual: las familias Editors / Profiler / Utilities con submenú, y los views directos) → los de todos los días (Project Explorer, Transport Control, Soundcaster) → editors de propiedades (Property Editor con pestañas + RTPC, States, Effects, Stingers, Metadata) → editors por tipo de objeto (Music Playlist, Music Segment, State, Switch, SoundBank, Effects, Event) → los layouts (dos acomodos del mismo lienzo) → tabla de layouts de fábrica → el layout Designer.
+- El slide z=6 (tabla de layouts) usa `s.plain` — excepción deliberada al principio de poquísimo texto, para listar los layouts de fábrica con su atajo (F5–F12) y su propósito.
+- El slide z=2 hace morph desde z=1: misma geometría; los tres views útiles cruzan a protagonistas con pulso escalonado, el resto se atenúa, y la caja Editors pulsa al final como puente al z=3.
+- El slide z=3 entra con un zoom (`morphGlide`) desde la posición de la caja Editors del z=2; el z=4 es un crossfade de contenido en un paso único sobre el mismo contenedor del z=3. Si cambia la geometría de uno de estos slides, actualizar la de su vecino.
+
 ### wwise-inside-out
 
 - Es anterior a estas reglas y no las sigue; no re-estilizarla sin que se pida explícitamente.
