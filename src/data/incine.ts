@@ -29,6 +29,11 @@ export const INCINE_COURSES: IncineCourse[] = [
         component: dynamic(() => import('../presentations/wwise-unreal/que-es-un-motor-de-audio')),
       },
       {
+        slug: 'donde-viven-los-datos',
+        title: '¿Dónde viven los datos?',
+        component: dynamic(() => import('../presentations/wwise-unreal/donde-viven-los-datos')),
+      },
+      {
         slug: 'wwise-por-adentro',
         title: 'Wwise por adentro',
         component: dynamic(() => import('../presentations/wwise-unreal/wwise-por-adentro')),

@@ -97,6 +97,13 @@ Siempre sobre `<g>` envolventes (opacidad natural 1), nunca sobre elementos con 
 - El arco de la clase: Portada → compilados vs interpretados → el OS corre los compilados → un motor corre los interpretados → qué es un motor → game engines → motores de audio. Cada slide nuevo debe encajar en esa progresión de lo general a lo específico.
 - El slide "audio engines" (z=6) hace morph desde el diagrama de "game engines" (z=5): CÓDIGO y sus flechas se desvanecen, el engine sube a alinearse con las configuraciones y los textos cruzan al dominio de audio. Si cambia la geometría del z=5, hay que actualizar el estado inicial del z=6.
 
+### donde-viven-los-datos
+
+- Es otra clase de introducción, hermana de `que-es-un-motor-de-audio` (va después de ella en el curso). Abre con portada (mismo formato: `z="▶"`, `Cover.jpg`, título en `h1` con una palabra en ámbar).
+- El arco de la clase: Portada → la biblioteca (analogía de disco/RAM/caché) → morph a hardware → (por definir; mantener la progresión de lo general a lo específico).
+- La analogía: estanterías = disco, la mesa con libros a medio leer = RAM, los libros abiertos del centro = caché, las dos personas sentadas = CPU. Las tres flechas codifican velocidad con su largo: levantarse a la estantería (lento) > alcanzar otra esquina de la mesa (rápido) > leer el libro abierto (al instante).
+- El slide "computador" (z="=") hace morph desde "la biblioteca" (z=1): geometría idéntica (compartida en `EscenaBiblioteca`), solo los rótulos cruzan de dominio en un paso único, más lento que el estándar (`animation-duration` 1.2s inline). Los rótulos de cada dominio viven en `RotulosBiblioteca` / `RotulosComputador`; si cambia uno, revisar su gemelo.
+
 ### wwise-por-adentro
 
 - Abre sin portada: el primer slide es un recap del último slide de `que-es-un-motor-de-audio` (mismo diagrama), con eyebrow "Recap · donde quedamos".
