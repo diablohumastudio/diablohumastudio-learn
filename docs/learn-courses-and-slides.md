@@ -18,19 +18,52 @@ The `/learn` prefix lives in one place, `LEARN_BASE_PATH` in the registry, and e
 
 ## Adding a class (presentation) to an existing course
 
-1. Create `src/presentations/<course-slug>/<class-slug>.tsx`:
+1. Create the dictionary `src/presentations/<course-slug>/<class-slug>.dict.tsx` with every text of the deck in both languages. Type it explicitly (titles carry markup) and write `es` first, since the content is authored in Spanish:
+
+```tsx
+import type { ReactNode } from 'react';
+import s from '../../components/learn/Deck.module.css';
+
+type MyNewClassTexts = {
+  name: string;
+  context: string;
+  labels: { intro: string };
+  intro: { eyebrow: string; title: ReactNode; lede: string };
+};
+
+const es: MyNewClassTexts = {
+  name: 'Título de la clase',
+  context: 'Contexto · opcional · va en el footer',
+  labels: { intro: 'intro' },
+  intro: { eyebrow: 'Kicker en ámbar', title: <>Título del <span className={s.accent}>slide</span></>, lede: 'Párrafo principal.' },
+};
+
+const en: MyNewClassTexts = {
+  name: 'Class title',
+  context: 'Optional · context · shown in the footer',
+  labels: { intro: 'intro' },
+  intro: { eyebrow: 'Small amber kicker', title: <>Slide <span className={s.accent}>title</span></>, lede: 'Main paragraph.' },
+};
+
+export const myNewClassDict = { es, en };
+```
+
+2. Create `src/presentations/<course-slug>/<class-slug>.tsx`, reading the dictionary with `useT`:
 
 ```tsx
 import Deck, { Slide } from '../../components/learn/Deck';
 import s from '../../components/learn/Deck.module.css';
+import { useT } from '../../i18n/useT';
+import { myNewClassDict } from './my-new-class.dict';
 
 export default function MyNewClass() {
+  const t = useT(myNewClassDict);
   return (
-    <Deck name="Class title" context="Optional · context · shown in the footer">
-      <Slide z="1" label="intro">
-        <div className={s.eyebrow}>Small amber kicker</div>
-        <h2>Slide title</h2>
-        <p className={s.lede}>Main paragraph.</p>
+    <Deck name={t.name} context={t.context}>
+      <Slide z="1" label={t.labels.intro}>
+        <div className={s.eyebrow}>{t.intro.eyebrow}</div>
+        <h2>{t.intro.title}</h2>
+        <p className={s.lede}>{t.intro.lede}</p>
       </Slide>
       {/* more <Slide>s */}
     </Deck>
@@ -38,12 +71,12 @@ export default function MyNewClass() {
 }
 ```
 
-2. Register it in `src/data/learn.ts`, appending to the course's `classes` array:
+3. Register it in `src/data/learn.ts`, appending to the course's `classes` array (the title is per language too):
 
 ```ts
 {
   slug: 'my-new-class',
-  title: 'My New Class',
+  title: { es: 'Mi clase nueva', en: 'My New Class' },
   component: dynamic(() => import('../presentations/wwise-unreal/my-new-class')),
 },
 ```
@@ -85,6 +118,12 @@ Content goes inside `Slide` as JSX. Plain `h1`, `h2`, `strong`, `code`, `figure`
 | `s.plain` | Data table (first column mono + amber); use `<thead>`/`<tbody>` |
 | `s.svgSans` | On an SVG `<text>` to use the body font (SVG text defaults to mono) |
 | `s.morphOut` / `s.morphIn` / `s.morphGlide` / `s.morphPulse` | On SVG `<g>` wrappers, replay a transition from the previous slide's diagram when the slide mounts (draw the final state; stagger steps with inline `animation-delay`; `morphGlide` reads its start `transform` from `--morph-from`; `morphPulse` scales briefly for emphasis) |
+
+Texts and languages:
+
+- Every visible text of a deck lives in its `.dict.tsx`: `h1`/`h2` (as JSX, with the amber `span`), eyebrows, `figcaption`, the SVG `aria-label`, every `<text>`, the `Slide` labels and the `Deck` name and context. The SVG `<text>` nodes are JSX, so `{t.key}` goes inside them like anywhere else. Functions that draw labels (the `Rotulos*` pattern) receive their texts object as a prop; geometry helpers take no texts.
+- Keep the two languages about the same length (±15 % characters) so labels stay inside their boxes; absorb a difference with `textAnchor` (`middle`/`end`) before moving coordinates. When a phrase must change length by more, check the slide in both `/learn/...` and `/es/learn/...`.
+- Product names (Wwise views, editors, layouts, file names such as `juego.exe`) stay in English in both dictionaries.
 
 Gotchas:
 
