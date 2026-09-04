@@ -220,9 +220,11 @@
 
 /* A slide that continues the previous slide's diagram is drawn in its FINAL
    state; these classes replay the transition when the slide mounts (Deck
-   remounts slideHost on every navigation, so they fire on entry). Apply them
-   to <g> wrappers (natural opacity 1), never to elements with an opacity
-   attribute, and stagger the steps with inline animation-delay. */
+   remounts slideHost on every slide change, so they fire on entry). Within a
+   stepped slide the host stays mounted: only the pieces a new step adds are
+   mounted, so put the class on those. Apply them to <g> wrappers (natural
+   opacity 1), never to elements with an opacity attribute, and stagger the
+   steps with inline animation-delay. */
 .morphOut {
   opacity: 0;
   animation: morphOut 0.6s ease both;

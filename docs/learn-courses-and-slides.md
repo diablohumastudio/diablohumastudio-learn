@@ -12,7 +12,7 @@ The `/learn` section serves class presentations. It is unlisted (`noindex, nofol
 | Section layout | `src/components/learn/LearnLayout.tsx` | Header with course/class dropdowns and the fullscreen button |
 | Routes | `src/pages/learn/index.tsx`, `src/pages/learn/[curso]/index.tsx` and `src/pages/learn/[curso]/[clase].tsx` | `/learn` redirects to the latest class; `/learn/<course-slug>` redirects to the course's first class (slide 1); the dynamic route renders the selected one |
 
-URLs look like `/learn/<course-slug>/<class-slug>` (e.g. `/learn/wwise-unreal/el-editor-wwise`). The current slide is kept in the `?s=<n>` query param, so browser back/forward walk through visited slides and a link can point to an exact slide.
+URLs look like `/learn/<course-slug>/<class-slug>` (e.g. `/learn/wwise-unreal/el-editor-wwise`). The current slide is kept in the `?s=<n>` query param (and the current step of a stepped slide in `&p=<n>`), so browser back/forward walk through visited slides and steps, and a link can point to an exact slide or step.
 
 The `/learn` prefix lives in one place, `LEARN_BASE_PATH` in the registry, and every internal route is built with `classPath(course, class)`. To move the section (another path, or later a subdomain via a host-conditioned rewrite), change the constant and rename `src/pages/learn/`. Links already shared under the old `/incine` prefix are kept alive by a permanent redirect in `next.config.js`.
 
@@ -101,7 +101,7 @@ The course dropdown is generated from `LEARN_COURSES`; switching course navigate
 `Slide` props:
 
 - `z` — the big amber character in the left rail (a zoom level, number or symbol).
-- `label` — the small vertical text in the rail, also shown uppercase in the footer.
+- `label` — the small vertical text in the rail, also shown uppercase in the footer. An array of labels makes a **stepped slide** (see below), one step per label.
 - `backgroundImage` (optional) — URL of a full-bleed background image for the slide, automatically darkened with a gradient so text stays readable (used for cover slides). Put slide images under `public/assets/presentations/<course-slug>/` and reference them as `/assets/presentations/<course-slug>/<file>`.
 
 Content goes inside `Slide` as JSX. Plain `h1`, `h2`, `strong`, `code`, `figure`/`figcaption` and `svg text` are already styled by `Deck.module.css`; for the rest import the module (`import s from '../../components/learn/Deck.module.css'`):
@@ -118,6 +118,13 @@ Content goes inside `Slide` as JSX. Plain `h1`, `h2`, `strong`, `code`, `figure`
 | `s.plain` | Data table (first column mono + amber); use `<thead>`/`<tbody>` |
 | `s.svgSans` | On an SVG `<text>` to use the body font (SVG text defaults to mono) |
 | `s.morphOut` / `s.morphIn` / `s.morphGlide` / `s.morphPulse` | On SVG `<g>` wrappers, replay a transition from the previous slide's diagram when the slide mounts (draw the final state; stagger steps with inline `animation-delay`; `morphGlide` reads its start `transform` from `--morph-from`; `morphPulse` scales briefly for emphasis) |
+
+Stepped slides (one slide built up in several steps, like fragments in other slide tools):
+
+- Pass `label` as an array: `<Slide z="6" label={[t.labels.arranque, t.labels.pide, t.labels.busca]}>`. `→` walks the steps before leaving the slide and `←` walks them back (coming from the next slide lands on the last step). The rail and footer show the current step's label, and the counter reads e.g. `09 / 09 · 2/3`.
+- Content reads the current step (0-based) with `useSlideStep()` from `Deck`, inside a component rendered within the `Slide`: `const step = useSlideStep();` then draw the state for that step.
+- The slide stays mounted between steps, so only the elements a step adds are mounted: put `s.morphIn` (or the other morph classes) on the group the new step adds, and it animates once when the step is reached. Elements from earlier steps stay static. Opening a step directly (`?s=9&p=3`) draws the final state and animates only the last piece.
+- Prefer a stepped slide over a run of `z="="` slides whenever the steps share the same title and diagram; `=` slides remain for a diagram that morphs into a different idea.
 
 Texts and languages:
 
@@ -141,6 +148,6 @@ Gotchas:
 
 ## Navigation reference
 
-- Keyboard: `←` `→` / space / PageUp / PageDown to move, Home / End to jump to first/last slide.
+- Keyboard: `←` `→` / space / PageUp / PageDown to move (through the steps of a stepped slide first), Home / End to jump to first/last slide.
 - The header's ⛶ button toggles fullscreen (Esc exits).
 - Browser back/forward move through the slides you visited, including across presentations.
