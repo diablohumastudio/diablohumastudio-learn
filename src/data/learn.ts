@@ -92,6 +92,10 @@ export function neighborClass(
   return index === -1 ? undefined : course.classes[index + offset];
 }
 
+export function firstClass(course: LearnCourse): LearnClass {
+  return course.classes[0];
+}
+
 export function latestClass(course: LearnCourse): LearnClass {
   return course.classes[course.classes.length - 1];
 }

@@ -10,7 +10,7 @@ The `/learn` section serves class presentations. It is unlisted (`noindex, nofol
 | Presentations | `src/presentations/<course-slug>/<class-slug>.tsx` | One React component per class, built with `Deck`/`Slide` |
 | Deck engine | `src/components/learn/Deck.tsx` + `Deck.module.css` | Slide state, keyboard navigation, playhead/counter, `?s=` URL sync |
 | Section layout | `src/components/learn/LearnLayout.tsx` | Header with course/class dropdowns and the fullscreen button |
-| Routes | `src/pages/learn/index.tsx` and `src/pages/learn/[curso]/[clase].tsx` | `/learn` redirects to the latest class; the dynamic route renders the selected one |
+| Routes | `src/pages/learn/index.tsx`, `src/pages/learn/[curso]/index.tsx` and `src/pages/learn/[curso]/[clase].tsx` | `/learn` redirects to the latest class; `/learn/<course-slug>` redirects to the course's first class (slide 1); the dynamic route renders the selected one |
 
 URLs look like `/learn/<course-slug>/<class-slug>` (e.g. `/learn/wwise-unreal/el-editor-wwise`). The current slide is kept in the `?s=<n>` query param, so browser back/forward walk through visited slides and a link can point to an exact slide.
 
