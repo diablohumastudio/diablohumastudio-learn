@@ -1,0 +1,44 @@
+/* Sits inside .site-pages-nav (globals.css), so it inherits the nav's
+   row/column layout and matches .site-page-link spacing. */
+.switch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 20px;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.option,
+.active {
+  color: #e7945e;
+  text-decoration: none;
+}
+
+.option {
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+
+.option:hover,
+.option:focus-visible {
+  opacity: 1;
+}
+
+.active {
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.separator {
+  color: rgba(244, 244, 244, 0.3);
+}
+
+@media (max-width: 767px) {
+  .switch {
+    padding: 15px 10px;
+    font-size: 1rem;
+  }
+}
