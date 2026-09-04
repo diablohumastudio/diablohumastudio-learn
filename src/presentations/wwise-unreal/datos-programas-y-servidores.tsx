@@ -1,8 +1,9 @@
-import Deck, { Slide } from '../../components/learn/Deck';
+import Deck, { Slide, useSlideStep } from '../../components/learn/Deck';
 import s from '../../components/learn/Deck.module.css';
 import { useT } from '../../i18n/useT';
 import { datosDict } from './datos-programas-y-servidores.dict';
 import type {
+  ArranqueTexts,
   EscenaArranqueTexts,
   MaquinaTexts,
   RotulosBibliotecaTexts,
@@ -215,8 +216,8 @@ function Maquina({ x, r, protagonista }: { x: number; r: MaquinaTexts; protagoni
   );
 }
 
-/* Escena del arranque en el celular. Cada slide "=" avanza un paso y anima solo
-   la pieza nueva (las anteriores quedan estáticas); paso 3 además hace aparecer
+/* Escena del arranque en el celular. Cada paso del slide añade una pieza y
+   anima solo esa (las anteriores quedan estáticas); paso 3 además hace aparecer
    soundbank_menus en la posición libre. */
 function EscenaArranque({ paso, markerPrefix, r }: { paso: number; markerPrefix: string; r: EscenaArranqueTexts }) {
   const flecha = `url(#${markerPrefix})`;
@@ -295,12 +296,18 @@ function EscenaArranque({ paso, markerPrefix, r }: { paso: number; markerPrefix:
   );
 }
 
-const ARRANQUE_PASOS: { label: 'arranque' | 'pide' | 'busca' | 'sube'; z: string; markerPrefix: string }[] = [
-  { label: 'arranque', z: '6', markerPrefix: 'arrD6a' },
-  { label: 'pide', z: '=', markerPrefix: 'arrD6b' },
-  { label: 'busca', z: '=', markerPrefix: 'arrD6c' },
-  { label: 'sube', z: '=', markerPrefix: 'arrD6d' },
-];
+/* Un solo slide con cuatro pasos; el paso actual lo da el Deck. */
+function FiguraArranque({ r }: { r: ArranqueTexts }) {
+  const paso = useSlideStep();
+  return (
+    <figure>
+      <svg viewBox="0 0 920 420" role="img" aria-label={r.arias[paso]}>
+        <EscenaArranque paso={paso} markerPrefix="arrD6" r={r.escena} />
+      </svg>
+      <figcaption>{r.captions[paso]}</figcaption>
+    </figure>
+  );
+}
 
 export default function DatosProgramasYServidores() {
   const t = useT(datosDict);
@@ -475,18 +482,11 @@ export default function DatosProgramasYServidores() {
         </figure>
       </Slide>
 
-      {ARRANQUE_PASOS.map(({ label, z, markerPrefix }, paso) => (
-        <Slide key={label} z={z} label={t.labels[label]}>
-          <div className={s.eyebrow}>{t.arranque.eyebrow}</div>
-          <h2>{t.arranque.title}</h2>
-          <figure>
-            <svg viewBox="0 0 920 420" role="img" aria-label={t.arranque.arias[paso]}>
-              <EscenaArranque paso={paso} markerPrefix={markerPrefix} r={t.arranque.escena} />
-            </svg>
-            <figcaption>{t.arranque.captions[paso]}</figcaption>
-          </figure>
-        </Slide>
-      ))}
+      <Slide z="6" label={[t.labels.arranque, t.labels.pide, t.labels.busca, t.labels.sube]}>
+        <div className={s.eyebrow}>{t.arranque.eyebrow}</div>
+        <h2>{t.arranque.title}</h2>
+        <FiguraArranque r={t.arranque} />
+      </Slide>
     </Deck>
   );
 }

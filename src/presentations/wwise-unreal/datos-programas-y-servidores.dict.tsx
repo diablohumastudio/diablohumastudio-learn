@@ -124,13 +124,15 @@ type DatosTexts = {
     servidor: MaquinaTexts;
     diseno: MaquinaTexts;
   };
-  arranque: {
-    eyebrow: string;
-    title: ReactNode;
-    arias: [string, string, string, string];
-    captions: [string, string, string, string];
-    escena: EscenaArranqueTexts;
-  };
+  arranque: ArranqueTexts;
+};
+
+export type ArranqueTexts = {
+  eyebrow: string;
+  title: ReactNode;
+  arias: [string, string, string, string];
+  captions: [string, string, string, string];
+  escena: EscenaArranqueTexts;
 };
 
 export type FilaServidor = { servidor: string; pides: string; sirve: string; ejemplos: string };
