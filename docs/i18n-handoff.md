@@ -1,6 +1,6 @@
 # Localización (es / en) — propuesta y handoff
 
-Estado: **decisiones tomadas (sección 4), implementación no iniciada**. Nada de esto está en el código. Documento escrito el 2026-09-04 a partir del commit `95d0d51` (sección de clases ya en `/learn`). El siguiente paso es proponer la fase 1 ítem por ítem y esperar aprobación.
+Estado (2026-09-04): **fase 1 hecha** (I1–I3) y **fase 2 hecha salvo M3 `/courses`**, que el usuario dejó fuera a propósito. Pendientes: M3 cuando se pida, fase 3 (chrome de `/learn`) y fase 4 (diccionario por deck). Documento escrito a partir del commit `95d0d51` (sección de clases ya en `/learn`). Cada ítem pendiente se propone y se aprueba antes de implementarse.
 
 Quien retome esto: leer primero `CLAUDE.md`, `docs/css-and-nextjs-conventions.md` y `docs/learn-courses-and-slides.md`. Cada ítem de abajo se propone y se aprueba por separado antes de implementarse, y va en su propio commit (`<type>(<scope>): <summary>`, scope `I18n` para la infraestructura y el scope de la página para el copy).
 
