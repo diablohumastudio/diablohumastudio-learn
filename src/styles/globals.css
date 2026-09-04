@@ -1354,6 +1354,7 @@ iframe.showcase-video {
 .modal-btn {
     padding: 10px 24px;
     border-radius: 8px;
+    font: inherit;
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
