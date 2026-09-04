@@ -27,32 +27,31 @@ export type RotulosComputadorTexts = {
   cpu: string;
 };
 
-export type RotulosRestauranteTexts = {
-  ingredientes: string;
-  laDespensa: string;
-  tu: string;
-  enLaMesa: string;
-  cocina: string;
-  hayIngredientes: string;
-  siSeCocina: string;
-  pides: string;
-  aTuMedida: string;
-  teTrae: string;
-  oNoHay: string;
+/* Shared by the restaurant and its client-server morph: same positions, other domain. */
+export type RotulosPeticionTexts = {
+  cliente: string;
+  clienteSub: string;
+  servidor: string;
+  paso1: string;
+  paso2: string;
+  paso3: string;
+  peticion: string;
+  peticionSub: string;
+  respuesta: string;
+  respuestaSub: string;
 };
 
-export type RotulosClienteServidorTexts = {
-  recursos: string;
-  datosPermisos: string;
-  pcCliente: string;
-  quienPide: string;
-  pcServidor: string;
-  tienesAcceso: string;
-  siArma: string;
-  peticion: string;
-  loQueQuieres: string;
-  respuesta: string;
-  oError: string;
+export type MaquinaTexts = {
+  titulo: string;
+  cpu: string;
+  ram: string;
+  disco: string;
+  tarjetaRed: string;
+  tarjetaRedSub: string;
+  fuente: string;
+  fuenteSub: string;
+  tarjetaVideo: string;
+  tarjetaVideoSub: string;
 };
 
 export type EscenaArranqueTexts = {
@@ -106,8 +105,8 @@ type DatosTexts = {
     laCpuLee: string;
     niveles: [NivelDeLenguaje, NivelDeLenguaje, NivelDeLenguaje, NivelDeLenguaje];
   };
-  restaurante: { eyebrow: string; title: ReactNode; aria: string; caption: string; rotulos: RotulosRestauranteTexts };
-  clienteServidor: { eyebrow: string; title: ReactNode; aria: string; caption: string; rotulos: RotulosClienteServidorTexts };
+  restaurante: { eyebrow: string; title: ReactNode; aria: string; caption: string; rotulos: RotulosPeticionTexts };
+  clienteServidor: { eyebrow: string; title: ReactNode; aria: string; caption: string; rotulos: RotulosPeticionTexts };
   servidores: {
     eyebrow: string;
     title: ReactNode;
@@ -120,19 +119,10 @@ type DatosTexts = {
     title: ReactNode;
     aria: string;
     caption: string;
-    computadoraServidor: string;
-    cpu: string;
-    ram: string;
-    disco: string;
-    tarjetaRed: string;
-    conectada: string;
-    fuente: string;
-    encendida: string;
     peticiones: string;
     respuestas: string;
-    tarjetaGrafica: string;
-    noHaceFalta: string;
-    nadieMira: string;
+    servidor: MaquinaTexts;
+    diseno: MaquinaTexts;
   };
   arranque: {
     eyebrow: string;
@@ -143,7 +133,7 @@ type DatosTexts = {
   };
 };
 
-export type FilaServidor = { servidor: string; pides: string; sirve: string };
+export type FilaServidor = { servidor: string; pides: string; sirve: string; ejemplos: string };
 
 const es: DatosTexts = {
   name: 'Datos, programas y servidores',
@@ -180,7 +170,7 @@ const es: DatosTexts = {
         Para trabajar, los datos tienen que <span className={s.accent}>llegar a tus manos</span>
       </>
     ),
-    aria: 'Una biblioteca vista desde arriba: las estanterías guardan todas las materias; en la mesa hay libros a medio leer con separadores; en el centro, dos personas leen los libros abiertos de la materia actual. Levantarse a las estanterías es lento, alcanzar otra esquina de la mesa es rápido y leer el libro abierto es instantáneo.',
+    aria: 'Una biblioteca vista desde arriba: las estanterías guardan todas las materias; en las puntas de una mesa larga hay libros cerrados; en el centro de la mesa, los libros abiertos de la materia actual, y dos personas sentadas arriba y abajo de la mesa los leen. Levantarse a las estanterías es lento, alcanzar la punta de la mesa es rápido y leer el libro abierto es instantáneo.',
     caption: 'Cuanto más cerca de las manos, más rápido — y menos cabe.',
     rotulos: {
       estanterias: 'ESTANTERÍAS',
@@ -200,7 +190,7 @@ const es: DatosTexts = {
         La biblioteca <span className={s.accent}>es tu computador</span>
       </>
     ),
-    aria: 'El mismo diagrama de la biblioteca con nombres de hardware: las estanterías son el disco duro, la mesa es la memoria RAM, los libros abiertos son la caché y las dos personas son los CPU.',
+    aria: 'El mismo diagrama de la biblioteca con nombres de hardware: las estanterías son el disco duro, la mesa es la memoria RAM, los libros abiertos son la caché y las dos personas sentadas son los CPU.',
     caption: 'Mismo lugar, otros nombres: disco, RAM y caché son distancias hasta tus manos.',
     rotulos: {
       discoDuro: 'DISCO DURO',
@@ -243,20 +233,19 @@ const es: DatosTexts = {
         Un servidor es un programa que <span className={s.accent}>atiende peticiones</span>
       </>
     ),
-    aria: 'Un restaurante visto como flujo: tú en la mesa pides la hamburguesa al camarero, la petición llega a la cocina, la cocina verifica si hay ingredientes, y el camarero te trae la hamburguesa o la noticia de que no hay. La despensa de ingredientes alimenta a la cocina desde arriba.',
+    aria: 'Un restaurante visto como flujo: tú en la mesa pides la hamburguesa al camarero, la petición llega a la cocina, la cocina verifica que el plato esté en el menú, revisa y trae los ingredientes y prepara la hamburguesa, y el camarero te la trae o te trae la noticia de que no hay.',
     caption: 'Recibir el pedido, verificar que se puede, prepararlo y devolverlo: eso hace un servidor.',
     rotulos: {
-      ingredientes: 'INGREDIENTES',
-      laDespensa: 'la despensa',
-      tu: 'TÚ',
-      enLaMesa: 'en la mesa',
-      cocina: 'COCINA',
-      hayIngredientes: '¿hay ingredientes?',
-      siSeCocina: 'sí → se cocina',
-      pides: 'pides la hamburguesa al camarero',
-      aTuMedida: 'a tu medida',
-      teTrae: 'el camarero te trae la hamburguesa',
-      oNoHay: '…o la noticia de que no hay hamburguesas',
+      cliente: 'TÚ',
+      clienteSub: 'en la mesa',
+      servidor: 'COCINA',
+      paso1: '① verifica que el plato esté en el menú',
+      paso2: '② revisa y trae los ingredientes',
+      paso3: '③ prepara la hamburguesa',
+      peticion: 'pides la hamburguesa al camarero',
+      peticionSub: 'a tu medida',
+      respuesta: 'el camarero te trae la hamburguesa',
+      respuestaSub: '…o la noticia de que no hay hamburguesas',
     },
   },
   clienteServidor: {
@@ -266,20 +255,19 @@ const es: DatosTexts = {
         El restaurante es <span className={s.accent}>cliente y servidor</span>
       </>
     ),
-    aria: 'El mismo diagrama del restaurante con nombres de computación: tú eres el PC cliente, la cocina es el PC servidor, la despensa son sus recursos, y las flechas son la petición y la respuesta. Verificar los ingredientes es verificar que tienes acceso y que se puede armar la respuesta.',
-    caption: 'Misma escena, otros nombres: el servidor verifica que puedes y que hay, arma la respuesta y la manda.',
+    aria: 'El mismo diagrama del restaurante con nombres de computación: tú eres el PC cliente, la cocina es el PC servidor, y las flechas son la petición y la respuesta. Los pasos de la cocina son validar al usuario, buscar los recursos y armar la respuesta.',
+    caption: 'Misma escena, otros nombres: el servidor valida, busca lo que hace falta, arma la respuesta y la manda.',
     rotulos: {
-      recursos: 'RECURSOS',
-      datosPermisos: 'datos · permisos',
-      pcCliente: 'PC CLIENTE',
-      quienPide: 'quien pide',
-      pcServidor: 'PC SERVIDOR',
-      tienesAcceso: '¿tienes acceso?',
-      siArma: 'sí → arma la respuesta',
+      cliente: 'PC CLIENTE',
+      clienteSub: 'quien pide',
+      servidor: 'PC SERVIDOR',
+      paso1: '① valida al usuario',
+      paso2: '② busca los recursos',
+      paso3: '③ arma la respuesta',
       peticion: 'petición',
-      loQueQuieres: 'lo que quieres, como lo quieres',
+      peticionSub: 'lo que quieres, como lo quieres',
       respuesta: 'respuesta',
-      oError: '…o un error si no se puede',
+      respuestaSub: '…o un error si no se puede',
     },
   },
   servidores: {
@@ -292,9 +280,9 @@ const es: DatosTexts = {
     aria: 'Tres filas iguales donde la petición entra por la izquierda y la respuesta regresa por el mismo lado: pides una página y el servidor web sirve páginas web; pides un archivo y el servidor FTP sirve archivos; pides unos datos y el servidor de base de datos sirve datos.',
     caption: 'Por eso se llama servidor: sirve páginas, archivos o datos — siempre a quien los pide.',
     filas: [
-      { servidor: 'SERVIDOR WEB', pides: 'pides una página', sirve: 'sirve páginas web' },
-      { servidor: 'SERVIDOR FTP', pides: 'pides un archivo', sirve: 'sirve archivos' },
-      { servidor: 'SERVIDOR DE BASE DE DATOS', pides: 'pides unos datos', sirve: 'sirve datos' },
+      { servidor: 'SERVIDOR WEB', pides: 'pides una página', sirve: 'sirve páginas web', ejemplos: 'ej.: Apache · Nginx' },
+      { servidor: 'SERVIDOR FTP', pides: 'pides un archivo', sirve: 'sirve archivos', ejemplos: 'ej.: FileZilla Server · vsftpd' },
+      { servidor: 'SERVIDOR DE BASE DE DATOS', pides: 'pides unos datos', sirve: 'sirve datos', ejemplos: 'ej.: PostgreSQL · MySQL' },
     ],
   },
   hardware: {
@@ -304,21 +292,34 @@ const es: DatosTexts = {
         Una computadora servidor: hecha para <span className={s.accent}>servir todo el día</span>
       </>
     ),
-    aria: 'Una computadora servidor por dentro: CPU, RAM y disco arriba; una tarjeta de red conectada 24/7 por donde entran las peticiones y salen las respuestas; una fuente de poder encendida 24/7. Afuera, punteada, la tarjeta gráfica que no hace falta porque nadie mira la pantalla.',
-    caption: 'Nada para mostrar, todo para responder: la máquina está hecha para no apagarse.',
-    computadoraServidor: 'COMPUTADORA SERVIDOR',
-    cpu: 'CPU',
-    ram: 'RAM',
-    disco: 'DISCO',
-    tarjetaRed: 'TARJETA(S) DE RED',
-    conectada: 'conectada · 24/7',
-    fuente: 'FUENTE DE PODER',
-    encendida: 'encendida · 24/7',
+    aria: 'Dos computadoras por dentro, lado a lado. La computadora servidor: CPU, RAM y disco; tarjetas de red súper rápidas y robustas por donde entran las peticiones y salen las respuestas día y noche; una fuente de poder súper robusta encendida 24/7; y la tarjeta de video, inexistente, porque nadie mira la pantalla. La PC de diseño gráfico: las mismas piezas, pero con tarjeta de red básica, fuente básica y una tarjeta de video potente.',
+    caption: 'Mismas piezas, prioridades opuestas: el servidor responde todo el día; la PC de diseño muestra.',
     peticiones: 'peticiones · día y noche',
     respuestas: 'respuestas',
-    tarjetaGrafica: 'TARJETA GRÁFICA',
-    noHaceFalta: 'no hace falta:',
-    nadieMira: 'nadie mira la pantalla',
+    servidor: {
+      titulo: 'COMPUTADORA SERVIDOR',
+      cpu: 'CPU',
+      ram: 'RAM',
+      disco: 'DISCO',
+      tarjetaRed: 'TARJETA(S) DE RED',
+      tarjetaRedSub: 'súper rápidas y robustas · 24/7',
+      fuente: 'FUENTE DE PODER',
+      fuenteSub: 'súper robusta · encendida 24/7',
+      tarjetaVideo: 'TARJETA DE VIDEO',
+      tarjetaVideoSub: 'inexistente: nadie mira la pantalla',
+    },
+    diseno: {
+      titulo: 'PC DE DISEÑO GRÁFICO',
+      cpu: 'CPU',
+      ram: 'RAM',
+      disco: 'DISCO',
+      tarjetaRed: 'TARJETA DE RED',
+      tarjetaRedSub: 'básica',
+      fuente: 'FUENTE DE PODER',
+      fuenteSub: 'básica',
+      tarjetaVideo: 'TARJETA DE VIDEO',
+      tarjetaVideoSub: 'potente: todo se ve en pantalla',
+    },
   },
   arranque: {
     eyebrow: 'Concepto 6 · el arranque',
@@ -392,7 +393,7 @@ const en: DatosTexts = {
         To work, the data has to <span className={s.accent}>reach your hands</span>
       </>
     ),
-    aria: 'A library seen from above: the shelves hold every subject; on the table there are half-read books with bookmarks; in the middle, two people read the open books of the current subject. Getting up to the shelves is slow, reaching another corner of the table is fast and reading the open book is instant.',
+    aria: 'A library seen from above: the shelves hold every subject; at the ends of a long table there are closed books; in the middle of the table, the open books of the current subject, and two people seated above and below the table read them. Getting up to the shelves is slow, reaching the end of the table is fast and reading the open book is instant.',
     caption: 'The closer to your hands, the faster — and the less fits.',
     rotulos: {
       estanterias: 'SHELVES',
@@ -412,7 +413,7 @@ const en: DatosTexts = {
         The library <span className={s.accent}>is your computer</span>
       </>
     ),
-    aria: 'The same library diagram with hardware names: the shelves are the hard disk, the table is the RAM memory, the open books are the cache and the two people are the CPUs.',
+    aria: 'The same library diagram with hardware names: the shelves are the hard disk, the table is the RAM memory, the open books are the cache and the two seated people are the CPUs.',
     caption: 'Same place, other names: disk, RAM and cache are distances to your hands.',
     rotulos: {
       discoDuro: 'HARD DISK',
@@ -455,20 +456,19 @@ const en: DatosTexts = {
         A server is a program that <span className={s.accent}>handles requests</span>
       </>
     ),
-    aria: 'A restaurant seen as a flow: you at the table order the burger from the waiter, the order reaches the kitchen, the kitchen checks whether there are ingredients, and the waiter brings you the burger or the news that there is none. The pantry of ingredients feeds the kitchen from above.',
+    aria: 'A restaurant seen as a flow: you at the table order the burger from the waiter, the order reaches the kitchen, the kitchen checks the dish is on the menu, checks and fetches the ingredients and cooks the burger, and the waiter brings it to you or brings the news that there is none.',
     caption: 'Take the order, check it can be done, prepare it and bring it back: that is what a server does.',
     rotulos: {
-      ingredientes: 'INGREDIENTS',
-      laDespensa: 'the pantry',
-      tu: 'YOU',
-      enLaMesa: 'at the table',
-      cocina: 'KITCHEN',
-      hayIngredientes: 'any ingredients?',
-      siSeCocina: 'yes → it cooks',
-      pides: 'you order the burger from the waiter',
-      aTuMedida: 'your way',
-      teTrae: 'the waiter brings you the burger',
-      oNoHay: '…or the news that there are no burgers',
+      cliente: 'YOU',
+      clienteSub: 'at the table',
+      servidor: 'KITCHEN',
+      paso1: '① checks the dish is on the menu',
+      paso2: '② checks and fetches the ingredients',
+      paso3: '③ cooks the burger',
+      peticion: 'you order the burger from the waiter',
+      peticionSub: 'your way',
+      respuesta: 'the waiter brings you the burger',
+      respuestaSub: '…or the news that there are no burgers',
     },
   },
   clienteServidor: {
@@ -478,20 +478,19 @@ const en: DatosTexts = {
         The restaurant is <span className={s.accent}>client and server</span>
       </>
     ),
-    aria: 'The same restaurant diagram with computing names: you are the client PC, the kitchen is the server PC, the pantry is its resources, and the arrows are the request and the response. Checking the ingredients is checking that you have access and that the response can be built.',
-    caption: 'Same scene, other names: the server checks you may and it can, builds the response and sends it.',
+    aria: 'The same restaurant diagram with computing names: you are the client PC, the kitchen is the server PC, and the arrows are the request and the response. The kitchen steps are validating the user, looking up the resources and building the response.',
+    caption: 'Same scene, other names: the server validates, finds what it needs, builds the response and sends it.',
     rotulos: {
-      recursos: 'RESOURCES',
-      datosPermisos: 'data · permissions',
-      pcCliente: 'CLIENT PC',
-      quienPide: 'who asks',
-      pcServidor: 'SERVER PC',
-      tienesAcceso: 'do you have access?',
-      siArma: 'yes → builds the response',
+      cliente: 'CLIENT PC',
+      clienteSub: 'who asks',
+      servidor: 'SERVER PC',
+      paso1: '① validates the user',
+      paso2: '② looks up the resources',
+      paso3: '③ builds the response',
       peticion: 'request',
-      loQueQuieres: 'what you want, how you want it',
+      peticionSub: 'what you want, how you want it',
       respuesta: 'response',
-      oError: "…or an error if it can't",
+      respuestaSub: "…or an error if it can't",
     },
   },
   servidores: {
@@ -504,9 +503,9 @@ const en: DatosTexts = {
     aria: 'Three equal rows where the request enters from the left and the response returns the same way: you ask for a page and the web server serves web pages; you ask for a file and the FTP server serves files; you ask for some data and the database server serves data.',
     caption: "That's why it's called a server: it serves pages, files or data — always to whoever asks.",
     filas: [
-      { servidor: 'WEB SERVER', pides: 'you ask for a page', sirve: 'serves web pages' },
-      { servidor: 'FTP SERVER', pides: 'you ask for a file', sirve: 'serves files' },
-      { servidor: 'DATABASE SERVER', pides: 'you ask for some data', sirve: 'serves data' },
+      { servidor: 'WEB SERVER', pides: 'you ask for a page', sirve: 'serves web pages', ejemplos: 'e.g. Apache · Nginx' },
+      { servidor: 'FTP SERVER', pides: 'you ask for a file', sirve: 'serves files', ejemplos: 'e.g. FileZilla Server · vsftpd' },
+      { servidor: 'DATABASE SERVER', pides: 'you ask for some data', sirve: 'serves data', ejemplos: 'e.g. PostgreSQL · MySQL' },
     ],
   },
   hardware: {
@@ -516,21 +515,34 @@ const en: DatosTexts = {
         A server computer: built to <span className={s.accent}>serve all day long</span>
       </>
     ),
-    aria: 'A server computer from the inside: CPU, RAM and disk on top; a network card connected 24/7 where requests come in and responses go out; a power supply on 24/7. Outside, dotted, the graphics card that is not needed because nobody looks at the screen.',
-    caption: 'Nothing to show, everything to answer: the machine is built to never turn off.',
-    computadoraServidor: 'SERVER COMPUTER',
-    cpu: 'CPU',
-    ram: 'RAM',
-    disco: 'DISK',
-    tarjetaRed: 'NETWORK CARD(S)',
-    conectada: 'connected · 24/7',
-    fuente: 'POWER SUPPLY',
-    encendida: 'powered on · 24/7',
+    aria: 'Two computers from the inside, side by side. The server computer: CPU, RAM and disk; super fast and robust network cards where requests come in and responses go out day and night; a super robust power supply on 24/7; and the video card, nonexistent, because nobody looks at the screen. The graphic design PC: the same parts, but with a basic network card, a basic power supply and a powerful video card.',
+    caption: 'Same parts, opposite priorities: the server answers all day; the design PC shows.',
     peticiones: 'requests · day and night',
     respuestas: 'responses',
-    tarjetaGrafica: 'GRAPHICS CARD',
-    noHaceFalta: 'not needed:',
-    nadieMira: 'nobody looks at the screen',
+    servidor: {
+      titulo: 'SERVER COMPUTER',
+      cpu: 'CPU',
+      ram: 'RAM',
+      disco: 'DISK',
+      tarjetaRed: 'NETWORK CARD(S)',
+      tarjetaRedSub: 'super fast and robust · 24/7',
+      fuente: 'POWER SUPPLY',
+      fuenteSub: 'super robust · powered on 24/7',
+      tarjetaVideo: 'VIDEO CARD',
+      tarjetaVideoSub: 'none: nobody looks at the screen',
+    },
+    diseno: {
+      titulo: 'GRAPHIC DESIGN PC',
+      cpu: 'CPU',
+      ram: 'RAM',
+      disco: 'DISK',
+      tarjetaRed: 'NETWORK CARD',
+      tarjetaRedSub: 'basic',
+      fuente: 'POWER SUPPLY',
+      fuenteSub: 'basic',
+      tarjetaVideo: 'VIDEO CARD',
+      tarjetaVideoSub: 'powerful: everything shows on screen',
+    },
   },
   arranque: {
     eyebrow: 'Concept 6 · the boot',

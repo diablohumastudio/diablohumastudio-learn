@@ -4,32 +4,58 @@ import { useT } from '../../i18n/useT';
 import { datosDict } from './datos-programas-y-servidores.dict';
 import type {
   EscenaArranqueTexts,
+  MaquinaTexts,
   RotulosBibliotecaTexts,
-  RotulosClienteServidorTexts,
   RotulosComputadorTexts,
-  RotulosRestauranteTexts,
+  RotulosPeticionTexts,
 } from './datos-programas-y-servidores.dict';
 
-const SHELF_XS: number[] = [70, 240, 410];
-const SPINE_OFFSETS: number[] = [22, 44, 61, 86, 105, 127];
-const SPINES_D: string = SHELF_XS.map((shelfX) =>
-  SPINE_OFFSETS.map((offset) => `M ${shelfX + offset} 34 V 66`).join(' ')
+const SHELF_XS: number[] = [40, 330, 620];
+const SHELF_SPINE_OFFSETS: number[] = [14, 34, 50, 72, 92, 112, 130, 152, 170, 192, 212, 232, 246];
+const SHELF_SPINES_D: string = SHELF_XS.map((shelfX) =>
+  SHELF_SPINE_OFFSETS.map((offset) => `M ${shelfX + offset} 36 V 54 M ${shelfX + offset} 60 V 78`).join(' ')
 ).join(' ');
 
-const LIBROS_XY: [number, number][] = [
-  [490, 225],
-  [525, 225],
-  [95, 365],
-  [130, 365],
-  [545, 365],
-  [580, 365],
+/* Libros cerrados en las puntas de la mesa: lejos de los abiertos del centro. */
+const LIBROS_CERRADOS_XY: [number, number][] = [
+  [66, 232],
+  [101, 232],
+  [66, 282],
+  [101, 282],
+  [785, 232],
+  [820, 232],
+  [785, 282],
+  [820, 282],
 ];
 
-function Libro({ x, y }: { x: number; y: number }) {
+function LibroCerrado({ x, y }: { x: number; y: number }) {
   return (
     <g>
       <rect x={x} y={y} width="30" height="20" rx="3" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-      <line x1={x + 8} y1={y - 5} x2={x + 8} y2={y + 4} stroke="#63b6a4" strokeWidth="1.5" />
+      <line x1={x + 6} y1={y} x2={x + 6} y2={y + 20} stroke="#63b6a4" strokeWidth="1.5" />
+    </g>
+  );
+}
+
+function LibroAbierto({ x, y }: { x: number; y: number }) {
+  return (
+    <g>
+      <path d={`M ${x + 16} ${y + 2} L ${x + 16} ${y + 24}`} stroke="#f2a33c" strokeWidth="1.5" />
+      <path d={`M ${x} ${y + 4} Q ${x + 8} ${y} ${x + 16} ${y + 3} V ${y + 24} Q ${x + 8} ${y + 21} ${x} ${y + 25} Z`} fill="#232730" stroke="#f2a33c" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d={`M ${x + 32} ${y + 4} Q ${x + 24} ${y} ${x + 16} ${y + 3} V ${y + 24} Q ${x + 24} ${y + 21} ${x + 32} ${y + 25} Z`} fill="#232730" stroke="#f2a33c" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d={`M ${x + 4} ${y + 10} h 8 M ${x + 4} ${y + 15} h 8 M ${x + 20} ${y + 10} h 8 M ${x + 20} ${y + 15} h 8`} stroke="currentColor" strokeOpacity=".4" strokeWidth="1" />
+    </g>
+  );
+}
+
+/* Persona sentada a la mesa, vista de frente: una carita. */
+function Cara({ cx, cy }: { cx: number; cy: number }) {
+  return (
+    <g>
+      <circle cx={cx} cy={cy} r="16" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
+      <circle cx={cx - 5.5} cy={cy - 4} r="1.8" fill="#f2a33c" />
+      <circle cx={cx + 5.5} cy={cy - 4} r="1.8" fill="#f2a33c" />
+      <path d={`M ${cx - 6} ${cy + 4} Q ${cx} ${cy + 10} ${cx + 6} ${cy + 4}`} fill="none" stroke="#f2a33c" strokeWidth="1.5" strokeLinecap="round" />
     </g>
   );
 }
@@ -49,22 +75,27 @@ function EscenaBiblioteca({ markerPrefix }: { markerPrefix: string }) {
       </defs>
 
       {SHELF_XS.map((shelfX) => (
-        <rect key={shelfX} x={shelfX} y="24" width="150" height="52" rx="8" fill="#1d2026" stroke="#63b6a4" />
+        <g key={shelfX}>
+          <rect x={shelfX} y="30" width="260" height="52" rx="6" fill="#1d2026" stroke="#63b6a4" />
+          <line x1={shelfX} y1="56" x2={shelfX + 260} y2="56" stroke="#63b6a4" strokeOpacity=".6" />
+        </g>
       ))}
-      <path d={SPINES_D} fill="none" stroke="#63b6a4" strokeOpacity=".45" strokeWidth="1.5" />
-      <line x1="145" y1="76" x2="145" y2="194" stroke="#63b6a4" strokeWidth="2" markerEnd={`url(#${markerPrefix}t)`} />
+      <path d={SHELF_SPINES_D} fill="none" stroke="#63b6a4" strokeOpacity=".45" strokeWidth="1.5" />
+      <line x1="170" y1="82" x2="170" y2="186" stroke="#63b6a4" strokeWidth="2" markerEnd={`url(#${markerPrefix}t)`} />
 
-      <rect x="70" y="200" width="580" height="200" rx="12" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-      {LIBROS_XY.map(([x, y]) => (
-        <Libro key={`${x}-${y}`} x={x} y={y} />
+      <rect x="40" y="192" width="840" height="140" rx="12" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
+      {LIBROS_CERRADOS_XY.map(([x, y]) => (
+        <LibroCerrado key={`${x}-${y}`} x={x} y={y} />
       ))}
 
-      <path d="M 486 235 L 412 235 Q 400 235 400 247 L 400 264" fill="none" stroke="#f2a33c" strokeWidth="2" markerEnd={`url(#${markerPrefix})`} />
-      <rect x="290" y="270" width="140" height="64" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-      <circle cx="228" cy="302" r="13" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-      <circle cx="492" cy="302" r="13" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-      <line x1="290" y1="302" x2="248" y2="302" stroke="#f2a33c" strokeWidth="2" markerEnd={`url(#${markerPrefix})`} />
-      <line x1="430" y1="302" x2="472" y2="302" stroke="#f2a33c" strokeWidth="2" markerEnd={`url(#${markerPrefix})`} />
+      <line x1="138" y1="262" x2="364" y2="262" stroke="#f2a33c" strokeWidth="2" markerEnd={`url(#${markerPrefix})`} />
+      <rect x="370" y="228" width="180" height="68" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
+      <LibroAbierto x={382} y={248} />
+
+      <Cara cx={460} cy={150} />
+      <Cara cx={460} cy={380} />
+      <line x1="460" y1="224" x2="460" y2="172" stroke="#f2a33c" strokeWidth="2" markerEnd={`url(#${markerPrefix})`} />
+      <line x1="460" y1="300" x2="460" y2="358" stroke="#f2a33c" strokeWidth="2" markerEnd={`url(#${markerPrefix})`} />
     </>
   );
 }
@@ -72,14 +103,14 @@ function EscenaBiblioteca({ markerPrefix }: { markerPrefix: string }) {
 function RotulosBiblioteca({ r }: { r: RotulosBibliotecaTexts }) {
   return (
     <>
-      <text x="615" y="46" fontSize="12" fill="#63b6a4">{r.estanterias}</text>
-      <text x="615" y="64" fontSize="10.5" fill="currentColor" opacity=".6">{r.todasLasMaterias}</text>
-      <text x="157" y="140" fontSize="10.5" fill="#63b6a4">{r.levantarse}</text>
-      <text x="95" y="226" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.laMesa}</text>
-      <text x="478" y="227" fontSize="10.5" fill="#f2a33c" textAnchor="end">{r.alcanzar}</text>
-      <text x="360" y="296" fontSize="12" fill="#f2a33c" textAnchor="middle">{r.librosAbiertos}</text>
-      <text x="360" y="314" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.materiaActual}</text>
-      <text x="360" y="352" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.leer}</text>
+      <text x="40" y="20" fontSize="12" fill="#63b6a4">{r.estanterias}</text>
+      <text x="880" y="20" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="end">{r.todasLasMaterias}</text>
+      <text x="182" y="140" fontSize="10.5" fill="#63b6a4">{r.levantarse}</text>
+      <text x="56" y="212" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.laMesa}</text>
+      <text x="251" y="252" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.alcanzar}</text>
+      <text x="474" y="256" fontSize="12" fill="#f2a33c" textAnchor="middle">{r.librosAbiertos}</text>
+      <text x="474" y="274" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.materiaActual}</text>
+      <text x="474" y="186" fontSize="10.5" fill="#f2a33c">{r.leer}</text>
     </>
   );
 }
@@ -87,79 +118,100 @@ function RotulosBiblioteca({ r }: { r: RotulosBibliotecaTexts }) {
 function RotulosComputador({ r }: { r: RotulosComputadorTexts }) {
   return (
     <>
-      <text x="615" y="46" fontSize="12" fill="#63b6a4">{r.discoDuro}</text>
-      <text x="615" y="64" fontSize="10.5" fill="currentColor" opacity=".6">{r.todosLosDatos}</text>
-      <text x="157" y="140" fontSize="10.5" fill="#63b6a4">{r.cargar}</text>
-      <text x="95" y="226" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.ram}</text>
-      <text x="478" y="227" fontSize="10.5" fill="#f2a33c" textAnchor="end">{r.traer}</text>
-      <text x="360" y="296" fontSize="12" fill="#f2a33c" textAnchor="middle">{r.cache}</text>
-      <text x="360" y="314" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.loQueUsas}</text>
-      <text x="360" y="352" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.leerCache}</text>
-      <text x="228" y="341" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.cpu}</text>
-      <text x="492" y="341" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.cpu}</text>
+      <text x="40" y="20" fontSize="12" fill="#63b6a4">{r.discoDuro}</text>
+      <text x="880" y="20" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="end">{r.todosLosDatos}</text>
+      <text x="182" y="140" fontSize="10.5" fill="#63b6a4">{r.cargar}</text>
+      <text x="56" y="212" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.ram}</text>
+      <text x="251" y="252" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.traer}</text>
+      <text x="474" y="256" fontSize="12" fill="#f2a33c" textAnchor="middle">{r.cache}</text>
+      <text x="474" y="274" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.loQueUsas}</text>
+      <text x="474" y="186" fontSize="10.5" fill="#f2a33c">{r.leerCache}</text>
+      <text x="484" y="154" fontSize="10.5" fill="#f2a33c">{r.cpu}</text>
+      <text x="484" y="384" fontSize="10.5" fill="#f2a33c">{r.cpu}</text>
     </>
   );
 }
 
 /* Geometría compartida por "el restaurante" y su morph "cliente-servidor";
    los textos van aparte porque son lo único que cruza de dominio. */
-function EscenaRestaurante({ markerPrefix }: { markerPrefix: string }) {
+function EscenaPeticion({ markerPrefix }: { markerPrefix: string }) {
   return (
     <>
       <defs>
         <marker id={markerPrefix} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M0,0 L10,5 L0,10 z" fill="#f2a33c" />
         </marker>
-        <marker id={`${markerPrefix}t`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M0,0 L10,5 L0,10 z" fill="#63b6a4" />
-        </marker>
       </defs>
 
-      <rect x="700" y="28" width="150" height="52" rx="8" fill="#1d2026" stroke="#63b6a4" />
-      <line x1="775" y1="80" x2="775" y2="152" stroke="#63b6a4" strokeWidth="2" markerEnd={`url(#${markerPrefix}t)`} />
+      <rect x="70" y="80" width="200" height="110" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
+      <rect x="600" y="40" width="280" height="150" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
 
-      <rect x="70" y="160" width="160" height="80" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-      <rect x="700" y="160" width="150" height="80" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-
-      <line x1="230" y1="178" x2="692" y2="178" stroke="#f2a33c" strokeWidth="2" markerEnd={`url(#${markerPrefix})`} />
-      <line x1="700" y1="222" x2="238" y2="222" stroke="#f2a33c" strokeWidth="2" markerEnd={`url(#${markerPrefix})`} />
+      <line x1="270" y1="108" x2="592" y2="108" stroke="#f2a33c" strokeWidth="2" markerEnd={`url(#${markerPrefix})`} />
+      <line x1="600" y1="166" x2="278" y2="166" stroke="#f2a33c" strokeWidth="2" markerEnd={`url(#${markerPrefix})`} />
     </>
   );
 }
 
-function RotulosRestaurante({ r }: { r: RotulosRestauranteTexts }) {
+function RotulosPeticion({ r }: { r: RotulosPeticionTexts }) {
   return (
     <>
-      <text x="775" y="50" fontSize="12" fill="#63b6a4" textAnchor="middle">{r.ingredientes}</text>
-      <text x="775" y="68" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.laDespensa}</text>
-      <text x="150" y="192" fontSize="12" fill="currentColor" textAnchor="middle">{r.tu}</text>
-      <text x="150" y="210" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.enLaMesa}</text>
-      <text x="775" y="186" fontSize="12" fill="#f2a33c" textAnchor="middle">{r.cocina}</text>
-      <text x="775" y="204" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.hayIngredientes}</text>
-      <text x="775" y="220" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.siSeCocina}</text>
-      <text x="461" y="168" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.pides}</text>
-      <text x="461" y="196" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.aTuMedida}</text>
-      <text x="461" y="242" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.teTrae}</text>
-      <text x="461" y="258" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.oNoHay}</text>
+      <text x="170" y="128" fontSize="12" fill="currentColor" textAnchor="middle">{r.cliente}</text>
+      <text x="170" y="148" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.clienteSub}</text>
+      <text x="740" y="68" fontSize="12" fill="#f2a33c" textAnchor="middle">{r.servidor}</text>
+      <text x="618" y="100" fontSize="10.5" fill="currentColor" opacity=".8">{r.paso1}</text>
+      <text x="618" y="126" fontSize="10.5" fill="currentColor" opacity=".8">{r.paso2}</text>
+      <text x="618" y="152" fontSize="10.5" fill="currentColor" opacity=".8">{r.paso3}</text>
+      <text x="431" y="98" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.peticion}</text>
+      <text x="431" y="124" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.peticionSub}</text>
+      <text x="431" y="188" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.respuesta}</text>
+      <text x="431" y="204" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.respuestaSub}</text>
     </>
   );
 }
 
-function RotulosClienteServidor({ r }: { r: RotulosClienteServidorTexts }) {
+/* Una computadora por dentro; `protagonista` marca qué piezas van en ámbar. */
+function Maquina({ x, r, protagonista }: { x: number; r: MaquinaTexts; protagonista: 'red' | 'video' }) {
+  const y = 64;
+  const piezaProtagonista = { fill: '#232730', stroke: '#f2a33c', strokeWidth: 2 };
+  const piezaNormal = { fill: '#1d2026', stroke: 'currentColor', strokeOpacity: 0.35 };
+  const piezaAusente = { fill: 'none', stroke: 'currentColor', strokeOpacity: 0.35, strokeDasharray: '6 6' };
+  const redEsProtagonista = protagonista === 'red';
+  const piezas: { titulo: string; sub: string; estilo: object; protagonista: boolean; ausente: boolean }[] = [
+    { titulo: r.tarjetaRed, sub: r.tarjetaRedSub, estilo: redEsProtagonista ? piezaProtagonista : piezaNormal, protagonista: redEsProtagonista, ausente: false },
+    { titulo: r.fuente, sub: r.fuenteSub, estilo: redEsProtagonista ? piezaProtagonista : piezaNormal, protagonista: redEsProtagonista, ausente: false },
+    {
+      titulo: r.tarjetaVideo,
+      sub: r.tarjetaVideoSub,
+      estilo: redEsProtagonista ? piezaAusente : piezaProtagonista,
+      protagonista: !redEsProtagonista,
+      ausente: redEsProtagonista,
+    },
+  ];
+
   return (
-    <>
-      <text x="775" y="50" fontSize="12" fill="#63b6a4" textAnchor="middle">{r.recursos}</text>
-      <text x="775" y="68" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.datosPermisos}</text>
-      <text x="150" y="192" fontSize="12" fill="currentColor" textAnchor="middle">{r.pcCliente}</text>
-      <text x="150" y="210" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.quienPide}</text>
-      <text x="775" y="186" fontSize="12" fill="#f2a33c" textAnchor="middle">{r.pcServidor}</text>
-      <text x="775" y="204" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.tienesAcceso}</text>
-      <text x="775" y="220" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.siArma}</text>
-      <text x="461" y="168" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.peticion}</text>
-      <text x="461" y="196" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.loQueQuieres}</text>
-      <text x="461" y="242" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.respuesta}</text>
-      <text x="461" y="258" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.oError}</text>
-    </>
+    <g>
+      <rect x={x} y={y} width="410" height="340" rx="12" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
+      <text x={x + 20} y={y + 28} fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.titulo}</text>
+
+      {[r.cpu, r.ram, r.disco].map((nombre, i) => (
+        <g key={nombre}>
+          <rect x={x + 22 + i * 124} y={y + 46} width="118" height="44" rx="8" {...piezaNormal} />
+          <text x={x + 81 + i * 124} y={y + 73} fontSize="12" fill="currentColor" textAnchor="middle">{nombre}</text>
+        </g>
+      ))}
+
+      {piezas.map((pieza, i) => {
+        const py = y + 108 + i * 70;
+        const opacidad = pieza.ausente ? '.5' : '1';
+        return (
+          <g key={pieza.titulo}>
+            <rect x={x + 22} y={py} width="366" height="56" rx="8" {...pieza.estilo} />
+            <text x={x + 205} y={py + 22} fontSize="12" fill={pieza.protagonista ? '#f2a33c' : 'currentColor'} opacity={opacidad} textAnchor="middle">{pieza.titulo}</text>
+            <text x={x + 205} y={py + 40} fontSize="10.5" fill="currentColor" opacity={pieza.ausente ? '.5' : '.6'} textAnchor="middle">{pieza.sub}</text>
+          </g>
+        );
+      })}
+    </g>
   );
 }
 
@@ -265,7 +317,7 @@ export default function DatosProgramasYServidores() {
         <div className={s.eyebrow}>{t.biblioteca.eyebrow}</div>
         <h2>{t.biblioteca.title}</h2>
         <figure>
-          <svg viewBox="0 0 920 430" role="img" aria-label={t.biblioteca.aria}>
+          <svg viewBox="0 0 920 410" role="img" aria-label={t.biblioteca.aria}>
             <EscenaBiblioteca markerPrefix="arrD1" />
             <RotulosBiblioteca r={t.biblioteca.rotulos} />
           </svg>
@@ -277,7 +329,7 @@ export default function DatosProgramasYServidores() {
         <div className={s.eyebrow}>{t.computador.eyebrow}</div>
         <h2>{t.computador.title}</h2>
         <figure>
-          <svg viewBox="0 0 920 430" role="img" aria-label={t.computador.aria}>
+          <svg viewBox="0 0 920 410" role="img" aria-label={t.computador.aria}>
             <EscenaBiblioteca markerPrefix="arrD2" />
             {/* Paso único, sin espera y más lento que el estándar: los rótulos cruzan de dominio */}
             <g className={s.morphOut} style={{ animationDuration: '1.2s' }}>
@@ -344,9 +396,9 @@ export default function DatosProgramasYServidores() {
         <div className={s.eyebrow}>{t.restaurante.eyebrow}</div>
         <h2>{t.restaurante.title}</h2>
         <figure>
-          <svg viewBox="0 0 920 270" role="img" aria-label={t.restaurante.aria}>
-            <EscenaRestaurante markerPrefix="arrD3" />
-            <RotulosRestaurante r={t.restaurante.rotulos} />
+          <svg viewBox="0 0 920 230" role="img" aria-label={t.restaurante.aria}>
+            <EscenaPeticion markerPrefix="arrD3" />
+            <RotulosPeticion r={t.restaurante.rotulos} />
           </svg>
           <figcaption>{t.restaurante.caption}</figcaption>
         </figure>
@@ -356,14 +408,14 @@ export default function DatosProgramasYServidores() {
         <div className={s.eyebrow}>{t.clienteServidor.eyebrow}</div>
         <h2>{t.clienteServidor.title}</h2>
         <figure>
-          <svg viewBox="0 0 920 270" role="img" aria-label={t.clienteServidor.aria}>
-            <EscenaRestaurante markerPrefix="arrD3b" />
+          <svg viewBox="0 0 920 230" role="img" aria-label={t.clienteServidor.aria}>
+            <EscenaPeticion markerPrefix="arrD3b" />
             {/* Paso único, sin espera y más lento que el estándar: los rótulos cruzan de dominio */}
             <g className={s.morphOut} style={{ animationDuration: '1.2s' }}>
-              <RotulosRestaurante r={t.restaurante.rotulos} />
+              <RotulosPeticion r={t.restaurante.rotulos} />
             </g>
             <g className={s.morphIn} style={{ animationDuration: '1.2s' }}>
-              <RotulosClienteServidor r={t.clienteServidor.rotulos} />
+              <RotulosPeticion r={t.clienteServidor.rotulos} />
             </g>
           </svg>
           <figcaption>{t.clienteServidor.caption}</figcaption>
@@ -381,7 +433,7 @@ export default function DatosProgramasYServidores() {
               </marker>
             </defs>
 
-            {t.servidores.filas.map(({ servidor, pides, sirve }, i) => {
+            {t.servidores.filas.map(({ servidor, pides, sirve, ejemplos }, i) => {
               const y = 40 + i * 90;
               return (
                 <g key={servidor}>
@@ -391,6 +443,7 @@ export default function DatosProgramasYServidores() {
                   <line x1="90" y1={y + 18} x2="322" y2={y + 18} stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD4)" />
                   <line x1="330" y1={y + 42} x2="98" y2={y + 42} stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD4)" />
                   <text x="206" y={y + 56} fontSize="10.5" fill="#f2a33c" textAnchor="middle">{sirve}</text>
+                  <text x="628" y={y + 35} fontSize="10.5" fill="currentColor" opacity=".6">{ejemplos}</text>
                 </g>
               );
             })}
@@ -403,40 +456,20 @@ export default function DatosProgramasYServidores() {
         <div className={s.eyebrow}>{t.hardware.eyebrow}</div>
         <h2>{t.hardware.title}</h2>
         <figure>
-          <svg viewBox="0 0 920 360" role="img" aria-label={t.hardware.aria}>
+          <svg viewBox="0 0 920 420" role="img" aria-label={t.hardware.aria}>
             <defs>
               <marker id="arrD5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                 <path d="M0,0 L10,5 L0,10 z" fill="#f2a33c" />
               </marker>
             </defs>
 
-            <rect x="300" y="50" width="360" height="290" rx="12" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-            <text x="320" y="78" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{t.hardware.computadoraServidor}</text>
+            <line x1="150" y1="10" x2="150" y2="58" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD5)" />
+            <text x="160" y="36" fontSize="10.5" fill="#f2a33c">{t.hardware.peticiones}</text>
+            <line x1="340" y1="58" x2="340" y2="10" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD5)" />
+            <text x="350" y="36" fontSize="10.5" fill="#f2a33c">{t.hardware.respuestas}</text>
 
-            <rect x="330" y="100" width="90" height="46" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-            <text x="375" y="128" fontSize="12" fill="currentColor" textAnchor="middle">{t.hardware.cpu}</text>
-            <rect x="435" y="100" width="90" height="46" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-            <text x="480" y="128" fontSize="12" fill="currentColor" textAnchor="middle">{t.hardware.ram}</text>
-            <rect x="540" y="100" width="90" height="46" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-            <text x="585" y="128" fontSize="12" fill="currentColor" textAnchor="middle">{t.hardware.disco}</text>
-
-            <rect x="330" y="170" width="300" height="56" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-            <text x="480" y="192" fontSize="12" fill="#f2a33c" textAnchor="middle">{t.hardware.tarjetaRed}</text>
-            <text x="480" y="210" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{t.hardware.conectada}</text>
-
-            <rect x="330" y="250" width="300" height="56" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-            <text x="480" y="272" fontSize="12" fill="#f2a33c" textAnchor="middle">{t.hardware.fuente}</text>
-            <text x="480" y="290" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{t.hardware.encendida}</text>
-
-            <line x1="90" y1="186" x2="322" y2="186" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD5)" />
-            <text x="196" y="176" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{t.hardware.peticiones}</text>
-            <line x1="330" y1="212" x2="98" y2="212" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD5)" />
-            <text x="196" y="230" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{t.hardware.respuestas}</text>
-
-            <rect x="700" y="170" width="170" height="64" rx="8" fill="none" stroke="currentColor" strokeOpacity=".35" strokeDasharray="6 6" />
-            <text x="785" y="190" fontSize="12" fill="currentColor" opacity=".5" textAnchor="middle">{t.hardware.tarjetaGrafica}</text>
-            <text x="785" y="206" fontSize="10.5" fill="currentColor" opacity=".5" textAnchor="middle">{t.hardware.noHaceFalta}</text>
-            <text x="785" y="220" fontSize="10.5" fill="currentColor" opacity=".5" textAnchor="middle">{t.hardware.nadieMira}</text>
+            <Maquina x={40} r={t.hardware.servidor} protagonista="red" />
+            <Maquina x={470} r={t.hardware.diseno} protagonista="video" />
           </svg>
           <figcaption>{t.hardware.caption}</figcaption>
         </figure>
