@@ -1,12 +1,13 @@
 import dynamic from 'next/dynamic';
 import type { ComponentType } from 'react';
+import type { Dictionary } from '../i18n/useT';
 
 /** URL prefix of the section; every route the section builds goes through `classPath`. */
 export const LEARN_BASE_PATH: string = '/learn';
 
 export type LearnClass = {
   slug: string;
-  title: string;
+  title: Dictionary<string>;
   component: ComponentType;
   /** Optional grouping shown in the class dropdown and the slide rail (e.g. 'Intro'). */
   section?: string;
@@ -30,25 +31,25 @@ export const LEARN_COURSES: LearnCourse[] = [
     classes: [
       {
         slug: 'datos-programas-y-servidores',
-        title: 'Datos, programas y servidores',
+        title: { es: 'Datos, programas y servidores', en: 'Data, programs and servers' },
         section: 'Intro',
         component: dynamic(() => import('../presentations/wwise-unreal/datos-programas-y-servidores')),
       },
       {
         slug: 'que-es-un-motor-de-audio',
-        title: '¿Qué es un motor de audio?',
+        title: { es: '¿Qué es un motor de audio?', en: 'What is an audio engine?' },
         section: 'Intro',
         component: dynamic(() => import('../presentations/wwise-unreal/que-es-un-motor-de-audio')),
       },
       {
         slug: 'wwise-por-adentro',
-        title: 'Wwise por adentro',
+        title: { es: 'Wwise por adentro', en: 'Wwise from the inside' },
         section: 'Intro',
         component: dynamic(() => import('../presentations/wwise-unreal/wwise-por-adentro')),
       },
       {
         slug: 'el-editor-wwise',
-        title: 'El editor Wwise',
+        title: { es: 'El editor Wwise', en: 'The Wwise editor' },
         section: 'Intro',
         component: dynamic(() => import('../presentations/wwise-unreal/el-editor-wwise')),
       },

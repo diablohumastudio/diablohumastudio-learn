@@ -24,13 +24,13 @@ function rememberLocale(locale: Locale) {
   document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=${COOKIE_MAX_AGE_SECONDS}; SameSite=Lax`;
 }
 
-export default function LanguageSwitch() {
+export default function LanguageSwitch({ className }: { className?: string }) {
   const router = useRouter();
   const t = useT(dict);
   const activeLocale = isLocale(router.locale) ? router.locale : DEFAULT_LOCALE;
 
   return (
-    <nav className={s.switch} aria-label={t.label}>
+    <nav className={className ? `${s.switch} ${className}` : s.switch} aria-label={t.label}>
       {LOCALES.map((locale, index) => (
         <Fragment key={locale}>
           {index > 0 && (

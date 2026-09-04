@@ -14,28 +14,26 @@ import {
   querySlug,
 } from '../../data/learn';
 import type { LearnClass } from '../../data/learn';
+import { learnDict } from '../../i18n/learn';
+import { useLocale, useT } from '../../i18n/useT';
+import LanguageSwitch from '../LanguageSwitch';
 import { LEARN_FONT_VARS } from './fonts';
 import s from './LearnLayout.module.css';
 
 export function LearnMissing() {
+  const t = useT(learnDict);
   return (
     <div className={s.missing}>
-      <p>Clase no encontrada.</p>
-      <Link href={LEARN_BASE_PATH}>Ir a la última clase</Link>
+      <p>{t.classNotFound}</p>
+      <Link href={LEARN_BASE_PATH}>{t.goToLatest}</Link>
     </div>
-  );
-}
-
-function renderClassOption(learnClass: LearnClass) {
-  return (
-    <option key={learnClass.slug} value={learnClass.slug}>
-      {learnClass.title}
-    </option>
   );
 }
 
 export default function LearnLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const t = useT(learnDict);
+  const locale = useLocale();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const activeCourse = findCourse(querySlug(router.query.curso)) ?? LEARN_COURSES[0];
@@ -67,10 +65,18 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
     document.documentElement.requestFullscreen();
   }
 
+  function renderClassOption(learnClass: LearnClass) {
+    return (
+      <option key={learnClass.slug} value={learnClass.slug}>
+        {learnClass.title[locale]}
+      </option>
+    );
+  }
+
   return (
     <div className={`${s.shell} ${LEARN_FONT_VARS}`}>
       <Head>
-        <title>Learn – DiabloHumaStudio</title>
+        <title>{t.pageTitle}</title>
         {/* Unlisted section: reachable only by direct link. */}
         <meta name="robots" content="noindex, nofollow" />
         <meta name="theme-color" content="#14161a" />
@@ -79,7 +85,7 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
         <span className={s.led} />
         <span className={s.brand}>LEARN</span>
         <label className={s.selectGroup}>
-          <span className={s.selectLabel}>Curso</span>
+          <span className={s.selectLabel}>{t.courseLabel}</span>
           <select
             className={s.select}
             value={activeCourse.slug}
@@ -96,7 +102,7 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
           </select>
         </label>
         <label className={s.selectGroup}>
-          <span className={s.selectLabel}>Clase</span>
+          <span className={s.selectLabel}>{t.classLabel}</span>
           <select
             className={s.select}
             value={activeClassSlug}
@@ -117,12 +123,13 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
           </select>
         </label>
         <span className={s.spacer} />
+        <LanguageSwitch className={s.languageSwitch} />
         <button
           type="button"
           className={s.fullscreenBtn}
           onClick={toggleFullscreen}
-          aria-label={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
-          title={isFullscreen ? 'Salir de pantalla completa (Esc)' : 'Pantalla completa'}
+          aria-label={isFullscreen ? t.exitFullscreen : t.fullscreen}
+          title={isFullscreen ? t.exitFullscreenHint : t.fullscreen}
         >
           ⛶
         </button>

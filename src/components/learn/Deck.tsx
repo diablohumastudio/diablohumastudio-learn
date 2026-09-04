@@ -2,6 +2,8 @@ import { useRouter } from 'next/router';
 import { Children, createContext, isValidElement, useContext, useEffect } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 import { classPath, findClass, findCourse, neighborClass, querySlug } from '../../data/learn';
+import { learnDict } from '../../i18n/learn';
+import { useT } from '../../i18n/useT';
 import { LEARN_FONT_VARS } from './fonts';
 import s from './Deck.module.css';
 
@@ -49,6 +51,7 @@ function pad2(value: number): string {
 
 export default function Deck({ name, context, children }: DeckProps) {
   const router = useRouter();
+  const t = useT(learnDict);
   const slides = Children.toArray(children).filter(isValidElement) as ReactElement<SlideProps>[];
   const total = slides.length;
   const course = findCourse(querySlug(router.query.curso));
@@ -142,10 +145,10 @@ export default function Deck({ name, context, children }: DeckProps) {
       </div>
       <footer className={s.bar}>
         <div className={s.navbtns}>
-          <button type="button" onClick={() => goTo(currentIndex - 1)} aria-label="Diapositiva anterior">
+          <button type="button" onClick={() => goTo(currentIndex - 1)} aria-label={t.previousSlide}>
             ←
           </button>
-          <button type="button" onClick={() => goTo(currentIndex + 1)} aria-label="Siguiente diapositiva">
+          <button type="button" onClick={() => goTo(currentIndex + 1)} aria-label={t.nextSlide}>
             →
           </button>
         </div>
@@ -158,7 +161,7 @@ export default function Deck({ name, context, children }: DeckProps) {
         <span className={s.counter}>
           {pad2(currentIndex + 1)} / {pad2(total)}
         </span>
-        <span className={s.hint}>← → · espacio</span>
+        <span className={s.hint}>{t.keysHint}</span>
       </footer>
     </div>
   );

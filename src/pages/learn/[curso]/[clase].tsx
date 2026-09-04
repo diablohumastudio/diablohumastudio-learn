@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import type { ReactElement } from 'react';
 import LearnLayout, { LearnMissing } from '../../../components/learn/LearnLayout';
 import { findClass, findCourse, querySlug } from '../../../data/learn';
+import { useLocale } from '../../../i18n/useT';
 import type { NextPageWithLayout } from '../../_app';
 
 // Forces SSR so route params reach useRouter on the first render:
@@ -12,6 +13,7 @@ export const getServerSideProps: GetServerSideProps = async () => ({ props: {} }
 
 const LearnClassPage: NextPageWithLayout = () => {
   const router = useRouter();
+  const locale = useLocale();
   const course = findCourse(querySlug(router.query.curso));
   const learnClass = course ? findClass(course, querySlug(router.query.clase)) : undefined;
 
@@ -20,11 +22,12 @@ const LearnClassPage: NextPageWithLayout = () => {
   }
 
   const Presentation = learnClass.component;
+  const title = learnClass.title[locale];
 
   return (
     <>
       <Head>
-        <title>{`${learnClass.title} – ${course.title}`}</title>
+        <title>{`${title} – ${course.title}`}</title>
       </Head>
       <Presentation />
     </>

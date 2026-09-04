@@ -1,6 +1,8 @@
 /* Sits inside .site-pages-nav (globals.css), so it inherits the nav's
-   row/column layout and matches .site-page-link spacing. */
+   row/column layout and matches .site-page-link spacing. Another host can
+   restyle it through a wrapper class: --switch-color, padding, font-size. */
 .switch {
+  --switch-color: #e7945e;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -12,7 +14,7 @@
 
 .option,
 .active {
-  color: #e7945e;
+  color: var(--switch-color);
   text-decoration: none;
 }
 

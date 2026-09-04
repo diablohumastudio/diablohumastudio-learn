@@ -81,6 +81,14 @@
   flex: 1;
 }
 
+/* LanguageSwitch is styled for the marketing header; here it takes the deck theme. */
+.languageSwitch {
+  --switch-color: var(--amber);
+  padding-left: 0;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+}
+
 .fullscreenBtn {
   font-family: inherit;
   font-size: 14px;
