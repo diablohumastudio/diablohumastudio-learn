@@ -1,8 +1,9 @@
 import { Html, Head, Main, NextScript } from 'next/document';
 
 export default function Document() {
+  // <Html> gets its `lang` from the active locale (Next.js i18n fills it in).
   return (
-    <Html lang="en">
+    <Html>
       <Head>
         <link rel="icon" href="/favicon.png" type="image/png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
