@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router';
-import { Children, isValidElement, useEffect } from 'react';
+import { Children, createContext, isValidElement, useContext, useEffect } from 'react';
 import type { ReactElement, ReactNode } from 'react';
-import { findCourse, neighborClass, querySlug } from '../../data/incine';
-import { INCINE_FONT_VARS } from './fonts';
+import { classPath, findClass, findCourse, neighborClass, querySlug } from '../../data/learn';
+import { LEARN_FONT_VARS } from './fonts';
 import s from './Deck.module.css';
 
 type SlideProps = {
@@ -12,7 +12,12 @@ type SlideProps = {
   children: ReactNode;
 };
 
+/* The class section (e.g. "Intro") comes from the registry, not from the deck
+   author, so Deck resolves it once and every Slide reads it for its rail. */
+const SlideSectionContext = createContext<string | undefined>(undefined);
+
 export function Slide({ z, label, backgroundImage, children }: SlideProps) {
+  const section = useContext(SlideSectionContext);
   const backgroundStyle = backgroundImage
     ? {
         backgroundImage: `linear-gradient(180deg, rgba(20, 22, 26, 0.45) 0%, rgba(20, 22, 26, 0.85) 100%), url(${backgroundImage})`,
@@ -21,6 +26,7 @@ export function Slide({ z, label, backgroundImage, children }: SlideProps) {
   return (
     <section className={s.slide} style={backgroundStyle}>
       <div className={s.rail}>
+        {section ? <span className={s.railSection}>{section}</span> : null}
         <span className={s.z}>{z}</span>
         <span className={s.zl}>{label}</span>
       </div>
@@ -45,6 +51,8 @@ export default function Deck({ name, context, children }: DeckProps) {
   const router = useRouter();
   const slides = Children.toArray(children).filter(isValidElement) as ReactElement<SlideProps>[];
   const total = slides.length;
+  const course = findCourse(querySlug(router.query.curso));
+  const section = course ? findClass(course, querySlug(router.query.clase))?.section : undefined;
 
   const rawSlideParam = Array.isArray(router.query.s) ? router.query.s[0] : router.query.s;
   // '?s=last' lands on the final slide without the sender knowing the count
@@ -61,7 +69,7 @@ export default function Deck({ name, context, children }: DeckProps) {
     const target = neighborClass(course, querySlug(router.query.clase), offset);
     if (!target) return;
     router.push({
-      pathname: `/incine/${course.slug}/${target.slug}`,
+      pathname: classPath(course, target),
       query: offset < 0 ? { s: 'last' } : undefined,
     });
   }
@@ -126,10 +134,10 @@ export default function Deck({ name, context, children }: DeckProps) {
   const activeSlide = slides[currentIndex];
 
   return (
-    <div className={`${s.deck} ${INCINE_FONT_VARS}`}>
+    <div className={`${s.deck} ${LEARN_FONT_VARS}`}>
       <div className={s.stage}>
         <div key={currentIndex} className={s.slideHost}>
-          {activeSlide}
+          <SlideSectionContext.Provider value={section}>{activeSlide}</SlideSectionContext.Provider>
         </div>
       </div>
       <footer className={s.bar}>

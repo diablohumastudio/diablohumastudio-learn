@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
-import Deck, { Slide } from '../../components/incine/Deck';
-import s from '../../components/incine/Deck.module.css';
+import Deck, { Slide } from '../../components/learn/Deck';
+import s from '../../components/learn/Deck.module.css';
 
 export default function QueEsUnMotorDeAudio() {
   return (

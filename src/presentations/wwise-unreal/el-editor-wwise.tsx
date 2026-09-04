@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
-import Deck, { Slide } from '../../components/incine/Deck';
-import s from '../../components/incine/Deck.module.css';
+import Deck, { Slide } from '../../components/learn/Deck';
+import s from '../../components/learn/Deck.module.css';
 
 const VIEWS_DIRECTOS_FILA1: [number, string][] = [
   [60, 'Audio Device Meter'],

@@ -1,6 +1,6 @@
 # Presentations — Instructions
 
-Each class presentation is one React component built with `Deck` / `Slide`, registered in `src/data/incine.ts` and served under `/incine`. The mechanics (how to add a course, a class or a slide, which CSS classes exist, the `Slide` props) are in [docs/incine-courses-and-slides.md](../../docs/incine-courses-and-slides.md).
+Each class presentation is one React component built with `Deck` / `Slide`, registered in `src/data/learn.ts` and served under `/learn`. The mechanics (how to add a course, a class or a slide, which CSS classes exist, the `Slide` props) are in [docs/learn-courses-and-slides.md](../../docs/learn-courses-and-slides.md).
 
 ## Per-course style rules
 

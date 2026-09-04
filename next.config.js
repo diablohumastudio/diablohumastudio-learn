@@ -8,6 +8,12 @@ const nextConfig = {
         destination: 'https://discord.gg/5JNJcmHSQ',
         permanent: false,
       },
+      // Class links shared before the section moved to /learn.
+      {
+        source: '/incine/:path*',
+        destination: '/learn/:path*',
+        permanent: true,
+      },
     ]
   },
 }

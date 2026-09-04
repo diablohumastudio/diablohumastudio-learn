@@ -18,4 +18,4 @@ const monoFont = IBM_Plex_Mono({
   variable: '--font-mono',
 });
 
-export const INCINE_FONT_VARS = `${displayFont.variable} ${bodyFont.variable} ${monoFont.variable}`;
+export const LEARN_FONT_VARS = `${displayFont.variable} ${bodyFont.variable} ${monoFont.variable}`;

@@ -3,24 +3,42 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { INCINE_COURSES, findCourse, latestClass, querySlug } from '../../data/incine';
-import { INCINE_FONT_VARS } from './fonts';
-import s from './IncineLayout.module.css';
+import {
+  LEARN_BASE_PATH,
+  LEARN_COURSES,
+  classPath,
+  findClass,
+  findCourse,
+  groupClassesBySection,
+  latestClass,
+  querySlug,
+} from '../../data/learn';
+import type { LearnClass } from '../../data/learn';
+import { LEARN_FONT_VARS } from './fonts';
+import s from './LearnLayout.module.css';
 
-export function IncineMissing() {
+export function LearnMissing() {
   return (
     <div className={s.missing}>
       <p>Clase no encontrada.</p>
-      <Link href="/incine">Ir a la última clase</Link>
+      <Link href={LEARN_BASE_PATH}>Ir a la última clase</Link>
     </div>
   );
 }
 
-export default function IncineLayout({ children }: { children: ReactNode }) {
+function renderClassOption(learnClass: LearnClass) {
+  return (
+    <option key={learnClass.slug} value={learnClass.slug}>
+      {learnClass.title}
+    </option>
+  );
+}
+
+export default function LearnLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const activeCourse = findCourse(querySlug(router.query.curso)) ?? INCINE_COURSES[0];
+  const activeCourse = findCourse(querySlug(router.query.curso)) ?? LEARN_COURSES[0];
   const activeClassSlug = querySlug(router.query.clase) ?? '';
 
   useEffect(() => {
@@ -32,11 +50,13 @@ export default function IncineLayout({ children }: { children: ReactNode }) {
   function changeCourse(slug: string) {
     const course = findCourse(slug);
     if (!course || course.classes.length === 0) return;
-    router.push(`/incine/${course.slug}/${latestClass(course).slug}`);
+    router.push(classPath(course, latestClass(course)));
   }
 
   function changeClass(slug: string) {
-    router.push(`/incine/${activeCourse.slug}/${slug}`);
+    const target = findClass(activeCourse, slug);
+    if (!target) return;
+    router.push(classPath(activeCourse, target));
   }
 
   function toggleFullscreen() {
@@ -48,16 +68,16 @@ export default function IncineLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className={`${s.shell} ${INCINE_FONT_VARS}`}>
+    <div className={`${s.shell} ${LEARN_FONT_VARS}`}>
       <Head>
-        <title>INCINE – DiabloHumaStudio</title>
+        <title>Learn – DiabloHumaStudio</title>
         {/* Unlisted section: reachable only by direct link. */}
         <meta name="robots" content="noindex, nofollow" />
         <meta name="theme-color" content="#14161a" />
       </Head>
       <header className={s.header}>
         <span className={s.led} />
-        <span className={s.brand}>INCINE</span>
+        <span className={s.brand}>LEARN</span>
         <label className={s.selectGroup}>
           <span className={s.selectLabel}>Curso</span>
           <select
@@ -68,7 +88,7 @@ export default function IncineLayout({ children }: { children: ReactNode }) {
               event.target.blur();
             }}
           >
-            {INCINE_COURSES.map((course) => (
+            {LEARN_COURSES.map((course) => (
               <option key={course.slug} value={course.slug}>
                 {course.title}
               </option>
@@ -85,11 +105,15 @@ export default function IncineLayout({ children }: { children: ReactNode }) {
               event.target.blur();
             }}
           >
-            {activeCourse.classes.map((incineClass) => (
-              <option key={incineClass.slug} value={incineClass.slug}>
-                {incineClass.title}
-              </option>
-            ))}
+            {groupClassesBySection(activeCourse).map((group) =>
+              group.section ? (
+                <optgroup key={group.section} label={group.section}>
+                  {group.classes.map(renderClassOption)}
+                </optgroup>
+              ) : (
+                group.classes.map(renderClassOption)
+              )
+            )}
           </select>
         </label>
         <span className={s.spacer} />

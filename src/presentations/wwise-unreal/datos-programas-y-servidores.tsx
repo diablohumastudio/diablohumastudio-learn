@@ -1,11 +1,18 @@
-import Deck, { Slide } from '../../components/incine/Deck';
-import s from '../../components/incine/Deck.module.css';
+import Deck, { Slide } from '../../components/learn/Deck';
+import s from '../../components/learn/Deck.module.css';
 
 const SHELF_XS: number[] = [70, 240, 410];
 const SPINE_OFFSETS: number[] = [22, 44, 61, 86, 105, 127];
 const SPINES_D: string = SHELF_XS.map((shelfX) =>
   SPINE_OFFSETS.map((offset) => `M ${shelfX + offset} 34 V 66`).join(' ')
 ).join(' ');
+
+const NIVELES_DE_LENGUAJE: { titulo: string; lineas: [string, string] }[] = [
+  { titulo: 'PYTHON / JAVASCRIPT', lineas: ['se lee casi como inglés', 'la memoria la maneja el lenguaje por ti'] },
+  { titulo: 'C++ / RUST', lineas: ['control total del hardware y la memoria', 'se compila antes de correr'] },
+  { titulo: 'ENSAMBLADOR (ASSEMBLY)', lineas: ['instrucciones directas al procesador', 'difícil de leer para un humano'] },
+  { titulo: 'CÓDIGO MÁQUINA · 1s y 0s', lineas: ['el único lenguaje que la CPU entiende', 'pulsos eléctricos: 1 = encendido · 0 = apagado'] },
+];
 
 const LIBROS_XY: [number, number][] = [
   [490, 225],
@@ -234,15 +241,15 @@ function EscenaArranque({ paso, markerPrefix }: { paso: number; markerPrefix: st
   );
 }
 
-export default function DondeVivenLosDatos() {
+export default function DatosProgramasYServidores() {
   return (
-    <Deck name="¿Dónde viven los datos?" context="Intro a Wwise · Wwise + Unreal">
+    <Deck name="Datos, programas y servidores" context="Intro a Wwise · Wwise + Unreal">
       <Slide z="▶" label="intro" backgroundImage="/assets/presentations/wwise-unreal/Cover.jpg">
-        <div className={s.eyebrow}>Intro a Wwise</div>
+        <div className={s.eyebrow}>Intro a Wwise · del disco al servidor</div>
         <h1>
-          ¿Dónde viven
+          Datos, programas
           <br />
-          los <span className={s.accent}>datos</span>?
+          y <span className={s.accent}>servidores</span>
         </h1>
         <p className={s.note}>Navega con ← → · espacio</p>
       </Slide>
@@ -289,8 +296,63 @@ export default function DondeVivenLosDatos() {
         </figure>
       </Slide>
 
-      <Slide z="2" label="restaurante">
-        <div className={s.eyebrow}>Concepto 2 · el restaurante</div>
+      <Slide z="2" label="lenguajes">
+        <div className={s.eyebrow}>Concepto 2 · los lenguajes</div>
+        <h2>
+          La CPU solo entiende <span className={s.accent}>unos y ceros</span>
+        </h2>
+        <figure>
+          <svg
+            viewBox="0 0 920 420"
+            role="img"
+            aria-label="Cuatro niveles de lenguaje apilados de arriba hacia abajo, del más cercano al humano al más cercano a la máquina: Python y JavaScript (se leen casi como inglés y el lenguaje maneja la memoria por ti), C++ y Rust (control total del hardware y la memoria, se compilan antes de correr), ensamblador (instrucciones directas al procesador, difícil de leer para un humano) y código máquina en unos y ceros (el único lenguaje que la CPU entiende: pulsos eléctricos, 1 encendido y 0 apagado). Tú escribes en el nivel de arriba; la CPU lee el de abajo."
+          >
+            <defs>
+              <marker id="arrD7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#f2a33c" />
+              </marker>
+              <marker id="arrD7t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#63b6a4" />
+              </marker>
+            </defs>
+
+            <text x="220" y="18" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">MÁS CERCA DEL HUMANO</text>
+            <text x="700" y="18" fontSize="10.5" fill="#63b6a4" textAnchor="end">más fácil para ti</text>
+
+            {NIVELES_DE_LENGUAJE.map(({ titulo, lineas }, i) => {
+              const y = 34 + i * 94;
+              const esMaquina = i === NIVELES_DE_LENGUAJE.length - 1;
+              return (
+                <g key={titulo}>
+                  {esMaquina ? (
+                    <rect x="220" y={y} width="480" height="58" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
+                  ) : (
+                    <rect x="220" y={y} width="480" height="58" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
+                  )}
+                  <text x="240" y={y + 21} fontSize="12" fill={esMaquina ? '#f2a33c' : 'currentColor'}>{titulo}</text>
+                  <text x="240" y={y + 37} fontSize="10.5" fill="currentColor" opacity=".6">{lineas[0]}</text>
+                  <text x="240" y={y + 51} fontSize="10.5" fill="currentColor" opacity=".6">{lineas[1]}</text>
+                  {!esMaquina && (
+                    <line x1="460" y1={y + 62} x2="460" y2={y + 88} stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD7)" />
+                  )}
+                </g>
+              );
+            })}
+
+            <text x="220" y="398" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">MÁS CERCA DE LA MÁQUINA</text>
+            <text x="700" y="398" fontSize="10.5" fill="#f2a33c" textAnchor="end">más rápido para la CPU</text>
+
+            <text x="770" y="53" fontSize="10.5" fill="#63b6a4" textAnchor="middle">tú escribes aquí</text>
+            <line x1="830" y1="63" x2="708" y2="63" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrD7t)" />
+            <text x="770" y="335" fontSize="10.5" fill="#f2a33c" textAnchor="middle">la CPU lee aquí</text>
+            <line x1="830" y1="345" x2="708" y2="345" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD7)" />
+          </svg>
+          <figcaption>Cuanto más arriba, más fácil para ti; cuanto más abajo, más rápido para la CPU.</figcaption>
+        </figure>
+      </Slide>
+
+      <Slide z="3" label="restaurante">
+        <div className={s.eyebrow}>Concepto 3 · el restaurante</div>
         <h2>
           Un servidor es un programa que <span className={s.accent}>atiende peticiones</span>
         </h2>
@@ -308,7 +370,7 @@ export default function DondeVivenLosDatos() {
       </Slide>
 
       <Slide z="=" label="cliente-servidor">
-        <div className={s.eyebrow}>Concepto 2 · cliente y servidor</div>
+        <div className={s.eyebrow}>Concepto 3 · cliente y servidor</div>
         <h2>
           El restaurante es <span className={s.accent}>cliente y servidor</span>
         </h2>
@@ -331,8 +393,8 @@ export default function DondeVivenLosDatos() {
         </figure>
       </Slide>
 
-      <Slide z="3" label="servidores">
-        <div className={s.eyebrow}>Concepto 3 · servir</div>
+      <Slide z="4" label="servidores">
+        <div className={s.eyebrow}>Concepto 4 · servir</div>
         <h2>
           Cada servidor <span className={s.accent}>sirve</span> lo suyo
         </h2>
@@ -373,8 +435,8 @@ export default function DondeVivenLosDatos() {
         </figure>
       </Slide>
 
-      <Slide z="4" label="hardware">
-        <div className={s.eyebrow}>Concepto 4 · la máquina</div>
+      <Slide z="5" label="hardware">
+        <div className={s.eyebrow}>Concepto 5 · la máquina</div>
         <h2>
           Una computadora servidor: hecha para <span className={s.accent}>servir todo el día</span>
         </h2>
@@ -422,8 +484,8 @@ export default function DondeVivenLosDatos() {
         </figure>
       </Slide>
 
-      <Slide z="5" label="arranque">
-        <div className={s.eyebrow}>Concepto 5 · el arranque</div>
+      <Slide z="6" label="arranque">
+        <div className={s.eyebrow}>Concepto 6 · el arranque</div>
         <h2>
           Arranca el juego, y los bancos suben <span className={s.accent}>cuando hacen falta</span>
         </h2>
@@ -440,7 +502,7 @@ export default function DondeVivenLosDatos() {
       </Slide>
 
       <Slide z="=" label="pide">
-        <div className={s.eyebrow}>Concepto 5 · el arranque</div>
+        <div className={s.eyebrow}>Concepto 6 · el arranque</div>
         <h2>
           Arranca el juego, y los bancos suben <span className={s.accent}>cuando hacen falta</span>
         </h2>
@@ -457,7 +519,7 @@ export default function DondeVivenLosDatos() {
       </Slide>
 
       <Slide z="=" label="busca">
-        <div className={s.eyebrow}>Concepto 5 · el arranque</div>
+        <div className={s.eyebrow}>Concepto 6 · el arranque</div>
         <h2>
           Arranca el juego, y los bancos suben <span className={s.accent}>cuando hacen falta</span>
         </h2>
@@ -474,7 +536,7 @@ export default function DondeVivenLosDatos() {
       </Slide>
 
       <Slide z="=" label="sube">
-        <div className={s.eyebrow}>Concepto 5 · el arranque</div>
+        <div className={s.eyebrow}>Concepto 6 · el arranque</div>
         <h2>
           Arranca el juego, y los bancos suben <span className={s.accent}>cuando hacen falta</span>
         </h2>
