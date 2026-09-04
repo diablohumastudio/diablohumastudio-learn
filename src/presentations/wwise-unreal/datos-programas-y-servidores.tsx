@@ -307,7 +307,7 @@ export default function DatosProgramasYServidores() {
 
   return (
     <Deck name={t.name} context={t.context}>
-      <Slide z="▶" label={t.labels.intro} backgroundImage="/assets/presentations/wwise-unreal/Cover.jpg">
+      <Slide z="▶" label={t.labels.intro} backgroundImage="/assets/presentations/wwise-unreal/ComputerCover.jpg">
         <div className={s.eyebrow}>{t.cover.eyebrow}</div>
         <h1>{t.cover.title}</h1>
         <p className={s.note}>{t.cover.hint}</p>
