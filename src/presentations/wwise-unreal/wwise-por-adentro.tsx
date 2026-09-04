@@ -1,20 +1,18 @@
 import Deck, { Slide } from '../../components/learn/Deck';
 import s from '../../components/learn/Deck.module.css';
+import { useT } from '../../i18n/useT';
+import { wwisePorAdentroDict } from './wwise-por-adentro.dict';
 
 export default function WwisePorAdentro() {
+  const t = useT(wwisePorAdentroDict);
+
   return (
-    <Deck name="Wwise por adentro" context="Intro a Wwise · Wwise + Unreal">
-      <Slide z="↺" label="recap">
-        <div className={s.eyebrow}>Recap · donde quedamos</div>
-        <h2>
-          Wwise: <span className={s.accent}>el mismo patrón</span>
-        </h2>
+    <Deck name={t.name} context={t.context}>
+      <Slide z="↺" label={t.labels.recap}>
+        <div className={s.eyebrow}>{t.recap.eyebrow}</div>
+        <h2>{t.recap.title}</h2>
         <figure>
-          <svg
-            viewBox="0 0 910 330"
-            role="img"
-            aria-label="Los recursos —canciones, sonidos y voces— alimentan a los Wwise objects; de ahí salen SoundBanks que el sound engine corre para producir el audio."
-          >
+          <svg viewBox="0 0 910 330" role="img" aria-label={t.recap.aria}>
             <defs>
               <marker id="arrW1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                 <path d="M0,0 L10,5 L0,10 z" fill="#f2a33c" />
@@ -26,98 +24,92 @@ export default function WwisePorAdentro() {
 
             {/* Igual que el último slide de que-es-un-motor-de-audio */}
             <rect x="40" y="20" width="230" height="56" rx="8" fill="#1d2026" stroke="#63b6a4" />
-            <text x="155" y="44" fontSize="12" fill="#63b6a4" textAnchor="middle">RECURSOS</text>
-            <text x="155" y="63" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">canciones · sonidos · voces</text>
+            <text x="155" y="44" fontSize="12" fill="#63b6a4" textAnchor="middle">{t.recap.recursos}</text>
+            <text x="155" y="63" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{t.recap.recursosDeAudio}</text>
             <path d="M 210 76 L 210 128 Q 210 140 222 140 L 292 140" fill="none" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrW1t)" />
-            <text x="198" y="112" fontSize="10.5" fill="#63b6a4" textAnchor="end">usan</text>
+            <text x="198" y="112" fontSize="10.5" fill="#63b6a4" textAnchor="end">{t.recap.usan}</text>
             <line x1="550" y1="140" x2="644" y2="140" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrW1)" />
             <rect x="650" y="105" width="200" height="70" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-            <text x="750" y="134" fontSize="13" fill="#f2a33c" textAnchor="middle">SOUND ENGINE</text>
-            <text x="750" y="153" fontSize="10.5" fill="currentColor" opacity=".65" textAnchor="middle">los corre</text>
+            <text x="750" y="134" fontSize="13" fill="#f2a33c" textAnchor="middle">{t.recap.soundEngine}</text>
+            <text x="750" y="153" fontSize="10.5" fill="currentColor" opacity=".65" textAnchor="middle">{t.recap.losCorre}</text>
             <line x1="850" y1="140" x2="884" y2="140" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrW1)" />
-            <text className={s.svgSans} x="860" y="128" fontSize="12" fill="currentColor" textAnchor="middle">audio</text>
+            <text className={s.svgSans} x="860" y="128" fontSize="12" fill="currentColor" textAnchor="middle">{t.recap.audio}</text>
 
             {/* Paso único (al entrar): las configuraciones se vuelven Wwise objects,
                 y el cuadro pulsa y pasa a estilo protagonista */}
             <g className={s.morphOut}>
               <rect x="300" y="110" width="250" height="60" rx="8" fill="#1d2026" stroke="#f2a33c" strokeOpacity=".9" />
-              <text x="425" y="129" fontSize="11.5" fill="#f2a33c" textAnchor="middle">Configuraciones de</text>
-              <text x="425" y="143" fontSize="11.5" fill="#f2a33c" textAnchor="middle">Sonido Interactivo</text>
-              <text x="425" y="160" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">tracks · buses · events</text>
+              <text x="425" y="129" fontSize="11.5" fill="#f2a33c" textAnchor="middle">{t.recap.configsDeAudioLinea1}</text>
+              <text x="425" y="143" fontSize="11.5" fill="#f2a33c" textAnchor="middle">{t.recap.configsDeAudioLinea2}</text>
+              <text x="425" y="160" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{t.recap.tracksBusesEvents}</text>
             </g>
             <g className={s.morphPulse}>
               <g className={s.morphIn}>
                 <rect x="300" y="110" width="250" height="60" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-                <text x="425" y="134" fontSize="12" fill="#f2a33c" textAnchor="middle">WWISE OBJECT</text>
-                <text x="425" y="153" fontSize="11" fill="currentColor" opacity=".6" textAnchor="middle">segments · containers · events</text>
+                <text x="425" y="134" fontSize="12" fill="#f2a33c" textAnchor="middle">{t.recap.wwiseObject}</text>
+                <text x="425" y="153" fontSize="11" fill="currentColor" opacity=".6" textAnchor="middle">{t.recap.segmentsContainersEvents}</text>
               </g>
             </g>
             <g className={s.morphIn}>
-              <text x="597" y="128" fontSize="11" fill="#f2a33c" textAnchor="middle">SoundBanks</text>
+              <text x="597" y="128" fontSize="11" fill="#f2a33c" textAnchor="middle">{t.recap.soundBanks}</text>
             </g>
           </svg>
-          <figcaption>Mismo patrón: recursos afuera, objects configurados, un engine que los corre.</figcaption>
+          <figcaption>{t.recap.caption}</figcaption>
         </figure>
       </Slide>
 
-      <Slide z="1" label="punta a punta">
-        <div className={s.eyebrow}>Concepto 1 · el mapa completo</div>
-        <h2>
-          Wwise <span className={s.accent}>de punta a punta</span>
-        </h2>
+      <Slide z="1" label={t.labels.puntaAPunta}>
+        <div className={s.eyebrow}>{t.puntaAPunta.eyebrow}</div>
+        <h2>{t.puntaAPunta.title}</h2>
         <figure>
-          <svg
-            viewBox="0 0 960 430"
-            role="img"
-            aria-label="Los audio clips entran al Wwise project y las configuraciones del diseñador a los Wwise Objects; el Wwise editor genera SoundBanks hacia el proyecto del engine; en el build, el juego hace Wwise calls al Wwise engine, que corre los SoundBanks cargados y produce el audio."
-          >
+          <svg viewBox="0 0 960 430" role="img" aria-label={t.puntaAPunta.aria}>
             <defs>
               <marker id="arrW2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                 <path d="M0,0 L10,5 L0,10 z" fill="#f2a33c" />
               </marker>
             </defs>
 
-            <text x="24" y="110" fontSize="12" fill="currentColor">audio clips</text>
+            <text x="24" y="110" fontSize="12" fill="currentColor">{t.puntaAPunta.audioClips}</text>
             <line x1="24" y1="120" x2="160" y2="120" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrW2)" />
-            <text x="24" y="158" fontSize="12" fill="currentColor">configs del diseñador</text>
+            <text x="24" y="158" fontSize="12" fill="currentColor">{t.puntaAPunta.configsDelDisenador}</text>
             <line x1="24" y1="168" x2="174" y2="168" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrW2)" />
 
             <rect x="150" y="60" width="210" height="170" rx="10" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-            <text x="166" y="88" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">WWISE EDITOR</text>
+            <text x="166" y="88" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{t.puntaAPunta.wwiseEditor}</text>
             <rect x="170" y="104" width="170" height="110" rx="8" fill="#232730" stroke="#f2a33c" strokeOpacity=".8" />
-            <text x="255" y="126" fontSize="12" fill="currentColor" textAnchor="middle">Wwise project</text>
+            <text x="255" y="126" fontSize="12" fill="currentColor" textAnchor="middle">{t.puntaAPunta.wwiseProject}</text>
             <rect x="184" y="142" width="142" height="52" rx="8" fill="#1d2026" stroke="#f2a33c" strokeOpacity=".8" />
-            <text x="255" y="172" fontSize="11.5" fill="currentColor" textAnchor="middle">Wwise Objects</text>
+            <text x="255" y="172" fontSize="11.5" fill="currentColor" textAnchor="middle">{t.puntaAPunta.wwiseObjects}</text>
             <path d="M 255 214 L 255 316 Q 255 328 267 328 L 444 328" fill="none" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrW2)" />
-            <text x="355" y="318" fontSize="11" fill="#f2a33c" textAnchor="middle">genera SoundBanks</text>
+            <text x="355" y="318" fontSize="11" fill="#f2a33c" textAnchor="middle">{t.puntaAPunta.generaSoundBanks}</text>
 
             <rect x="430" y="40" width="240" height="360" rx="10" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-            <text x="446" y="68" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">ENGINE EDITOR</text>
-            <text x="446" y="86" fontSize="10.5" fill="currentColor" opacity=".45">engine project</text>
+            <text x="446" y="68" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{t.puntaAPunta.engineEditor}</text>
+            <text x="446" y="86" fontSize="10.5" fill="currentColor" opacity=".45">{t.puntaAPunta.engineProject}</text>
             <rect x="450" y="100" width="200" height="56" rx="8" fill="#232730" stroke="#f2a33c" strokeOpacity=".8" />
-            <text x="550" y="124" fontSize="12" fill="currentColor" textAnchor="middle">Wwise code calls</text>
-            <text x="550" y="142" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">tu código de audio</text>
+            <text x="550" y="124" fontSize="12" fill="currentColor" textAnchor="middle">{t.puntaAPunta.wwiseCodeCalls}</text>
+            <text x="550" y="142" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{t.puntaAPunta.tuCodigoDeAudio}</text>
             <line x1="515" y1="192" x2="515" y2="160" stroke="#f2a33c" strokeWidth="1.5" markerEnd="url(#arrW2)" />
             <line x1="545" y1="160" x2="545" y2="192" stroke="#f2a33c" strokeWidth="1.5" markerEnd="url(#arrW2)" />
             <rect x="450" y="196" width="200" height="56" rx="8" fill="#232730" stroke="#f2a33c" strokeOpacity=".8" />
-            <text x="550" y="220" fontSize="12" fill="currentColor" textAnchor="middle">Wwise plugin</text>
-            <text x="550" y="238" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">la API en el editor</text>
+            <text x="550" y="220" fontSize="12" fill="currentColor" textAnchor="middle">{t.puntaAPunta.wwisePlugin}</text>
+            <text x="550" y="238" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{t.puntaAPunta.laApiEnElEditor}</text>
             <rect x="450" y="300" width="200" height="56" rx="8" fill="#232730" stroke="#f2a33c" strokeOpacity=".8" />
-            <text x="550" y="324" fontSize="12" fill="currentColor" textAnchor="middle">Wwise SoundBanks</text>
-            <text x="550" y="342" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">.bnk · estructura + media</text>
+            <text x="550" y="324" fontSize="12" fill="currentColor" textAnchor="middle">{t.puntaAPunta.wwiseSoundBanks}</text>
+            <text x="550" y="342" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{t.puntaAPunta.bnk}</text>
 
             <rect x="700" y="40" width="210" height="360" rx="10" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-            <text x="716" y="64" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">WRAPPER · BUILD</text>
+            <text x="716" y="64" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{t.puntaAPunta.wrapperBuild}</text>
             <rect x="716" y="76" width="178" height="96" rx="8" fill="none" stroke="currentColor" strokeOpacity=".5" />
-            <text x="728" y="94" fontSize="11" fill="currentColor" opacity=".65">GAME</text>
+            <text x="728" y="94" fontSize="11" fill="currentColor" opacity=".65">{t.puntaAPunta.game}</text>
             <rect x="728" y="102" width="154" height="52" rx="8" fill="#232730" stroke="#f2a33c" />
-            <text x="805" y="124" fontSize="12" fill="currentColor" textAnchor="middle">Wwise calls</text>
-            <text x="805" y="141" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">tu código</text>
+            <text x="805" y="124" fontSize="12" fill="currentColor" textAnchor="middle">{t.puntaAPunta.wwiseCalls}</text>
+            <text x="805" y="141" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{t.puntaAPunta.tuCodigo}</text>
             <rect x="716" y="232" width="178" height="140" rx="8" fill="none" stroke="#f2a33c" strokeOpacity=".9" />
-            <text x="728" y="254" fontSize="11" fill="#f2a33c">WWISE ENGINE</text>
+            <text x="728" y="254" fontSize="11" fill="#f2a33c">{t.puntaAPunta.wwiseEngine}</text>
             <rect x="728" y="302" width="154" height="52" rx="8" fill="#1d2026" stroke="#f2a33c" strokeOpacity=".8" />
-            <text x="805" y="324" fontSize="12" fill="currentColor" textAnchor="middle">SoundBanks</text>
-            <text x="805" y="341" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">cargados</text>
+            <text x="805" y="324" fontSize="12" fill="currentColor" textAnchor="middle">{t.puntaAPunta.soundBanks}</text>
+            <text x="805" y="341" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{t.puntaAPunta.cargados}</text>
             <line x1="785" y1="158" x2="785" y2="296" stroke="#f2a33c" strokeWidth="1.5" markerEnd="url(#arrW2)" />
             <line x1="825" y1="158" x2="825" y2="296" stroke="#f2a33c" strokeWidth="1.5" markerEnd="url(#arrW2)" />
 
@@ -126,11 +118,9 @@ export default function WwisePorAdentro() {
             <line x1="650" y1="328" x2="722" y2="328" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrW2)" />
 
             <line x1="894" y1="302" x2="944" y2="302" stroke="#f2a33c" strokeWidth="2.5" markerEnd="url(#arrW2)" />
-            <text className={s.svgSans} x="919" y="290" fontSize="13" fill="currentColor" textAnchor="middle">AUDIO</text>
+            <text className={s.svgSans} x="919" y="290" fontSize="13" fill="currentColor" textAnchor="middle">{t.puntaAPunta.audio}</text>
           </svg>
-          <figcaption>
-            Objects configurados + audios → SoundBanks · el juego solo usa la interface: los calls.
-          </figcaption>
+          <figcaption>{t.puntaAPunta.caption}</figcaption>
         </figure>
       </Slide>
     </Deck>
