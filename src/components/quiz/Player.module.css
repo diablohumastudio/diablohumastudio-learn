@@ -1,0 +1,186 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.topic {
+  composes: eyebrow from './ui.module.css';
+}
+
+.stop {
+  composes: btnGhost from './ui.module.css';
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.card {
+  composes: card from './ui.module.css';
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  animation: rise 0.3s ease both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none;
+  }
+}
+
+.prompt {
+  font-family: var(--font-disp, 'Arial Narrow', sans-serif);
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.choice {
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.4;
+  text-align: left;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s, opacity 0.15s;
+}
+
+.choice:hover:enabled {
+  border-color: var(--amber);
+}
+
+.choice:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.choice:disabled {
+  cursor: default;
+}
+
+.key {
+  composes: mono from './ui.module.css';
+  color: var(--amber);
+  flex: none;
+  width: 1.4em;
+}
+
+.choiceCorrect {
+  border-color: var(--teal);
+  background: rgba(99, 182, 164, 0.12);
+}
+
+.choiceWrong {
+  border-color: var(--red);
+  background: rgba(212, 104, 95, 0.12);
+}
+
+.choiceDim {
+  opacity: 0.45;
+}
+
+.feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.verdict {
+  font-family: var(--font-disp, 'Arial Narrow', sans-serif);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.verdictCorrect {
+  composes: verdict;
+  color: var(--teal);
+}
+
+.verdictWrong {
+  composes: verdict;
+  color: var(--red);
+}
+
+.explanation {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.next {
+  composes: btnPrimary from './ui.module.css';
+}
+
+.counters {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.counter {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.counterValue {
+  font-family: var(--font-mono, Menlo, Consolas, monospace);
+  font-size: 15px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.counterLabel {
+  composes: mono from './ui.module.css';
+  text-transform: uppercase;
+}
+
+.saveError {
+  composes: error from './ui.module.css';
+}
