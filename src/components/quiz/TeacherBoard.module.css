@@ -1,0 +1,64 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card {
+  composes: card from './ui.module.css';
+  padding: 8px 0;
+}
+
+.tableWrap {
+  composes: tableWrap from './ui.module.css';
+}
+
+.table {
+  composes: table from './ui.module.css';
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row:hover td {
+  background: var(--panel-2);
+}
+
+.name {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.email {
+  composes: mono from './ui.module.css';
+  display: block;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.back {
+  composes: btnGhost from './ui.module.css';
+  align-self: flex-start;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.right {
+  color: var(--teal);
+}
+
+.wrong {
+  color: var(--red);
+}
+
+.empty {
+  composes: mono from './ui.module.css';
+  padding: 16px 24px;
+}
