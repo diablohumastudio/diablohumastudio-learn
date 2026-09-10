@@ -1,0 +1,191 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.primary {
+  composes: btnPrimary from './ui.module.css';
+}
+
+.secondary {
+  composes: btn from './ui.module.css';
+}
+
+.card {
+  composes: card from './ui.module.css';
+  padding: 8px 0;
+}
+
+.tableWrap {
+  composes: tableWrap from './ui.module.css';
+}
+
+.table {
+  composes: table from './ui.module.css';
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row:hover td {
+  background: var(--panel-2);
+}
+
+.rowRetired td {
+  opacity: 0.45;
+}
+
+.id {
+  composes: mono from './ui.module.css';
+  color: var(--amber);
+  white-space: nowrap;
+}
+
+.empty {
+  composes: mono from './ui.module.css';
+  padding: 16px 24px;
+}
+
+.back {
+  composes: btnGhost from './ui.module.css';
+  align-self: flex-start;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.form {
+  composes: card from './ui.module.css';
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.select {
+  composes: input from './ui.module.css';
+  cursor: pointer;
+}
+
+.textarea {
+  composes: input from './ui.module.css';
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+  flex: 1;
+}
+
+.langField {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.langField > input,
+.langField > textarea {
+  flex: 1;
+  min-width: 0;
+}
+
+.langTag {
+  composes: mono from './ui.module.css';
+  text-transform: uppercase;
+  color: var(--amber);
+  padding-top: 13px;
+  width: 1.8em;
+  flex: none;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px 16px;
+  min-width: 0;
+}
+
+.group > legend {
+  padding: 0 6px;
+}
+
+.answerRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.remove {
+  composes: btnGhost from './ui.module.css';
+  padding: 10px 12px;
+  font-size: 16px;
+  line-height: 1;
+  flex: none;
+}
+
+.remove:hover:enabled {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.add {
+  composes: btnGhost from './ui.module.css';
+  align-self: flex-start;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.checkbox input {
+  accent-color: var(--amber);
+  width: 16px;
+  height: 16px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save {
+  composes: btnPrimary from './ui.module.css';
+}
+
+.importPanel {
+  composes: card from './ui.module.css';
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.importPanel .textarea {
+  font-family: var(--font-mono, Menlo, Consolas, monospace);
+  font-size: 13px;
+}
