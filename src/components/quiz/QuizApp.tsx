@@ -8,10 +8,13 @@ import QuizHome from './QuizHome';
 import SignIn from './SignIn';
 import { ensureStudentProfile, subscribeStudent } from './progress';
 import type { StudentStats } from './progress';
+import { activeQuestions, useQuestionBank } from './questions';
 import ui from './ui.module.css';
 import { useAuthUser } from './useAuthUser';
 
 function StudentArea({ user }: { user: User }) {
+  const t = useT(quizDict);
+  const bank = useQuestionBank();
   const [stats, setStats] = useState<StudentStats | null>(null);
   const [playing, setPlaying] = useState(false);
 
@@ -20,10 +23,27 @@ function StudentArea({ user }: { user: User }) {
     return subscribeStudent(user.uid, setStats);
   }, [user]);
 
-  if (playing) {
-    return <Player uid={user.uid} lifetime={stats} onStop={() => setPlaying(false)} />;
+  if (bank.status === 'loading') {
+    return (
+      <div className={ui.centered}>
+        <span className={ui.mono}>{t.loading}</span>
+      </div>
+    );
   }
-  return <QuizHome user={user} stats={stats} onPlay={() => setPlaying(true)} />;
+  if (bank.status === 'error') {
+    console.error('Could not load the questions', bank.error);
+    return (
+      <div className={ui.centered}>
+        <p className={ui.error}>{t.bankLoadError}</p>
+      </div>
+    );
+  }
+
+  const questions = activeQuestions(bank);
+  if (playing) {
+    return <Player uid={user.uid} questions={questions} lifetime={stats} onStop={() => setPlaying(false)} />;
+  }
+  return <QuizHome user={user} stats={stats} bankSize={questions.length} onPlay={() => setPlaying(true)} />;
 }
 
 export default function QuizApp() {

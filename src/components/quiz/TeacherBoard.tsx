@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { findQuestion, questionTopicTitle } from '../../data/quiz';
+import { questionTopicTitle } from '../../data/quiz';
+import type { QuizQuestion } from '../../data/quiz';
 import { quizDict } from '../../i18n/pages/quiz';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
@@ -7,6 +8,7 @@ import SignIn from './SignIn';
 import { dateText, percentText } from './format';
 import { fetchAllStudents, fetchStudentQuestions, isPermissionDenied } from './progress';
 import type { QuestionStats, StudentStats } from './progress';
+import { useQuestionBank } from './questions';
 import s from './TeacherBoard.module.css';
 import ui from './ui.module.css';
 import { useAuthUser } from './useAuthUser';
@@ -19,10 +21,17 @@ function byAttemptsDesc(a: QuestionStats, b: QuestionStats): number {
   return b.attempts - a.attempts;
 }
 
+function questionsById(bank: ReturnType<typeof useQuestionBank>): Map<string, QuizQuestion> {
+  if (bank.status !== 'ready') return new Map();
+  return new Map(bank.questions.map((question) => [question.id, question]));
+}
+
 function StudentDetail({ student, onBack }: { student: StudentStats; onBack: () => void }) {
   const t = useT(quizDict);
   const locale = useLocale();
+  const bank = useQuestionBank();
   const [questions, setQuestions] = useState<QuestionStats[] | null>(null);
+  const bankById = questionsById(bank);
 
   useEffect(() => {
     fetchStudentQuestions(student.uid)
@@ -58,7 +67,7 @@ function StudentDetail({ student, onBack }: { student: StudentStats; onBack: () 
         </div>
       </div>
       <div className={s.card}>
-        {questions === null ? (
+        {questions === null || bank.status === 'loading' ? (
           <p className={s.empty}>{t.loading}</p>
         ) : questions.length === 0 ? (
           <p className={s.empty}>{t.noAnswersYet}</p>
@@ -77,7 +86,7 @@ function StudentDetail({ student, onBack }: { student: StudentStats; onBack: () 
               </thead>
               <tbody>
                 {questions.map((stats) => {
-                  const question = findQuestion(stats.questionId);
+                  const question = bankById.get(stats.questionId);
                   return (
                     <tr key={stats.questionId}>
                       <td>{question ? question.prompt[locale] : `${t.unknownQuestion} (${stats.questionId})`}</td>

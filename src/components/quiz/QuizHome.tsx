@@ -1,5 +1,4 @@
 import type { User } from 'firebase/auth';
-import { QUIZ_QUESTIONS } from '../../data/quiz';
 import { quizDict } from '../../i18n/pages/quiz';
 import { useT } from '../../i18n/useT';
 import { percentText } from './format';
@@ -10,15 +9,16 @@ import ui from './ui.module.css';
 type QuizHomeProps = {
   user: User;
   stats: StudentStats | null;
+  bankSize: number;
   onPlay: () => void;
 };
 
-export default function QuizHome({ user, stats, onPlay }: QuizHomeProps) {
+export default function QuizHome({ user, stats, bankSize, onPlay }: QuizHomeProps) {
   const t = useT(quizDict);
   const sessionsPlayed = stats?.sessionsPlayed ?? 0;
   const totalAnswered = stats?.totalAnswered ?? 0;
   const totalCorrect = stats?.totalCorrect ?? 0;
-  const bankIsEmpty = QUIZ_QUESTIONS.length === 0;
+  const bankIsEmpty = bankSize === 0;
 
   return (
     <div className={s.wrap}>
@@ -48,9 +48,7 @@ export default function QuizHome({ user, stats, onPlay }: QuizHomeProps) {
           </div>
         </div>
         <div className={s.actions}>
-          <span className={ui.mono}>
-            {bankIsEmpty ? t.noQuestions : `${QUIZ_QUESTIONS.length} ${t.bankSize}`}
-          </span>
+          <span className={ui.mono}>{bankIsEmpty ? t.noQuestions : `${bankSize} ${t.bankSize}`}</span>
           <button type="button" className={s.play} onClick={onPlay} disabled={bankIsEmpty}>
             {t.play} →
           </button>
