@@ -26,6 +26,12 @@ service cloud.firestore {
       }
     }
 
+    // The question bank: any student can read it, only teachers edit it.
+    match /questions/{questionId} {
+      allow read: if isSignedIn();
+      allow write: if isTeacher();
+    }
+
     // Created by hand in the console; nobody can grant themselves the role.
     match /teachers/{uid} {
       allow read: if isOwner(uid);
