@@ -53,6 +53,12 @@ export const LEARN_COURSES: LearnCourse[] = [
         section: 'Intro',
         component: dynamic(() => import('../presentations/wwise-unreal/el-editor-wwise')),
       },
+      {
+        slug: 'wwise-objects',
+        title: { es: 'Wwise Objects', en: 'Wwise Objects' },
+        section: 'Intro',
+        component: dynamic(() => import('../presentations/wwise-unreal/wwise-objects')),
+      },
     ],
   },
 ];

@@ -131,3 +131,11 @@ Cuando una secuencia es *el mismo diagrama con el mismo h2* que se va construyen
 - El slide z=6 (tabla de layouts) usa `s.plain` — excepción deliberada al principio de poquísimo texto, para listar los layouts de fábrica con su atajo (F5–F12) y su propósito.
 - El slide z=2 hace morph desde z=1: misma geometría; los tres views útiles cruzan a protagonistas con pulso escalonado, el resto se atenúa, y la caja Editors pulsa al final como puente al z=3.
 - El slide z=3 entra con un zoom (`morphGlide`) desde la posición de la caja Editors del z=2; el z=4 es un crossfade de contenido en un paso único sobre el mismo contenedor del z=3. Si cambia la geometría de uno de estos slides, actualizar la de su vecino.
+
+### wwise-objects
+
+- El arco de la clase: Portada → el camino de un sonido (slide con siete pasos: event / actions / object / contenido / bus / procesa / salida) → siete preguntas (una caja por familia de objetos, con su pregunta) → y de ahí una familia por concepto, en el orden del camino: contenido (z=2) → estructura + herencia (z=3) → routing: busses + aux (z=4) → procesamiento: efectos + sharesets (z=5) → events (z=6) → game syncs + elegir vs modificar (z=7) → packaging (z=8). Los slides `=` son la segunda mitad de la misma pregunta, no un morph.
+- Es un catálogo de objetos, así que casi todo se dibuja con un solo componente `Caja` (título + subtítulos centrados; estilos `normal` / `protagonista` / `teal` / `atenuada`). Los textos de cada caja viven en el diccionario como `{ nombre, subs }`; en los containers (z=3) el primer sub es la pregunta que responde el container y va en ámbar (`primerSubAmbar`).
+- Los nombres de tipo de objeto (Sound SFX, Switch Container, Aux Bus, Work Units…) quedan en inglés en ambos idiomas; los ejemplos usan `footstep_*`, `Play_Footstep`, `Reverb_Hall`, `car_rpm`.
+- Color: ámbar para el flujo principal y las cajas que importan en el slide; teal para lo que alimenta desde afuera (Game Syncs, el código del juego, los sends y aux busses, los hijos que heredan).
+- Los teaching points de la fuente van en el `figcaption`; las indicaciones dirigidas al profesor (cómo presentar algo) no se incluyen.
