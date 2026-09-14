@@ -192,6 +192,15 @@
   max-width: 100%;
 }
 
+/* Small "where are we" map pinned above the eyebrow, left-aligned. */
+.minimap {
+  width: 210px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: -6px;
+}
+
 .content figure svg {
   max-width: 100%;
   height: auto;

@@ -14,9 +14,9 @@ type WwiseObjectsTexts = {
   labels: {
     intro: string;
     /** One label per step of the flow slide. */
-    camino: [string, string, string, string, string, string, string];
-    preguntas: string;
-    contenido: string;
+    flujo: [string, string, string, string, string];
+    clasificacion: string;
+    sonido: string;
     estructura: string;
     herencia: string;
     busses: string;
@@ -25,66 +25,71 @@ type WwiseObjectsTexts = {
     sharesets: string;
     events: string;
     gameSyncs: string;
-    seleccion: string;
     packaging: string;
+    cierre: string;
   };
   cover: { eyebrow: string; title: ReactNode; hint: string };
-  camino: {
+  /** The five families, drawn by the flow and the classification slides and by the minimap. */
+  familias: {
+    gameInput: { titulo: string; pregunta: string; events: Caja; gameSyncs: Caja };
+    contenido: {
+      titulo: string;
+      pregunta: string;
+      sfx: string;
+      music: string;
+      /** Row by row: sound SFX, sound music, structure SFX, structure music. */
+      celdas: [Caja, Caja, Caja, Caja];
+    };
+    mixing: Caja;
+    procesamiento: Caja;
+    packaging: Caja;
+  };
+  flujo: {
     eyebrow: string;
     title: ReactNode;
     /** One per step. */
-    arias: [string, string, string, string, string, string, string];
-    captions: [string, string, string, string, string, string, string];
+    arias: [string, string, string, string, string];
+    captions: [string, string, string, string, string];
     game: string;
-    postea: string;
-    event: string;
-    ejecuta: string;
-    actions: string;
-    apunta: string;
-    object: string;
-    objectSub: string;
-    resuelve: string;
-    contenido: string;
-    contenidoSub: string;
-    gameSyncs: string;
-    gameSyncsSub: string;
-    consulta: string;
-    envia: string;
-    bus: string;
-    procesa: string;
-    procesaSub: string;
-    llega: string;
+    parametros: string;
+    senal: string;
     salida: string;
     soundBank: string;
   };
-  preguntas: { eyebrow: string; title: ReactNode; aria: string; caption: string; familias: Caja[] };
-  contenido: { eyebrow: string; title: ReactNode; aria: string; caption: string; objetos: Caja[]; audioData: string };
+  clasificacion: { eyebrow: string; title: ReactNode; aria: string; caption: string };
+  sonido: { eyebrow: string; title: ReactNode; aria: string; caption: string; objetos: Caja[]; audioData: string };
   estructura: { eyebrow: string; title: ReactNode; aria: string; caption: string; contenedores: Caja[] };
   herencia: {
     eyebrow: string;
     title: ReactNode;
     aria: string;
     caption: string;
-    padre: Caja;
-    hijos: Caja[];
+    /** Three levels: the root container, two containers under it, three sounds under those. */
+    raiz: Caja;
+    medios: [Caja, Caja];
+    hojas: [Caja, Caja, Caja];
   };
   busses: {
     eyebrow: string;
     title: ReactNode;
     aria: string;
     caption: string;
-    jerarquiaContenido: string;
-    jerarquiaMixer: string;
-    actorMixer: Caja;
+    carpetaContainers: string;
+    carpetaBusses: string;
+    carpetaDevices: string;
+    propertyContainer: Caja;
     sonido: Caja;
     unBus: string;
     seMueve: string;
-    master: Caja;
+    main: Caja;
     busSfx: Caja;
     busMusic: Caja;
     auxReverb: Caja;
     motion: Caja;
     secondary: Caja;
+    parlante: string;
+    control: string;
+    audifonos: string;
   };
   aux: {
     eyebrow: string;
@@ -96,7 +101,7 @@ type WwiseObjectsTexts = {
     send: string;
     busSfx: Caja;
     auxReverb: Caja;
-    master: Caja;
+    main: Caja;
   };
   efectos: {
     eyebrow: string;
@@ -130,9 +135,10 @@ type WwiseObjectsTexts = {
     game: Caja;
     postea: string;
     event: string;
-    actions: Caja[];
-    cadaAction: string;
-    dialogue: Caja;
+    accion: string;
+    /** The fourth action repeats the third with another value: drawn in red as the counterexample. */
+    actions: [Caja, Caja, Caja, Caja];
+    sinArgumentos: string;
   };
   gameSyncs: {
     eyebrow: string;
@@ -140,28 +146,22 @@ type WwiseObjectsTexts = {
     aria: string;
     caption: string;
     codigo: Caja;
-    tipos: Caja[];
+    /** Switch, State, RTPC, Trigger; subs: [scope line, example line]. */
+    tipos: [Caja, Caja, Caja, Caja];
+    dibujos: {
+      switchObjetos: [string, string];
+      switchValores: [string, string, string];
+      stateValores: [string, string, string];
+      stateMarco: string;
+      rtpcEjeX: string;
+      rtpcEjeY: string;
+      triggerStinger: string;
+      triggerCompas: string;
+    };
     lectores: string;
   };
-  seleccion: {
-    eyebrow: string;
-    title: ReactNode;
-    aria: string;
-    caption: string;
-    laneSeleccion: string;
-    action: Caja;
-    switchValor: Caja;
-    lee: string;
-    container: Caja;
-    elige: string;
-    hijo: Caja;
-    laneModificacion: string;
-    rtpc: Caja;
-    curva: string;
-    propiedad: Caja;
-    sinAction: string;
-  };
   packaging: { eyebrow: string; title: ReactNode; aria: string; caption: string; items: Caja[] };
+  cierre: { eyebrow: string; title: ReactNode; aria: string; caption: string };
 };
 
 const es: WwiseObjectsTexts = {
@@ -169,19 +169,19 @@ const es: WwiseObjectsTexts = {
   context: 'Intro a Wwise · Wwise + Unreal',
   labels: {
     intro: 'intro',
-    camino: ['event', 'actions', 'object', 'contenido', 'bus', 'procesa', 'salida'],
-    preguntas: 'siete preguntas',
-    contenido: 'contenido',
+    flujo: ['el camino', 'game input', 'señal', 'procesa', 'soundbanks'],
+    clasificacion: 'clasificación',
+    sonido: 'sonido',
     estructura: 'estructura',
     herencia: 'herencia',
-    busses: 'routing',
+    busses: 'mixing · routing',
     aux: 'aux busses',
     efectos: 'efectos',
     sharesets: 'sharesets',
     events: 'events',
     gameSyncs: 'game syncs',
-    seleccion: 'elegir vs modificar',
     packaging: 'packaging',
+    cierre: 'cierre',
   },
   cover: {
     eyebrow: 'Intro a Wwise · el catálogo de objetos',
@@ -192,7 +192,30 @@ const es: WwiseObjectsTexts = {
     ),
     hint: 'Navega con ← → · espacio',
   },
-  camino: {
+  familias: {
+    gameInput: {
+      titulo: 'GAME INPUT',
+      pregunta: '¿qué le dice el juego?',
+      events: { nombre: 'Events', subs: ['qué acciones hacer'] },
+      gameSyncs: { nombre: 'Game Syncs', subs: ['qué variables cambiar', 'directamente'] },
+    },
+    contenido: {
+      titulo: 'CONTENIDO',
+      pregunta: '¿qué suena y cómo se elige?',
+      sfx: 'SFX',
+      music: 'MUSIC',
+      celdas: [
+        { nombre: 'Sonido', subs: ['Sound SFX', 'Sound Voice'] },
+        { nombre: 'Sonido', subs: ['Music Track', 'Music Segment'] },
+        { nombre: 'Estructura', subs: ['Random · Sequence', 'Switch · Blend'] },
+        { nombre: 'Estructura', subs: ['Music Switch', 'Music Playlist'] },
+      ],
+    },
+    mixing: { nombre: 'MIXING · ROUTING', subs: ['¿a dónde va la señal? · busses'] },
+    procesamiento: { nombre: 'PROCESAMIENTO', subs: ['¿qué le pasa', 'a la señal?', 'efectos · ShareSets'] },
+    packaging: { nombre: 'PACKAGING', subs: ['¿cómo se entrega?', 'SoundBanks'] },
+  },
+  flujo: {
     eyebrow: 'Concepto 1 · el camino de un sonido',
     title: (
       <>
@@ -200,93 +223,64 @@ const es: WwiseObjectsTexts = {
       </>
     ),
     arias: [
-      'El juego postea un Event.',
-      'El juego postea un Event, y el Event ejecuta sus Actions.',
-      'El juego postea un Event, el Event ejecuta sus Actions y cada Action apunta a un object: un container o un sonido.',
-      'El object resuelve a contenido real, consultando los Game Syncs si hace falta.',
-      'La señal resultante se envía a un bus.',
-      'Los busses aplican procesamiento: efectos y mezcla.',
-      'La mezcla llega a un dispositivo de salida. Todo va empaquetado en SoundBanks para que el juego lo cargue.',
+      'Cinco familias de objetos entre el juego y la salida: Game Input a la izquierda, Contenido sobre Mixing en el centro, Procesamiento a la derecha.',
+      'El juego solo toca el Game Input; desde ahí salen flechas hacia Contenido, hacia Mixing y, por arriba, hacia Procesamiento.',
+      'La señal nace en Contenido, baja a Mixing y sale por el dispositivo.',
+      'Procesamiento actúa sobre Contenido y sobre Mixing.',
+      'Un marco punteado encierra Game Input, Contenido, Mixing y Procesamiento: los SoundBanks. El juego y la salida quedan afuera.',
     ],
     captions: [
-      'El juego solo hace una cosa: postear un Event.',
-      'El Event no suena: ejecuta Actions.',
-      'Cada Action apunta a un object: un container o un sonido.',
-      'El object resuelve a contenido, consultando los Game Syncs si hace falta.',
-      'La señal resultante se envía a un bus.',
-      'Los busses procesan: efectos y mezcla.',
-      'La mezcla sale por el dispositivo · todo viaja empaquetado en SoundBanks.',
+      'Cinco familias de objetos entre el juego y la salida.',
+      'El juego solo toca el Game Input: postea Events y setea Game Syncs.',
+      'La señal nace en el contenido, pasa por los busses y sale.',
+      'El procesamiento actúa sobre el contenido y sobre la mezcla · sus parámetros también vienen del juego.',
+      'Todo lo de adentro viaja empaquetado en SoundBanks · el juego y la salida quedan afuera.',
     ],
     game: 'GAME',
-    postea: 'postea',
-    event: 'EVENT',
-    ejecuta: 'ejecuta',
-    actions: 'ACTIONS',
-    apunta: 'apunta a',
-    object: 'OBJECT',
-    objectSub: 'container o sonido',
-    resuelve: 'resuelve a',
-    contenido: 'CONTENIDO',
-    contenidoSub: 'audio real',
-    gameSyncs: 'GAME SYNCS',
-    gameSyncsSub: 'Switch · State · RTPC',
-    consulta: 'consulta',
-    envia: 'envía a',
-    bus: 'BUS',
-    procesa: 'PROCESA',
-    procesaSub: 'efectos · mezcla',
-    llega: 'llega a',
+    parametros: 'parámetros · RTPC · States',
+    senal: 'señal',
     salida: 'SALIDA',
     soundBank: 'SOUNDBANKS · todo empaquetado para que el juego lo cargue',
   },
-  preguntas: {
-    eyebrow: 'Concepto 1 · el mapa',
+  clasificacion: {
+    eyebrow: 'Concepto 1 · una clasificación didáctica',
     title: (
       <>
-        Cada objeto responde <span className={s.accent}>una pregunta</span>
+        Cinco familias, <span className={s.accent}>cinco preguntas</span>
       </>
     ),
-    aria: 'Siete familias de objetos, cada una con su pregunta: contenido (¿qué suena?), estructura (¿cómo se elige o combina?), routing (¿a dónde va la señal?), procesamiento (¿qué le pasa a la señal?), triggers (¿quién lo dispara?), game input (¿qué le dice el juego a Wwise?) y packaging (¿cómo se entrega?).',
-    caption: 'Siete preguntas a lo largo del camino · el resto de la clase las recorre.',
-    familias: [
-      { nombre: 'CONTENIDO', subs: ['¿qué suena?'] },
-      { nombre: 'ESTRUCTURA', subs: ['¿cómo se elige o combina?'] },
-      { nombre: 'ROUTING', subs: ['¿a dónde va la señal?'] },
-      { nombre: 'PROCESAMIENTO', subs: ['¿qué le pasa a la señal?'] },
-      { nombre: 'TRIGGERS', subs: ['¿quién lo dispara?'] },
-      { nombre: 'GAME INPUT', subs: ['¿qué le dice el juego?'] },
-      { nombre: 'PACKAGING', subs: ['¿cómo se entrega?'] },
-    ],
+    aria: 'Las mismas cinco familias del camino, ordenadas para nombrarlas: Game Input (¿qué le dice el juego?) con Events y Game Syncs adentro; Contenido (¿qué suena y cómo se elige?) con una grilla de Sonido y Estructura por SFX y Music; Mixing · Routing (¿a dónde va la señal?); Procesamiento (¿qué le pasa a la señal?) y Packaging (¿cómo se entrega?).',
+    caption: 'No es la clasificación de Wwise: es la nuestra, para entender el camino de un sonido.',
   },
-  contenido: {
-    eyebrow: 'Concepto 2 · ¿qué suena?',
+  sonido: {
+    eyebrow: 'Concepto 2 · Contenido · Sonido',
     title: (
       <>
         Los únicos que apuntan a <span className={s.accent}>audio real</span>
       </>
     ),
-    aria: 'Cinco objetos de contenido —Sound SFX, Sound Voice, Music Track, Music Segment y plug-in sources— apuntan hacia abajo a los datos de audio.',
+    aria: 'Cinco objetos de sonido —Sound SFX y Sound Voice en la columna SFX, Music Track y Music Segment en la columna Music, y plug-in sources— apuntan hacia abajo a los datos de audio.',
     caption: 'Todo lo demás existe para decidir si, cuándo, cuál y cómo suenan estos.',
     objetos: [
       { nombre: 'Sound SFX', subs: ['una o más fuentes', 'el caballo de batalla'] },
       { nombre: 'Sound Voice', subs: ['como SFX, pero', 'una fuente por idioma'] },
       { nombre: 'Music Track', subs: ['audio del sistema musical', 'sub-tracks y clips'] },
       { nombre: 'Music Segment', subs: ['timeline con tracks', 'cues · tempo · compás'] },
-      { nombre: 'Plug-in sources', subs: ['contenido generado', 'Wwise Synth · tone gen'] },
+      { nombre: 'Plug-in sources', subs: ['fuentes generadas', 'Wwise Synth · tone gen'] },
     ],
     audioData: 'DATOS DE AUDIO · wav · síntesis',
   },
   estructura: {
-    eyebrow: 'Concepto 3 · ¿cómo se elige o combina?',
+    eyebrow: 'Concepto 2 · Contenido · Estructura',
     title: (
       <>
         Containers: hijos + <span className={s.accent}>una regla</span>
       </>
     ),
-    aria: 'Ocho objetos estructurales, cada uno con su pregunta: Actor-Mixer (sin regla), Random (¿cuál?), Sequence (¿en qué orden?), Switch (¿según qué dice el juego?), Blend (¿cuánto de cada uno?), Music Playlist, Music Switch y Folders.',
+    aria: 'Ocho objetos de estructura, cada uno con su pregunta: en la columna SFX, Property Container (sin regla), Random (¿cuál?), Sequence (¿en qué orden?), Switch (¿según qué dice el juego?) y Blend (¿cuánto de cada uno?); en la columna Music, Music Playlist y Music Switch; y Folders, que solo organizan.',
     caption: 'Ninguno produce audio: tienen hijos y deciden cómo se reproducen.',
     contenedores: [
-      { nombre: 'Actor-Mixer', subs: ['sin regla', 'agrupa · hereda propiedades'] },
+      { nombre: 'Property Container', subs: ['sin regla', 'agrupa · hereda propiedades'] },
       { nombre: 'Random Container', subs: ['¿cuál?', 'uno · pesos · sin repetir'] },
       { nombre: 'Sequence Container', subs: ['¿en qué orden?', 'uno tras otro'] },
       { nombre: 'Switch Container', subs: ['¿según qué dice el juego?', 'por Switch o State'] },
@@ -297,61 +291,69 @@ const es: WwiseObjectsTexts = {
     ],
   },
   herencia: {
-    eyebrow: 'Concepto 3 · herencia',
+    eyebrow: 'Concepto 2 · Contenido · Estructura · herencia',
     title: (
       <>
         Lo del padre <span className={s.accent}>baja a los hijos</span>
       </>
     ),
-    aria: 'Un Actor-Mixer con volumen −6 dB y tres hijos: dos heredan el valor y el tercero lo sobreescribe con −12 dB.',
-    caption: 'Una propiedad del padre fluye hacia abajo, salvo que un hijo la sobreescriba.',
-    padre: { nombre: 'Actor-Mixer · footsteps', subs: ['Volume −6 dB · Output bus: SFX'] },
-    hijos: [
-      { nombre: 'footstep_wood', subs: ['hereda · −6 dB'] },
-      { nombre: 'footstep_grass', subs: ['hereda · −6 dB'] },
-      { nombre: 'footstep_metal', subs: ['override · −12 dB'] },
+    aria: 'Tres pisos: un Property Container footsteps con volumen −6 dB y bus SFX; debajo, player (0 dB, suma −6) y enemy (−4 dB, suma −10); debajo de player, footstep_wood (0 dB, suma −6) y footstep_grass (−2 dB, suma −8); debajo de enemy, footstep_metal (−4 dB, suma −14) que además sobreescribe el bus a Metal.',
+    caption: 'Lo relativo (volumen, pitch) se suma piso a piso · lo absoluto (bus, efectos) se hereda, salvo que un hijo lo sobreescriba.',
+    raiz: { nombre: 'Property Container · footsteps', subs: ['Volume −6 dB · Output bus: SFX'] },
+    medios: [
+      { nombre: 'Property Container · player', subs: ['Volume 0 dB → suma −6 dB'] },
+      { nombre: 'Property Container · enemy', subs: ['Volume −4 dB → suma −10 dB'] },
+    ],
+    hojas: [
+      { nombre: 'footstep_wood', subs: ['0 dB → suma −6 dB', 'bus SFX · heredado'] },
+      { nombre: 'footstep_grass', subs: ['−2 dB → suma −8 dB', 'bus SFX · heredado'] },
+      { nombre: 'footstep_metal', subs: ['−4 dB → suma −14 dB', 'override · bus: Metal'] },
     ],
   },
   busses: {
-    eyebrow: 'Concepto 4 · ¿a dónde va la señal?',
+    eyebrow: 'Concepto 3 · Mixing · Routing',
     title: (
       <>
-        Un árbol de mezcla <span className={s.accent}>aparte</span>
+        Cómo se mezclan las señales y <span className={s.accent}>por dónde suena</span> esa mezcla
       </>
     ),
-    aria: 'A la izquierda, la Actor-Mixer Hierarchy con un Sound SFX; a la derecha, la Master-Mixer Hierarchy: Master Audio Bus con los busses SFX y Music, un Aux Bus de reverb, el Master Motion Bus y un Secondary Bus. El sonido apunta con una flecha a su único output bus.',
+    aria: 'Tres carpetas de la pestaña Audio. Containers: un Sound SFX que apunta con una flecha a su único output bus. Busses: Main Audio Bus con los busses SFX y Music, un Aux Bus de reverb, el Master Motion Bus y un Secondary Bus. Devices: el Main Audio Bus sale a un parlante, el Motion Bus a un control y el Secondary Bus a unos audífonos.',
     caption: 'Cada objeto apunta a exactamente un output bus: la señal se mueve, no se copia.',
-    jerarquiaContenido: 'ACTOR-MIXER HIERARCHY',
-    jerarquiaMixer: 'MASTER-MIXER HIERARCHY',
-    actorMixer: { nombre: 'Actor-Mixer · footsteps', subs: [] },
+    carpetaContainers: 'CONTAINERS',
+    carpetaBusses: 'BUSSES',
+    carpetaDevices: 'DEVICES',
+    propertyContainer: { nombre: 'Property Container · footsteps', subs: [] },
     sonido: { nombre: 'Sound SFX · footstep_wood', subs: ['Output bus: SFX'] },
     unBus: 'un solo output bus',
     seMueve: 'la señal se mueve',
-    master: { nombre: 'Master Audio Bus', subs: ['la salida principal'] },
+    main: { nombre: 'Main Audio Bus', subs: ['la salida principal'] },
     busSfx: { nombre: 'Audio Bus · SFX', subs: [] },
     busMusic: { nombre: 'Audio Bus · Music', subs: [] },
     auxReverb: { nombre: 'Aux Bus · Reverb', subs: ['destino de sends'] },
     motion: { nombre: 'Master Motion Bus', subs: ['no audible · vibración · hápticos'] },
-    secondary: { nombre: 'Secondary Bus', subs: ['otro hardware · parlante del control'] },
+    secondary: { nombre: 'Secondary Bus', subs: ['audio a otro hardware'] },
+    parlante: 'parlante',
+    control: 'control',
+    audifonos: 'audífonos',
   },
   aux: {
-    eyebrow: 'Concepto 4 · aux busses',
+    eyebrow: 'Concepto 3 · Mixing · Routing · aux busses',
     title: (
       <>
         El send es <span className={s.accent}>una copia</span>
       </>
     ),
-    aria: 'Un Sound SFX manda su señal seca a su Audio Bus y una copia, con nivel de send por objeto, al Aux Bus de reverb; ambos busses desembocan en el Master Audio Bus.',
+    aria: 'Un Sound SFX manda su señal seca a su Audio Bus y una copia, con nivel de send por objeto, al Aux Bus de reverb; ambos busses desembocan en el Main Audio Bus.',
     caption: 'Bus normal = un destino, sin duplicar · Aux bus = duplicación para efectos compartidos.',
     sonido: { nombre: 'Sound SFX · footstep_wood', subs: ['Output bus: SFX · send: Reverb'] },
     dry: 'dry · se mueve · un destino',
     send: 'send · copia · nivel por objeto',
     busSfx: { nombre: 'Audio Bus · SFX', subs: ['la señal seca'] },
     auxReverb: { nombre: 'Aux Bus · Reverb', subs: ['la copia procesada'] },
-    master: { nombre: 'Master Audio Bus', subs: ['dry + wet'] },
+    main: { nombre: 'Main Audio Bus', subs: ['dry + wet'] },
   },
   efectos: {
-    eyebrow: 'Concepto 5 · ¿qué le pasa a la señal?',
+    eyebrow: 'Concepto 4 · Procesamiento · efectos',
     title: (
       <>
         Un efecto por voz o <span className={s.accent}>uno para todas</span>
@@ -368,7 +370,7 @@ const es: WwiseObjectsTexts = {
     unaParaTodo: '3 voces · 1 instancia · sobre la suma',
   },
   sharesets: {
-    eyebrow: 'Concepto 5 · sharesets',
+    eyebrow: 'Concepto 4 · Procesamiento · ShareSets',
     title: (
       <>
         Se edita una vez, <span className={s.accent}>se usa en todos</span>
@@ -387,67 +389,56 @@ const es: WwiseObjectsTexts = {
     custom: { nombre: 'Custom (local)', subs: ['una versión propia', 'para un caso puntual'] },
   },
   events: {
-    eyebrow: 'Concepto 6 · ¿quién lo dispara?',
+    eyebrow: 'Concepto 5 · Game Input · Events',
     title: (
       <>
         El juego solo ve <span className={s.accent}>el Event</span>
       </>
     ),
-    aria: 'El juego postea por nombre el Event Play_Footstep; adentro, tres Actions: Play sobre el container footsteps, Set Switch de surface y Stop sobre el bus de música. Al lado, un Dialogue Event: un árbol de decisión por State groups.',
+    aria: 'El juego postea por nombre el Event Play_Footstep; adentro, sus Actions: Play sobre el container footsteps, Set Switch de surface a grass, Set RTPC de car_rpm a 4200 y, en rojo, otro Set RTPC de car_rpm a 6000: no se puede, porque los Events no reciben argumentos y hace falta un Event por valor.',
     caption: 'El juego nunca ve las Actions: cambiar el comportamiento no toca el código.',
     game: { nombre: 'GAME', subs: ['código'] },
     postea: 'postea por nombre',
     event: 'EVENT · Play_Footstep',
+    accion: 'ACTION',
     actions: [
       { nombre: 'Play', subs: ['→ footsteps (container)'] },
       { nombre: 'Set Switch', subs: ['→ surface = grass'] },
-      { nombre: 'Stop', subs: ['→ Audio Bus · Music'] },
+      { nombre: 'Set RTPC', subs: ['→ car_rpm = 4200'] },
+      { nombre: 'Set RTPC', subs: ['→ car_rpm = 6000'] },
     ],
-    cadaAction: 'cada Action: target · fade · delay · scope',
-    dialogue: { nombre: 'DIALOGUE EVENT', subs: ['árbol de decisión', 'varios State groups', '→ un objeto'] },
+    sinArgumentos: 'los Events no reciben argumentos: un Event por valor',
   },
   gameSyncs: {
-    eyebrow: 'Concepto 7 · ¿qué le dice el juego?',
+    eyebrow: 'Concepto 5 · Game Input · Game Syncs',
     title: (
       <>
         Game Syncs: valores <span className={s.accent}>desde el código</span>
       </>
     ),
-    aria: 'El código del juego setea cuatro tipos de Game Sync —Switch, State, RTPC y Trigger— que luego leen los objects, containers y busses.',
-    caption: 'Switch = «qué sonido para este objeto» · State = «cuál es la situación para todos».',
+    aria: 'El código del juego setea cuatro tipos de Game Sync que luego leen los objects, containers y busses. Switch: un selector por Game Object (Enemy A en wood, Enemy B en tile). State: un solo selector para todo el juego (Low Health). RTPC: una curva continua de RPM a pitch. Trigger: un pulso que cae en el siguiente tiempo del compás, para stingers.',
+    caption: 'Los Events dicen cuándo; los Game Syncs, cómo · Switch = qué sonido para este objeto · State = la situación para todos.',
     codigo: { nombre: 'CÓDIGO DEL JUEGO', subs: ['setea los valores'] },
     tipos: [
-      { nombre: 'Switch', subs: ['discreto · local', 'un Game Object', 'Enemy A: wood · Enemy B: tile'] },
-      { nombre: 'State', subs: ['discreto · global', 'todo el juego a la vez', 'Low Health · con transición'] },
-      { nombre: 'RTPC', subs: ['continuo · por curva', 'propiedades de object o bus', 'RPM del auto → pitch'] },
-      { nombre: 'Trigger', subs: ['momentáneo', 'una señal puntual', 'stingers de música'] },
+      { nombre: 'Switch', subs: ['discreto · local · un Game Object', 'Enemy A: wood · Enemy B: tile'] },
+      { nombre: 'State', subs: ['discreto · global · todo el juego', 'Low Health · con transición'] },
+      { nombre: 'RTPC', subs: ['continuo · por curva', 'RPM del auto → pitch'] },
+      { nombre: 'Trigger', subs: ['momentáneo · una señal puntual', 'stingers de música'] },
     ],
+    dibujos: {
+      switchObjetos: ['Enemy A', 'Enemy B'],
+      switchValores: ['wood', 'grass', 'tile'],
+      stateValores: ['Low', 'Normal', 'Full'],
+      stateMarco: 'todo el juego',
+      rtpcEjeX: 'RPM',
+      rtpcEjeY: 'pitch',
+      triggerStinger: 'stinger',
+      triggerCompas: 'compás',
+    },
     lectores: 'LEÍDOS POR OBJECTS · CONTAINERS · BUSSES',
   },
-  seleccion: {
-    eyebrow: 'Concepto 7 · events vs game syncs',
-    title: (
-      <>
-        Los Events dicen cuándo; los Game Syncs, <span className={s.accent}>cómo</span>
-      </>
-    ),
-    aria: 'Dos carriles. Selección: una Action Play toca un Switch Container, que lee el Switch surface = grass y elige el hijo footstep_grass. Modificación: un RTPC de RPM pasa por una curva y altera el pitch del objeto sin ninguna Action.',
-    caption: 'Selección: la Action toca, el Switch/State elige · Modificación: el RTPC altera en vivo, sin Action.',
-    laneSeleccion: 'SELECCIÓN · Action + Switch / State',
-    action: { nombre: 'Action · Play', subs: ['desde un Event'] },
-    switchValor: { nombre: 'Switch · surface = grass', subs: [] },
-    lee: 'lee',
-    container: { nombre: 'Switch Container', subs: ['footsteps'] },
-    elige: 'elige',
-    hijo: { nombre: 'footstep_grass', subs: ['el hijo correcto'] },
-    laneModificacion: 'MODIFICACIÓN · RTPC',
-    rtpc: { nombre: 'RTPC · car_rpm', subs: ['4200'] },
-    curva: 'curva',
-    propiedad: { nombre: 'pitch del objeto', subs: ['o volumen · filtro · efecto'] },
-    sinAction: 'sin ninguna Action · en tiempo real',
-  },
   packaging: {
-    eyebrow: 'Concepto 8 · ¿cómo se entrega?',
+    eyebrow: 'Concepto 6 · Packaging',
     title: (
       <>
         Empaquetar y <span className={s.accent}>organizar</span>
@@ -461,6 +452,16 @@ const es: WwiseObjectsTexts = {
       { nombre: 'Queries · Sessions', subs: ['buscar en el proyecto', 'perfilar y mezclar', 'no son objetos de runtime'] },
     ],
   },
+  cierre: {
+    eyebrow: 'Cierre · el camino de un sonido',
+    title: (
+      <>
+        Todo sonido sigue <span className={s.accent}>el mismo camino</span>
+      </>
+    ),
+    aria: 'El camino completo otra vez: el juego toca el Game Input; la señal nace en Contenido, baja a Mixing y sale por el dispositivo; Procesamiento actúa sobre Contenido y Mixing; todo lo de adentro viaja en SoundBanks.',
+    caption: 'Game Input → Contenido → Mixing → Salida · Procesamiento actúa sobre el camino · SoundBanks lo empaquetan.',
+  },
 };
 
 const en: WwiseObjectsTexts = {
@@ -468,19 +469,19 @@ const en: WwiseObjectsTexts = {
   context: 'Intro to Wwise · Wwise + Unreal',
   labels: {
     intro: 'intro',
-    camino: ['event', 'actions', 'object', 'content', 'bus', 'process', 'output'],
-    preguntas: 'seven questions',
-    contenido: 'content',
+    flujo: ['the path', 'game input', 'signal', 'process', 'soundbanks'],
+    clasificacion: 'classification',
+    sonido: 'sound',
     estructura: 'structure',
     herencia: 'inheritance',
-    busses: 'routing',
+    busses: 'mixing · routing',
     aux: 'aux busses',
     efectos: 'effects',
     sharesets: 'sharesets',
     events: 'events',
     gameSyncs: 'game syncs',
-    seleccion: 'select vs modify',
     packaging: 'packaging',
+    cierre: 'wrap-up',
   },
   cover: {
     eyebrow: 'Intro to Wwise · the object catalog',
@@ -491,7 +492,30 @@ const en: WwiseObjectsTexts = {
     ),
     hint: 'Navigate with ← → · space',
   },
-  camino: {
+  familias: {
+    gameInput: {
+      titulo: 'GAME INPUT',
+      pregunta: 'what does the game say?',
+      events: { nombre: 'Events', subs: ['which actions to do'] },
+      gameSyncs: { nombre: 'Game Syncs', subs: ['which variables to change', 'directly'] },
+    },
+    contenido: {
+      titulo: 'CONTENT',
+      pregunta: 'what plays and how is it chosen?',
+      sfx: 'SFX',
+      music: 'MUSIC',
+      celdas: [
+        { nombre: 'Sound', subs: ['Sound SFX', 'Sound Voice'] },
+        { nombre: 'Sound', subs: ['Music Track', 'Music Segment'] },
+        { nombre: 'Structure', subs: ['Random · Sequence', 'Switch · Blend'] },
+        { nombre: 'Structure', subs: ['Music Switch', 'Music Playlist'] },
+      ],
+    },
+    mixing: { nombre: 'MIXING · ROUTING', subs: ['where does the signal go? · busses'] },
+    procesamiento: { nombre: 'PROCESSING', subs: ['what happens', 'to the signal?', 'effects · ShareSets'] },
+    packaging: { nombre: 'PACKAGING', subs: ['how does it ship?', 'SoundBanks'] },
+  },
+  flujo: {
     eyebrow: 'Concept 1 · the path of one sound',
     title: (
       <>
@@ -499,93 +523,64 @@ const en: WwiseObjectsTexts = {
       </>
     ),
     arias: [
-      'The game posts an Event.',
-      'The game posts an Event, and the Event executes its Actions.',
-      'The game posts an Event, the Event executes its Actions and each Action targets an object: a container or a sound.',
-      'The object resolves to actual content, consulting Game Syncs if needed.',
-      'The resulting signal is sent to a bus.',
-      'Busses apply processing: effects and mixing.',
-      'The mix reaches an output device. Everything is packaged into SoundBanks so the game can load it.',
+      'Five object families between the game and the output: Game Input on the left, Content above Mixing in the middle, Processing on the right.',
+      'The game only touches the Game Input; from there arrows go to Content, to Mixing and, over the top, to Processing.',
+      'The signal is born in Content, goes down to Mixing and leaves through the device.',
+      'Processing acts on Content and on Mixing.',
+      'A dashed frame encloses Game Input, Content, Mixing and Processing: the SoundBanks. The game and the output stay outside.',
     ],
     captions: [
-      'The game does one thing only: post an Event.',
-      'The Event makes no sound: it executes Actions.',
-      'Each Action targets an object: a container or a sound.',
-      'The object resolves to content, consulting Game Syncs if needed.',
-      'The resulting signal is sent to a bus.',
-      'Busses process: effects and mixing.',
-      'The mix leaves through the device · everything ships packaged in SoundBanks.',
+      'Five object families between the game and the output.',
+      'The game only touches the Game Input: it posts Events and sets Game Syncs.',
+      'The signal is born in the content, goes through the busses and leaves.',
+      'Processing acts on the content and on the mix · its parameters also come from the game.',
+      'Everything inside ships packaged in SoundBanks · the game and the output stay outside.',
     ],
     game: 'GAME',
-    postea: 'posts',
-    event: 'EVENT',
-    ejecuta: 'executes',
-    actions: 'ACTIONS',
-    apunta: 'targets',
-    object: 'OBJECT',
-    objectSub: 'container or sound',
-    resuelve: 'resolves to',
-    contenido: 'CONTENT',
-    contenidoSub: 'actual audio',
-    gameSyncs: 'GAME SYNCS',
-    gameSyncsSub: 'Switch · State · RTPC',
-    consulta: 'consults',
-    envia: 'sent to',
-    bus: 'BUS',
-    procesa: 'PROCESS',
-    procesaSub: 'effects · mixing',
-    llega: 'reaches',
+    parametros: 'parameters · RTPC · States',
+    senal: 'signal',
     salida: 'OUTPUT',
     soundBank: 'SOUNDBANKS · everything packaged so the game can load it',
   },
-  preguntas: {
-    eyebrow: 'Concept 1 · the map',
+  clasificacion: {
+    eyebrow: 'Concept 1 · a didactic classification',
     title: (
       <>
-        Each object answers <span className={s.accent}>one question</span>
+        Five families, <span className={s.accent}>five questions</span>
       </>
     ),
-    aria: 'Seven object families, each with its question: content (what plays?), structure (how is it chosen or combined?), routing (where does the signal go?), processing (what happens to the signal?), triggers (who tells it to happen?), game input (what does the game tell Wwise?) and packaging (how does it ship?).',
-    caption: 'Seven questions along the path · the rest of the class walks through them.',
-    familias: [
-      { nombre: 'CONTENT', subs: ['what plays?'] },
-      { nombre: 'STRUCTURE', subs: ['how is it chosen or combined?'] },
-      { nombre: 'ROUTING', subs: ['where does the signal go?'] },
-      { nombre: 'PROCESSING', subs: ['what happens to the signal?'] },
-      { nombre: 'TRIGGERS', subs: ['who tells it to happen?'] },
-      { nombre: 'GAME INPUT', subs: ['what does the game say?'] },
-      { nombre: 'PACKAGING', subs: ['how does it ship?'] },
-    ],
+    aria: 'The same five families of the path, laid out to name them: Game Input (what does the game say?) with Events and Game Syncs inside; Content (what plays and how is it chosen?) with a grid of Sound and Structure by SFX and Music; Mixing · Routing (where does the signal go?); Processing (what happens to the signal?) and Packaging (how does it ship?).',
+    caption: 'Not the Wwise classification: ours, to understand the path of one sound.',
   },
-  contenido: {
-    eyebrow: 'Concept 2 · what plays?',
+  sonido: {
+    eyebrow: 'Concept 2 · Content · Sound',
     title: (
       <>
         The only ones that point to <span className={s.accent}>actual audio</span>
       </>
     ),
-    aria: 'Five content objects —Sound SFX, Sound Voice, Music Track, Music Segment and plug-in sources— point down to the audio data.',
+    aria: 'Five sound objects —Sound SFX and Sound Voice in the SFX column, Music Track and Music Segment in the Music column, and plug-in sources— point down to the audio data.',
     caption: 'Everything else exists to decide whether, when, which and how these play.',
     objetos: [
       { nombre: 'Sound SFX', subs: ['one or more sources', 'the workhorse'] },
       { nombre: 'Sound Voice', subs: ['like SFX, but', 'one source per language'] },
       { nombre: 'Music Track', subs: ['audio in the music system', 'sub-tracks and clips'] },
       { nombre: 'Music Segment', subs: ['timeline holding tracks', 'cues · tempo · meter'] },
-      { nombre: 'Plug-in sources', subs: ['generated content', 'Wwise Synth · tone gen'] },
+      { nombre: 'Plug-in sources', subs: ['generated sources', 'Wwise Synth · tone gen'] },
     ],
     audioData: 'AUDIO DATA · wav · synthesis',
   },
   estructura: {
-    eyebrow: 'Concept 3 · how is it chosen or combined?',
+    eyebrow: 'Concept 2 · Content · Structure',
     title: (
       <>
         Containers: children + <span className={s.accent}>one rule</span>
       </>
     ),
-    aria: 'Eight structural objects, each with its question: Actor-Mixer (no rule), Random (which one?), Sequence (in what order?), Switch (based on what the game says?), Blend (how much of each?), Music Playlist, Music Switch and Folders.',
+    aria: 'Eight structure objects, each with its question: in the SFX column, Property Container (no rule), Random (which one?), Sequence (in what order?), Switch (based on what the game says?) and Blend (how much of each?); in the Music column, Music Playlist and Music Switch; and Folders, organization only.',
     caption: 'None of them produce audio: they own children and decide how they play.',
     contenedores: [
-      { nombre: 'Actor-Mixer', subs: ['no rule', 'groups · shares properties'] },
+      { nombre: 'Property Container', subs: ['no rule', 'groups · shares properties'] },
       { nombre: 'Random Container', subs: ['which one?', 'one · weights · no repeat'] },
       { nombre: 'Sequence Container', subs: ['in what order?', 'one after another'] },
       { nombre: 'Switch Container', subs: ['based on what the game says?', 'by Switch or State'] },
@@ -596,61 +591,69 @@ const en: WwiseObjectsTexts = {
     ],
   },
   herencia: {
-    eyebrow: 'Concept 3 · inheritance',
+    eyebrow: 'Concept 2 · Content · Structure · inheritance',
     title: (
       <>
         The parent's values <span className={s.accent}>flow down</span>
       </>
     ),
-    aria: 'An Actor-Mixer with volume −6 dB and three children: two inherit the value and the third overrides it with −12 dB.',
-    caption: 'A property set on the parent flows down, unless a child overrides it.',
-    padre: { nombre: 'Actor-Mixer · footsteps', subs: ['Volume −6 dB · Output bus: SFX'] },
-    hijos: [
-      { nombre: 'footstep_wood', subs: ['inherits · −6 dB'] },
-      { nombre: 'footstep_grass', subs: ['inherits · −6 dB'] },
-      { nombre: 'footstep_metal', subs: ['override · −12 dB'] },
+    aria: 'Three levels: a Property Container footsteps with volume −6 dB and bus SFX; below it, player (0 dB, sum −6) and enemy (−4 dB, sum −10); under player, footstep_wood (0 dB, sum −6) and footstep_grass (−2 dB, sum −8); under enemy, footstep_metal (−4 dB, sum −14), which also overrides the bus to Metal.',
+    caption: 'Relative properties (volume, pitch) add up level by level · absolute ones (bus, effects) are inherited unless a child overrides them.',
+    raiz: { nombre: 'Property Container · footsteps', subs: ['Volume −6 dB · Output bus: SFX'] },
+    medios: [
+      { nombre: 'Property Container · player', subs: ['Volume 0 dB → sum −6 dB'] },
+      { nombre: 'Property Container · enemy', subs: ['Volume −4 dB → sum −10 dB'] },
+    ],
+    hojas: [
+      { nombre: 'footstep_wood', subs: ['0 dB → sum −6 dB', 'bus SFX · inherited'] },
+      { nombre: 'footstep_grass', subs: ['−2 dB → sum −8 dB', 'bus SFX · inherited'] },
+      { nombre: 'footstep_metal', subs: ['−4 dB → sum −14 dB', 'override · bus: Metal'] },
     ],
   },
   busses: {
-    eyebrow: 'Concept 4 · where does the signal go?',
+    eyebrow: 'Concept 3 · Mixing · Routing',
     title: (
       <>
-        A <span className={s.accent}>separate</span> mixer tree
+        How the signals are mixed and <span className={s.accent}>where that mix</span> plays
       </>
     ),
-    aria: 'On the left, the Actor-Mixer Hierarchy with a Sound SFX; on the right, the Master-Mixer Hierarchy: Master Audio Bus with the SFX and Music busses, a reverb Aux Bus, the Master Motion Bus and a Secondary Bus. The sound points with an arrow to its single output bus.',
+    aria: 'Three folders of the Audio tab. Containers: a Sound SFX pointing with an arrow to its single output bus. Busses: Main Audio Bus with the SFX and Music busses, a reverb Aux Bus, the Master Motion Bus and a Secondary Bus. Devices: the Main Audio Bus goes out to a speaker, the Motion Bus to a controller and the Secondary Bus to headphones.',
     caption: 'Every object points to exactly one output bus: the signal is moved, not copied.',
-    jerarquiaContenido: 'ACTOR-MIXER HIERARCHY',
-    jerarquiaMixer: 'MASTER-MIXER HIERARCHY',
-    actorMixer: { nombre: 'Actor-Mixer · footsteps', subs: [] },
+    carpetaContainers: 'CONTAINERS',
+    carpetaBusses: 'BUSSES',
+    carpetaDevices: 'DEVICES',
+    propertyContainer: { nombre: 'Property Container · footsteps', subs: [] },
     sonido: { nombre: 'Sound SFX · footstep_wood', subs: ['Output bus: SFX'] },
     unBus: 'a single output bus',
     seMueve: 'the signal is moved',
-    master: { nombre: 'Master Audio Bus', subs: ['the main output'] },
+    main: { nombre: 'Main Audio Bus', subs: ['the main output'] },
     busSfx: { nombre: 'Audio Bus · SFX', subs: [] },
     busMusic: { nombre: 'Audio Bus · Music', subs: [] },
     auxReverb: { nombre: 'Aux Bus · Reverb', subs: ['send destination'] },
     motion: { nombre: 'Master Motion Bus', subs: ['not audible · rumble · haptics'] },
-    secondary: { nombre: 'Secondary Bus', subs: ['other hardware · controller speaker'] },
+    secondary: { nombre: 'Secondary Bus', subs: ['audio to other hardware'] },
+    parlante: 'speaker',
+    control: 'controller',
+    audifonos: 'headphones',
   },
   aux: {
-    eyebrow: 'Concept 4 · aux busses',
+    eyebrow: 'Concept 3 · Mixing · Routing · aux busses',
     title: (
       <>
         A send is <span className={s.accent}>a copy</span>
       </>
     ),
-    aria: 'A Sound SFX sends its dry signal to its Audio Bus and a copy, at a per-object send level, to the reverb Aux Bus; both busses flow into the Master Audio Bus.',
+    aria: 'A Sound SFX sends its dry signal to its Audio Bus and a copy, at a per-object send level, to the reverb Aux Bus; both busses flow into the Main Audio Bus.',
     caption: 'Regular bus = one destination, no duplication · Aux bus = duplication for shared effects.',
     sonido: { nombre: 'Sound SFX · footstep_wood', subs: ['Output bus: SFX · send: Reverb'] },
     dry: 'dry · moved · one destination',
     send: 'send · copy · per-object level',
     busSfx: { nombre: 'Audio Bus · SFX', subs: ['the dry signal'] },
     auxReverb: { nombre: 'Aux Bus · Reverb', subs: ['the processed copy'] },
-    master: { nombre: 'Master Audio Bus', subs: ['dry + wet'] },
+    main: { nombre: 'Main Audio Bus', subs: ['dry + wet'] },
   },
   efectos: {
-    eyebrow: 'Concept 5 · what happens to the signal?',
+    eyebrow: 'Concept 4 · Processing · effects',
     title: (
       <>
         One effect per voice or <span className={s.accent}>one for all</span>
@@ -667,7 +670,7 @@ const en: WwiseObjectsTexts = {
     unaParaTodo: '3 voices · 1 instance · on the sum',
   },
   sharesets: {
-    eyebrow: 'Concept 5 · sharesets',
+    eyebrow: 'Concept 4 · Processing · ShareSets',
     title: (
       <>
         Edited once, <span className={s.accent}>used everywhere</span>
@@ -686,67 +689,56 @@ const en: WwiseObjectsTexts = {
     custom: { nombre: 'Custom (local)', subs: ['its own version', 'for a one-off case'] },
   },
   events: {
-    eyebrow: 'Concept 6 · who tells it to happen?',
+    eyebrow: 'Concept 5 · Game Input · Events',
     title: (
       <>
         The game only sees <span className={s.accent}>the Event</span>
       </>
     ),
-    aria: 'The game posts the Event Play_Footstep by name; inside, three Actions: Play on the footsteps container, Set Switch for surface and Stop on the music bus. Beside it, a Dialogue Event: a decision tree by State groups.',
+    aria: 'The game posts the Event Play_Footstep by name; inside, its Actions: Play on the footsteps container, Set Switch of surface to grass, Set RTPC of car_rpm to 4200 and, in red, another Set RTPC of car_rpm to 6000: not possible, because Events take no arguments and you need one Event per value.',
     caption: 'The game never sees the Actions: changing behavior does not touch the code.',
     game: { nombre: 'GAME', subs: ['code'] },
     postea: 'posts by name',
     event: 'EVENT · Play_Footstep',
+    accion: 'ACTION',
     actions: [
       { nombre: 'Play', subs: ['→ footsteps (container)'] },
       { nombre: 'Set Switch', subs: ['→ surface = grass'] },
-      { nombre: 'Stop', subs: ['→ Audio Bus · Music'] },
+      { nombre: 'Set RTPC', subs: ['→ car_rpm = 4200'] },
+      { nombre: 'Set RTPC', subs: ['→ car_rpm = 6000'] },
     ],
-    cadaAction: 'each Action: target · fade · delay · scope',
-    dialogue: { nombre: 'DIALOGUE EVENT', subs: ['decision tree', 'several State groups', '→ one object'] },
+    sinArgumentos: 'Events take no arguments: one Event per value',
   },
   gameSyncs: {
-    eyebrow: 'Concept 7 · what does the game say?',
+    eyebrow: 'Concept 5 · Game Input · Game Syncs',
     title: (
       <>
         Game Syncs: values <span className={s.accent}>from the code</span>
       </>
     ),
-    aria: 'The game code sets four kinds of Game Sync —Switch, State, RTPC and Trigger— that objects, containers and busses then read.',
-    caption: 'Switch = "which sound for this object" · State = "what is the situation for everything".',
+    aria: 'The game code sets four kinds of Game Sync that objects, containers and busses then read. Switch: one selector per Game Object (Enemy A on wood, Enemy B on tile). State: a single selector for the whole game (Low Health). RTPC: a continuous curve from RPM to pitch. Trigger: a pulse that lands on the next beat of the bar, for stingers.',
+    caption: 'Events say when; Game Syncs say how · Switch = which sound for this object · State = the situation for everything.',
     codigo: { nombre: 'GAME CODE', subs: ['sets the values'] },
     tipos: [
-      { nombre: 'Switch', subs: ['discrete · local', 'one Game Object', 'Enemy A: wood · Enemy B: tile'] },
-      { nombre: 'State', subs: ['discrete · global', 'the whole game at once', 'Low Health · with transition'] },
-      { nombre: 'RTPC', subs: ['continuous · via curve', 'object or bus properties', 'car RPM → pitch'] },
-      { nombre: 'Trigger', subs: ['momentary', 'a one-shot signal', 'music stingers'] },
+      { nombre: 'Switch', subs: ['discrete · local · one Game Object', 'Enemy A: wood · Enemy B: tile'] },
+      { nombre: 'State', subs: ['discrete · global · the whole game', 'Low Health · with transition'] },
+      { nombre: 'RTPC', subs: ['continuous · via curve', 'car RPM → pitch'] },
+      { nombre: 'Trigger', subs: ['momentary · a one-shot signal', 'music stingers'] },
     ],
+    dibujos: {
+      switchObjetos: ['Enemy A', 'Enemy B'],
+      switchValores: ['wood', 'grass', 'tile'],
+      stateValores: ['Low', 'Normal', 'Full'],
+      stateMarco: 'the whole game',
+      rtpcEjeX: 'RPM',
+      rtpcEjeY: 'pitch',
+      triggerStinger: 'stinger',
+      triggerCompas: 'bar',
+    },
     lectores: 'READ BY OBJECTS · CONTAINERS · BUSSES',
   },
-  seleccion: {
-    eyebrow: 'Concept 7 · events vs game syncs',
-    title: (
-      <>
-        Events say when; Game Syncs say <span className={s.accent}>how</span>
-      </>
-    ),
-    aria: 'Two lanes. Selection: a Play Action plays a Switch Container, which reads the Switch surface = grass and picks the child footstep_grass. Modification: an RPM RTPC goes through a curve and alters the object pitch without any Action.',
-    caption: 'Selection: the Action plays, the Switch/State picks · Modification: the RTPC alters live, with no Action.',
-    laneSeleccion: 'SELECTION · Action + Switch / State',
-    action: { nombre: 'Action · Play', subs: ['from an Event'] },
-    switchValor: { nombre: 'Switch · surface = grass', subs: [] },
-    lee: 'reads',
-    container: { nombre: 'Switch Container', subs: ['footsteps'] },
-    elige: 'picks',
-    hijo: { nombre: 'footstep_grass', subs: ['the right child'] },
-    laneModificacion: 'MODIFICATION · RTPC',
-    rtpc: { nombre: 'RTPC · car_rpm', subs: ['4200'] },
-    curva: 'curve',
-    propiedad: { nombre: 'object pitch', subs: ['or volume · filter · effect'] },
-    sinAction: 'without any Action · in real time',
-  },
   packaging: {
-    eyebrow: 'Concept 8 · how does it ship?',
+    eyebrow: 'Concept 6 · Packaging',
     title: (
       <>
         Package and <span className={s.accent}>organize</span>
@@ -759,6 +751,16 @@ const en: WwiseObjectsTexts = {
       { nombre: 'Work Units', subs: ['.wwu files', 'split the project', 'version control · team work'] },
       { nombre: 'Queries · Sessions', subs: ['search the project', 'profile and mix', 'not runtime objects'] },
     ],
+  },
+  cierre: {
+    eyebrow: 'Wrap-up · the path of one sound',
+    title: (
+      <>
+        Every sound follows <span className={s.accent}>the same path</span>
+      </>
+    ),
+    aria: 'The full path once more: the game touches the Game Input; the signal is born in Content, goes down to Mixing and leaves through the device; Processing acts on Content and Mixing; everything inside ships in SoundBanks.',
+    caption: 'Game Input → Content → Mixing → Output · Processing acts on the path · SoundBanks package it.',
   },
 };
 
