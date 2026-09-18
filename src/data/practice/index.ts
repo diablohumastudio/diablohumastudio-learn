@@ -39,18 +39,24 @@ export function questionTopicTitle(question: PracticeQuestion, locale: Locale): 
   return learnClass ? learnClass.title[locale] : question.topic;
 }
 
-/** 'wwise-unreal' → 'wu': the id prefix shared by every question of a course. */
-function courseIdPrefix(course: LearnCourse | undefined): string {
-  if (!course) return NO_COURSE_ID_PREFIX;
-  return course.slug
+/** 'wwise-unreal' → 'wu', 'wwise-objects' → 'wo'. */
+function slugInitials(slug: string): string {
+  return slug
     .split('-')
     .map((part) => part[0])
     .join('');
 }
 
-/** Next free id for the course of `topic` (e.g. 'wu-014'); ids are never reused. */
+/** 'wu-wo-': course and class initials, so every class numbers its own questions. */
+function questionIdPrefix(topic: string | undefined): string {
+  const course = courseOfTopic(topic);
+  if (!course || !topic) return `${NO_COURSE_ID_PREFIX}-`;
+  return `${slugInitials(course.slug)}-${slugInitials(topic)}-`;
+}
+
+/** Next free id for the class of `topic` (e.g. 'wu-wo-014'); ids are never reused. */
 export function nextQuestionId(questions: readonly PracticeQuestion[], topic: string | undefined): string {
-  const prefix = `${courseIdPrefix(courseOfTopic(topic))}-`;
+  const prefix = questionIdPrefix(topic);
   const highest = questions
     .filter((question) => question.id.startsWith(prefix))
     .map((question) => Number(question.id.slice(prefix.length)))

@@ -6,7 +6,7 @@ export const MIN_INCORRECT_ANSWERS: number = 3;
 export const SHOWN_INCORRECT_ANSWERS: number = 3;
 
 export type PracticeQuestion = {
-  /** Stable and never reused: every student's stats are keyed by it (e.g. 'wu-001'). */
+  /** Stable and never reused: every student's stats are keyed by it (e.g. 'wu-wo-001'). */
   id: string;
   /** Class slug from src/data/learn.ts, so results can be grouped by class. */
   topic?: string;
