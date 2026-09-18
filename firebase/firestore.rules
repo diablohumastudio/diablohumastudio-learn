@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Quiz data (see docs/quiz.md). Paste into Firebase console → Firestore → Rules.
+// Practice data (see docs/practice.md). Paste into Firebase console → Firestore → Rules.
 service cloud.firestore {
   match /databases/{database}/documents {
     function isSignedIn() {

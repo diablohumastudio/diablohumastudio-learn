@@ -11,13 +11,15 @@ import {
   findCourse,
   groupClassesBySection,
   latestClass,
+  practicePath,
   querySlug,
 } from '../../data/learn';
 import type { LearnClass } from '../../data/learn';
 import { learnDict } from '../../i18n/learn';
 import { useLocale, useT } from '../../i18n/useT';
-import LanguageSwitch from '../LanguageSwitch';
 import { LEARN_FONT_VARS } from './fonts';
+import LearnHeader from './LearnHeader';
+import h from './LearnHeader.module.css';
 import s from './LearnLayout.module.css';
 
 export function LearnMissing() {
@@ -25,7 +27,7 @@ export function LearnMissing() {
   return (
     <div className={s.missing}>
       <p>{t.classNotFound}</p>
-      <Link href={LEARN_BASE_PATH}>{t.goToLatest}</Link>
+      <Link href={LEARN_BASE_PATH}>{t.goToMenu}</Link>
     </div>
   );
 }
@@ -38,6 +40,7 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
 
   const activeCourse = findCourse(querySlug(router.query.curso)) ?? LEARN_COURSES[0];
   const activeClassSlug = querySlug(router.query.clase) ?? '';
+  const activeClass = findClass(activeCourse, activeClassSlug);
 
   useEffect(() => {
     const syncFullscreenState = () => setIsFullscreen(Boolean(document.fullscreenElement));
@@ -81,59 +84,70 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
         <meta name="robots" content="noindex, nofollow" />
         <meta name="theme-color" content="#14161a" />
       </Head>
-      <header className={s.header}>
-        <span className={s.led} />
-        <span className={s.brand}>LEARN</span>
-        <label className={s.selectGroup}>
-          <span className={s.selectLabel}>{t.courseLabel}</span>
-          <select
-            className={s.select}
-            value={activeCourse.slug}
-            onChange={(event) => {
-              changeCourse(event.target.value);
-              event.target.blur();
-            }}
-          >
-            {LEARN_COURSES.map((course) => (
-              <option key={course.slug} value={course.slug}>
-                {course.title}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className={s.selectGroup}>
-          <span className={s.selectLabel}>{t.classLabel}</span>
-          <select
-            className={s.select}
-            value={activeClassSlug}
-            onChange={(event) => {
-              changeClass(event.target.value);
-              event.target.blur();
-            }}
-          >
-            {groupClassesBySection(activeCourse).map((group) =>
-              group.section ? (
-                <optgroup key={group.section} label={group.section}>
-                  {group.classes.map(renderClassOption)}
-                </optgroup>
-              ) : (
-                group.classes.map(renderClassOption)
-              )
+      <LearnHeader
+        center={
+          <>
+            <label className={h.selectGroup}>
+              <span className={h.selectLabel}>{t.courseLabel}</span>
+              <select
+                className={h.select}
+                value={activeCourse.slug}
+                onChange={(event) => {
+                  changeCourse(event.target.value);
+                  event.target.blur();
+                }}
+              >
+                {LEARN_COURSES.map((course) => (
+                  <option key={course.slug} value={course.slug}>
+                    {course.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className={h.selectGroup}>
+              <span className={h.selectLabel}>{t.classLabel}</span>
+              <select
+                className={h.select}
+                value={activeClassSlug}
+                onChange={(event) => {
+                  changeClass(event.target.value);
+                  event.target.blur();
+                }}
+              >
+                {groupClassesBySection(activeCourse).map((group) =>
+                  group.section ? (
+                    <optgroup key={group.section} label={group.section}>
+                      {group.classes.map(renderClassOption)}
+                    </optgroup>
+                  ) : (
+                    group.classes.map(renderClassOption)
+                  )
+                )}
+              </select>
+            </label>
+            {activeClass && (
+              <Link
+                href={practicePath({ courseSlug: activeCourse.slug, classSlug: activeClass.slug })}
+                className={s.practiceLink}
+                title={t.practiceThisClass}
+              >
+                {t.practice}
+              </Link>
             )}
-          </select>
-        </label>
-        <span className={s.spacer} />
-        <LanguageSwitch className={s.languageSwitch} />
-        <button
-          type="button"
-          className={s.fullscreenBtn}
-          onClick={toggleFullscreen}
-          aria-label={isFullscreen ? t.exitFullscreen : t.fullscreen}
-          title={isFullscreen ? t.exitFullscreenHint : t.fullscreen}
-        >
-          ⛶
-        </button>
-      </header>
+          </>
+        }
+        trailing={
+          <button
+            type="button"
+            className={s.fullscreenBtn}
+            onClick={toggleFullscreen}
+            aria-label={isFullscreen ? t.exitFullscreen : t.fullscreen}
+            title={isFullscreen ? t.exitFullscreenHint : t.fullscreen}
+          >
+            ⛶
+          </button>
+        }
+      />
       <main className={s.main}>{children}</main>
     </div>
   );

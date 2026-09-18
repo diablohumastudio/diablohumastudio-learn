@@ -20,6 +20,22 @@ const nextConfig = {
         destination: '/learn/:path*',
         permanent: true,
       },
+      // Links shared before the quiz became /learn/practice and /learn/teacher.
+      {
+        source: '/learn/quiz',
+        destination: '/learn/practice',
+        permanent: true,
+      },
+      {
+        source: '/learn/quiz/teacher',
+        destination: '/learn/teacher/students-practice-info',
+        permanent: true,
+      },
+      {
+        source: '/learn/quiz/questions',
+        destination: '/learn/teacher/questions',
+        permanent: true,
+      },
     ]
   },
 }

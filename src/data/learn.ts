@@ -63,6 +63,23 @@ export const LEARN_COURSES: LearnCourse[] = [
   },
 ];
 
+export const PRACTICE_PATH: string = `${LEARN_BASE_PATH}/practice`;
+export const PRACTICE_PLAY_PATH: string = `${PRACTICE_PATH}/play`;
+export const TEACHER_PATH: string = `${LEARN_BASE_PATH}/teacher`;
+export const STUDENTS_PRACTICE_INFO_PATH: string = `${TEACHER_PATH}/students-practice-info`;
+export const QUESTIONS_EDITOR_PATH: string = `${TEACHER_PATH}/questions`;
+export const SIGN_IN_PATH: string = `${LEARN_BASE_PATH}/sign-in`;
+
+/** What a practice session draws from: everything, one course, or one class of a course. */
+export type PracticeScope = {
+  courseSlug?: string;
+  classSlug?: string;
+};
+
+export function coursePath(course: LearnCourse): string {
+  return `${LEARN_BASE_PATH}/${course.slug}`;
+}
+
 export function classPath(course: LearnCourse, learnClass: LearnClass): string {
   return `${LEARN_BASE_PATH}/${course.slug}/${learnClass.slug}`;
 }
@@ -87,6 +104,30 @@ export function groupClassesBySection(course: LearnCourse): LearnClassGroup[] {
     }
   }
   return groups;
+}
+
+/** Drops anything the registry does not know, so a stale link falls back to a wider scope. */
+export function practiceScope(courseSlug: string | undefined, classSlug: string | undefined): PracticeScope {
+  const course = findCourse(courseSlug);
+  if (!course) return {};
+  const learnClass = findClass(course, classSlug);
+  return learnClass ? { courseSlug: course.slug, classSlug: learnClass.slug } : { courseSlug: course.slug };
+}
+
+function scopeQuery(scope: PracticeScope): string {
+  const params = new URLSearchParams();
+  if (scope.courseSlug) params.set('course', scope.courseSlug);
+  if (scope.courseSlug && scope.classSlug) params.set('class', scope.classSlug);
+  const query = params.toString();
+  return query ? `?${query}` : '';
+}
+
+export function practicePath(scope: PracticeScope): string {
+  return `${PRACTICE_PATH}${scopeQuery(scope)}`;
+}
+
+export function practicePlayPath(scope: PracticeScope): string {
+  return `${PRACTICE_PLAY_PATH}${scopeQuery(scope)}`;
 }
 
 export function neighborClass(

@@ -9,12 +9,17 @@ The `/learn` section serves class presentations. It is unlisted (`noindex, nofol
 | Registry | `src/data/learn.ts` | Single source of truth: courses → classes → presentation component |
 | Presentations | `src/presentations/<course-slug>/<class-slug>.tsx` | One React component per class, built with `Deck`/`Slide` |
 | Deck engine | `src/components/learn/Deck.tsx` + `Deck.module.css` | Slide state, keyboard navigation, playhead/counter, `?s=` URL sync |
-| Section layout | `src/components/learn/LearnLayout.tsx` | Header with course/class dropdowns and the fullscreen button |
-| Routes | `src/pages/learn/index.tsx`, `src/pages/learn/[curso]/index.tsx` and `src/pages/learn/[curso]/[clase].tsx` | `/learn` redirects to the latest class; `/learn/<course-slug>` redirects to the course's first class (slide 1); the dynamic route renders the selected one |
+| Deck layout | `src/components/learn/LearnLayout.tsx` | Full-height shell for the decks; puts the course/class dropdowns, the Practice link and the fullscreen button in the header |
+| Page layout | `src/components/learn/LearnPageLayout.tsx` | Scrolling column for the menus, practice, teacher and sign-in pages |
+| Header | `src/components/learn/LearnHeader.tsx`, `AccountMenu.tsx`, `TeacherLink.tsx` | Shared by both layouts: `LEARN` links to `/learn`; the right side shows the account (name + sign out, or guest + sign in) and, for teachers, a link to `/learn/teacher` |
+| Menus | `src/components/learn/CourseList.tsx`, `ClassList.tsx` | `/learn` lists the courses, `/learn/<course-slug>` its classes; both link to practice with their scope |
+| Routes | `src/pages/learn/index.tsx`, `src/pages/learn/[curso]/index.tsx` and `src/pages/learn/[curso]/[clase].tsx` | `/learn` is the course menu; `/learn/<course-slug>` is the class menu of a course; the dynamic route renders the selected class |
 
 URLs look like `/learn/<course-slug>/<class-slug>` (e.g. `/learn/wwise-unreal/el-editor-wwise`). The current slide is kept in the `?s=<n>` query param (and the current step of a stepped slide in `&p=<n>`), so browser back/forward walk through visited slides and steps, and a link can point to an exact slide or step.
 
-The `/learn` prefix lives in one place, `LEARN_BASE_PATH` in the registry, and every internal route is built with `classPath(course, class)`. To move the section (another path, or later a subdomain via a host-conditioned rewrite), change the constant and rename `src/pages/learn/`. Links already shared under the old `/incine` prefix are kept alive by a permanent redirect in `next.config.js`.
+Practice and the teacher tools live under the same prefix (`/learn/practice`, `/learn/teacher`, `/learn/sign-in`, see [practice.md](practice.md)); static routes win over `[curso]`, so a course can never be slugged `practice`, `teacher` or `sign-in`. Navigation is always a `next/link` styled as a button, never a `<button>` with `router.push`, so the destination shows in the browser.
+
+The `/learn` prefix lives in one place, `LEARN_BASE_PATH` in the registry, and every internal route is built with the registry's helpers (`classPath`, `coursePath`, `practicePath`, `TEACHER_PATH`…). To move the section (another path, or later a subdomain via a host-conditioned rewrite), change the constant and rename `src/pages/learn/`. Links already shared under the old `/incine` prefix are kept alive by a permanent redirect in `next.config.js`.
 
 ## Adding a class (presentation) to an existing course
 
@@ -81,12 +86,12 @@ export default function MyNewClass() {
 },
 ```
 
-That is all — the class dropdown and the route are generated from the registry.
+That is all — the class menu, the class dropdown, the practice scopes and the route are generated from the registry.
 
 Notes:
 
 - Slugs are kebab-case and become the URL segment; the file name must match the slug.
-- **Append new classes at the end of the array**: `/learn` redirects to the *last* class of the first course, which is treated as the most recent one. The array order is also the teaching order: `←` on a class's first slide and `→` on its last slide step into the neighbouring class.
+- **Append new classes at the end of the array**: the array order is the teaching order shown in the class menu, and `←` on a class's first slide and `→` on its last slide step into the neighbouring class.
 - Optional `section: 'Intro'` groups the class with its neighbours: consecutive classes sharing a `section` become an `<optgroup>` in the class dropdown, and the section name is shown at the top of every slide's left rail. Classes without a section render as today. Keep sectioned classes contiguous in the array — the grouping is by adjacency, so a gap starts a second group with the same name.
 
 ## Adding a course
@@ -94,7 +99,7 @@ Notes:
 1. Create the folder `src/presentations/<course-slug>/`.
 2. Add an entry to `LEARN_COURSES` in `src/data/learn.ts` with `slug`, `title` and a `classes` array (at least one class).
 
-The course dropdown is generated from `LEARN_COURSES`; switching course navigates to that course's latest class.
+The course menu and the course dropdown are generated from `LEARN_COURSES`; switching course in the dropdown navigates to that course's latest class.
 
 ## Writing slides
 

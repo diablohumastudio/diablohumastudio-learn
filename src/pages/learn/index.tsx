@@ -1,18 +1,10 @@
-import type { GetServerSideProps } from 'next';
-import { LEARN_COURSES, classPath, latestClass } from '../../data/learn';
-import { DEFAULT_LOCALE, isLocale, localizedPath } from '../../i18n/locales';
+import type { ReactElement } from 'react';
+import CourseList from '../../components/learn/CourseList';
+import LearnPageLayout from '../../components/learn/LearnPageLayout';
+import type { NextPageWithLayout } from '../_app';
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  const course = LEARN_COURSES[0];
-  const activeLocale = isLocale(locale) ? locale : DEFAULT_LOCALE;
-  return {
-    redirect: {
-      destination: localizedPath(activeLocale, classPath(course, latestClass(course))),
-      permanent: false,
-    },
-  };
-};
+const LearnIndexPage: NextPageWithLayout = () => <CourseList />;
 
-export default function LearnIndex() {
-  return null;
-}
+LearnIndexPage.getLayout = (page: ReactElement) => <LearnPageLayout>{page}</LearnPageLayout>;
+
+export default LearnIndexPage;

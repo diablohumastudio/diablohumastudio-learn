@@ -1,0 +1,138 @@
+/* Colors come from the Learn theme tokens, which every layout composes onto its shell. */
+
+.header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono, Menlo, Consolas, monospace);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  font-weight: 600;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.brand:hover {
+  color: var(--amber);
+}
+
+.brand:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 4px;
+}
+
+.led {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 8px rgba(242, 163, 60, 0.7);
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* LanguageSwitch is styled for the marketing header; here it takes the deck theme. */
+.languageSwitch {
+  --switch-color: var(--amber);
+  padding-left: 0;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.userName {
+  color: var(--ink);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.headerBtn {
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: 1.5;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 10px;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.headerBtn:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.headerBtn:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.selectGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selectLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 10px;
+}
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  background-color: var(--panel);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='5'><path d='M0 0l4 5 4-5z' fill='%238b909b'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 26px 6px 10px;
+  max-width: 260px;
+  cursor: pointer;
+}
+
+.select:hover {
+  border-color: var(--amber);
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+@media (max-width: 560px) {
+  .userName {
+    display: none;
+  }
+}
