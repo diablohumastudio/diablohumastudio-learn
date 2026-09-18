@@ -29,7 +29,7 @@ Play is endless: the questions in scope are shuffled into a cycle so a student s
 ## Question model
 
 ```
-id            permanent, never reused or renumbered (e.g. 'wu-014')
+id            permanent, never reused or renumbered (e.g. 'wu-wo-014')
 topic         class slug from src/data/learn.ts (optional)
 prompt        { es, en }
 correct       [{ es, en }, …]   at least 1; one is shown per display
@@ -40,7 +40,7 @@ retired       boolean           kept so old stats still resolve, never asked
 
 Rules of thumb:
 
-- Ids are how stats are keyed. A new question gets the next number for its course automatically (`wu-` for `wwise-unreal`, from the initials of the course slug; `q-` when it has no class). Never reuse an id.
+- Ids are how stats are keyed. A new question gets the next number for its class automatically: `wu-wo-` for `wwise-unreal` / `wwise-objects`, from the initials of the course and class slugs; `q-` when it has no class. The first questions predate the class part (`wu-001`…) and keep their ids. The prefix is only a label: a question moved to another class keeps its id. Never reuse an id.
 - Do not delete questions: **retire** them. Deleting one leaves its stats showing as "Question no longer in the bank".
 - `es` is the source language, like the presentations. Product names stay in English.
 - The more wrong answers a question has, the more different it looks each time. Add many.
@@ -55,7 +55,7 @@ Open `/learn/teacher/questions` with a teacher account (see setup step 6). The l
 ```json
 [
   {
-    "id": "wu-014",
+    "id": "wu-eew-014",
     "topic": "el-editor-wwise",
     "prompt": { "es": "¿…?", "en": "…?" },
     "correct": [{ "es": "Correcta", "en": "Correct" }],
