@@ -42,6 +42,26 @@
   color: var(--amber);
 }
 
+/* A class row: the slides link takes the room, the practice link sits beside it. */
+.row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.rowItem {
+  composes: item;
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 560px) {
+  .row {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
 .itemIndex {
   composes: mono from './ui.module.css';
   flex: none;
@@ -51,6 +71,29 @@
 .itemArrow {
   margin-left: auto;
   color: var(--muted);
+}
+
+.coursePicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.courseSelect {
+  composes: input from './ui.module.css';
+  flex: 1;
+  min-width: 220px;
+  cursor: pointer;
+}
+
+/* The placeholder option is showing. */
+.courseSelectEmpty {
+  composes: courseSelect;
+  color: var(--muted);
+}
+
+.actions:empty {
+  display: none;
 }
 
 .actions {
@@ -64,6 +107,13 @@
 .primaryAction {
   composes: btnPrimary from './ui.module.css';
   text-decoration: none;
+}
+
+.primaryActionDisabled {
+  composes: primaryAction;
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
 }
 
 .secondaryAction {
