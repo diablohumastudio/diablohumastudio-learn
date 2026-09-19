@@ -1,0 +1,36 @@
+.link {
+  composes: btn from '../learn/ui.module.css';
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  text-decoration: none;
+}
+
+.link:hover .label {
+  color: var(--amber);
+}
+
+/* Room for '✓ 999 / 999', so every row's button is as wide whatever the digits. */
+.count {
+  min-width: 11ch;
+  text-align: right;
+  white-space: nowrap;
+  font-family: var(--font-mono, Menlo, Consolas, monospace);
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.label {
+  font-size: 14px;
+  transition: color 0.15s;
+}
+
+@media (max-width: 560px) {
+  .link {
+    justify-content: space-between;
+    padding: 10px 18px;
+  }
+}

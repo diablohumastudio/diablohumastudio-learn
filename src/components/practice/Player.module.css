@@ -16,6 +16,53 @@
   composes: eyebrow from '../learn/ui.module.css';
 }
 
+.topbarSpacer {
+  flex: 1;
+}
+
+.timer {
+  font-family: var(--font-mono, Menlo, Consolas, monospace);
+  font-size: 15px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.timerUrgent {
+  composes: timer;
+  color: var(--red);
+}
+
+.timerTrack {
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+/* The bar drains by itself for the question's time; the number next to Stop is the exact value. */
+.timerFill {
+  display: block;
+  height: 100%;
+  background: var(--amber);
+  transform-origin: left;
+  animation: drain linear forwards;
+}
+
+.timerFillStopped {
+  composes: timerFill;
+  animation-play-state: paused;
+}
+
+@keyframes drain {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
 .stop {
   composes: btnGhost from '../learn/ui.module.css';
   padding: 8px 12px;
@@ -158,28 +205,17 @@
   composes: btnPrimary from '../learn/ui.module.css';
 }
 
-.counters {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-.counter {
+.homework {
+  composes: card from '../learn/ui.module.css';
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 12px;
+  padding: 18px 24px;
 }
 
-.counterValue {
-  font-family: var(--font-mono, Menlo, Consolas, monospace);
-  font-size: 15px;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-}
-
-.counterLabel {
+.sessionCount {
   composes: mono from '../learn/ui.module.css';
-  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
 }
 
 .saveError {

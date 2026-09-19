@@ -16,7 +16,7 @@ const PracticePlayPage: NextPageWithLayout = () => {
       <Head>
         <title>{t.pageTitle}</title>
       </Head>
-      <PracticeApp screen="play" />
+      <PracticeApp />
     </>
   );
 };

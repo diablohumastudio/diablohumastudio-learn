@@ -20,10 +20,16 @@ const nextConfig = {
         destination: '/learn/:path*',
         permanent: true,
       },
+      // Practice has no home of its own any more: it starts from a course (/learn/<course>).
+      {
+        source: '/learn/practice',
+        destination: '/learn',
+        permanent: false,
+      },
       // Links shared before the quiz became /learn/practice and /learn/teacher.
       {
         source: '/learn/quiz',
-        destination: '/learn/practice',
+        destination: '/learn',
         permanent: true,
       },
       {

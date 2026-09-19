@@ -1,0 +1,99 @@
+.meter {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.label {
+  composes: mono from '../learn/ui.module.css';
+  text-transform: uppercase;
+}
+
+.track {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  background: var(--amber);
+  transition: width 0.3s ease;
+}
+
+.fillDone {
+  composes: fill;
+  background: var(--teal);
+}
+
+.pips {
+  display: flex;
+  gap: 6px;
+}
+
+.pip {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.pipCorrect {
+  background: var(--teal);
+  border-color: var(--teal);
+}
+
+.pipWrong {
+  background: var(--red);
+  border-color: var(--red);
+}
+
+.spacer {
+  display: block;
+}
+
+.value {
+  font-family: var(--font-mono, Menlo, Consolas, monospace);
+  font-size: 13px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.valueDone {
+  composes: value;
+  color: var(--teal);
+}
+
+.hint {
+  composes: mono from '../learn/ui.module.css';
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .row {
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+
+  .pips {
+    gap: 4px;
+  }
+
+  .pip {
+    width: 10px;
+    height: 10px;
+  }
+}

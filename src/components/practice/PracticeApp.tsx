@@ -1,9 +1,9 @@
 import type { User } from 'firebase/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { practicePath, practiceScope, querySlug } from '../../data/learn';
-import type { PracticeScope } from '../../data/learn';
+import { useEffect } from 'react';
+import { LEARN_BASE_PATH, coursePath, findCourse, practicePlayPath, practiceScope, querySlug } from '../../data/learn';
+import type { LearnCourse, PracticeScope } from '../../data/learn';
 import { questionsInScope } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useT } from '../../i18n/useT';
@@ -12,28 +12,21 @@ import SignInRedirect from '../learn/SignInRedirect';
 import ui from '../learn/ui.module.css';
 import { useAuthUser } from '../learn/useAuthUser';
 import Player from './Player';
-import PracticeHome from './PracticeHome';
-import { ensureStudentProfile, isPermissionDenied, subscribeStudent } from './progress';
-import type { StudentStats } from './progress';
+import { ensureStudentProfile, isPermissionDenied } from './progress';
 import { activeQuestions, useQuestionBank } from './questions';
-
-/** Each screen has its own URL, so the browser's back button returns from playing to the numbers. */
-export type PracticeScreen = 'home' | 'play';
 
 type StudentAreaProps = {
   user: User;
-  screen: PracticeScreen;
+  course: LearnCourse;
   scope: PracticeScope;
 };
 
-function StudentArea({ user, screen, scope }: StudentAreaProps) {
+function StudentArea({ user, course, scope }: StudentAreaProps) {
   const t = useT(practiceDict);
   const bank = useQuestionBank();
-  const [stats, setStats] = useState<StudentStats | null>(null);
 
   useEffect(() => {
     ensureStudentProfile(user).catch((error) => console.error('Could not save the student profile', error));
-    return subscribeStudent(user.uid, setStats);
   }, [user]);
 
   if (bank.status === 'loading') {
@@ -60,29 +53,34 @@ function StudentArea({ user, screen, scope }: StudentAreaProps) {
     );
   }
 
-  const questions = activeQuestions(bank);
-  if (screen === 'home') {
-    return <PracticeHome user={user} stats={stats} questions={questions} scope={scope} />;
-  }
-
-  const scopedQuestions = questionsInScope(questions, scope);
+  const scopedQuestions = questionsInScope(activeQuestions(bank), scope);
   if (scopedQuestions.length === 0) {
     return (
       <div className={ui.centered}>
         <p className={ui.mono}>{t.noQuestions}</p>
-        <Link href={practicePath(scope)} className={ui.btn}>
-          ← {t.backToPractice}
+        <Link href={coursePath(course)} className={ui.btn}>
+          ← {t.backToCourse}
         </Link>
       </div>
     );
   }
-  return <Player uid={user.uid} questions={scopedQuestions} lifetime={stats} stopHref={practicePath(scope)} />;
+  return (
+    <Player uid={user.uid} questions={scopedQuestions} courseSlug={course.slug} stopHref={coursePath(course)} />
+  );
 }
 
-export default function PracticeApp({ screen }: { screen: PracticeScreen }) {
+export default function PracticeApp() {
   const t = useT(practiceDict);
   const router = useRouter();
   const auth = useAuthUser();
+  const scope = practiceScope(querySlug(router.query.course), querySlug(router.query.class));
+  const course = findCourse(scope.courseSlug);
+  const isCourseMissing = router.isReady && !course;
+
+  // Practice never mixes courses: a link without a known course goes back to the course menu.
+  useEffect(() => {
+    if (isCourseMissing) router.replace(LEARN_BASE_PATH);
+  }, [isCourseMissing, router]);
 
   if (!isFirebaseConfigured()) {
     return (
@@ -92,7 +90,7 @@ export default function PracticeApp({ screen }: { screen: PracticeScreen }) {
     );
   }
   // The scope lives in the query string, which a static page only knows once the router is ready.
-  if (auth.status === 'loading' || !router.isReady) {
+  if (auth.status === 'loading' || !course) {
     return (
       <div className={ui.centered}>
         <span className={ui.mono}>{t.loading}</span>
@@ -103,7 +101,6 @@ export default function PracticeApp({ screen }: { screen: PracticeScreen }) {
     return <SignInRedirect />;
   }
 
-  const scope = practiceScope(querySlug(router.query.course), querySlug(router.query.class));
   // Keyed by scope so a session never mixes the questions of two scopes.
-  return <StudentArea key={practicePath(scope)} user={auth.user} screen={screen} scope={scope} />;
+  return <StudentArea key={practicePlayPath(scope)} user={auth.user} course={course} scope={scope} />;
 }

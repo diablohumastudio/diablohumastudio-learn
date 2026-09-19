@@ -13,6 +13,24 @@ export {
   shuffledCycle,
 } from './types';
 
+export type { DayProgress } from './homework';
+export {
+  DAILY_QUESTIONS_GOAL,
+  RECENT_DAYS_SHOWN,
+  RUN_CORRECT_GOAL,
+  RUN_LENGTH,
+  TIMEOUT_COUNTS_AS_ANSWER,
+  dayKey,
+  dayKeysBetween,
+  emptyDay,
+  isDayDone,
+  pushRunResult,
+  recentDayKeys,
+  runCorrectCount,
+  weekDayKeys,
+  weekdayInitial,
+} from './homework';
+
 /* The bank itself lives in Firestore (src/components/practice/questions.ts);
    this module holds what only depends on the Learn registry. */
 

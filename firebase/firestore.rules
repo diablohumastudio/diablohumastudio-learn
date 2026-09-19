@@ -27,6 +27,8 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/exams/$(examId)).data.closesAt <= request.time;
     }
 
+    // The subtree holds questions, sessions and days (homework): all written by the student's
+    // own browser, so a student can forge them. Accepted for homework; exams go through the API.
     match /students/{uid} {
       allow read: if isOwner(uid) || isTeacher();
       allow write: if isOwner(uid);

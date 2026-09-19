@@ -1,0 +1,136 @@
+.card {
+  composes: card from '../learn/ui.module.css';
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+.title {
+  composes: eyebrow from '../learn/ui.module.css';
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.weekSection {
+  composes: section;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.sectionLabel {
+  font-family: var(--font-disp, 'Arial Narrow', sans-serif);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.week {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+}
+
+.days {
+  display: flex;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.dayMark {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--bg);
+}
+
+.dayEmpty {
+  composes: dayMark;
+}
+
+.dayStarted {
+  composes: dayMark;
+  border-color: var(--amber);
+}
+
+/* A day of the week that has not come yet. */
+.dayFuture {
+  composes: dayMark;
+  opacity: 0.35;
+  border-style: dashed;
+}
+
+.dayDone {
+  composes: dayMark;
+  border-color: var(--teal);
+  background: var(--teal);
+}
+
+.dayLabel {
+  composes: mono from '../learn/ui.module.css';
+  text-transform: uppercase;
+}
+
+.weekNumbers {
+  display: flex;
+  gap: 24px;
+  margin: 0;
+}
+
+.weekNumber {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.weekNumberLabel {
+  composes: mono from '../learn/ui.module.css';
+  text-transform: uppercase;
+}
+
+.weekNumberValue {
+  margin: 0;
+  font-family: var(--font-mono, Menlo, Consolas, monospace);
+  font-size: 15px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.practice {
+  composes: btnPrimary from '../learn/ui.module.css';
+  text-decoration: none;
+}
+
+.exams {
+  composes: btn from '../learn/ui.module.css';
+  text-decoration: none;
+}

@@ -11,17 +11,21 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import type { DocumentData, Timestamp, Unsubscribe } from 'firebase/firestore';
+import { emptyDay } from '../../data/practice/homework';
+import type { DayProgress } from '../../data/practice/homework';
 import { getFirestoreDb } from '../../lib/firebase';
 
 /* Firestore layout (rules in firebase/firestore.rules):
    students/{uid}                         profile + lifetime counters
    students/{uid}/questions/{questionId}  attempts per question
    students/{uid}/sessions/{sessionId}    one doc per visit with at least one answer
+   students/{uid}/days/{course}_{day}     homework of one course on one local day
    teachers/{uid}                         created by hand; grants read access to every student */
 
 const STUDENTS_COLLECTION: string = 'students';
 const QUESTIONS_SUBCOLLECTION: string = 'questions';
 const SESSIONS_SUBCOLLECTION: string = 'sessions';
+const DAYS_SUBCOLLECTION: string = 'days';
 
 export type StudentStats = {
   uid: string;
@@ -31,6 +35,19 @@ export type StudentStats = {
   totalAnswered: number;
   totalCorrect: number;
   lastPlayedAt: Timestamp | null;
+};
+
+export type AnswerRecord = {
+  uid: string;
+  sessionId: string;
+  questionId: string;
+  courseSlug: string;
+  /** Local day of the answer (`dayKey`). */
+  day: string;
+  isCorrect: boolean;
+  isFirstAnswerOfSession: boolean;
+  /** Only when this answer beat the day's best run; Firestore has no max() to do it server-side. */
+  newBestRun: number | null;
 };
 
 export type QuestionStats = {
@@ -43,6 +60,20 @@ export type QuestionStats = {
 
 function studentRef(uid: string) {
   return doc(getFirestoreDb(), STUDENTS_COLLECTION, uid);
+}
+
+function dayRef(uid: string, courseSlug: string, day: string) {
+  return doc(studentRef(uid), DAYS_SUBCOLLECTION, `${courseSlug}_${day}`);
+}
+
+function toDayProgress(data: DocumentData): DayProgress {
+  return {
+    courseSlug: data.courseSlug ?? '',
+    day: data.day ?? '',
+    answered: data.answered ?? 0,
+    correct: data.correct ?? 0,
+    bestRun: data.bestRun ?? 0,
+  };
 }
 
 function toStudentStats(uid: string, data: DocumentData): StudentStats {
@@ -97,13 +128,8 @@ export function newSessionId(uid: string): string {
   return doc(collection(studentRef(uid), SESSIONS_SUBCOLLECTION)).id;
 }
 
-export async function recordAnswer(
-  uid: string,
-  sessionId: string,
-  questionId: string,
-  isCorrect: boolean,
-  isFirstAnswerOfSession: boolean
-): Promise<void> {
+export async function recordAnswer(record: AnswerRecord): Promise<void> {
+  const { uid, sessionId, questionId, courseSlug, day, isCorrect, isFirstAnswerOfSession, newBestRun } = record;
   const db = getFirestoreDb();
   const batch = writeBatch(db);
   const now = serverTimestamp();
@@ -134,8 +160,38 @@ export async function recordAnswer(
     },
     { merge: true }
   );
+  batch.set(
+    dayRef(uid, courseSlug, day),
+    {
+      courseSlug,
+      day,
+      answered: increment(1),
+      correct: increment(correctDelta),
+      updatedAt: now,
+      ...(newBestRun !== null ? { bestRun: newBestRun } : {}),
+    },
+    { merge: true }
+  );
 
   await batch.commit();
+}
+
+/** Fires at once with the local write of each answer, so the player never waits for the server. */
+export function subscribeDay(
+  uid: string,
+  courseSlug: string,
+  day: string,
+  onChange: (progress: DayProgress) => void
+): Unsubscribe {
+  return onSnapshot(dayRef(uid, courseSlug, day), (snapshot) => {
+    onChange(snapshot.exists() ? toDayProgress(snapshot.data()) : emptyDay(courseSlug, day));
+  });
+}
+
+/** Every day of every course: one small doc per day played, filtered by the caller. */
+export async function fetchStudentDays(uid: string): Promise<DayProgress[]> {
+  const snapshot = await getDocs(collection(studentRef(uid), DAYS_SUBCOLLECTION));
+  return snapshot.docs.map((dayDoc) => toDayProgress(dayDoc.data()));
 }
 
 /** Teacher only (the rules reject anyone not in `teachers`). */

@@ -63,8 +63,7 @@ export const LEARN_COURSES: LearnCourse[] = [
   },
 ];
 
-export const PRACTICE_PATH: string = `${LEARN_BASE_PATH}/practice`;
-export const PRACTICE_PLAY_PATH: string = `${PRACTICE_PATH}/play`;
+export const PRACTICE_PLAY_PATH: string = `${LEARN_BASE_PATH}/practice/play`;
 export const TEACHER_PATH: string = `${LEARN_BASE_PATH}/teacher`;
 export const STUDENTS_PRACTICE_INFO_PATH: string = `${TEACHER_PATH}/students-practice-info`;
 export const QUESTIONS_EDITOR_PATH: string = `${TEACHER_PATH}/questions`;
@@ -72,7 +71,7 @@ export const EXAM_PATH: string = `${LEARN_BASE_PATH}/exam`;
 export const TEACHER_EXAM_PATH: string = `${TEACHER_PATH}/exam`;
 export const SIGN_IN_PATH: string = `${LEARN_BASE_PATH}/sign-in`;
 
-/** What a practice session draws from: everything, one course, or one class of a course. */
+/** One course or one class of it. Practice always has a course; only an exam may cover everything. */
 export type PracticeScope = {
   courseSlug?: string;
   classSlug?: string;
@@ -80,6 +79,11 @@ export type PracticeScope = {
 
 export function coursePath(course: LearnCourse): string {
   return `${LEARN_BASE_PATH}/${course.slug}`;
+}
+
+/** Exams belong to a course, like practice: the list lives under it, never under /learn. */
+export function courseExamsPath(course: LearnCourse): string {
+  return `${LEARN_BASE_PATH}/${course.slug}/exams`;
 }
 
 export function classPath(course: LearnCourse, learnClass: LearnClass): string {
@@ -124,14 +128,11 @@ function scopeQuery(scope: PracticeScope): string {
   return query ? `?${query}` : '';
 }
 
-export function practicePath(scope: PracticeScope): string {
-  return `${PRACTICE_PATH}${scopeQuery(scope)}`;
-}
-
 export function practicePlayPath(scope: PracticeScope): string {
   return `${PRACTICE_PLAY_PATH}${scopeQuery(scope)}`;
 }
 
+/** The page a student takes an exam on: the link the teacher shares. */
 export function examPath(examId: string): string {
   return `${EXAM_PATH}/${examId}`;
 }

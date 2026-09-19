@@ -1,9 +1,12 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { LEARN_BASE_PATH, classPath, groupClassesBySection, practicePath } from '../../data/learn';
+import { LEARN_BASE_PATH, classPath, groupClassesBySection } from '../../data/learn';
 import type { LearnCourse } from '../../data/learn';
 import { learnDict } from '../../i18n/learn';
 import { useLocale, useT } from '../../i18n/useT';
+import ClassPracticeLink from '../practice/ClassPracticeLink';
+import CourseProgress from '../practice/CourseProgress';
+import { CourseProgressProvider } from '../practice/CourseProgressContext';
 import s from './LearnMenu.module.css';
 import ui from './ui.module.css';
 
@@ -26,36 +29,39 @@ export default function ClassList({ course }: { course: LearnCourse }) {
   const locale = useLocale();
 
   return (
-    <div className={s.wrap}>
-      <Link href={LEARN_BASE_PATH} className={ui.backLink}>
-        ← {t.allCourses}
-      </Link>
-      <div className={s.heading}>
-        <span className={ui.eyebrow}>{t.classesEyebrow}</span>
-        <h1 className={ui.title}>{course.title}</h1>
-      </div>
-      {groupClassesBySection(course).map((group) => (
-        <div key={group.classes[0].slug} className={s.group}>
-          {group.section && <span className={s.groupLabel}>{group.section}</span>}
-          <nav className={s.list}>
-            {group.classes.map((learnClass) => (
-              <Link key={learnClass.slug} href={classPath(course, learnClass)} className={s.item}>
-                <span className={s.itemIndex}>
-                  {String(course.classes.indexOf(learnClass) + 1).padStart(CLASS_NUMBER_WIDTH, '0')}
-                </span>
-                {learnClass.title[locale]}
-                <span className={s.itemArrow}>→</span>
-              </Link>
-            ))}
-          </nav>
-        </div>
-      ))}
-      <div className={s.actions}>
-        <Link href={practicePath({ courseSlug: course.slug })} className={s.primaryAction}>
-          {t.practiceThisCourse}
+    <CourseProgressProvider course={course}>
+      <div className={s.wrap}>
+        <Link href={LEARN_BASE_PATH} className={ui.backLink}>
+          ← {t.allCourses}
         </Link>
-        <TeacherLink className={s.secondaryAction} />
+        <div className={s.heading}>
+          <span className={ui.eyebrow}>{t.classesEyebrow}</span>
+          <h1 className={ui.title}>{course.title}</h1>
+        </div>
+        <CourseProgress course={course} />
+        {groupClassesBySection(course).map((group) => (
+          <div key={group.classes[0].slug} className={s.group}>
+            {group.section && <span className={s.groupLabel}>{group.section}</span>}
+            <nav className={s.list}>
+              {group.classes.map((learnClass) => (
+                <div key={learnClass.slug} className={s.row}>
+                  <Link href={classPath(course, learnClass)} className={s.rowItem}>
+                    <span className={s.itemIndex}>
+                      {String(course.classes.indexOf(learnClass) + 1).padStart(CLASS_NUMBER_WIDTH, '0')}
+                    </span>
+                    {learnClass.title[locale]}
+                    <span className={s.itemArrow}>→</span>
+                  </Link>
+                  <ClassPracticeLink course={course} learnClass={learnClass} />
+                </div>
+              ))}
+            </nav>
+          </div>
+        ))}
+        <div className={s.actions}>
+          <TeacherLink className={s.secondaryAction} />
+        </div>
       </div>
-    </div>
+    </CourseProgressProvider>
   );
 }
