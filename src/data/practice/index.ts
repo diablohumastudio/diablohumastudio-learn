@@ -3,12 +3,13 @@ import { LEARN_COURSES } from '../learn';
 import type { LearnCourse, PracticeScope } from '../learn';
 import type { PracticeQuestion } from './types';
 
-export type { PracticeQuestion, ShuffledChoice } from './types';
+export type { PracticeAnswer, PracticeQuestion, ShuffledChoice } from './types';
 export {
   MIN_CORRECT_ANSWERS,
   MIN_INCORRECT_ANSWERS,
   SHOWN_INCORRECT_ANSWERS,
   drawChoices,
+  newAnswerId,
   shuffledCycle,
 } from './types';
 

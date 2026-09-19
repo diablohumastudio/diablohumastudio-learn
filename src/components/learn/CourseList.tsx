@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { LEARN_COURSES, coursePath, practicePath } from '../../data/learn';
+import { EXAM_PATH, LEARN_COURSES, coursePath, practicePath } from '../../data/learn';
 import { learnDict } from '../../i18n/learn';
 import { useT } from '../../i18n/useT';
 import s from './LearnMenu.module.css';
@@ -28,6 +28,9 @@ export default function CourseList() {
       <div className={s.actions}>
         <Link href={practicePath({})} className={s.primaryAction}>
           {t.practiceAllCourses}
+        </Link>
+        <Link href={EXAM_PATH} className={s.secondaryAction}>
+          {t.exams}
         </Link>
         <TeacherLink className={s.secondaryAction} />
       </div>

@@ -32,8 +32,8 @@ Play is endless: the questions in scope are shuffled into a cycle so a student s
 id            permanent, never reused or renumbered (e.g. 'wu-wo-014')
 topic         class slug from src/data/learn.ts (optional)
 prompt        { es, en }
-correct       [{ es, en }, …]   at least 1; one is shown per display
-incorrect     [{ es, en }, …]   at least 3; three are shown per display
+correct       [{ id?, es, en }, …]   at least 1; one is shown per display
+incorrect     [{ id?, es, en }, …]   at least 3; three are shown per display
 explanation   { es, en }        optional, shown after answering
 retired       boolean           kept so old stats still resolve, never asked
 ```
@@ -45,6 +45,7 @@ Rules of thumb:
 - `es` is the source language, like the presentations. Product names stay in English.
 - The more wrong answers a question has, the more different it looks each time. Add many.
 - With several correct answers, write the explanation so it covers all of them.
+- Every answer carries an opaque `id`, which is what an exam attempt records as the option a student picked (`docs/exam.md`). The editor assigns it on save and keeps it when the text changes; practice ignores it.
 
 ## Editing questions
 
@@ -91,7 +92,7 @@ students/{uid}/sessions/{sessionId}
 teachers/{uid}                                       created by hand; any field
 ```
 
-Each answer is one batched write touching the student doc, the question doc and the session doc. Any signed-in user can read the question bank; only teachers can write it. A student can only read and write their own subtree; an account whose uid exists in `teachers` can read every student.
+Each answer is one batched write touching the student doc, the question doc and the session doc. Any signed-in user can read the question bank, except while an exam is running, when practice is paused for every non-teacher (`docs/exam.md`); only teachers can write it. A student can only read and write their own subtree; an account whose uid exists in `teachers` can read every student.
 
 ## Firebase console setup (once)
 

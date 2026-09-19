@@ -1,0 +1,105 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.primary {
+  composes: btnPrimary from '../learn/ui.module.css';
+}
+
+.secondary {
+  composes: btn from '../learn/ui.module.css';
+  align-self: flex-start;
+}
+
+.ghost {
+  composes: btnGhost from '../learn/ui.module.css';
+}
+
+.back {
+  composes: btnGhost from '../learn/ui.module.css';
+  align-self: flex-start;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.card {
+  composes: card from '../learn/ui.module.css';
+  padding: 8px 0;
+}
+
+.form {
+  composes: card from '../learn/ui.module.css';
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.select {
+  composes: input from '../learn/ui.module.css';
+  cursor: pointer;
+}
+
+.numbers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.summary {
+  composes: card from '../learn/ui.module.css';
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.running {
+  composes: mono from '../learn/ui.module.css';
+  color: var(--teal);
+}
+
+.link {
+  color: var(--amber);
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row:hover td {
+  background: var(--panel-2);
+}
+
+.name {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.email {
+  composes: mono from '../learn/ui.module.css';
+  display: block;
+  letter-spacing: 0.02em;
+}
+
+.late {
+  color: var(--red);
+}
+
+.empty {
+  composes: mono from '../learn/ui.module.css';
+  padding: 16px 24px;
+}

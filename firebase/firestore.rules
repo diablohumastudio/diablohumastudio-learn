@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Practice data (see docs/practice.md). Paste into Firebase console → Firestore → Rules.
+// Practice data (see docs/practice.md) and exams (see docs/exam.md). Paste into Firebase console → Firestore → Rules.
 service cloud.firestore {
   match /databases/{database}/documents {
     function isSignedIn() {
@@ -16,6 +16,17 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/teachers/$(request.auth.uid));
     }
 
+    // True from the moment a teacher opens an exam until its clock ends. The exam API writes
+    // settings/examLock when it opens or closes one.
+    function examRunning() {
+      return exists(/databases/$(database)/documents/settings/examLock)
+        && get(/databases/$(database)/documents/settings/examLock).data.closesAt > request.time;
+    }
+
+    function examIsOver(examId) {
+      return get(/databases/$(database)/documents/exams/$(examId)).data.closesAt <= request.time;
+    }
+
     match /students/{uid} {
       allow read: if isOwner(uid) || isTeacher();
       allow write: if isOwner(uid);
@@ -27,9 +38,43 @@ service cloud.firestore {
     }
 
     // The question bank: any student can read it, only teachers edit it.
+    // SIDE EFFECT ON PURPOSE: while an exam runs, practice is paused for EVERY non-teacher
+    // account, not only for the students taking it. The bank holds the correct answers and
+    // Firebase cannot tell an examinee from a second account they opened in another tab.
     match /questions/{questionId} {
-      allow read: if isSignedIn();
+      allow read: if isTeacher() || (isSignedIn() && !examRunning());
       allow write: if isTeacher();
+    }
+
+    // Exams. Browsers only ever write drafts; opening, starting, submitting and grading go
+    // through the API routes (src/pages/api/exam), which use the admin SDK and skip these rules.
+    match /exams/{examId} {
+      allow read: if isTeacher() || (isSignedIn() && resource.data.status == 'opened');
+      allow create: if isTeacher() && request.resource.data.status == 'draft';
+      allow update: if isTeacher() && resource.data.status == 'draft' && request.resource.data.status == 'draft';
+      allow delete: if isTeacher() && resource.data.status == 'draft';
+
+      // The frozen questions and answers of one student. Never holds which option is correct.
+      match /attempts/{uid} {
+        allow read: if isOwner(uid) || isTeacher();
+        allow write: if false;
+      }
+
+      // Score and correct options: the student sees them once the exam clock is over.
+      match /grades/{uid} {
+        allow read: if isTeacher() || (isOwner(uid) && examIsOver(examId));
+        allow write: if false;
+      }
+
+      // The paper with the answer key: no browser reads it, not even a teacher's.
+      match /private/{document} {
+        allow read, write: if false;
+      }
+    }
+
+    match /settings/examLock {
+      allow read: if isSignedIn();
+      allow write: if false;
     }
 
     // Created by hand in the console; nobody can grant themselves the role.

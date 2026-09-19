@@ -20,6 +20,7 @@ const en = {
   practiceAllCourses: 'Practice all courses',
   practiceThisCourse: 'Practice this course',
   practiceThisClass: 'Practice this class',
+  exams: 'Exams',
   teacherArea: 'Teacher',
   loading: 'Loading…',
 
@@ -80,6 +81,7 @@ const es: Record<keyof typeof en, string> = {
   practiceAllCourses: 'Practicar todos los cursos',
   practiceThisCourse: 'Practicar este curso',
   practiceThisClass: 'Practicar esta clase',
+  exams: 'Exámenes',
   teacherArea: 'Docente',
   loading: 'Cargando…',
 

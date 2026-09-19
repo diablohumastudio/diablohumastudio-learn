@@ -6,6 +6,7 @@ const en = {
   loading: 'Loading…',
   notConfigured: 'Firebase is not configured: set the NEXT_PUBLIC_FIREBASE_* variables (see docs/practice.md).',
   bankLoadError: 'The questions could not be loaded. Check your connection.',
+  pausedForExam: 'Practice is paused while an exam is running. Reload this page when the exam is over.',
 
   errorGeneric: 'Something went wrong. Try again.',
 
@@ -94,6 +95,7 @@ const es: Record<keyof typeof en, string> = {
   loading: 'Cargando…',
   notConfigured: 'Firebase no está configurado: define las variables NEXT_PUBLIC_FIREBASE_* (ver docs/practice.md).',
   bankLoadError: 'No se pudieron cargar las preguntas. Revisa tu conexión.',
+  pausedForExam: 'La práctica está en pausa mientras haya un examen en curso. Recarga esta página cuando el examen termine.',
 
   errorGeneric: 'Algo salió mal. Intenta de nuevo.',
 

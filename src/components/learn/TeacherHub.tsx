@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { LEARN_BASE_PATH, QUESTIONS_EDITOR_PATH, STUDENTS_PRACTICE_INFO_PATH } from '../../data/learn';
+import { LEARN_BASE_PATH, QUESTIONS_EDITOR_PATH, STUDENTS_PRACTICE_INFO_PATH, TEACHER_EXAM_PATH } from '../../data/learn';
 import { learnDict } from '../../i18n/learn';
 import { useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
@@ -53,6 +53,10 @@ export default function TeacherHub() {
         </Link>
         <Link href={QUESTIONS_EDITOR_PATH} className={s.item}>
           {t.practiceQuestions}
+          <span className={s.itemArrow}>→</span>
+        </Link>
+        <Link href={TEACHER_EXAM_PATH} className={s.item}>
+          {t.exams}
           <span className={s.itemArrow}>→</span>
         </Link>
       </nav>

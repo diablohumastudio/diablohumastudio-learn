@@ -1,0 +1,27 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card {
+  composes: card from '../learn/ui.module.css';
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.score {
+  font-family: var(--font-disp, 'Arial Narrow', sans-serif);
+  font-weight: 800;
+  font-size: 56px;
+  line-height: 1;
+  color: var(--amber);
+}
+
+.start {
+  composes: btnPrimary from '../learn/ui.module.css';
+  align-self: flex-start;
+  padding: 14px 28px;
+  font-size: 16px;
+}

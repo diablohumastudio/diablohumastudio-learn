@@ -1,0 +1,33 @@
+.panel {
+  composes: card from '../learn/ui.module.css';
+  border-color: var(--amber);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.message {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.detail {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--red);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.confirm {
+  composes: btnPrimary from '../learn/ui.module.css';
+}
+
+.cancel {
+  composes: btn from '../learn/ui.module.css';
+}

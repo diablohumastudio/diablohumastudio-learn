@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { LEARN_COURSES, TEACHER_PATH } from '../../data/learn';
 import { MIN_CORRECT_ANSWERS, MIN_INCORRECT_ANSWERS, nextQuestionId, questionTopicTitle } from '../../data/practice';
-import type { PracticeQuestion } from '../../data/practice';
+import type { PracticeAnswer, PracticeQuestion } from '../../data/practice';
 import { LOCALES } from '../../i18n/locales';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
@@ -21,8 +21,8 @@ type Texts = Record<keyof typeof practiceDict.en, string>;
 type Draft = {
   topic: string;
   prompt: Dictionary<string>;
-  correct: Dictionary<string>[];
-  incorrect: Dictionary<string>[];
+  correct: PracticeAnswer[];
+  incorrect: PracticeAnswer[];
   explanation: Dictionary<string>;
   retired: boolean;
 };
@@ -59,6 +59,11 @@ function trimmed(text: Dictionary<string>): Dictionary<string> {
   return { en: text.en.trim(), es: text.es.trim() };
 }
 
+/* The id survives an edit of the text: exam attempts already saved point at it. */
+function trimmedAnswer(answer: PracticeAnswer): PracticeAnswer {
+  return answer.id ? { ...trimmed(answer), id: answer.id } : trimmed(answer);
+}
+
 function isComplete(text: Dictionary<string>): boolean {
   return LOCALES.every((locale) => text[locale] !== '');
 }
@@ -69,8 +74,8 @@ function isBlank(text: Dictionary<string>): boolean {
 
 function validateDraft(draft: Draft, t: Texts): Validation {
   const prompt = trimmed(draft.prompt);
-  const correct = draft.correct.map(trimmed).filter((text) => !isBlank(text));
-  const incorrect = draft.incorrect.map(trimmed).filter((text) => !isBlank(text));
+  const correct = draft.correct.map(trimmedAnswer).filter((text) => !isBlank(text));
+  const incorrect = draft.incorrect.map(trimmedAnswer).filter((text) => !isBlank(text));
   const explanation = trimmed(draft.explanation);
 
   if (!isComplete(prompt)) return { ok: false, message: t.validationPrompt };
@@ -92,13 +97,13 @@ function validateDraft(draft: Draft, t: Texts): Validation {
   };
 }
 
-type TextPairProps = {
-  value: Dictionary<string>;
-  onChange: (value: Dictionary<string>) => void;
+type TextPairProps<T extends Dictionary<string>> = {
+  value: T;
+  onChange: (value: T) => void;
   multiline?: boolean;
 };
 
-function TextPair({ value, onChange, multiline = false }: TextPairProps) {
+function TextPair<T extends Dictionary<string>>({ value, onChange, multiline = false }: TextPairProps<T>) {
   return (
     <div className={s.pair}>
       {LOCALES.map((locale) => (
@@ -127,15 +132,15 @@ function TextPair({ value, onChange, multiline = false }: TextPairProps) {
 
 type AnswerListProps = {
   label: string;
-  items: Dictionary<string>[];
+  items: PracticeAnswer[];
   minimum: number;
-  onChange: (items: Dictionary<string>[]) => void;
+  onChange: (items: PracticeAnswer[]) => void;
 };
 
 function AnswerList({ label, items, minimum, onChange }: AnswerListProps) {
   const t = useT(practiceDict);
 
-  function replaceAt(index: number, value: Dictionary<string>) {
+  function replaceAt(index: number, value: PracticeAnswer) {
     onChange(items.map((item, candidate) => (candidate === index ? value : item)));
   }
 

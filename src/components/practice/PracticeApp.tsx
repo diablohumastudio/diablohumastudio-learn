@@ -13,7 +13,7 @@ import ui from '../learn/ui.module.css';
 import { useAuthUser } from '../learn/useAuthUser';
 import Player from './Player';
 import PracticeHome from './PracticeHome';
-import { ensureStudentProfile, subscribeStudent } from './progress';
+import { ensureStudentProfile, isPermissionDenied, subscribeStudent } from './progress';
 import type { StudentStats } from './progress';
 import { activeQuestions, useQuestionBank } from './questions';
 
@@ -40,6 +40,14 @@ function StudentArea({ user, screen, scope }: StudentAreaProps) {
     return (
       <div className={ui.centered}>
         <span className={ui.mono}>{t.loading}</span>
+      </div>
+    );
+  }
+  // The rules refuse the bank to every non-teacher while an exam runs (firebase/firestore.rules).
+  if (bank.status === 'error' && isPermissionDenied(bank.error)) {
+    return (
+      <div className={ui.centered}>
+        <p className={ui.notice}>{t.pausedForExam}</p>
       </div>
     );
   }

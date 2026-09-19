@@ -1,0 +1,14 @@
+.state {
+  composes: mono from '../learn/ui.module.css';
+  margin-left: auto;
+  text-align: right;
+}
+
+.running {
+  composes: state;
+  color: var(--teal);
+}
+
+.finished {
+  composes: state;
+}

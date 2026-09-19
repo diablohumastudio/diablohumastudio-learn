@@ -68,6 +68,8 @@ export const PRACTICE_PLAY_PATH: string = `${PRACTICE_PATH}/play`;
 export const TEACHER_PATH: string = `${LEARN_BASE_PATH}/teacher`;
 export const STUDENTS_PRACTICE_INFO_PATH: string = `${TEACHER_PATH}/students-practice-info`;
 export const QUESTIONS_EDITOR_PATH: string = `${TEACHER_PATH}/questions`;
+export const EXAM_PATH: string = `${LEARN_BASE_PATH}/exam`;
+export const TEACHER_EXAM_PATH: string = `${TEACHER_PATH}/exam`;
 export const SIGN_IN_PATH: string = `${LEARN_BASE_PATH}/sign-in`;
 
 /** What a practice session draws from: everything, one course, or one class of a course. */
@@ -128,6 +130,17 @@ export function practicePath(scope: PracticeScope): string {
 
 export function practicePlayPath(scope: PracticeScope): string {
   return `${PRACTICE_PLAY_PATH}${scopeQuery(scope)}`;
+}
+
+export function examPath(examId: string): string {
+  return `${EXAM_PATH}/${examId}`;
+}
+
+/** Class slugs a scope covers, or null for everything: what an exam stores to filter the bank. */
+export function scopeTopics(scope: PracticeScope): string[] | null {
+  if (scope.classSlug) return [scope.classSlug];
+  const course = findCourse(scope.courseSlug);
+  return course ? course.classes.map((learnClass) => learnClass.slug) : null;
 }
 
 export function neighborClass(

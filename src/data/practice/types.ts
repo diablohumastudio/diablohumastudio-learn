@@ -5,6 +5,10 @@ export const MIN_INCORRECT_ANSWERS: number = 3;
 /** Every display shows one correct answer plus this many wrong ones. */
 export const SHOWN_INCORRECT_ANSWERS: number = 3;
 
+/** One answer text. The id is what an exam attempt records as "the option the student picked":
+    opaque so it says nothing about being correct, assigned on save and never reused. */
+export type PracticeAnswer = Dictionary<string> & { id?: string };
+
 export type PracticeQuestion = {
   /** Stable and never reused: every student's stats are keyed by it (e.g. 'wu-wo-001'). */
   id: string;
@@ -12,9 +16,9 @@ export type PracticeQuestion = {
   topic?: string;
   prompt: Dictionary<string>;
   /** At least one; a random one is shown each time. */
-  correct: Dictionary<string>[];
+  correct: PracticeAnswer[];
   /** At least three; a random subset is shown each time. */
-  incorrect: Dictionary<string>[];
+  incorrect: PracticeAnswer[];
   explanation?: Dictionary<string>;
   /** Retired questions are kept so old stats still resolve, but are never asked. */
   retired: boolean;
@@ -25,7 +29,13 @@ export type ShuffledChoice = {
   text: Dictionary<string>;
 };
 
-function shuffled<T>(items: readonly T[]): T[] {
+const ANSWER_ID_LENGTH: number = 8;
+
+export function newAnswerId(): string {
+  return Array.from({ length: ANSWER_ID_LENGTH }, () => Math.floor(Math.random() * 36).toString(36)).join('');
+}
+
+export function shuffled<T>(items: readonly T[]): T[] {
   const copy = [...items];
   for (let i = copy.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
