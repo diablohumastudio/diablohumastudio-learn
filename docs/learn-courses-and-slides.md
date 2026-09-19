@@ -9,17 +9,17 @@ The `/learn` section serves class presentations. It is unlisted (`noindex, nofol
 | Registry | `src/data/learn.ts` | Single source of truth: courses → classes → presentation component |
 | Presentations | `src/presentations/<course-slug>/<class-slug>.tsx` | One React component per class, built with `Deck`/`Slide` |
 | Deck engine | `src/components/learn/Deck.tsx` + `Deck.module.css` | Slide state, keyboard navigation, playhead/counter, `?s=` URL sync |
-| Deck layout | `src/components/learn/LearnLayout.tsx` | Full-height shell for the decks; puts the course/class dropdowns, the Practice link and the fullscreen button in the header |
+| Deck layout | `src/components/learn/LearnLayout.tsx` | Full-height shell for the decks; puts the course/class dropdowns and the Practice link in the header; `F` toggles full screen |
 | Page layout | `src/components/learn/LearnPageLayout.tsx` | Scrolling column for the menus, practice, teacher and sign-in pages |
-| Header | `src/components/learn/LearnHeader.tsx`, `AccountMenu.tsx`, `TeacherLink.tsx` | Shared by both layouts: `LEARN` links to `/learn`; the right side shows the account (name + sign out, or guest + sign in) and, for teachers, a link to `/learn/teacher` |
-| Menus | `src/components/learn/CourseList.tsx`, `ClassList.tsx` | `/learn` lists the courses, `/learn/<course-slug>` its classes; both link to practice with their scope |
+| Header | `src/components/learn/LearnHeader.tsx`, `AccountMenu.tsx`, `ConfigDialog.tsx`, `TeacherLink.tsx`, `useFullscreen.ts` | Shared by both layouts: `LEARN` links to `/learn`; the account name (or Guest user) opens a menu with Teacher (teachers only), language, full screen, Config (language and practice time per question) and sign in / sign out |
+| Menus | `src/components/learn/CourseList.tsx`, `ClassList.tsx` | `/learn` is a course dropdown with a Go to course link; `/learn/<course-slug>` shows the homework card and a row per class with its slides link and its practice button (see [practice.md](practice.md)) |
 | Routes | `src/pages/learn/index.tsx`, `src/pages/learn/[curso]/index.tsx` and `src/pages/learn/[curso]/[clase].tsx` | `/learn` is the course menu; `/learn/<course-slug>` is the class menu of a course; the dynamic route renders the selected class |
 
 URLs look like `/learn/<course-slug>/<class-slug>` (e.g. `/learn/wwise-unreal/el-editor-wwise`). The current slide is kept in the `?s=<n>` query param (and the current step of a stepped slide in `&p=<n>`), so browser back/forward walk through visited slides and steps, and a link can point to an exact slide or step.
 
-Practice and the teacher tools live under the same prefix (`/learn/practice`, `/learn/teacher`, `/learn/sign-in`, see [practice.md](practice.md)); static routes win over `[curso]`, so a course can never be slugged `practice`, `teacher` or `sign-in`. Navigation is always a `next/link` styled as a button, never a `<button>` with `router.push`, so the destination shows in the browser.
+Practice and the teacher tools live under the same prefix (`/learn/practice`, `/learn/teacher`, `/learn/sign-in`, see [practice.md](practice.md)); static routes win over `[curso]`, so a course can never be slugged `practice`, `teacher`, `exam` or `sign-in`, nor a class `exams` (`/learn/<course>/exams`, see [exam.md](exam.md)). Navigation is always a `next/link` styled as a button, never a `<button>` with `router.push`, so the destination shows in the browser.
 
-The `/learn` prefix lives in one place, `LEARN_BASE_PATH` in the registry, and every internal route is built with the registry's helpers (`classPath`, `coursePath`, `practicePath`, `TEACHER_PATH`…). To move the section (another path, or later a subdomain via a host-conditioned rewrite), change the constant and rename `src/pages/learn/`. Links already shared under the old `/incine` prefix are kept alive by a permanent redirect in `next.config.js`.
+The `/learn` prefix lives in one place, `LEARN_BASE_PATH` in the registry, and every internal route is built with the registry's helpers (`classPath`, `coursePath`, `practicePlayPath`, `TEACHER_PATH`…). To move the section (another path, or later a subdomain via a host-conditioned rewrite), change the constant and rename `src/pages/learn/`. Links already shared under the old `/incine` prefix are kept alive by a permanent redirect in `next.config.js`.
 
 ## Adding a class (presentation) to an existing course
 
@@ -154,5 +154,5 @@ Gotchas:
 ## Navigation reference
 
 - Keyboard: `←` `→` / space / PageUp / PageDown to move (through the steps of a stepped slide first), Home / End to jump to first/last slide.
-- The header's ⛶ button toggles fullscreen (Esc exits).
+- `F` toggles full screen while a deck is open (Esc exits); the account menu has the same action.
 - Browser back/forward move through the slides you visited, including across presentations.

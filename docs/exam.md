@@ -1,6 +1,6 @@
 # Exams: Timed Tests, Server Grading and Setup
 
-`/learn/exam` is where students take real, timed tests; `/learn/teacher/exam` is where a teacher creates, opens and reviews them. Like the rest of `/learn` it is unlisted. It reuses the practice question bank (`docs/practice.md`), but unlike practice **the browser is never trusted**: opening, drawing questions, receiving answers and grading all run on the server (Next API routes on Vercel using the Firebase admin SDK).
+`/learn/exam/<id>` is where students take a real, timed test and `/learn/<course>/exams` lists the opened exams of a course; `/learn/teacher/exam` is where a teacher creates, opens and reviews them. Like the rest of `/learn` it is unlisted. **An exam always belongs to one course** (the whole course or one class of it), like practice: the list is reached from the Exams button of the course page's homework card, there is no list under `/learn` (`/learn/exam` redirects there), and the exam room's back links go to the exam's course. It reuses the practice question bank (`docs/practice.md`), but unlike practice **the browser is never trusted**: opening, drawing questions, receiving answers and grading all run on the server (Next API routes on Vercel using the Firebase admin SDK).
 
 ## What the teacher and the student see
 
@@ -25,7 +25,7 @@
 | Student | `src/components/exam/ExamList.tsx`, `ExamApp.tsx`, `ExamTaker.tsx` | List, exam room (start, resume, submit and retry, result), the one-page taker |
 | Teacher | `src/components/exam/ExamManager.tsx` | Drafts, open, close early, live attempts, replay |
 | Shared | `AttemptReplay.tsx`, `ConfirmPanel.tsx`, `format.ts` | Replay of an attempt, inline confirmation, countdown and error texts |
-| Routes | `src/pages/learn/exam/index.tsx`, `exam/[examId].tsx`, `teacher/exam.tsx` | `next/dynamic` + `ssr: false` like practice |
+| Routes | `src/pages/learn/[curso]/exams.tsx`, `exam/[examId].tsx`, `teacher/exam.tsx` | `next/dynamic` + `ssr: false` like practice; a static `exams.tsx` wins over `[clase]`, so a class can never be slugged `exams` |
 | Rules | `firebase/firestore.rules` | What browsers may read; they write drafts only |
 | Texts | `src/i18n/pages/exam.ts` | UI strings in both languages |
 
@@ -98,6 +98,6 @@ Without the variable the routes answer `serverNotConfigured` and the pages show 
 ## Verifying changes
 
 - `npx tsc --noEmit` for any edit; `npm run build` when routes or dependencies change.
-- Teacher: `http://localhost:3000/learn/teacher/exam` → create a draft, open it. Student (another account, another browser): `http://localhost:3000/learn/exam` → start, answer, reload mid-exam (answers and draw must survive), submit. Check "Submitted", then the result after the clock ends, and the replay on the teacher side.
+- Teacher: `http://localhost:3000/learn/teacher/exam` → create a draft, open it. Student (another account, another browser): `http://localhost:3000/learn/wwise-unreal/exams` → start, answer, reload mid-exam (answers and draw must survive), submit. Check "Submitted", then the result after the clock ends, and the replay on the teacher side.
 - While it runs, `http://localhost:3000/learn/practice` with the student account must show the pause notice.
 - Turn the network off before submitting: the page must show the retry message and send once the network is back.
