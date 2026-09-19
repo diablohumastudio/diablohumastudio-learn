@@ -1,0 +1,75 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.controls {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input {
+  composes: input from '../learn/ui.module.css';
+  font-size: 14px;
+  padding: 8px 10px;
+  color-scheme: dark;
+}
+
+.card {
+  composes: card from '../learn/ui.module.css';
+  padding: 8px 0;
+}
+
+.tableWrap {
+  composes: tableWrap from '../learn/ui.module.css';
+}
+
+.table {
+  composes: table from '../learn/ui.module.css';
+}
+
+.dayHead {
+  text-align: center;
+}
+
+.dayNumber {
+  display: block;
+  color: var(--muted);
+}
+
+.cell {
+  text-align: center;
+  white-space: nowrap;
+  font-family: var(--font-mono, Menlo, Consolas, monospace);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cellEmpty {
+  composes: cell;
+  color: var(--muted);
+}
+
+.cellStarted {
+  composes: cell;
+  color: var(--amber);
+}
+
+.cellDone {
+  composes: cell;
+  color: var(--teal);
+}
+
+.empty {
+  composes: mono from '../learn/ui.module.css';
+  padding: 16px 24px;
+}

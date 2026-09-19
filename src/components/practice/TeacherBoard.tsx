@@ -8,6 +8,7 @@ import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
 import SignInRedirect from '../learn/SignInRedirect';
 import { dateText, percentText } from './format';
+import HomeworkGrid from './HomeworkGrid';
 import { fetchAllStudents, fetchStudentQuestions, isPermissionDenied } from './progress';
 import type { QuestionStats, StudentStats } from './progress';
 import { useQuestionBank } from './questions';
@@ -150,6 +151,7 @@ function StudentsTable() {
         <span className={ui.eyebrow}>{t.brand}</span>
         <h1 className={ui.title}>{t.teacherTitle}</h1>
       </div>
+      {students !== null && students.length > 0 && <HomeworkGrid students={students} />}
       <div className={s.card}>
         {students === null ? (
           <p className={s.empty}>{t.loading}</p>
