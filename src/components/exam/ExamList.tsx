@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { isExamRunning } from '../../data/exam/types';
 import type { Exam } from '../../data/exam/types';
-import { LEARN_BASE_PATH, examPath } from '../../data/learn';
+import { coursePath, examPath } from '../../data/learn';
+import type { LearnCourse } from '../../data/learn';
 import { examDict } from '../../i18n/pages/exam';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
@@ -14,7 +15,7 @@ import s from './ExamList.module.css';
 import { subscribeOpenedExams } from './exams';
 import { dateTimeText } from './format';
 
-function OpenedExams() {
+function OpenedExams({ course }: { course: LearnCourse }) {
   const t = useT(examDict);
   const locale = useLocale();
   const [exams, setExams] = useState<Exam[] | null>(null);
@@ -43,21 +44,22 @@ function OpenedExams() {
       </div>
     );
   }
+  const courseExams = exams.filter((exam) => exam.courseSlug === course.slug);
 
   return (
     <div className={menu.wrap}>
-      <Link href={LEARN_BASE_PATH} className={ui.backLink}>
-        ← {t.backToCourses}
+      <Link href={coursePath(course)} className={ui.backLink}>
+        ← {course.title}
       </Link>
       <div className={menu.heading}>
-        <span className={ui.eyebrow}>{t.brand}</span>
+        <span className={ui.eyebrow}>{course.title}</span>
         <h1 className={ui.title}>{t.examsTitle}</h1>
       </div>
-      {exams.length === 0 ? (
+      {courseExams.length === 0 ? (
         <p className={ui.mono}>{t.noExams}</p>
       ) : (
         <nav className={menu.list}>
-          {exams.map((exam) => {
+          {courseExams.map((exam) => {
             // The list only needs to tell running from finished; the exam page keeps the exact clock.
             const running = isExamRunning(exam, Date.now());
             return (
@@ -76,7 +78,7 @@ function OpenedExams() {
   );
 }
 
-export default function ExamList() {
+export default function ExamList({ course }: { course: LearnCourse }) {
   const t = useT(examDict);
   const auth = useAuthUser();
 
@@ -95,5 +97,5 @@ export default function ExamList() {
     );
   }
   if (auth.status === 'signedOut') return <SignInRedirect />;
-  return <OpenedExams />;
+  return <OpenedExams course={course} />;
 }

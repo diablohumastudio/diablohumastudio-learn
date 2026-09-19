@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { isExamOver, isExamRunning, questionsPerStudent } from '../../data/exam/types';
 import type { Exam, ExamAnswers, ExamAttempt, ExamGrade, ExamQuestion } from '../../data/exam/types';
-import { EXAM_PATH, querySlug } from '../../data/learn';
+import { LEARN_BASE_PATH, courseExamsPath, findCourse, querySlug } from '../../data/learn';
 import { examDict } from '../../i18n/pages/exam';
 import { useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
@@ -59,6 +59,9 @@ function ExamRoom({ user, examId }: { user: User; examId: string }) {
   const running = exam ? isExamRunning(exam, nowMs) : false;
   const over = exam ? isExamOver(exam, nowMs) : false;
   const attemptStatus = attempt?.status;
+  // An exam still loading, or one left without a course, has no list to go back to.
+  const examCourse = findCourse(exam?.courseSlug ?? undefined);
+  const examsHref = examCourse ? courseExamsPath(examCourse) : LEARN_BASE_PATH;
 
   const refreshAttempt = useCallback(async () => {
     try {
@@ -163,7 +166,7 @@ function ExamRoom({ user, examId }: { user: User; examId: string }) {
     return (
       <div className={ui.centered}>
         <p className={isError ? ui.error : ui.mono}>{text}</p>
-        <Link href={EXAM_PATH} className={ui.btn}>
+        <Link href={examsHref} className={ui.btn}>
           ← {t.backToExams}
         </Link>
       </div>
@@ -196,7 +199,7 @@ function ExamRoom({ user, examId }: { user: User; examId: string }) {
     if (!grade) return message(t.resultLoading, false);
     return (
       <div className={s.wrap}>
-        <Link href={EXAM_PATH} className={ui.backLink}>
+        <Link href={examsHref} className={ui.backLink}>
           ← {t.backToExams}
         </Link>
         <div className={s.card}>
@@ -233,7 +236,7 @@ function ExamRoom({ user, examId }: { user: User; examId: string }) {
 
   return (
     <div className={s.wrap}>
-      <Link href={EXAM_PATH} className={ui.backLink}>
+      <Link href={examsHref} className={ui.backLink}>
         ← {t.backToExams}
       </Link>
       <div className={s.card}>

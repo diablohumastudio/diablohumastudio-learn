@@ -26,6 +26,12 @@ const nextConfig = {
         destination: '/learn',
         permanent: false,
       },
+      // Exams are listed per course (/learn/<course>/exams); /learn/exam/<id> still takes one.
+      {
+        source: '/learn/exam',
+        destination: '/learn',
+        permanent: false,
+      },
       // Links shared before the quiz became /learn/practice and /learn/teacher.
       {
         source: '/learn/quiz',

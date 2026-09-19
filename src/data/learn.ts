@@ -67,7 +67,7 @@ export const PRACTICE_PLAY_PATH: string = `${LEARN_BASE_PATH}/practice/play`;
 export const TEACHER_PATH: string = `${LEARN_BASE_PATH}/teacher`;
 export const STUDENTS_PRACTICE_INFO_PATH: string = `${TEACHER_PATH}/students-practice-info`;
 export const QUESTIONS_EDITOR_PATH: string = `${TEACHER_PATH}/questions`;
-export const EXAM_PATH: string = `${LEARN_BASE_PATH}/exam`;
+const EXAM_PATH: string = `${LEARN_BASE_PATH}/exam`;
 export const TEACHER_EXAM_PATH: string = `${TEACHER_PATH}/exam`;
 export const SIGN_IN_PATH: string = `${LEARN_BASE_PATH}/sign-in`;
 

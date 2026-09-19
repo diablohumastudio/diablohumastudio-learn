@@ -30,6 +30,8 @@ import { dateTimeText, durationText, examErrorText } from './format';
 import type { ExamTexts } from './format';
 
 const SCOPE_VALUE_SEPARATOR: string = '/';
+/** An exam always belongs to one course, whose exams page lists it. */
+const DEFAULT_SCOPE_VALUE: string = LEARN_COURSES[0].slug;
 const DEFAULT_MAX_QUESTIONS: string = '10';
 const DEFAULT_DURATION_MINUTES: string = '15';
 const RUNNING_CHECK_MS: number = 1000;
@@ -56,14 +58,19 @@ function scopeFromValue(value: string): PracticeScope {
 
 function scopeTitle(exam: Exam, locale: Locale, t: ExamTexts): string {
   const course = findCourse(exam.courseSlug ?? undefined);
-  if (!course) return t.allCourses;
+  if (!course) return t.noCourse;
   const learnClass = findClass(course, exam.classSlug ?? undefined);
   return learnClass ? `${course.title} · ${learnClass.title[locale]}` : `${course.title} · ${t.wholeCourse}`;
 }
 
 function draftOf(exam: Exam | null): Draft {
   if (!exam) {
-    return { title: '', scopeValue: '', maxQuestions: DEFAULT_MAX_QUESTIONS, durationMinutes: DEFAULT_DURATION_MINUTES };
+    return {
+      title: '',
+      scopeValue: DEFAULT_SCOPE_VALUE,
+      maxQuestions: DEFAULT_MAX_QUESTIONS,
+      durationMinutes: DEFAULT_DURATION_MINUTES,
+    };
   }
   return {
     title: exam.title,
@@ -79,6 +86,7 @@ function validateDraft(draft: Draft, t: ExamTexts): DraftValidation {
   const durationMinutes = Number(draft.durationMinutes);
   const scope = scopeFromValue(draft.scopeValue);
   if (title === '') return { ok: false, message: t.validationTitle };
+  if (!scope.courseSlug) return { ok: false, message: t.validationCourse };
   if (!Number.isInteger(maxQuestions) || maxQuestions < 1 || !Number.isInteger(durationMinutes) || durationMinutes < 1) {
     return { ok: false, message: t.validationNumbers };
   }
@@ -187,7 +195,6 @@ function DraftForm({ exam, onDone }: DraftFormProps) {
           value={draft.scopeValue}
           onChange={(event) => setDraft({ ...draft, scopeValue: event.target.value })}
         >
-          <option value="">{t.allCourses}</option>
           {LEARN_COURSES.map((course) => (
             <optgroup key={course.slug} label={course.title}>
               <option value={scopeValue({ courseSlug: course.slug })}>
