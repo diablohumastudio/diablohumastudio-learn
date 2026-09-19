@@ -46,50 +46,105 @@
   flex: 1;
 }
 
-/* LanguageSwitch is styled for the marketing header; here it takes the deck theme. */
-.languageSwitch {
-  --switch-color: var(--amber);
-  padding-left: 0;
-  font-size: 11px;
-  letter-spacing: 0.14em;
+.account {
+  position: relative;
 }
 
-.account {
+.accountBtn {
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: 1.5;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.accountBtn:hover,
+.accountBtn[aria-expanded='true'] {
+  border-color: var(--amber);
+}
+
+.accountBtn:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
 }
 
 .userName {
-  color: var(--ink);
   max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.headerBtn {
+/* Above the slides and the player, which the header shares the page with. */
+.menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+}
+
+.menuItem {
   font: inherit;
   letter-spacing: inherit;
   line-height: 1.5;
-  color: var(--muted);
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 6px 10px;
+  text-align: left;
   text-decoration: none;
   white-space: nowrap;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  padding: 8px 10px;
   cursor: pointer;
 }
 
-.headerBtn:hover {
-  border-color: var(--amber);
+.menuItem:hover {
   color: var(--amber);
+  background: var(--panel-2);
 }
 
-.headerBtn:focus-visible {
+.menuItem:focus-visible {
   outline: 2px solid var(--amber);
-  outline-offset: 2px;
+  outline-offset: -2px;
+}
+
+.menuItemAccent {
+  composes: menuItem;
+  margin-top: 6px;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 5px 5px;
+  color: var(--muted);
+}
+
+.menuRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 10px;
+}
+
+/* LanguageSwitch is styled for the marketing header; here it takes the deck theme. */
+.languageSwitch {
+  --switch-color: var(--amber);
+  padding: 0;
+  font-size: 11px;
+  letter-spacing: 0.14em;
 }
 
 .selectGroup {
@@ -133,6 +188,6 @@
 
 @media (max-width: 560px) {
   .userName {
-    display: none;
+    max-width: 110px;
   }
 }

@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 import {
   LEARN_BASE_PATH,
@@ -11,7 +11,7 @@ import {
   findCourse,
   groupClassesBySection,
   latestClass,
-  practicePath,
+  practicePlayPath,
   querySlug,
 } from '../../data/learn';
 import type { LearnClass } from '../../data/learn';
@@ -21,6 +21,9 @@ import { LEARN_FONT_VARS } from './fonts';
 import LearnHeader from './LearnHeader';
 import h from './LearnHeader.module.css';
 import s from './LearnLayout.module.css';
+import { toggleFullscreen } from './useFullscreen';
+
+const FULLSCREEN_SHORTCUT_KEY: string = 'f';
 
 export function LearnMissing() {
   const t = useT(learnDict);
@@ -36,16 +39,22 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const t = useT(learnDict);
   const locale = useLocale();
-  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const activeCourse = findCourse(querySlug(router.query.curso)) ?? LEARN_COURSES[0];
   const activeClassSlug = querySlug(router.query.clase) ?? '';
   const activeClass = findClass(activeCourse, activeClassSlug);
 
+  // Full screen lives in the account menu; while presenting, F is the one-key way in and out.
   useEffect(() => {
-    const syncFullscreenState = () => setIsFullscreen(Boolean(document.fullscreenElement));
-    document.addEventListener('fullscreenchange', syncFullscreenState);
-    return () => document.removeEventListener('fullscreenchange', syncFullscreenState);
+    const toggleOnShortcut = (event: KeyboardEvent) => {
+      const isTyping = event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement;
+      if (isTyping || event.ctrlKey || event.metaKey || event.altKey) return;
+      if (event.key.toLowerCase() !== FULLSCREEN_SHORTCUT_KEY) return;
+      event.preventDefault();
+      toggleFullscreen();
+    };
+    window.addEventListener('keydown', toggleOnShortcut);
+    return () => window.removeEventListener('keydown', toggleOnShortcut);
   }, []);
 
   function changeCourse(slug: string) {
@@ -58,14 +67,6 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
     const target = findClass(activeCourse, slug);
     if (!target) return;
     router.push(classPath(activeCourse, target));
-  }
-
-  function toggleFullscreen() {
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-      return;
-    }
-    document.documentElement.requestFullscreen();
   }
 
   function renderClassOption(learnClass: LearnClass) {
@@ -127,7 +128,7 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
             </label>
             {activeClass && (
               <Link
-                href={practicePath({ courseSlug: activeCourse.slug, classSlug: activeClass.slug })}
+                href={practicePlayPath({ courseSlug: activeCourse.slug, classSlug: activeClass.slug })}
                 className={s.practiceLink}
                 title={t.practiceThisClass}
               >
@@ -135,17 +136,6 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
               </Link>
             )}
           </>
-        }
-        trailing={
-          <button
-            type="button"
-            className={s.fullscreenBtn}
-            onClick={toggleFullscreen}
-            aria-label={isFullscreen ? t.exitFullscreen : t.fullscreen}
-            title={isFullscreen ? t.exitFullscreenHint : t.fullscreen}
-          >
-            ⛶
-          </button>
         }
       />
       <main className={s.main}>{children}</main>
