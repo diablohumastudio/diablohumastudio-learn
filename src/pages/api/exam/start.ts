@@ -1,14 +1,7 @@
 import { Timestamp } from 'firebase-admin/firestore';
-import type { ExamQuestion, PaperQuestion, StartExamResponse } from '../../../data/exam/types';
-import { shuffled } from '../../../data/practice/types';
+import { drawQuestions } from '../../../data/exam/paper';
+import type { StartExamResponse } from '../../../data/exam/types';
 import { ExamApiError, attemptRef, examApiRoute, examRef, paperRef } from '../../../lib/examApi';
-
-/* Without the key: this is the copy frozen into the attempt and sent to the browser. */
-function drawQuestions(paper: PaperQuestion[], maxQuestions: number): ExamQuestion[] {
-  return shuffled(paper)
-    .slice(0, maxQuestions)
-    .map((question) => ({ id: question.id, prompt: question.prompt, options: shuffled(question.options) }));
-}
 
 /** Safe to call again: a student who already started gets the same frozen draw back. */
 export default examApiRoute(async (context): Promise<StartExamResponse> => {

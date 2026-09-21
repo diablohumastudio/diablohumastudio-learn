@@ -13,6 +13,7 @@ import { useTeacherStatus } from '../learn/useTeacherStatus';
 import QuestionPicker from '../practice/QuestionPicker';
 import { activeQuestions, useExamOnlyBank, useQuestionBank } from '../practice/questions';
 import AttemptReplay from './AttemptReplay';
+import ExamPreview from './ExamPreview';
 import ConfirmPanel from './ConfirmPanel';
 import s from './ExamManager.module.css';
 import {
@@ -115,6 +116,7 @@ function DraftForm({ exam, onDone }: DraftFormProps) {
   const [message, setMessage] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [confirming, setConfirming] = useState<'open' | 'delete' | null>(null);
+  const [previewing, setPreviewing] = useState(false);
   const pickableQuestions = [...activeQuestions(bank), ...activeQuestions(examOnlyBank)];
   const pickedQuestions = questionsWithIds(pickableQuestions, draft.questionIds);
   const inScopeCount = pickedQuestions.length;
@@ -158,6 +160,19 @@ function DraftForm({ exam, onDone }: DraftFormProps) {
       await updateDraft(draftExam.id, validation.settings);
       await openExam(draftExam.id);
     }, false);
+  }
+
+  // The draft lives in this component's state, so closing the preview returns to it as it was.
+  if (previewing) {
+    return (
+      <ExamPreview
+        title={draft.title.trim() || t.newExam}
+        questions={pickedQuestions}
+        maxQuestions={Number(draft.maxQuestions) || pickedQuestions.length}
+        durationMinutes={Number(draft.durationMinutes) || 1}
+        onClose={() => setPreviewing(false)}
+      />
+    );
   }
 
   return (
@@ -241,6 +256,15 @@ function DraftForm({ exam, onDone }: DraftFormProps) {
         <div className={s.actions}>
           <button type="submit" className={exam ? s.secondary : s.primary} disabled={busy}>
             {busy ? t.saving : t.save}
+          </button>
+          <button
+            type="button"
+            className={s.secondary}
+            onClick={() => setPreviewing(true)}
+            disabled={busy || inScopeCount === 0}
+            title={t.previewHint}
+          >
+            {t.previewExam}
           </button>
           {exam && (
             <>

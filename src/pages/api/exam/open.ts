@@ -1,16 +1,10 @@
 import { Timestamp } from 'firebase-admin/firestore';
 import type { Firestore } from 'firebase-admin/firestore';
-import type { PaperQuestion } from '../../../data/exam/types';
+import { toPaperQuestion, withAnswerIds } from '../../../data/exam/paper';
 import { parseQuestion } from '../../../data/practice/parse';
 import { parseQuestionIds, questionsWithIds } from '../../../data/practice/selection';
-import {
-  EXAM_QUESTIONS_COLLECTION,
-  QUESTIONS_COLLECTION,
-  SHOWN_INCORRECT_ANSWERS,
-  newAnswerId,
-  shuffled,
-} from '../../../data/practice/types';
-import type { PracticeAnswer, PracticeQuestion } from '../../../data/practice/types';
+import { EXAM_QUESTIONS_COLLECTION, QUESTIONS_COLLECTION } from '../../../data/practice/types';
+import type { PracticeQuestion } from '../../../data/practice/types';
 import { ExamApiError, examApiRoute, examLockRef, examRef, paperRef, requireTeacher } from '../../../lib/examApi';
 
 const MS_PER_MINUTE: number = 60_000;
@@ -20,18 +14,6 @@ type BankRead = {
   /** Questions that had answers without an id; the ids given here are saved back to the bank. */
   questionsGivenIds: PracticeQuestion[];
 };
-
-function withAnswerIds(question: PracticeQuestion): { question: PracticeQuestion; changed: boolean } {
-  let changed: boolean = false;
-  function withId(answer: PracticeAnswer): PracticeAnswer {
-    if (answer.id) return answer;
-    changed = true;
-    return { ...answer, id: newAnswerId() };
-  }
-  const correct = question.correct.map(withId);
-  const incorrect = question.incorrect.map(withId);
-  return { question: { ...question, correct, incorrect }, changed };
-}
 
 /** Reads one of the two banks; `examOnly` marks the questions of the teacher-only one. */
 async function readActiveBank(db: Firestore, collectionName: string, examOnly: boolean): Promise<BankRead> {
@@ -48,21 +30,6 @@ async function readActiveBank(db: Firestore, collectionName: string, examOnly: b
     }
   }
   return bank;
-}
-
-/** One random correct answer and three random wrong ones, the same four for every student. */
-function toPaperQuestion(question: PracticeQuestion): PaperQuestion {
-  const correct = shuffled(question.correct)[0];
-  const incorrect = shuffled(question.incorrect).slice(0, SHOWN_INCORRECT_ANSWERS);
-  return {
-    id: question.id,
-    prompt: question.prompt,
-    options: shuffled([correct, ...incorrect]).map((answer) => ({
-      id: answer.id ?? '',
-      text: { en: answer.en, es: answer.es },
-    })),
-    correctOptionId: correct.id ?? '',
-  };
 }
 
 export default examApiRoute(async (context) => {
