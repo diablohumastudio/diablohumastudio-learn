@@ -22,6 +22,7 @@
 | Bank parsing | `src/data/practice/parse.ts` | Same validation in the browser and on the server (no Firebase, no Learn registry) |
 | Browser data | `src/components/exam/exams.ts` | Firestore reads, draft writes, `callExamApi()` with the ID token |
 | Answer storage | `src/components/exam/examStorage.ts` | Answers in `localStorage` until the server confirms |
+| Paper | `src/data/exam/paper.ts` | Pure functions that turn bank questions into a paper and a student's draw: used by `open`, `start` and the teacher's preview |
 | Student | `src/components/exam/ExamList.tsx`, `ExamApp.tsx`, `ExamTaker.tsx` | List, exam room (start, resume, submit and retry, result), the one-page taker |
 | Teacher | `src/components/exam/ExamManager.tsx` | Drafts, open, close early, live attempts, replay |
 | Shared | `AttemptReplay.tsx`, `ConfirmPanel.tsx`, `format.ts` | Replay of an attempt, inline confirmation, countdown and error texts |
@@ -37,7 +38,7 @@ All are `POST /api/exam/<action>` with `Authorization: Bearer <Firebase ID token
 
 | Route | Who | What |
 |---|---|---|
-| `open` | teacher | Reads the bank, keeps the active questions of the scope, builds the **paper** (per question: one random correct answer and three random wrong ones, the same four for every student) with the answer key, sets `closesAt = now + minutes`, writes the practice lock. Answers without an id get one and are saved back to the bank. Refuses when another exam is running or the scope is empty. |
+| `open` | teacher | Reads both banks, keeps the active questions among the exam's `questionIds`, builds the **paper** (per question: one random correct answer and three random wrong ones, the same four for every student) with the answer key, sets `closesAt = now + minutes`, writes the practice lock. Answers without an id get one and are saved back to the bank. Refuses when another exam is running or the scope is empty. |
 | `close` | teacher | Moves `closesAt` (exam and lock) to now. |
 | `start` | student | In a transaction: returns the existing attempt, or draws `min(maxQuestions, paper size)` random questions, shuffles their options and saves the attempt. Never includes which option is correct. Returns `closesAtMs` and `serverNowMs`. Idempotent, so a reload gets the same draw. |
 | `submit` | student | In a transaction: keeps only answers to the attempt's questions with options that were shown, grades against the paper, writes the attempt and the grade. A second call changes nothing. |
@@ -54,7 +55,7 @@ Each selection is written to `localStorage` (`exam:<examId>:<uid>`). Submit mark
 
 ```
 exams/{examId}
-  title, courseSlug, classSlug, topics[], maxQuestions, durationMinutes
+  title, courseSlug, questionIds[], maxQuestions, durationMinutes
   status            'draft' | 'opened'   ("finished" is just closesAt in the past)
   createdAt, openedAt, closesAt, paperSize
 
@@ -74,7 +75,15 @@ settings/examLock                       written by the API only
   examId, closesAt
 ```
 
-`topics` is the list of class slugs the scope covers (null for the whole bank). The browser resolves it when saving the draft (`scopeTopics()` in `src/data/learn.ts`) because the server does not load the Learn registry, which would pull every presentation into the API bundle.
+`questionIds` is the exam's question selection: the ids ticked in the shared `QuestionPicker` (`src/components/practice/QuestionPicker.tsx`). The picker is one Questions box whose list is what gets saved. Its **Filter** row narrows the list with a dropdown by group (the whole course, a class, a slide of a class, the questions without a slide of the course or of one class, which is how to find what is still untagged, or the exam-only questions), a dropdown by selected (all, only selected, only not selected: how to review what the exam holds) and a text search, and **Select all the questions shown** ticks or unticks exactly what the filter shows (a dash means only some are ticked), so "every question of a slide" is: filter by the slide, select all. A slide lists the questions tagged with it (`docs/practice.md`), so it is empty until questions carry the tag. Because ids are stored, a question added to the bank later is not in the exam until it is ticked. `open` keeps the ids that are still active, with the same `questionsWithIds()` the manager uses for its count (`src/data/practice/selection.ts`).
+
+### Previewing a draft
+
+**Preview exam**, in the draft form, runs the exam as one student would get it (`ExamPreview.tsx`): the same draw, the same four options per question, the clock, Submit and the result with the replay, using the form's values even before they are saved. It is built in the browser with the API routes' own functions (`src/data/exam/paper.ts`: `toPaperQuestion`, `drawQuestions`), so it matches the real thing, but nothing is written: no attempt, no grade, and the draft is not opened. A teacher can do it because teachers may read both banks; an opened exam has no preview, since its paper is frozen on the server where no browser reads it.
+
+### Exam-only questions
+
+Questions written for exams live in a second bank, `examQuestions/{id}`, with the same model and the same editor (`/learn/teacher/questions`, the **Exam only** checkbox on a new question or on Import JSON). The practice bank cannot hold them because students read it. Only teachers can read `examQuestions`; `open` reads it with the admin SDK. They are never practiced and only reach a paper when ticked in the picker, which has a filter for them. Their ids start with `x-` so they cannot collide with practice ids, and a question never moves between banks.
 
 The attempt stores the **texts** next to the ids, so a replay stays exact after the bank is edited. Option ids come from the bank (`id` on every entry of `correct[]` / `incorrect[]`): opaque, assigned by the editor on save or by `open`, kept when the text is edited. A JSON import that leaves them out gets new ones.
 

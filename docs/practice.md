@@ -8,6 +8,8 @@
 |---|---|---|
 | Question model | `src/data/practice/types.ts`, `src/data/practice/index.ts` | Types, choice drawing, id numbering, class titles and `questionsInScope()` from the Learn registry |
 | Homework model | `src/data/practice/homework.ts` | The goals (`DAILY_QUESTIONS_GOAL`, `RUN_LENGTH`, `RUN_CORRECT_GOAL`), day keys, the run and `isDayDone()` |
+| Question selection | `src/data/practice/selection.ts`, `src/components/practice/QuestionPicker.tsx` | Which questions an exam draws from: a list of ids, ticked one by one or all at once after filtering by class or slide (`docs/exam.md`) |
+| Slides of a class | `src/data/learn.ts` (`slideLabels`, `classSlides`), `src/components/learn/useClassSlides.ts` | Slide ids and titles from the deck dictionaries, loaded only by the teacher tools |
 | Question bank | `src/components/practice/questions.ts` | Firestore reads/writes of `questions/{id}`, validation, `useQuestionBank()` |
 | Question editor | `src/components/practice/QuestionEditor.tsx` | Teacher-only list, form and JSON import at `/learn/teacher/questions` |
 | Firebase init | `src/lib/firebase.ts` | Lazy client init from `NEXT_PUBLIC_FIREBASE_*`; `isFirebaseConfigured()` |
@@ -49,6 +51,7 @@ Days use the student's local date, read when the answer is given. Like all progr
 ```
 id            permanent, never reused or renumbered (e.g. 'wu-wo-014')
 topic         class slug from src/data/learn.ts (optional)
+slides        [slide id, …] of that class (optional): keys of the deck dictionary's `labels`
 prompt        { es, en }
 correct       [{ id?, es, en }, …]   at least 1; one is shown per display
 incorrect     [{ id?, es, en }, …]   at least 3; three are shown per display
@@ -63,13 +66,15 @@ Rules of thumb:
 - `es` is the source language, like the presentations. Product names stay in English.
 - The more wrong answers a question has, the more different it looks each time. Add many.
 - With several correct answers, write the explanation so it covers all of them.
+- `slides` says which slides a question is about. Pick them in the editor (the checkboxes appear once a class is chosen) or write them in the JSON, e.g. `"slides": ["flujo", "sonido"]`. Untagged questions still belong to their class; the tag only lets the exam picker filter by slide and tick all its questions at once.
+- The **Exam only** checkbox stores the question in the teacher-only bank `examQuestions`: never practiced, only picked into exams (`docs/exam.md`).
 - Every answer carries an opaque `id`, which is what an exam attempt records as the option a student picked (`docs/exam.md`). The editor assigns it on save and keeps it when the text changes; practice ignores it.
 
 ## Editing questions
 
 Open `/learn/teacher/questions` with a teacher account (see setup step 6). The list shows every question; click one to edit it or use **New question**. The form enforces both languages, at least one correct and three wrong answers, and assigns the id on save.
 
-**Import JSON** takes an array of questions in the model above, each with its own `id`; an existing id is replaced, which is also how you fix many questions at once. Example:
+**Export JSON** downloads the practice bank (and, apart, the exam-only one) in the exact format Import reads, answer ids included, so a file edited outside the site, for instance to tag every question with its slides, goes back in with Import. **Import JSON** takes an array of questions in the model above, each with its own `id`; an existing id is replaced, which is also how you fix many questions at once. Example:
 
 ```json
 [
@@ -94,8 +99,8 @@ Malformed documents in Firestore are skipped with a console warning rather than 
 ## Firestore data model
 
 ```
-questions/{questionId}
-  topic?, prompt, correct[], incorrect[], explanation?, retired, updatedAt
+questions/{questionId}                               examQuestions/{questionId} has the same fields
+  topic?, slides[]?, prompt, correct[], incorrect[], explanation?, retired, updatedAt
 
 students/{uid}
   displayName, email, createdAt, lastPlayedAt
@@ -122,7 +127,7 @@ Each answer is one batched write touching the student doc, the question doc, the
    `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`, `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`, `NEXT_PUBLIC_FIREBASE_APP_ID`. Restart the dev server after editing `.env.local`.
 3. Build → Authentication → Sign-in method: enable **Google** and **Email/Password**. Settings → Authorized domains: add `diablohumastudio.com` (and the `*.vercel.app` preview domain if you test previews). `localhost` is already there.
 4. Build → Firestore Database → Create database, production mode, nearest region.
-5. Firestore → Rules: paste the contents of `firebase/firestore.rules` and publish. Do the same whenever that file changes.
+5. Firestore → Rules: paste the contents of `firebase/firestore.rules` and publish. Do the same whenever that file changes (`examQuestions` needs it: without the rules the Exam only checkbox is refused and the editor shows a notice).
 6. Make yourself a teacher: sign in once at `/learn/sign-in`, copy your UID from Authentication → Users, then in Firestore create the document `teachers/<your uid>` with any field (e.g. `role: "teacher"`). `/learn/teacher` and its pages now work for that account, which also gets the Teacher links in the header and the menus; everyone else sees "not registered as a teacher".
 7. Load the first questions: open `/learn/teacher/questions`, click **Import JSON** and paste an array in the format above.
 

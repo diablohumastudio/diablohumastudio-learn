@@ -83,8 +83,11 @@ export default function MyNewClass() {
   slug: 'my-new-class',
   title: { es: 'Mi clase nueva', en: 'My New Class' },
   component: dynamic(() => import('../presentations/wwise-unreal/my-new-class')),
+  slideLabels: () => import('../presentations/wwise-unreal/my-new-class.dict').then((deck) => labelsOf(deck.myNewClassDict)),
 },
 ```
+
+`slideLabels` hands the deck dictionary's `labels` to the teacher tools: **every key of `labels` is the id of a slide** (a stepped slide has one key per step). Questions are tagged with those ids, and exams select by them (see [practice.md](practice.md)), so give every slide its label through `t.labels.<key>` and **never rename a key once questions point at it**; changing the text of a label is free.
 
 That is all — the class menu, the class dropdown, the practice scopes and the route are generated from the registry.
 
