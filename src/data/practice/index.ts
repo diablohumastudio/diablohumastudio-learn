@@ -33,6 +33,7 @@ export {
   weekdayInitial,
 } from './homework';
 
+export { parseQuestionIds, questionsWithIds } from './selection';
 
 /* The bank itself lives in Firestore (src/components/practice/questions.ts);
    this module holds what only depends on the Learn registry. */

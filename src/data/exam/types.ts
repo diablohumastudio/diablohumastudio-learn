@@ -18,11 +18,11 @@ export type ExamStatus = 'draft' | 'opened';
 
 export type ExamSettings = {
   title: string;
+  /** Every exam belongs to one course, whose exams page lists it. */
   courseSlug: string | null;
-  classSlug: string | null;
-  /** Class slugs the scope resolves to, or null for the whole bank. Resolved in the browser
-      because the server does not load the Learn registry. */
-  topics: string[] | null;
+  /** The questions ticked in the picker: the paper is built from the ones still active when the
+      exam opens. Ids of both banks, the practice one and the exam-only one. */
+  questionIds: string[];
   maxQuestions: number;
   durationMinutes: number;
 };

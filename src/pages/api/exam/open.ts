@@ -2,11 +2,17 @@ import { Timestamp } from 'firebase-admin/firestore';
 import type { Firestore } from 'firebase-admin/firestore';
 import type { PaperQuestion } from '../../../data/exam/types';
 import { parseQuestion } from '../../../data/practice/parse';
-import { SHOWN_INCORRECT_ANSWERS, newAnswerId, shuffled } from '../../../data/practice/types';
+import { parseQuestionIds, questionsWithIds } from '../../../data/practice/selection';
+import {
+  EXAM_QUESTIONS_COLLECTION,
+  QUESTIONS_COLLECTION,
+  SHOWN_INCORRECT_ANSWERS,
+  newAnswerId,
+  shuffled,
+} from '../../../data/practice/types';
 import type { PracticeAnswer, PracticeQuestion } from '../../../data/practice/types';
 import { ExamApiError, examApiRoute, examLockRef, examRef, paperRef, requireTeacher } from '../../../lib/examApi';
 
-const QUESTIONS_COLLECTION: string = 'questions';
 const MS_PER_MINUTE: number = 60_000;
 
 type BankRead = {
@@ -27,25 +33,21 @@ function withAnswerIds(question: PracticeQuestion): { question: PracticeQuestion
   return { question: { ...question, correct, incorrect }, changed };
 }
 
-async function readActiveBank(db: Firestore): Promise<BankRead> {
+/** Reads one of the two banks; `examOnly` marks the questions of the teacher-only one. */
+async function readActiveBank(db: Firestore, collectionName: string, examOnly: boolean): Promise<BankRead> {
   const bank: BankRead = { questions: [], questionsGivenIds: [] };
-  const snapshot = await db.collection(QUESTIONS_COLLECTION).get();
+  const snapshot = await db.collection(collectionName).get();
   for (const questionDoc of snapshot.docs) {
     try {
       const { question, changed } = withAnswerIds(parseQuestion(questionDoc.id, questionDoc.data()));
       if (question.retired) continue;
-      bank.questions.push(question);
+      bank.questions.push(examOnly ? { ...question, examOnly: true } : question);
       if (changed) bank.questionsGivenIds.push(question);
     } catch (error) {
       console.warn('Skipping a malformed question', error);
     }
   }
   return bank;
-}
-
-function isInTopics(question: PracticeQuestion, topics: unknown): boolean {
-  if (!Array.isArray(topics)) return true;
-  return question.topic !== undefined && topics.includes(question.topic);
 }
 
 /** One random correct answer and three random wrong ones, the same four for every student. */
@@ -78,17 +80,27 @@ export default examApiRoute(async (context) => {
     throw new ExamApiError('anotherExamRunning');
   }
 
-  const bank = await readActiveBank(db);
-  const paper = bank.questions.filter((question) => isInTopics(question, examDoc.get('topics'))).map(toPaperQuestion);
+  const practiceBank = await readActiveBank(db, QUESTIONS_COLLECTION, false);
+  const examOnlyBank = await readActiveBank(db, EXAM_QUESTIONS_COLLECTION, true);
+  const paper = questionsWithIds(
+    [...practiceBank.questions, ...examOnlyBank.questions],
+    parseQuestionIds(examDoc.get('questionIds'))
+  ).map(toPaperQuestion);
   if (paper.length === 0) throw new ExamApiError('noQuestions');
 
   const closesAt = Timestamp.fromMillis(now.toMillis() + Number(examDoc.get('durationMinutes')) * MS_PER_MINUTE);
   const batch = db.batch();
-  for (const question of bank.questionsGivenIds) {
-    batch.update(db.collection(QUESTIONS_COLLECTION).doc(question.id), {
-      correct: question.correct,
-      incorrect: question.incorrect,
-    });
+  const banks: [string, BankRead][] = [
+    [QUESTIONS_COLLECTION, practiceBank],
+    [EXAM_QUESTIONS_COLLECTION, examOnlyBank],
+  ];
+  for (const [collectionName, bank] of banks) {
+    for (const question of bank.questionsGivenIds) {
+      batch.update(db.collection(collectionName).doc(question.id), {
+        correct: question.correct,
+        incorrect: question.incorrect,
+      });
+    }
   }
   batch.set(paperRef(db, examId), { questions: paper });
   batch.update(examRef(db, examId), { status: 'opened', openedAt: now, closesAt, paperSize: paper.length });

@@ -176,13 +176,6 @@ export function examPath(examId: string): string {
   return `${EXAM_PATH}/${examId}`;
 }
 
-/** Class slugs a scope covers, or null for everything: what an exam stores to filter the bank. */
-export function scopeTopics(scope: PracticeScope): string[] | null {
-  if (scope.classSlug) return [scope.classSlug];
-  const course = findCourse(scope.courseSlug);
-  return course ? course.classes.map((learnClass) => learnClass.slug) : null;
-}
-
 export function neighborClass(
   course: LearnCourse,
   classSlug: string | undefined,

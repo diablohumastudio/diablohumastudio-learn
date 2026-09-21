@@ -1,0 +1,102 @@
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.select {
+  composes: input from '../learn/ui.module.css';
+  cursor: pointer;
+}
+
+.group {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filter .select {
+  flex: 0 1 220px;
+  min-width: 0;
+}
+
+.search {
+  composes: input from '../learn/ui.module.css';
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+/* Acts on the questions the filter shows, so it sits between the filter and the list. */
+.selectAll {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.selectAllEmpty {
+  composes: selectAll;
+  color: var(--muted);
+  cursor: default;
+}
+
+.selectAll input,
+.question input {
+  flex: none;
+  accent-color: var(--amber);
+  width: 16px;
+  height: 16px;
+}
+
+.questionList {
+  max-height: 280px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 6px;
+}
+
+.question {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.question input {
+  align-self: center;
+}
+
+.questionId {
+  composes: mono from '../learn/ui.module.css';
+  flex: none;
+  color: var(--amber);
+}
+
+.questionText {
+  min-width: 0;
+}
+
+.total {
+  composes: mono from '../learn/ui.module.css';
+  color: var(--teal);
+}

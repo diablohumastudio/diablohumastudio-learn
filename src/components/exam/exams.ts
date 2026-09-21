@@ -21,6 +21,7 @@ import type {
   StartExamResponse,
   ExamAnswers,
 } from '../../data/exam/types';
+import { parseQuestionIds } from '../../data/practice/selection';
 import { getFirebaseAuth, getFirestoreDb } from '../../lib/firebase';
 
 /* Firestore layout (rules in firebase/firestore.rules, model in docs/exam.md):
@@ -49,8 +50,7 @@ function toExam(id: string, data: DocumentData): Exam {
     id,
     title: data.title ?? '',
     courseSlug: data.courseSlug ?? null,
-    classSlug: data.classSlug ?? null,
-    topics: Array.isArray(data.topics) ? data.topics : null,
+    questionIds: parseQuestionIds(data.questionIds),
     maxQuestions: Number(data.maxQuestions) || 0,
     durationMinutes: Number(data.durationMinutes) || 0,
     status: data.status === 'opened' ? 'opened' : 'draft',

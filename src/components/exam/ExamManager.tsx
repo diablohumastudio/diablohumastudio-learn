@@ -2,17 +2,16 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { isExamRunning, questionsPerStudent } from '../../data/exam/types';
 import type { Exam, ExamAttempt, ExamGrade, ExamSettings } from '../../data/exam/types';
-import { LEARN_COURSES, TEACHER_PATH, examPath, findClass, findCourse, practiceScope, scopeTopics } from '../../data/learn';
-import type { PracticeScope } from '../../data/learn';
-import { questionsInScope } from '../../data/practice';
-import type { Locale } from '../../i18n/locales';
+import { LEARN_COURSES, TEACHER_PATH, examPath, findCourse } from '../../data/learn';
+import { questionsWithIds } from '../../data/practice';
 import { examDict } from '../../i18n/pages/exam';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
 import SignInRedirect from '../learn/SignInRedirect';
 import ui from '../learn/ui.module.css';
 import { useTeacherStatus } from '../learn/useTeacherStatus';
-import { activeQuestions, useQuestionBank } from '../practice/questions';
+import QuestionPicker from '../practice/QuestionPicker';
+import { activeQuestions, useExamOnlyBank, useQuestionBank } from '../practice/questions';
 import AttemptReplay from './AttemptReplay';
 import ConfirmPanel from './ConfirmPanel';
 import s from './ExamManager.module.css';
@@ -29,16 +28,15 @@ import {
 import { dateTimeText, durationText, examErrorText } from './format';
 import type { ExamTexts } from './format';
 
-const SCOPE_VALUE_SEPARATOR: string = '/';
-/** An exam always belongs to one course, whose exams page lists it. */
-const DEFAULT_SCOPE_VALUE: string = LEARN_COURSES[0].slug;
 const DEFAULT_MAX_QUESTIONS: string = '10';
 const DEFAULT_DURATION_MINUTES: string = '15';
 const RUNNING_CHECK_MS: number = 1000;
 
 type Draft = {
   title: string;
-  scopeValue: string;
+  /** An exam always belongs to one course, whose exams page lists it: the picker has no "all courses". */
+  courseSlug: string;
+  questionIds: string[];
   maxQuestions: string;
   durationMinutes: string;
 };
@@ -47,34 +45,26 @@ type DraftValidation = { ok: true; settings: ExamSettings } | { ok: false; messa
 
 type Screen = { kind: 'list' } | { kind: 'new' } | { kind: 'exam'; examId: string };
 
-function scopeValue(scope: PracticeScope): string {
-  return [scope.courseSlug, scope.classSlug].filter(Boolean).join(SCOPE_VALUE_SEPARATOR);
-}
-
-function scopeFromValue(value: string): PracticeScope {
-  const [courseSlug, classSlug] = value.split(SCOPE_VALUE_SEPARATOR);
-  return practiceScope(courseSlug, classSlug);
-}
-
-function scopeTitle(exam: Exam, locale: Locale, t: ExamTexts): string {
+function scopeTitle(exam: Exam, t: ExamTexts): string {
   const course = findCourse(exam.courseSlug ?? undefined);
   if (!course) return t.noCourse;
-  const learnClass = findClass(course, exam.classSlug ?? undefined);
-  return learnClass ? `${course.title} · ${learnClass.title[locale]}` : `${course.title} · ${t.wholeCourse}`;
+  return `${course.title} · ${exam.questionIds.length} ${t.pickedQuestions}`;
 }
 
 function draftOf(exam: Exam | null): Draft {
   if (!exam) {
     return {
       title: '',
-      scopeValue: DEFAULT_SCOPE_VALUE,
+      courseSlug: LEARN_COURSES[0].slug,
+      questionIds: [],
       maxQuestions: DEFAULT_MAX_QUESTIONS,
       durationMinutes: DEFAULT_DURATION_MINUTES,
     };
   }
   return {
     title: exam.title,
-    scopeValue: scopeValue({ courseSlug: exam.courseSlug ?? undefined, classSlug: exam.classSlug ?? undefined }),
+    courseSlug: exam.courseSlug ?? LEARN_COURSES[0].slug,
+    questionIds: exam.questionIds,
     maxQuestions: String(exam.maxQuestions),
     durationMinutes: String(exam.durationMinutes),
   };
@@ -84,9 +74,8 @@ function validateDraft(draft: Draft, t: ExamTexts): DraftValidation {
   const title = draft.title.trim();
   const maxQuestions = Number(draft.maxQuestions);
   const durationMinutes = Number(draft.durationMinutes);
-  const scope = scopeFromValue(draft.scopeValue);
   if (title === '') return { ok: false, message: t.validationTitle };
-  if (!scope.courseSlug) return { ok: false, message: t.validationCourse };
+  if (!findCourse(draft.courseSlug)) return { ok: false, message: t.validationCourse };
   if (!Number.isInteger(maxQuestions) || maxQuestions < 1 || !Number.isInteger(durationMinutes) || durationMinutes < 1) {
     return { ok: false, message: t.validationNumbers };
   }
@@ -94,9 +83,8 @@ function validateDraft(draft: Draft, t: ExamTexts): DraftValidation {
     ok: true,
     settings: {
       title,
-      courseSlug: scope.courseSlug ?? null,
-      classSlug: scope.classSlug ?? null,
-      topics: scopeTopics(scope),
+      courseSlug: draft.courseSlug,
+      questionIds: draft.questionIds,
       maxQuestions,
       durationMinutes,
     },
@@ -120,14 +108,16 @@ type DraftFormProps = {
 
 function DraftForm({ exam, onDone }: DraftFormProps) {
   const t = useT(examDict);
-  const locale = useLocale();
   const bank = useQuestionBank();
+  const examOnlyBank = useExamOnlyBank();
   const [draft, setDraft] = useState<Draft>(() => draftOf(exam));
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [confirming, setConfirming] = useState<'open' | 'delete' | null>(null);
-  const inScopeCount = questionsInScope(activeQuestions(bank), scopeFromValue(draft.scopeValue)).length;
+  const pickableQuestions = [...activeQuestions(bank), ...activeQuestions(examOnlyBank)];
+  const pickedQuestions = questionsWithIds(pickableQuestions, draft.questionIds);
+  const inScopeCount = pickedQuestions.length;
 
   async function run(action: () => Promise<unknown>, leaveAfter: boolean) {
     setBusy(true);
@@ -188,30 +178,20 @@ function DraftForm({ exam, onDone }: DraftFormProps) {
         />
       </label>
 
-      <label className={ui.field}>
+      <div className={ui.field}>
         <span className={ui.label}>{t.scopeLabel}</span>
-        <select
-          className={s.select}
-          value={draft.scopeValue}
-          onChange={(event) => setDraft({ ...draft, scopeValue: event.target.value })}
-        >
-          {LEARN_COURSES.map((course) => (
-            <optgroup key={course.slug} label={course.title}>
-              <option value={scopeValue({ courseSlug: course.slug })}>
-                {course.title} · {t.wholeCourse}
-              </option>
-              {course.classes.map((learnClass) => (
-                <option key={learnClass.slug} value={scopeValue({ courseSlug: course.slug, classSlug: learnClass.slug })}>
-                  {learnClass.title[locale]}
-                </option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
-        <span className={ui.mono}>
-          {bank.status === 'ready' ? inScopeCount : '…'} {t.inScope}
-        </span>
-      </label>
+        <QuestionPicker
+          courseSlug={draft.courseSlug}
+          questionIds={draft.questionIds}
+          onChange={(courseSlug, questionIds) => setDraft({ ...draft, courseSlug, questionIds })}
+          questions={pickableQuestions}
+        />
+        {bank.status === 'ready' && inScopeCount < Number(draft.maxQuestions) && (
+          <span className={ui.mono}>
+            {t.fewerThanMax} ({inScopeCount})
+          </span>
+        )}
+      </div>
 
       <div className={s.numbers}>
         <label className={ui.field}>
@@ -461,7 +441,7 @@ function Exams() {
           ← {t.backToExams}
         </button>
         <div className={s.heading}>
-          <span className={ui.eyebrow}>{shownExam ? scopeTitle(shownExam, locale, t) : t.managerTitle}</span>
+          <span className={ui.eyebrow}>{shownExam ? scopeTitle(shownExam, t) : t.managerTitle}</span>
           <h1 className={ui.title}>{shownExam ? shownExam.title : t.newExam}</h1>
         </div>
         {shownExam && shownExam.status === 'opened' ? (
@@ -506,7 +486,7 @@ function Exams() {
                 {exams.map((exam) => (
                   <tr key={exam.id} className={s.row} onClick={() => setScreen({ kind: 'exam', examId: exam.id })}>
                     <td className={s.name}>{exam.title}</td>
-                    <td>{scopeTitle(exam, locale, t)}</td>
+                    <td>{scopeTitle(exam, t)}</td>
                     <td className={ui.num}>{exam.maxQuestions}</td>
                     <td className={ui.num}>{exam.durationMinutes}</td>
                     <td>
