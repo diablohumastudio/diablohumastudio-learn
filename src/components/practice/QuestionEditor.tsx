@@ -11,7 +11,7 @@ import { isFirebaseConfigured } from '../../lib/firebase';
 import s from './QuestionEditor.module.css';
 import SignInRedirect from '../learn/SignInRedirect';
 import { isPermissionDenied } from './progress';
-import { parseQuestionList, saveQuestions, useExamOnlyBank, useQuestionBank } from './questions';
+import { parseQuestionList, saveQuestions, toExportJson, useExamOnlyBank, useQuestionBank } from './questions';
 import ui from '../learn/ui.module.css';
 import { useAuthUser } from '../learn/useAuthUser';
 import { useClassSlides } from '../learn/useClassSlides';
@@ -383,6 +383,20 @@ function ImportPanel({ onDone }: { onDone: (count: number) => void }) {
   );
 }
 
+const PRACTICE_EXPORT_FILE: string = 'practice-questions.json';
+const EXAM_ONLY_EXPORT_FILE: string = 'exam-only-questions.json';
+const JSON_MIME_TYPE: string = 'application/json';
+
+/** The two banks are exported apart because Import JSON sends a whole file to one of them. */
+function downloadQuestions(questions: readonly PracticeQuestion[], fileName: string) {
+  const url = URL.createObjectURL(new Blob([toExportJson(questions)], { type: JSON_MIME_TYPE }));
+  const download = document.createElement('a');
+  download.href = url;
+  download.download = fileName;
+  download.click();
+  URL.revokeObjectURL(url);
+}
+
 type Screen = { kind: 'list' } | { kind: 'new' } | { kind: 'edit'; question: PracticeQuestion };
 
 function Bank() {
@@ -442,6 +456,23 @@ function Bank() {
         <button type="button" className={s.secondary} onClick={() => setImporting(!importing)}>
           {t.importJson}
         </button>
+        <button
+          type="button"
+          className={s.secondary}
+          disabled={bank.questions.length === 0}
+          onClick={() => downloadQuestions(bank.questions, PRACTICE_EXPORT_FILE)}
+        >
+          {t.exportJson}
+        </button>
+        {examOnlyBank.status === 'ready' && examOnlyBank.questions.length > 0 && (
+          <button
+            type="button"
+            className={s.secondary}
+            onClick={() => downloadQuestions(examOnlyBank.questions, EXAM_ONLY_EXPORT_FILE)}
+          >
+            {t.exportExamOnlyJson}
+          </button>
+        )}
         {notice && <span className={ui.notice}>{notice}</span>}
       </div>
       {isExamOnlyBankMissing && <p className={ui.error}>{t.examOnlyBankMissing}</p>}

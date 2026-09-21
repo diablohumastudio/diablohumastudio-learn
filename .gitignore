@@ -31,3 +31,7 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Question bank exports: they hold the correct answers.
+practice-questions*.json
+exam-only-questions*.json

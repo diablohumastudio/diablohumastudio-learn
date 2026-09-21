@@ -81,6 +81,22 @@ export function activeQuestions(bank: QuestionBank): PracticeQuestion[] {
   return bank.status === 'ready' ? bank.questions.filter((question) => !question.retired) : [];
 }
 
+/** The bank in the format Import JSON reads, so an export edited by hand (or tagged with slides
+    outside the site) goes back in unchanged. Answer ids travel too: exam attempts point at them. */
+export function toExportJson(questions: readonly PracticeQuestion[]): string {
+  const exported = questions.map((question) => ({
+    id: question.id,
+    ...(question.topic ? { topic: question.topic } : {}),
+    ...(question.slides && question.slides.length > 0 ? { slides: question.slides } : {}),
+    prompt: question.prompt,
+    correct: question.correct,
+    incorrect: question.incorrect,
+    ...(question.explanation ? { explanation: question.explanation } : {}),
+    retired: question.retired,
+  }));
+  return JSON.stringify(exported, null, 2);
+}
+
 /** Teacher only. Creates or fully replaces the question with that id, in the bank `examOnly` names. */
 export async function saveQuestions(questions: readonly PracticeQuestion[]): Promise<void> {
   const db = getFirestoreDb();
