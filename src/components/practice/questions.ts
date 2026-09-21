@@ -28,6 +28,7 @@ function withId(answer: PracticeAnswer): PracticeAnswer {
 function toDocument(question: PracticeQuestion): DocumentData {
   return {
     ...(question.topic ? { topic: question.topic } : {}),
+    ...(question.slides && question.slides.length > 0 ? { slides: question.slides } : {}),
     prompt: question.prompt,
     correct: question.correct.map(withId),
     incorrect: question.incorrect.map(withId),

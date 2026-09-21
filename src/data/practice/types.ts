@@ -14,6 +14,9 @@ export type PracticeQuestion = {
   id: string;
   /** Class slug from src/data/learn.ts, so results can be grouped by class. */
   topic?: string;
+  /** Slides of that class the question is about: keys of the deck dictionary's `labels`
+      (`classSlides` in src/data/learn.ts). Optional, so untagged questions still work by class. */
+  slides?: string[];
   prompt: Dictionary<string>;
   /** At least one; a random one is shown each time. */
   correct: PracticeAnswer[];

@@ -14,12 +14,14 @@ import { isPermissionDenied } from './progress';
 import { parseQuestionList, saveQuestions, useQuestionBank } from './questions';
 import ui from '../learn/ui.module.css';
 import { useAuthUser } from '../learn/useAuthUser';
+import { useClassSlides } from '../learn/useClassSlides';
 import { isTeacher } from '../learn/useTeacherStatus';
 
 type Texts = Record<keyof typeof practiceDict.en, string>;
 
 type Draft = {
   topic: string;
+  slides: string[];
   prompt: Dictionary<string>;
   correct: PracticeAnswer[];
   incorrect: PracticeAnswer[];
@@ -36,6 +38,7 @@ function emptyText(): Dictionary<string> {
 function emptyDraft(): Draft {
   return {
     topic: '',
+    slides: [],
     prompt: emptyText(),
     correct: Array.from({ length: MIN_CORRECT_ANSWERS }, emptyText),
     incorrect: Array.from({ length: MIN_INCORRECT_ANSWERS }, emptyText),
@@ -47,6 +50,7 @@ function emptyDraft(): Draft {
 function draftFromQuestion(question: PracticeQuestion): Draft {
   return {
     topic: question.topic ?? '',
+    slides: [...(question.slides ?? [])],
     prompt: { ...question.prompt },
     correct: question.correct.map((text) => ({ ...text })),
     incorrect: question.incorrect.map((text) => ({ ...text })),
@@ -88,6 +92,7 @@ function validateDraft(draft: Draft, t: Texts): Validation {
     ok: true,
     value: {
       ...(draft.topic ? { topic: draft.topic } : {}),
+      ...(draft.topic && draft.slides.length > 0 ? { slides: draft.slides } : {}),
       prompt,
       correct,
       incorrect,
@@ -184,6 +189,14 @@ function QuestionForm({ bank, editing, onDone }: QuestionFormProps) {
   const [draft, setDraft] = useState<Draft>(() => (editing ? draftFromQuestion(editing) : emptyDraft()));
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const classSlides = useClassSlides(draft.topic ? [draft.topic] : [])[draft.topic] ?? [];
+
+  function toggleSlide(slideId: string) {
+    const slides = draft.slides.includes(slideId)
+      ? draft.slides.filter((candidate) => candidate !== slideId)
+      : [...draft.slides, slideId];
+    setDraft({ ...draft, slides });
+  }
 
   async function save() {
     const validation = validateDraft(draft, t);
@@ -225,7 +238,8 @@ function QuestionForm({ bank, editing, onDone }: QuestionFormProps) {
           <select
             className={s.select}
             value={draft.topic}
-            onChange={(event) => setDraft({ ...draft, topic: event.target.value })}
+            // Slide ids belong to a class: another class starts without any.
+            onChange={(event) => setDraft({ ...draft, topic: event.target.value, slides: [] })}
           >
             <option value="">{t.noClass}</option>
             {LEARN_COURSES.map((course) =>
@@ -237,6 +251,22 @@ function QuestionForm({ bank, editing, onDone }: QuestionFormProps) {
             )}
           </select>
         </label>
+
+        {classSlides.length > 0 && (
+          <fieldset className={s.slides}>
+            <legend className={ui.label}>{t.slidesLabel}</legend>
+            {classSlides.map((slide) => (
+              <label key={slide.id} className={s.checkbox}>
+                <input
+                  type="checkbox"
+                  checked={draft.slides.includes(slide.id)}
+                  onChange={() => toggleSlide(slide.id)}
+                />
+                <span>{slide.title[locale]}</span>
+              </label>
+            ))}
+          </fieldset>
+        )}
 
         <div className={ui.field}>
           <span className={ui.label}>{t.promptLabel}</span>
@@ -361,10 +391,11 @@ function Bank() {
       </div>
     );
   }
+  const questions = bank.questions;
   if (screen.kind !== 'list') {
     return (
       <QuestionForm
-        bank={bank.questions}
+        bank={questions}
         editing={screen.kind === 'edit' ? screen.question : null}
         onDone={() => {
           setNotice(t.savedNotice);
@@ -401,7 +432,7 @@ function Bank() {
         />
       )}
       <div className={s.card}>
-        {bank.questions.length === 0 ? (
+        {questions.length === 0 ? (
           <p className={s.empty}>{t.noQuestions}</p>
         ) : (
           <div className={s.tableWrap}>
@@ -416,7 +447,7 @@ function Bank() {
                 </tr>
               </thead>
               <tbody>
-                {bank.questions.map((question) => (
+                {questions.map((question) => (
                   <tr
                     key={question.id}
                     className={question.retired ? `${s.row} ${s.rowRetired}` : s.row}

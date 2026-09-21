@@ -5,10 +5,22 @@ import type { Dictionary } from '../i18n/useT';
 /** URL prefix of the section; every route the section builds goes through `classPath`. */
 export const LEARN_BASE_PATH: string = '/learn';
 
+/** The `labels` of a deck dictionary: one key per slide (a stepped slide has one per step). */
+export type SlideLabels = Record<string, string | readonly string[]>;
+
+export type ClassSlide = {
+  /** Key of the deck dictionary's `labels`: stable while the slide keeps its label key. */
+  id: string;
+  title: Dictionary<string>;
+};
+
 export type LearnClass = {
   slug: string;
   title: Dictionary<string>;
   component: ComponentType;
+  /** Loads the deck dictionary's labels, which name every slide: questions and exams
+      point at slides with those keys. Lazy, so only the teacher tools download the dictionaries. */
+  slideLabels: () => Promise<Dictionary<SlideLabels>>;
   /** Optional grouping shown in the class dropdown and the slide rail (e.g. 'Intro'). */
   section?: string;
 };
@@ -24,6 +36,10 @@ export type LearnCourse = {
   classes: LearnClass[];
 };
 
+function labelsOf(deckDict: Dictionary<{ labels: SlideLabels }>): Dictionary<SlideLabels> {
+  return { en: deckDict.en.labels, es: deckDict.es.labels };
+}
+
 export const LEARN_COURSES: LearnCourse[] = [
   {
     slug: 'wwise-unreal',
@@ -34,30 +50,40 @@ export const LEARN_COURSES: LearnCourse[] = [
         title: { es: 'Datos, programas y servidores', en: 'Data, programs and servers' },
         section: 'Intro',
         component: dynamic(() => import('../presentations/wwise-unreal/datos-programas-y-servidores')),
+        slideLabels: () =>
+          import('../presentations/wwise-unreal/datos-programas-y-servidores.dict').then((deck) => labelsOf(deck.datosDict)),
       },
       {
         slug: 'que-es-un-motor-de-audio',
         title: { es: '¿Qué es un motor de audio?', en: 'What is an audio engine?' },
         section: 'Intro',
         component: dynamic(() => import('../presentations/wwise-unreal/que-es-un-motor-de-audio')),
+        slideLabels: () =>
+          import('../presentations/wwise-unreal/que-es-un-motor-de-audio.dict').then((deck) => labelsOf(deck.motorDict)),
       },
       {
         slug: 'wwise-por-adentro',
         title: { es: 'Wwise por adentro', en: 'Wwise from the inside' },
         section: 'Intro',
         component: dynamic(() => import('../presentations/wwise-unreal/wwise-por-adentro')),
+        slideLabels: () =>
+          import('../presentations/wwise-unreal/wwise-por-adentro.dict').then((deck) => labelsOf(deck.wwisePorAdentroDict)),
       },
       {
         slug: 'el-editor-wwise',
         title: { es: 'El editor Wwise', en: 'The Wwise editor' },
         section: 'Intro',
         component: dynamic(() => import('../presentations/wwise-unreal/el-editor-wwise')),
+        slideLabels: () =>
+          import('../presentations/wwise-unreal/el-editor-wwise.dict').then((deck) => labelsOf(deck.editorDict)),
       },
       {
         slug: 'wwise-objects',
         title: { es: 'Wwise Objects', en: 'Wwise Objects' },
         section: 'Intro',
         component: dynamic(() => import('../presentations/wwise-unreal/wwise-objects')),
+        slideLabels: () =>
+          import('../presentations/wwise-unreal/wwise-objects.dict').then((deck) => labelsOf(deck.wwiseObjectsDict)),
       },
     ],
   },
@@ -96,6 +122,19 @@ export function findCourse(slug: string | undefined): LearnCourse | undefined {
 
 export function findClass(course: LearnCourse, slug: string | undefined): LearnClass | undefined {
   return course.classes.find((learnClass) => learnClass.slug === slug);
+}
+
+function labelText(label: string | readonly string[]): string {
+  return typeof label === 'string' ? label : label[0];
+}
+
+/** The slides of a class in deck order, named by their label in each language. */
+export async function classSlides(learnClass: LearnClass): Promise<ClassSlide[]> {
+  const labels = await learnClass.slideLabels();
+  return Object.keys(labels.es).map((id) => ({
+    id,
+    title: { en: labelText(labels.en[id]), es: labelText(labels.es[id]) },
+  }));
 }
 
 /** Consecutive classes sharing a section form one group; unsectioned classes stand alone. */

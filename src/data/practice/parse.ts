@@ -23,6 +23,14 @@ function parseText(value: unknown, field: string): Dictionary<string> {
   return text;
 }
 
+function parseSlides(value: unknown, field: string): string[] {
+  if (!Array.isArray(value) || !value.every((slide) => typeof slide === 'string' && slide !== '')) {
+    throw new Error(`${field}: expected a list of slide ids`);
+  }
+  const slides = value as string[];
+  return slides.filter((slide, index) => slides.indexOf(slide) === index);
+}
+
 function parseAnswer(value: unknown, field: string): PracticeAnswer {
   const answer: PracticeAnswer = parseText(value, field);
   if (isRecord(value) && typeof value.id === 'string' && value.id !== '') answer.id = value.id;
@@ -47,6 +55,10 @@ export function parseQuestion(id: string, data: unknown): PracticeQuestion {
     retired: Boolean(data.retired),
   };
   if (topic) question.topic = topic;
+  if (data.slides !== undefined) {
+    const slides = parseSlides(data.slides, `${id}.slides`);
+    if (slides.length > 0) question.slides = slides;
+  }
   if (data.explanation !== undefined) question.explanation = parseText(data.explanation, `${id}.explanation`);
   return question;
 }
