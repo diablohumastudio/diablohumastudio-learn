@@ -97,6 +97,8 @@ Known limits: a student who loaded practice before the exam opened keeps what th
 
 ## Setup (once)
 
+**Node 22 on Vercel.** `firebase-admin` 14 needs Node 22 or newer: one of its dependencies loads an ES module with `require`, which older Node versions refuse. `package.json` pins `"engines": { "node": "22.x" }`, which Vercel follows. With an older Node the exam routes crash while loading and answer an HTML 500 instead of JSON, which the site shows as "Something went wrong"; `/api/contact` keeps working, so it is easy to miss.
+
 1. Firebase console → Project settings → Service accounts → **Generate new private key**. It downloads a JSON file. It is a secret with full access to the project: never commit it.
 2. Put the whole JSON **on one line** in `FIREBASE_SERVICE_ACCOUNT`, in `.env.local` (then restart the dev server) and in the Vercel project's environment variables (then redeploy). One way to flatten it: `node -e "console.log(JSON.stringify(require('./key.json')))"`.
 3. Firestore → Rules: paste `firebase/firestore.rules` and publish.
