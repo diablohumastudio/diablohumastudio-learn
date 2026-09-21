@@ -1,5 +1,9 @@
 import type { Dictionary } from '../../i18n/useT';
 
+export const QUESTIONS_COLLECTION: string = 'questions';
+/** Same model, readable by teachers only: questions that exist for exams and are never practiced. */
+export const EXAM_QUESTIONS_COLLECTION: string = 'examQuestions';
+
 export const MIN_CORRECT_ANSWERS: number = 1;
 export const MIN_INCORRECT_ANSWERS: number = 3;
 /** Every display shows one correct answer plus this many wrong ones. */
@@ -25,6 +29,9 @@ export type PracticeQuestion = {
   explanation?: Dictionary<string>;
   /** Retired questions are kept so old stats still resolve, but are never asked. */
   retired: boolean;
+  /** Set by the reader, never stored: the question lives in the teacher-only exam bank, so it is
+      never practiced and only enters an exam when picked by id (docs/exam.md). */
+  examOnly?: boolean;
 };
 
 export type ShuffledChoice = {

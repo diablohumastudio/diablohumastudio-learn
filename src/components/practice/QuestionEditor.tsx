@@ -11,7 +11,7 @@ import { isFirebaseConfigured } from '../../lib/firebase';
 import s from './QuestionEditor.module.css';
 import SignInRedirect from '../learn/SignInRedirect';
 import { isPermissionDenied } from './progress';
-import { parseQuestionList, saveQuestions, useQuestionBank } from './questions';
+import { parseQuestionList, saveQuestions, useExamOnlyBank, useQuestionBank } from './questions';
 import ui from '../learn/ui.module.css';
 import { useAuthUser } from '../learn/useAuthUser';
 import { useClassSlides } from '../learn/useClassSlides';
@@ -189,6 +189,8 @@ function QuestionForm({ bank, editing, onDone }: QuestionFormProps) {
   const [draft, setDraft] = useState<Draft>(() => (editing ? draftFromQuestion(editing) : emptyDraft()));
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  // A question never changes bank: its id says which one it is in, and stats and exams point at the id.
+  const [examOnly, setExamOnly] = useState(editing?.examOnly ?? false);
   const classSlides = useClassSlides(draft.topic ? [draft.topic] : [])[draft.topic] ?? [];
 
   function toggleSlide(slideId: string) {
@@ -204,11 +206,11 @@ function QuestionForm({ bank, editing, onDone }: QuestionFormProps) {
       setMessage(validation.message);
       return;
     }
-    const id = editing ? editing.id : nextQuestionId(bank, validation.value.topic);
+    const id = editing ? editing.id : nextQuestionId(bank, validation.value.topic, examOnly);
     setSaving(true);
     setMessage(null);
     try {
-      await saveQuestions([{ id, ...validation.value }]);
+      await saveQuestions([{ id, ...validation.value, examOnly }]);
       onDone();
     } catch (error) {
       console.error('Could not save the question', error);
@@ -233,6 +235,16 @@ function QuestionForm({ bank, editing, onDone }: QuestionFormProps) {
           void save();
         }}
       >
+        <label className={s.checkbox}>
+          <input
+            type="checkbox"
+            checked={examOnly}
+            disabled={editing !== null}
+            onChange={(event) => setExamOnly(event.target.checked)}
+          />
+          <span>{t.examOnlyLabel}</span>
+        </label>
+
         <label className={ui.field}>
           <span className={ui.label}>{t.classLabel}</span>
           <select
@@ -321,6 +333,7 @@ function QuestionForm({ bank, editing, onDone }: QuestionFormProps) {
 function ImportPanel({ onDone }: { onDone: (count: number) => void }) {
   const t = useT(practiceDict);
   const [json, setJson] = useState('');
+  const [examOnly, setExamOnly] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -335,7 +348,7 @@ function ImportPanel({ onDone }: { onDone: (count: number) => void }) {
     setBusy(true);
     setMessage(null);
     try {
-      await saveQuestions(questions);
+      await saveQuestions(questions.map((question) => ({ ...question, examOnly })));
       setJson('');
       onDone(questions.length);
     } catch (error) {
@@ -356,6 +369,10 @@ function ImportPanel({ onDone }: { onDone: (count: number) => void }) {
         onChange={(event) => setJson(event.target.value)}
         spellCheck={false}
       />
+      <label className={s.checkbox}>
+        <input type="checkbox" checked={examOnly} onChange={(event) => setExamOnly(event.target.checked)} />
+        <span>{t.examOnlyLabel}</span>
+      </label>
       {message && <p className={ui.error}>{message}</p>}
       <div className={s.actions}>
         <button type="button" className={s.save} onClick={() => void importQuestions()} disabled={busy || !json.trim()}>
@@ -372,11 +389,12 @@ function Bank() {
   const t = useT(practiceDict);
   const locale = useLocale();
   const bank = useQuestionBank();
+  const examOnlyBank = useExamOnlyBank();
   const [screen, setScreen] = useState<Screen>({ kind: 'list' });
   const [importing, setImporting] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
-  if (bank.status === 'loading') {
+  if (bank.status === 'loading' || examOnlyBank.status === 'loading') {
     return (
       <div className={ui.centered}>
         <span className={ui.mono}>{t.loading}</span>
@@ -391,7 +409,10 @@ function Bank() {
       </div>
     );
   }
-  const questions = bank.questions;
+  // The exam-only bank is refused until the rules that name it are published (docs/practice.md):
+  // the practice bank must stay editable meanwhile.
+  const isExamOnlyBankMissing = examOnlyBank.status === 'error';
+  const questions = [...bank.questions, ...(examOnlyBank.status === 'ready' ? examOnlyBank.questions : [])];
   if (screen.kind !== 'list') {
     return (
       <QuestionForm
@@ -423,6 +444,7 @@ function Bank() {
         </button>
         {notice && <span className={ui.notice}>{notice}</span>}
       </div>
+      {isExamOnlyBankMissing && <p className={ui.error}>{t.examOnlyBankMissing}</p>}
       {importing && (
         <ImportPanel
           onDone={(count) => {
@@ -459,7 +481,10 @@ function Bank() {
                     <td className={ui.num} title={t.answersSummary}>
                       {question.correct.length} / {question.incorrect.length}
                     </td>
-                    <td>{question.retired ? t.statusRetired : t.statusActive}</td>
+                    <td>
+                      {question.retired ? t.statusRetired : t.statusActive}
+                      {question.examOnly && ` · ${t.examOnlyTag}`}
+                    </td>
                   </tr>
                 ))}
               </tbody>

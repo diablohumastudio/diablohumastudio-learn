@@ -48,6 +48,12 @@ service cloud.firestore {
       allow write: if isTeacher();
     }
 
+    // Questions that exist for exams only: a student must never read them, exam or no exam.
+    // The exam API (admin SDK) reads them when it builds the paper.
+    match /examQuestions/{questionId} {
+      allow read, write: if isTeacher();
+    }
+
     // Exams. Browsers only ever write drafts; opening, starting, submitting and grading go
     // through the API routes (src/pages/api/exam), which use the admin SDK and skip these rules.
     match /exams/{examId} {

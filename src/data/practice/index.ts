@@ -5,6 +5,8 @@ import type { PracticeQuestion } from './types';
 
 export type { PracticeAnswer, PracticeQuestion, ShuffledChoice } from './types';
 export {
+  EXAM_QUESTIONS_COLLECTION,
+  QUESTIONS_COLLECTION,
   MIN_CORRECT_ANSWERS,
   MIN_INCORRECT_ANSWERS,
   SHOWN_INCORRECT_ANSWERS,
@@ -31,10 +33,12 @@ export {
   weekdayInitial,
 } from './homework';
 
+
 /* The bank itself lives in Firestore (src/components/practice/questions.ts);
    this module holds what only depends on the Learn registry. */
 
 const NO_COURSE_ID_PREFIX: string = 'q';
+const EXAM_ONLY_ID_PREFIX: string = 'x-';
 const ID_NUMBER_WIDTH: number = 3;
 
 export function courseOfTopic(topic: string | undefined): LearnCourse | undefined {
@@ -74,8 +78,13 @@ function questionIdPrefix(topic: string | undefined): string {
 }
 
 /** Next free id for the class of `topic` (e.g. 'wu-wo-014'); ids are never reused. */
-export function nextQuestionId(questions: readonly PracticeQuestion[], topic: string | undefined): string {
-  const prefix = questionIdPrefix(topic);
+export function nextQuestionId(
+  questions: readonly PracticeQuestion[],
+  topic: string | undefined,
+  examOnly: boolean
+): string {
+  // Both banks share the exam papers and the stats keys, so their ids must never collide.
+  const prefix = `${examOnly ? EXAM_ONLY_ID_PREFIX : ''}${questionIdPrefix(topic)}`;
   const highest = questions
     .filter((question) => question.id.startsWith(prefix))
     .map((question) => Number(question.id.slice(prefix.length)))
