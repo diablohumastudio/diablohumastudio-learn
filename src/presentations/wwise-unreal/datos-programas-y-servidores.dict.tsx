@@ -27,7 +27,32 @@ export type RotulosComputadorTexts = {
   cpu: string;
 };
 
-/* Shared by the restaurant and its client-server morph: same positions, other domain. */
+export type BibliotecaTexts = {
+  eyebrow: string;
+  title: ReactNode;
+  arias: [string, string];
+  caption: string;
+  notes: string;
+  biblioteca: RotulosBibliotecaTexts;
+  computador: RotulosComputadorTexts;
+};
+
+export type RotulosBackendTexts = {
+  cliente: string;
+  clienteSub: string;
+  backend: string;
+  api: string;
+  apiSub: string;
+  autorizacion: string;
+  autorizacionSub: string;
+  baseDeDatos: string;
+  baseDeDatosSub: string;
+  valida: string;
+  busca: string;
+  pides: string;
+  recibes: string;
+};
+
 export type RotulosPeticionTexts = {
   cliente: string;
   clienteSub: string;
@@ -55,22 +80,20 @@ export type MaquinaTexts = {
 };
 
 export type EscenaArranqueTexts = {
+  servidor: string;
+  servidorSub: string;
   celular: string;
   disco: string;
-  elJuego: string;
-  escenaMainEngine: string;
-  soundEngine: string;
   ram: string;
-  gameEngineRam: string;
-  escenaMainRam: string;
-  soundEngineRam: string;
-  libre: string;
-  paso1: string;
-  paso2: string;
-  paso3: string;
+  juego: string;
+  instalado: string;
+  corriendo: string;
+  instalas: string;
+  abres: string;
 };
 
-export type NivelDeLenguaje = { titulo: string; lineas: [string, string] };
+/* `resaltado` is a trailing part of the title drawn in amber and pulsed on entry. */
+export type NivelDeLenguaje = { titulo: string; resaltado?: string; lineas: [string, string] };
 
 type DatosTexts = {
   name: string;
@@ -80,18 +103,16 @@ type DatosTexts = {
     biblioteca: string;
     computador: string;
     lenguajes: string;
-    restaurante: string;
     clienteServidor: string;
     servidores: string;
+    backend: string;
     hardware: string;
     arranque: string;
-    pide: string;
-    busca: string;
-    sube: string;
+    instalas: string;
+    abres: string;
   };
   cover: { eyebrow: string; title: ReactNode; hint: string };
-  biblioteca: { eyebrow: string; title: ReactNode; aria: string; caption: string; rotulos: RotulosBibliotecaTexts };
-  computador: { eyebrow: string; title: ReactNode; aria: string; caption: string; rotulos: RotulosComputadorTexts };
+  biblioteca: BibliotecaTexts;
   lenguajes: {
     eyebrow: string;
     title: ReactNode;
@@ -101,19 +122,22 @@ type DatosTexts = {
     masFacil: string;
     masCercaMaquina: string;
     masRapido: string;
+    masAbstracto: string;
+    menosAbstracto: string;
     tuEscribes: string;
     laCpuLee: string;
     niveles: [NivelDeLenguaje, NivelDeLenguaje, NivelDeLenguaje, NivelDeLenguaje];
   };
-  restaurante: { eyebrow: string; title: ReactNode; aria: string; caption: string; rotulos: RotulosPeticionTexts };
-  clienteServidor: { eyebrow: string; title: ReactNode; aria: string; caption: string; rotulos: RotulosPeticionTexts };
+  clienteServidor: { eyebrow: string; title: ReactNode; aria: string; caption: string; notes: string; rotulos: RotulosPeticionTexts };
   servidores: {
     eyebrow: string;
     title: ReactNode;
     aria: string;
     caption: string;
-    filas: [FilaServidor, FilaServidor, FilaServidor];
+    notes: string;
+    filas: FilaServidor[];
   };
+  backend: { eyebrow: string; title: ReactNode; aria: string; caption: string; notes: string; rotulos: RotulosBackendTexts };
   hardware: {
     eyebrow: string;
     title: ReactNode;
@@ -127,15 +151,18 @@ type DatosTexts = {
   arranque: ArranqueTexts;
 };
 
+/* Three steps: before installing, installing (server → disk), opening (disk → RAM).
+   `titles` has one entry per step. */
 export type ArranqueTexts = {
   eyebrow: string;
-  title: ReactNode;
-  arias: [string, string, string, string];
-  captions: [string, string, string, string];
+  titles: [ReactNode, ReactNode, ReactNode];
+  arias: [string, string, string];
+  caption: string;
   escena: EscenaArranqueTexts;
 };
 
-export type FilaServidor = { servidor: string; pides: string; sirve: string; ejemplos: string };
+/* `sirveDetalle` is a second, muted line under `sirve`; `ejemplos` has one or two lines. */
+export type FilaServidor = { servidor: string; pides: string; sirve: string; sirveDetalle?: string; ejemplos: string[] };
 
 const es: DatosTexts = {
   name: 'Datos, programas y servidores',
@@ -145,14 +172,13 @@ const es: DatosTexts = {
     biblioteca: 'biblioteca',
     computador: 'computador',
     lenguajes: 'lenguajes',
-    restaurante: 'restaurante',
     clienteServidor: 'cliente-servidor',
-    servidores: 'servidores',
-    hardware: 'hardware',
+    servidores: 'tipos y ejemplos de servidores',
+    backend: 'backend',
+    hardware: 'hardware de servidor',
     arranque: 'arranque',
-    pide: 'pide',
-    busca: 'busca',
-    sube: 'sube',
+    instalas: 'instalas el juego',
+    abres: 'abres el juego',
   },
   cover: {
     eyebrow: 'Intro a Wwise · del disco al servidor',
@@ -166,15 +192,20 @@ const es: DatosTexts = {
     hint: 'Navega con ← → · espacio',
   },
   biblioteca: {
-    eyebrow: 'Concepto 1 · la biblioteca',
+    eyebrow: 'Los datos tienen que llegar al procesador',
     title: (
       <>
-        Para trabajar, los datos tienen que <span className={s.accent}>llegar a tus manos</span>
+        Analogía de un PC a una <span className={s.accent}>biblioteca</span>
       </>
     ),
-    aria: 'Una biblioteca vista desde arriba: las estanterías guardan todas las materias; en las puntas de una mesa larga hay libros cerrados; en el centro de la mesa, los libros abiertos de la materia actual, y dos personas sentadas arriba y abajo de la mesa los leen. Levantarse a las estanterías es lento, alcanzar la punta de la mesa es rápido y leer el libro abierto es instantáneo.',
-    caption: 'Cuanto más cerca de las manos, más rápido — y menos cabe.',
-    rotulos: {
+    arias: [
+      'Una biblioteca vista desde arriba: arriba, tres estanterías con todas las materias; abajo, dos mesas laterales con libros cerrados y, en el centro, una mesa con cuatro personas leyendo libros abiertos. Levantarse a las estanterías es lento, alcanzar las mesas laterales es rápido y leer el libro abierto es instantáneo.',
+      'La misma escena con las piezas de un computador: las estanterías se vuelven discos duros, las mesas laterales se vuelven módulos de memoria RAM y la mesa central se vuelve un CPU de cuatro núcleos con su caché. Cargar del disco es lento, traer de RAM es rápido y leer la caché es instantáneo.',
+    ],
+    caption: 'Mientras más cerca está la información, más rápido se procesa cuando se necesita.',
+    notes:
+      'Cuanto más cerca del procesador está el lugar donde reside la información que necesita una tarea, más rápido se puede empezar a trabajar en ella; a cambio, ese lugar es más pequeño.\n\nLas estanterías son el disco duro: cabe todo, pero ir a buscarlo es lento. Las mesas laterales son la memoria RAM: cabe menos, pero está al alcance de la mano. Los libros abiertos frente a cada persona son la caché del CPU: cabe muy poco, pero se lee al instante.',
+    biblioteca: {
       estanterias: 'ESTANTERÍAS',
       todasLasMaterias: 'todas las materias',
       levantarse: 'levantarse · lento',
@@ -184,17 +215,7 @@ const es: DatosTexts = {
       materiaActual: 'la materia actual',
       leer: 'leer · al instante',
     },
-  },
-  computador: {
-    eyebrow: 'Concepto 1 · el computador',
-    title: (
-      <>
-        La biblioteca <span className={s.accent}>es tu computador</span>
-      </>
-    ),
-    aria: 'El mismo diagrama de la biblioteca con nombres de hardware: las estanterías son el disco duro, la mesa es la memoria RAM, los libros abiertos son la caché y las dos personas sentadas son los CPU.',
-    caption: 'Mismo lugar, otros nombres: disco, RAM y caché son distancias hasta tus manos.',
-    rotulos: {
+    computador: {
       discoDuro: 'DISCO DURO',
       todosLosDatos: 'todos los datos',
       cargar: 'cargar del disco · lento',
@@ -207,58 +228,41 @@ const es: DatosTexts = {
     },
   },
   lenguajes: {
-    eyebrow: 'Concepto 2 · los lenguajes',
+    eyebrow: 'Los niveles de abstracción de los lenguajes de programación',
     title: (
       <>
-        La CPU solo entiende <span className={s.accent}>unos y ceros</span>
+        Más abstracto significa <span className={s.accent}>menos detalle</span>
       </>
     ),
-    aria: 'Cuatro niveles de lenguaje apilados de arriba hacia abajo, del más cercano al humano al más cercano a la máquina: Python y JavaScript (se leen casi como inglés y el lenguaje maneja la memoria por ti), C++ y Rust (control total del hardware y la memoria, se compilan antes de correr), ensamblador (instrucciones directas al procesador, difícil de leer para un humano) y código máquina en unos y ceros (el único lenguaje que la CPU entiende: pulsos eléctricos, 1 encendido y 0 apagado). Tú escribes en el nivel de arriba; la CPU lee el de abajo.',
-    caption: 'Cuanto más arriba, más fácil para ti; cuanto más abajo, más rápido para la CPU.',
+    aria: 'Cuatro niveles de lenguaje apilados de arriba hacia abajo, del más abstracto al menos abstracto: Python, JavaScript, GDScript y Blueprints (se leen casi como inglés y el lenguaje maneja la memoria por ti), C++ y Rust (control total del hardware y la memoria, se compilan antes de correr), ensamblador (instrucciones directas al procesador, difícil de leer para un humano) y código máquina en unos y ceros (el único lenguaje que la CPU entiende: pulsos eléctricos, 1 encendido y 0 apagado). Tú escribes en el nivel de arriba; la CPU lee el de abajo.',
+    caption: 'Mientras más abstracto es un lenguaje, menos detalle tienes que escribir y más fácil es de entender.',
     masCercaHumano: 'MÁS CERCA DEL HUMANO',
     masFacil: 'más fácil para ti',
     masCercaMaquina: 'MÁS CERCA DE LA MÁQUINA',
     masRapido: 'más rápido para la CPU',
+    masAbstracto: 'MÁS ABSTRACTO',
+    menosAbstracto: 'MENOS ABSTRACTO',
     tuEscribes: 'tú escribes aquí',
     laCpuLee: 'la CPU lee aquí',
     niveles: [
-      { titulo: 'PYTHON / JAVASCRIPT', lineas: ['se lee casi como inglés', 'la memoria la maneja el lenguaje por ti'] },
+      { titulo: 'PYTHON / JAVASCRIPT / ', resaltado: 'GDSCRIPT / BLUEPRINTS', lineas: ['se lee casi como inglés', 'la memoria la maneja el lenguaje por ti'] },
       { titulo: 'C++ / RUST', lineas: ['control total del hardware y la memoria', 'se compila antes de correr'] },
       { titulo: 'ENSAMBLADOR (ASSEMBLY)', lineas: ['instrucciones directas al procesador', 'difícil de leer para un humano'] },
       { titulo: 'CÓDIGO MÁQUINA · 1s y 0s', lineas: ['el único lenguaje que la CPU entiende', 'pulsos eléctricos: 1 = encendido · 0 = apagado'] },
     ],
   },
-  restaurante: {
-    eyebrow: 'Concepto 3 · el restaurante',
-    title: (
-      <>
-        Un servidor es un programa que <span className={s.accent}>atiende peticiones</span>
-      </>
-    ),
-    aria: 'Un restaurante visto como flujo: tú en la mesa pides la hamburguesa al camarero, la petición llega a la cocina, la cocina verifica que el plato esté en el menú, revisa y trae los ingredientes y prepara la hamburguesa, y el camarero te la trae o te trae la noticia de que no hay.',
-    caption: 'Recibir el pedido, verificar que se puede, prepararlo y devolverlo: eso hace un servidor.',
-    rotulos: {
-      cliente: 'TÚ',
-      clienteSub: 'en la mesa',
-      servidor: 'COCINA',
-      paso1: '① verifica que el plato esté en el menú',
-      paso2: '② revisa y trae los ingredientes',
-      paso3: '③ prepara la hamburguesa',
-      peticion: 'pides la hamburguesa al camarero',
-      peticionSub: 'a tu medida',
-      respuesta: 'el camarero te trae la hamburguesa',
-      respuestaSub: '…o la noticia de que no hay hamburguesas',
-    },
-  },
   clienteServidor: {
-    eyebrow: 'Concepto 3 · cliente y servidor',
+    eyebrow: 'Modelo cliente-servidor',
     title: (
       <>
-        El restaurante es <span className={s.accent}>cliente y servidor</span>
+        Un <span className={s.accent}>servidor</span> es un programa que <span className={s.accent}>atiende peticiones</span>
       </>
     ),
-    aria: 'El mismo diagrama del restaurante con nombres de computación: tú eres el PC cliente, la cocina es el PC servidor, y las flechas son la petición y la respuesta. Los pasos de la cocina son validar al usuario, buscar los recursos y armar la respuesta.',
-    caption: 'Misma escena, otros nombres: el servidor valida, busca lo que hace falta, arma la respuesta y la manda.',
+    aria: 'Un PC cliente a la izquierda envía una petición al PC servidor de la derecha; el servidor valida al usuario, busca los recursos y arma la respuesta, y la devuelve al cliente, o un error si no se pudo.',
+    caption:
+      'Flujo: el cliente envía una petición; el servidor ① valida al usuario, ② busca los recursos y ③ arma la respuesta; y devuelve la respuesta al cliente (o un error si no se pudo).',
+    notes:
+      'Analogía del restaurante. Tú, sentado en la mesa, le pides al camarero una hamburguesa a tu gusto: esa es la petición. El pedido llega a la cocina, que hace tres cosas: verifica que el plato esté en el menú, revisa y trae los ingredientes, y prepara la hamburguesa. Después el camarero te la trae, o te trae la noticia de que no hay hamburguesas: esa es la respuesta.\n\nCambia los nombres y tienes el modelo cliente-servidor: tú eres el PC cliente, la cocina es el PC servidor, el pedido es la petición y lo que vuelve es la respuesta. Los tres pasos de la cocina son los tres pasos del servidor: validar al usuario (¿quién eres, tienes permiso?), buscar los recursos que hacen falta y armar la respuesta antes de enviarla.\n\nCada vez que abres una página, ves un video o entras a un juego en línea, estás siendo cliente de algún servidor.',
     rotulos: {
       cliente: 'PC CLIENTE',
       clienteSub: 'quien pide',
@@ -273,25 +277,61 @@ const es: DatosTexts = {
     },
   },
   servidores: {
-    eyebrow: 'Concepto 4 · servir',
+    eyebrow: 'Tipos y ejemplos de servidores',
     title: (
       <>
         Cada servidor <span className={s.accent}>sirve</span> lo suyo
       </>
     ),
-    aria: 'Tres filas iguales donde la petición entra por la izquierda y la respuesta regresa por el mismo lado: pides una página y el servidor web sirve páginas web; pides un archivo y el servidor FTP sirve archivos; pides unos datos y el servidor de base de datos sirve datos.',
+    aria: 'Cuatro filas iguales donde la petición entra por la izquierda y la respuesta regresa por el mismo lado: pides una página y el servidor web sirve páginas web; pides unos datos y el servidor de base de datos sirve datos; pides el código de un repositorio y el servidor de git sirve repositorios; pides entrar con tu cuenta y el servidor de autorización sirve un permiso de acceso. A la derecha, ejemplos reales de cada tipo.',
     caption: 'Por eso se llama servidor: sirve páginas, archivos o datos — siempre a quien los pide.',
+    notes:
+      'Hay más tipos: un servidor FTP sirve archivos (le pides un archivo y te lo manda; FileZilla Server y vsftpd son ejemplos). El patrón es siempre el mismo; lo que cambia es qué se pide y qué se entrega.',
     filas: [
-      { servidor: 'SERVIDOR WEB', pides: 'pides una página', sirve: 'sirve páginas web', ejemplos: 'ej.: Apache · Nginx' },
-      { servidor: 'SERVIDOR FTP', pides: 'pides un archivo', sirve: 'sirve archivos', ejemplos: 'ej.: FileZilla Server · vsftpd' },
-      { servidor: 'SERVIDOR DE BASE DE DATOS', pides: 'pides unos datos', sirve: 'sirve datos', ejemplos: 'ej.: PostgreSQL · MySQL' },
+      { servidor: 'SERVIDOR WEB', pides: 'pides una página', sirve: 'sirve páginas web', ejemplos: ['ej.: Apache · Nginx'] },
+      { servidor: 'SERVIDOR DE BASE DE DATOS', pides: 'pides unos datos', sirve: 'sirve datos', ejemplos: ['ej.: PostgreSQL · MySQL'] },
+      { servidor: 'SERVIDOR DE GIT', pides: 'pides el código de un repositorio', sirve: 'sirve repositorios de código', ejemplos: ['ej.: GitHub · GitLab'] },
+      {
+        servidor: 'SERVIDOR DE AUTORIZACIÓN',
+        pides: 'pides entrar con tu cuenta',
+        sirve: 'sirve un permiso de acceso (token)',
+        ejemplos: ['ej.: OAuth de Google · OAuth de Apple'],
+      },
     ],
   },
-  hardware: {
-    eyebrow: 'Concepto 5 · la máquina',
+  backend: {
+    eyebrow: 'Backend-as-a-Service',
     title: (
       <>
-        Una computadora servidor: hecha para <span className={s.accent}>servir todo el día</span>
+        Un <span className={s.accent}>backend</span> es un conjunto de servidores que trabajan juntos
+      </>
+    ),
+    aria: 'El PC cliente a la izquierda envía una petición (pides un DLC) a un backend a la derecha: una caja grande con un servidor web / API que recibe la petición, un servidor de autorización que valida quién eres y una base de datos que busca qué te corresponde, unidos por flechas internas. El backend devuelve la respuesta (recibes el DLC).',
+    caption:
+      'El cliente habla con un solo punto; adentro, varios servidores se comunican entre sí para armar la respuesta. Ejemplos: Nakama · LootLocker · Steamworks · Google Play Services · Apple Game Center.',
+    notes:
+      'El DLC del ejemplo es un paquete nuevo del juego (niveles, personajes, música) que trae su propio soundbank: así el sound engine carga los sonidos nuevos sin reinstalar el juego.\n\nPlataformas backend-as-a-service: Nakama, LootLocker, Steamworks, Google Play Services y Apple Game Center. Cada una junta varios servicios (cuentas, guardado en la nube, compras, logros, DLC) detrás de un solo punto de contacto para el juego.',
+    rotulos: {
+      cliente: 'PC CLIENTE',
+      clienteSub: 'quien pide',
+      backend: 'BACKEND',
+      api: 'SERVIDOR WEB / API',
+      apiSub: 'recibe la petición',
+      autorizacion: 'SERVIDOR DE AUTORIZACIÓN',
+      autorizacionSub: '¿quién eres?',
+      baseDeDatos: 'BASE DE DATOS',
+      baseDeDatosSub: 'qué te corresponde',
+      valida: 'valida',
+      busca: 'busca',
+      pides: 'pides un DLC',
+      recibes: 'recibes el DLC',
+    },
+  },
+  hardware: {
+    eyebrow: 'Hardware de servidor',
+    title: (
+      <>
+        Una <span className={s.accent}>computadora</span> servidor: hecha <span className={s.accent}>para servir todo el día</span>
       </>
     ),
     aria: 'Dos computadoras por dentro, lado a lado. La computadora servidor: CPU, RAM y disco; tarjetas de red súper rápidas y robustas por donde entran las peticiones y salen las respuestas día y noche; una fuente de poder súper robusta encendida 24/7; y la tarjeta de video, inexistente, porque nadie mira la pantalla. La PC de diseño gráfico: las mismas piezas, pero con tarjeta de red básica, fuente básica y una tarjeta de video potente.',
@@ -324,38 +364,35 @@ const es: DatosTexts = {
     },
   },
   arranque: {
-    eyebrow: 'Concepto 6 · el arranque',
-    title: (
+    eyebrow: 'Instalar y abrir un programa',
+    titles: [
       <>
-        Arranca el juego, y los bancos suben <span className={s.accent}>cuando hacen falta</span>
-      </>
-    ),
+        Instalar un programa es <span className={s.accent}>copiarlo de un servidor al disco</span>
+      </>,
+      <>
+        Instalar un programa es <span className={s.accent}>copiarlo de un servidor al disco</span>
+      </>,
+      <>
+        Abrir un programa es <span className={s.accent}>copiarlo del disco a la RAM</span>
+      </>,
+    ],
     arias: [
-      'Un celular con el juego ya corriendo: en el disco está instalado el juego con sus tres SoundBanks (soundbank_init, soundbank_menus y soundbank_nivel_1); en la memoria RAM están cargados el game engine, la escena main, el sound engine y soundbank_init, con una posición libre punteada debajo.',
-      'El mismo diagrama del celular: la escena main le pide al sound engine que suene el menú.',
-      'El mismo diagrama del celular: el sound engine sale a buscar soundbank_menus al disco.',
-      'El mismo diagrama del celular: soundbank_menus sube del disco a la posición libre de la memoria RAM y aparece cargado. soundbank_nivel_1 se queda en el disco.',
+      'A la izquierda, fuera del celular, un servidor (o disco externo de instalación) con el juego. El celular por dentro: el disco y la memoria RAM, vacíos.',
+      'Al instalar el juego, una copia viaja del servidor al disco del celular y queda instalada ahí.',
+      'Al abrir el juego, otra copia viaja del disco a la memoria RAM y queda corriendo ahí; el original sigue instalado en el disco.',
     ],
-    captions: [
-      'Lo mínimo ya está cargado: los engines, la escena y el init — el resto espera en el disco.',
-      'La escena pide música de menú; el sound engine todavía no la tiene.',
-      'El sound engine sale a buscar el banco al disco.',
-      'El banco del menú sube a la posición libre — nivel_1 sigue esperando en el disco.',
-    ],
+    caption: 'Instalar copia el programa del servidor al disco; abrirlo lo copia del disco a la RAM, donde corre.',
     escena: {
+      servidor: 'SERVIDOR',
+      servidorSub: 'o disco de instalación',
       celular: 'CELULAR',
       disco: 'DISCO',
-      elJuego: 'EL JUEGO',
-      escenaMainEngine: 'escena main · game engine',
-      soundEngine: 'sound engine',
       ram: 'MEMORIA RAM',
-      gameEngineRam: 'GAME ENGINE',
-      escenaMainRam: 'ESCENA MAIN',
-      soundEngineRam: 'SOUND ENGINE',
-      libre: '…libre',
-      paso1: '① «suena el menú»',
-      paso2: '② busca soundbank_menus',
-      paso3: '③ sube a la RAM',
+      juego: 'JUEGO',
+      instalado: 'instalado',
+      corriendo: 'corriendo',
+      instalas: 'instalas el juego',
+      abres: 'abres el juego',
     },
   },
 };
@@ -368,14 +405,13 @@ const en: DatosTexts = {
     biblioteca: 'library',
     computador: 'computer',
     lenguajes: 'languages',
-    restaurante: 'restaurant',
     clienteServidor: 'client-server',
-    servidores: 'servers',
-    hardware: 'hardware',
+    servidores: 'types and examples of servers',
+    backend: 'backend',
+    hardware: 'server hardware',
     arranque: 'boot',
-    pide: 'asks',
-    busca: 'looks',
-    sube: 'loads',
+    instalas: 'you install the game',
+    abres: 'you open the game',
   },
   cover: {
     eyebrow: 'Intro to Wwise · from disk to server',
@@ -389,15 +425,20 @@ const en: DatosTexts = {
     hint: 'Navigate with ← → · space',
   },
   biblioteca: {
-    eyebrow: 'Concept 1 · the library',
+    eyebrow: 'Data has to reach the processor',
     title: (
       <>
-        To work, the data has to <span className={s.accent}>reach your hands</span>
+        Analogy of a PC to a <span className={s.accent}>library</span>
       </>
     ),
-    aria: 'A library seen from above: the shelves hold every subject; at the ends of a long table there are closed books; in the middle of the table, the open books of the current subject, and two people seated above and below the table read them. Getting up to the shelves is slow, reaching the end of the table is fast and reading the open book is instant.',
-    caption: 'The closer to your hands, the faster — and the less fits.',
-    rotulos: {
+    arias: [
+      'A library seen from above: on top, three shelves with every subject; below, two side tables with closed books and, in the middle, a table with four people reading open books. Getting up to the shelves is slow, reaching the side tables is fast and reading the open book is instant.',
+      'The same scene with the parts of a computer: the shelves become hard disks, the side tables become RAM memory modules and the central table becomes a four-core CPU with its cache. Loading from disk is slow, fetching from RAM is fast and reading the cache is instant.',
+    ],
+    caption: 'The closer the information is, the faster it gets processed when it is needed.',
+    notes:
+      'The closer to the processor the place where the information a task needs lives, the sooner that task can start; in exchange, that place is smaller.\n\nThe shelves are the hard disk: everything fits, but going to get it is slow. The side tables are the RAM memory: less fits, but it is within reach. The open books in front of each person are the CPU cache: very little fits, but it is read instantly.',
+    biblioteca: {
       estanterias: 'SHELVES',
       todasLasMaterias: 'every subject',
       levantarse: 'get up · slow',
@@ -407,17 +448,7 @@ const en: DatosTexts = {
       materiaActual: 'the current subject',
       leer: 'read · instant',
     },
-  },
-  computador: {
-    eyebrow: 'Concept 1 · the computer',
-    title: (
-      <>
-        The library <span className={s.accent}>is your computer</span>
-      </>
-    ),
-    aria: 'The same library diagram with hardware names: the shelves are the hard disk, the table is the RAM memory, the open books are the cache and the two seated people are the CPUs.',
-    caption: 'Same place, other names: disk, RAM and cache are distances to your hands.',
-    rotulos: {
+    computador: {
       discoDuro: 'HARD DISK',
       todosLosDatos: 'all the data',
       cargar: 'load from disk · slow',
@@ -430,58 +461,41 @@ const en: DatosTexts = {
     },
   },
   lenguajes: {
-    eyebrow: 'Concept 2 · languages',
+    eyebrow: 'The abstraction levels of programming languages',
     title: (
       <>
-        The CPU only understands <span className={s.accent}>ones and zeros</span>
+        More abstract means <span className={s.accent}>less detail</span>
       </>
     ),
-    aria: 'Four language levels stacked top to bottom, from the closest to the human to the closest to the machine: Python and JavaScript (read almost like English and the language manages memory for you), C++ and Rust (full control of hardware and memory, compiled before running), assembly (direct instructions to the processor, hard for a human to read) and machine code in ones and zeros (the only language the CPU understands: electric pulses, 1 on and 0 off). You write at the top level; the CPU reads the bottom one.',
-    caption: 'The higher up, the easier for you; the lower down, the faster for the CPU.',
+    aria: 'Four language levels stacked top to bottom, from the most abstract to the least abstract: Python, JavaScript, GDScript and Blueprints (read almost like English and the language manages memory for you), C++ and Rust (full control of hardware and memory, compiled before running), assembly (direct instructions to the processor, hard for a human to read) and machine code in ones and zeros (the only language the CPU understands: electric pulses, 1 on and 0 off). You write at the top level; the CPU reads the bottom one.',
+    caption: 'The more abstract a language is, the less detail you have to write and the easier it is to understand.',
     masCercaHumano: 'CLOSER TO THE HUMAN',
     masFacil: 'easier for you',
     masCercaMaquina: 'CLOSER TO THE MACHINE',
     masRapido: 'faster for the CPU',
+    masAbstracto: 'MORE ABSTRACT',
+    menosAbstracto: 'LESS ABSTRACT',
     tuEscribes: 'you write here',
     laCpuLee: 'the CPU reads here',
     niveles: [
-      { titulo: 'PYTHON / JAVASCRIPT', lineas: ['reads almost like English', 'the language manages memory for you'] },
+      { titulo: 'PYTHON / JAVASCRIPT / ', resaltado: 'GDSCRIPT / BLUEPRINTS', lineas: ['reads almost like English', 'the language manages memory for you'] },
       { titulo: 'C++ / RUST', lineas: ['full control of hardware and memory', 'compiled before it runs'] },
       { titulo: 'ASSEMBLY', lineas: ['direct instructions to the processor', 'hard for a human to read'] },
       { titulo: 'MACHINE CODE · 1s and 0s', lineas: ['the only language the CPU understands', 'electric pulses: 1 = on · 0 = off'] },
     ],
   },
-  restaurante: {
-    eyebrow: 'Concept 3 · the restaurant',
-    title: (
-      <>
-        A server is a program that <span className={s.accent}>handles requests</span>
-      </>
-    ),
-    aria: 'A restaurant seen as a flow: you at the table order the burger from the waiter, the order reaches the kitchen, the kitchen checks the dish is on the menu, checks and fetches the ingredients and cooks the burger, and the waiter brings it to you or brings the news that there is none.',
-    caption: 'Take the order, check it can be done, prepare it and bring it back: that is what a server does.',
-    rotulos: {
-      cliente: 'YOU',
-      clienteSub: 'at the table',
-      servidor: 'KITCHEN',
-      paso1: '① checks the dish is on the menu',
-      paso2: '② checks and fetches the ingredients',
-      paso3: '③ cooks the burger',
-      peticion: 'you order the burger from the waiter',
-      peticionSub: 'your way',
-      respuesta: 'the waiter brings you the burger',
-      respuestaSub: '…or the news that there are no burgers',
-    },
-  },
   clienteServidor: {
-    eyebrow: 'Concept 3 · client and server',
+    eyebrow: 'Client-server model',
     title: (
       <>
-        The restaurant is <span className={s.accent}>client and server</span>
+        A <span className={s.accent}>server</span> is a program that <span className={s.accent}>handles requests</span>
       </>
     ),
-    aria: 'The same restaurant diagram with computing names: you are the client PC, the kitchen is the server PC, and the arrows are the request and the response. The kitchen steps are validating the user, looking up the resources and building the response.',
-    caption: 'Same scene, other names: the server validates, finds what it needs, builds the response and sends it.',
+    aria: 'A client PC on the left sends a request to the server PC on the right; the server validates the user, looks up the resources and builds the response, and returns it to the client, or an error if it could not.',
+    caption:
+      'Flow: the client sends a request; the server ① validates the user, ② looks up the resources and ③ builds the response; and returns the response to the client (or an error if it could not).',
+    notes:
+      'The restaurant analogy. You, seated at the table, order a burger your way from the waiter: that is the request. The order reaches the kitchen, which does three things: checks the dish is on the menu, checks and fetches the ingredients, and cooks the burger. Then the waiter brings it to you, or brings the news that there are no burgers: that is the response.\n\nChange the names and you have the client-server model: you are the client PC, the kitchen is the server PC, the order is the request and what comes back is the response. The three kitchen steps are the three server steps: validate the user (who are you, are you allowed?), look up the resources it needs and build the response before sending it.\n\nEvery time you open a page, watch a video or join an online game, you are the client of some server.',
     rotulos: {
       cliente: 'CLIENT PC',
       clienteSub: 'who asks',
@@ -496,25 +510,61 @@ const en: DatosTexts = {
     },
   },
   servidores: {
-    eyebrow: 'Concept 4 · serving',
+    eyebrow: 'Types and examples of servers',
     title: (
       <>
         Each server <span className={s.accent}>serves</span> its own thing
       </>
     ),
-    aria: 'Three equal rows where the request enters from the left and the response returns the same way: you ask for a page and the web server serves web pages; you ask for a file and the FTP server serves files; you ask for some data and the database server serves data.',
+    aria: "Four equal rows where the request enters from the left and the response returns the same way: you ask for a page and the web server serves web pages; you ask for some data and the database server serves data; you ask for a repository's code and the git server serves repositories; you ask to sign in with your account and the authorization server serves an access permission. On the right, real examples of each type.",
     caption: "That's why it's called a server: it serves pages, files or data — always to whoever asks.",
+    notes:
+      'There are more types: an FTP server serves files (you ask for a file and it sends it; FileZilla Server and vsftpd are examples). The pattern is always the same; what changes is what is asked for and what is delivered.',
     filas: [
-      { servidor: 'WEB SERVER', pides: 'you ask for a page', sirve: 'serves web pages', ejemplos: 'e.g. Apache · Nginx' },
-      { servidor: 'FTP SERVER', pides: 'you ask for a file', sirve: 'serves files', ejemplos: 'e.g. FileZilla Server · vsftpd' },
-      { servidor: 'DATABASE SERVER', pides: 'you ask for some data', sirve: 'serves data', ejemplos: 'e.g. PostgreSQL · MySQL' },
+      { servidor: 'WEB SERVER', pides: 'you ask for a page', sirve: 'serves web pages', ejemplos: ['e.g. Apache · Nginx'] },
+      { servidor: 'DATABASE SERVER', pides: 'you ask for some data', sirve: 'serves data', ejemplos: ['e.g. PostgreSQL · MySQL'] },
+      { servidor: 'GIT SERVER', pides: "you ask for a repository's code", sirve: 'serves code repositories', ejemplos: ['e.g. GitHub · GitLab'] },
+      {
+        servidor: 'AUTHORIZATION SERVER',
+        pides: 'you ask to sign in with your account',
+        sirve: 'serves an access permission (token)',
+        ejemplos: ['e.g. Google OAuth · Apple OAuth'],
+      },
     ],
   },
-  hardware: {
-    eyebrow: 'Concept 5 · the machine',
+  backend: {
+    eyebrow: 'Backend-as-a-Service',
     title: (
       <>
-        A server computer: built to <span className={s.accent}>serve all day long</span>
+        A <span className={s.accent}>backend</span> is a set of servers working together
+      </>
+    ),
+    aria: 'The client PC on the left sends a request (you ask for a DLC) to a backend on the right: a large box with a web / API server that receives the request, an authorization server that validates who you are and a database that looks up what you are entitled to, joined by internal arrows. The backend returns the response (you receive the DLC).',
+    caption:
+      'The client talks to a single point; inside, several servers talk to each other to build the response. Examples: Nakama · LootLocker · Steamworks · Google Play Services · Apple Game Center.',
+    notes:
+      'The DLC in the example is a new package of the game (levels, characters, music) that brings its own soundbank: that way the sound engine loads the new sounds without reinstalling the game.\n\nBackend-as-a-service platforms: Nakama, LootLocker, Steamworks, Google Play Services and Apple Game Center. Each one bundles several services (accounts, cloud saves, purchases, achievements, DLC) behind a single point of contact for the game.',
+    rotulos: {
+      cliente: 'CLIENT PC',
+      clienteSub: 'who asks',
+      backend: 'BACKEND',
+      api: 'WEB SERVER / API',
+      apiSub: 'receives the request',
+      autorizacion: 'AUTHORIZATION SERVER',
+      autorizacionSub: 'who are you?',
+      baseDeDatos: 'DATABASE',
+      baseDeDatosSub: 'what you are owed',
+      valida: 'validates',
+      busca: 'looks up',
+      pides: 'you ask for a DLC',
+      recibes: 'you receive the DLC',
+    },
+  },
+  hardware: {
+    eyebrow: 'Server hardware',
+    title: (
+      <>
+        A server <span className={s.accent}>computer</span>: built <span className={s.accent}>to serve all day long</span>
       </>
     ),
     aria: 'Two computers from the inside, side by side. The server computer: CPU, RAM and disk; super fast and robust network cards where requests come in and responses go out day and night; a super robust power supply on 24/7; and the video card, nonexistent, because nobody looks at the screen. The graphic design PC: the same parts, but with a basic network card, a basic power supply and a powerful video card.',
@@ -547,38 +597,35 @@ const en: DatosTexts = {
     },
   },
   arranque: {
-    eyebrow: 'Concept 6 · the boot',
-    title: (
+    eyebrow: 'Installing and opening a program',
+    titles: [
       <>
-        The game boots, and banks load <span className={s.accent}>when they are needed</span>
-      </>
-    ),
+        Installing a program is <span className={s.accent}>copying it from a server to disk</span>
+      </>,
+      <>
+        Installing a program is <span className={s.accent}>copying it from a server to disk</span>
+      </>,
+      <>
+        Opening a program is <span className={s.accent}>copying it from disk to RAM</span>
+      </>,
+    ],
     arias: [
-      'A phone with the game already running: the game is installed on disk with its three SoundBanks (soundbank_init, soundbank_menus and soundbank_nivel_1); the game engine, the main scene, the sound engine and soundbank_init are loaded in RAM, with a dotted free slot below.',
-      'The same phone diagram: the main scene asks the sound engine to play the menu.',
-      'The same phone diagram: the sound engine goes to the disk looking for soundbank_menus.',
-      'The same phone diagram: soundbank_menus goes up from the disk to the free slot in RAM and appears loaded. soundbank_nivel_1 stays on disk.',
+      'On the left, outside the phone, a server (or external install disk) with the game. The phone from the inside: the disk and the RAM memory, both empty.',
+      'When you install the game, a copy travels from the server to the phone disk and stays installed there.',
+      'When you open the game, another copy travels from the disk to the RAM memory and runs there; the original stays installed on disk.',
     ],
-    captions: [
-      'The minimum is loaded: the engines, the scene and init — the rest waits on disk.',
-      "The scene asks for menu music; the sound engine doesn't have it yet.",
-      'The sound engine goes to the disk to fetch the bank.',
-      'The menu bank goes up to the free slot — nivel_1 keeps waiting on disk.',
-    ],
+    caption: 'Installing copies the program from the server to disk; opening it copies it from disk to RAM, where it runs.',
     escena: {
+      servidor: 'SERVER',
+      servidorSub: 'or install disk',
       celular: 'PHONE',
       disco: 'DISK',
-      elJuego: 'THE GAME',
-      escenaMainEngine: 'main scene · game engine',
-      soundEngine: 'sound engine',
       ram: 'RAM MEMORY',
-      gameEngineRam: 'GAME ENGINE',
-      escenaMainRam: 'MAIN SCENE',
-      soundEngineRam: 'SOUND ENGINE',
-      libre: '…free',
-      paso1: '① “play the menu”',
-      paso2: '② looks for soundbank_menus',
-      paso3: '③ goes up to RAM',
+      juego: 'GAME',
+      instalado: 'installed',
+      corriendo: 'running',
+      instalas: 'you install the game',
+      abres: 'you open the game',
     },
   },
 };

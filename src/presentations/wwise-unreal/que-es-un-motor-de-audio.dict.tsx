@@ -4,6 +4,45 @@ import s from '../../components/learn/Deck.module.css';
 /* Texts of the deck, one object per language. `es` is the source; keep the `en`
    phrases about the same length (±15 %) so the SVG labels stay in their boxes. */
 
+/* One step of the "what is an engine" slide: what goes in, what runs it. */
+export type PasoMotor = {
+  title: ReactNode;
+  aria: string;
+  entrada: string;
+  entradaSub: string;
+  motor: string;
+};
+
+export type QueEsUnMotorTexts = {
+  eyebrow: string;
+  pasos: [PasoMotor, PasoMotor, PasoMotor, PasoMotor, PasoMotor];
+  unProgramaCorriendo: string;
+  comportamiento: string;
+  thMotor: string;
+  thCorre: string;
+  filas: [[string, string], [string, string], [string, string], [string, string]];
+};
+
+/* Three steps: only the title "compiled vs interpreted"; then "programas
+   compilados" rises into the eyebrow and the compile flow appears; then the OS
+   and the CPU below it. */
+export type CompiladosTexts = {
+  eyebrow: string;
+  titles: [ReactNode, ReactNode, ReactNode];
+  arias: [string, string, string];
+  caption: string;
+  texto: string;
+  compilador: string;
+  unaVez: string;
+  binario: string;
+  elOsLoLanza: string;
+  os: string;
+  sistemas: string;
+  instruccionesDirectas: string;
+  cpu: string;
+  ejecutaTalCual: string;
+};
+
 type MotorTexts = {
   name: string;
   context: string;
@@ -11,41 +50,16 @@ type MotorTexts = {
     intro: string;
     lenguajes: string;
     compilados: string;
+    elOs: string;
     interpretados: string;
     queEsUnMotor: string;
+    navegador: string;
+    python: string;
     gameEngines: string;
     audioEngines: string;
   };
   cover: { eyebrow: string; title: ReactNode; hint: string };
-  lenguajes: {
-    eyebrow: string;
-    title: ReactNode;
-    aria: string;
-    caption: string;
-    compilado: string;
-    texto: string;
-    compilador: string;
-    unaVez: string;
-    binario: string;
-    listoParaLaCpu: string;
-    interpretado: string;
-    noSeTraduce: string;
-    sigueSiendoTexto: string;
-    quienLoLee: string;
-  };
-  compilados: {
-    eyebrow: string;
-    title: ReactNode;
-    aria: string;
-    caption: string;
-    binarioCompilado: string;
-    elOsLoLanza: string;
-    os: string;
-    sistemas: string;
-    instruccionesDirectas: string;
-    cpu: string;
-    ejecutaTalCual: string;
-  };
+  compilados: CompiladosTexts;
   interpretados: {
     eyebrow: string;
     title: ReactNode;
@@ -57,49 +71,7 @@ type MotorTexts = {
     interprete: string;
     elOsCorreAlMotor: string;
   };
-  queEsUnMotor: {
-    eyebrow: string;
-    title: ReactNode;
-    aria: string;
-    programas: string;
-    recursos: string;
-    codigoYConfigs: string;
-    motor: string;
-    unProgramaCorriendo: string;
-    comportamiento: string;
-    thMotor: string;
-    thCorre: string;
-    filas: [[string, string], [string, string], [string, string], [string, string]];
-  };
-  gameEngines: {
-    eyebrow: string;
-    title: ReactNode;
-    aria: string;
-    caption: string;
-    recursos: string;
-    recursosDeJuego: string;
-    usan: string;
-    configuraciones: string;
-    configsDeJuego: string;
-    codigo: string;
-    scriptsGameplay: string;
-    gameEngine: string;
-    losCorreJuntos: string;
-    elJuego: string;
-  };
-  audioEngines: {
-    eyebrow: string;
-    title: ReactNode;
-    aria: string;
-    caption: string;
-    recursosDeAudio: string;
-    configsDeAudioLinea1: string;
-    configsDeAudioLinea2: string;
-    tracksBusesEvents: string;
-    soundEngine: string;
-    losCorre: string;
-    audio: string;
-  };
+  queEsUnMotor: QueEsUnMotorTexts;
 };
 
 const es: MotorTexts = {
@@ -109,8 +81,11 @@ const es: MotorTexts = {
     intro: 'intro',
     lenguajes: 'lenguajes',
     compilados: 'compilados',
+    elOs: 'el OS',
     interpretados: 'interpretados',
     queEsUnMotor: 'qué es un motor',
+    navegador: 'navegador',
+    python: 'python',
     gameEngines: 'game engines',
     audioEngines: 'audio engines',
   },
@@ -125,36 +100,29 @@ const es: MotorTexts = {
     ),
     hint: 'Navega con ← → · espacio',
   },
-  lenguajes: {
-    eyebrow: 'Concepto 1',
-    title: (
+  compilados: {
+    eyebrow: 'Programas compilados',
+    titles: [
       <>
         Programas compilados <span className={s.teal}>vs</span> interpretados
-      </>
-    ),
-    aria: 'Un programa compilado se traduce una vez a binario (juego.exe) antes de correr; un programa interpretado sigue siendo texto y alguien tiene que leerlo en vivo.',
-    caption: 'Traducido una vez, antes — o leído en vivo, cada vez.',
-    compilado: 'COMPILADO',
+      </>,
+      <>
+        Tu código se compila: <span className={s.accent}>se vuelve binario</span>
+      </>,
+      <>
+        Y a los <span className={s.accent}>compilados</span> los corre <span className={s.accent}>el OS</span>
+      </>,
+    ],
+    arias: [
+      'Solo el título: programas compilados vs interpretados.',
+      'Una pila vertical: juego.c es texto, el compilador lo traduce una vez antes de correr y sale juego.exe en binario.',
+      'La misma pila con dos pisos más abajo: el OS lanza el binario juego.exe y la CPU lo ejecuta tal cual, con instrucciones directas.',
+    ],
+    caption: 'El binario ya habla idioma de máquina — nadie lo traduce en runtime.',
     texto: 'texto',
     compilador: 'COMPILADOR',
     unaVez: 'una vez · antes de correr',
     binario: '0110 1001 · binario',
-    listoParaLaCpu: 'listo para la CPU',
-    interpretado: 'INTERPRETADO',
-    noSeTraduce: 'no se traduce',
-    sigueSiendoTexto: 'sigue siendo texto',
-    quienLoLee: '¿quién lo lee entonces?',
-  },
-  compilados: {
-    eyebrow: 'Concepto 2',
-    title: (
-      <>
-        A los compilados los corre <span className={s.accent}>el OS</span>
-      </>
-    ),
-    aria: 'El binario juego.exe corre sobre el OS y el OS sobre la CPU; el OS solo lanza el binario, que ya habla el idioma de la máquina.',
-    caption: 'El binario ya habla idioma de máquina — nadie lo traduce en runtime.',
-    binarioCompilado: '0110 1001 · binario compilado',
     elOsLoLanza: 'el OS solo lo lanza',
     os: 'OS',
     sistemas: 'Windows · macOS · Linux',
@@ -163,13 +131,13 @@ const es: MotorTexts = {
     ejecutaTalCual: 'ejecuta el binario tal cual',
   },
   interpretados: {
-    eyebrow: 'Concepto 3',
+    eyebrow: 'Programas interpretados',
     title: (
       <>
-        A los interpretados los corre <span className={s.accent}>un motor</span>
+        A los <span className={s.accent}>interpretados</span> los corre <span className={s.accent}>un motor</span>
       </>
     ),
-    aria: 'El mismo stack anterior con un piso nuevo: el script corre sobre un motor, el motor sobre el OS y el OS sobre la CPU.',
+    aria: 'La pila del slide anterior sale por la izquierda y entra por la derecha una nueva con OS y CPU en el mismo lugar; arriba, el script player.gd corre sobre un motor, y el motor sobre el OS.',
     caption: 'La CPU nunca ve tu script: ve al motor leyéndolo.',
     texto: 'texto',
     elMotorLoLee: 'el motor lo lee en vivo',
@@ -178,66 +146,84 @@ const es: MotorTexts = {
     elOsCorreAlMotor: 'el OS corre al motor',
   },
   queEsUnMotor: {
-    eyebrow: 'Concepto 4 · la definición',
-    title: (
-      <>
-        Un motor es un programa que corre
-        <br />
-        para <span className={s.accent}>correr programas</span>
-      </>
-    ),
-    aria: 'El motor recibe programas, programados o configurados, hechos de recursos, código y configuraciones, y produce comportamiento.',
-    programas: 'programas programados/configurados',
-    recursos: 'recursos',
-    codigoYConfigs: ' · código · configuraciones',
-    motor: 'MOTOR',
+    eyebrow: 'Definición de motor y ejemplos',
+    pasos: [
+      {
+        title: (
+          <>
+            Un <span className={s.accent}>motor</span> es un programa que corre
+            <br />
+            para <span className={s.accent}>correr programas</span>
+          </>
+        ),
+        aria: 'El motor recibe programas, programados o configurados, hechos de recursos, código y configuraciones, y produce comportamiento. Debajo, una tabla vacía de motor y qué corre.',
+        entrada: 'programas programados/configurados',
+        entradaSub: 'recursos · código · configuraciones',
+        motor: 'MOTOR',
+      },
+      {
+        title: (
+          <>
+            Un <span className={s.accent}>navegador web</span> es un programa que corre
+            <br />
+            <span className={s.accent}>páginas web</span> (html + css)
+          </>
+        ),
+        aria: 'El mismo diagrama con un ejemplo: las páginas web, hechas de imágenes, html y css, entran al navegador web, que las corre y produce comportamiento. La tabla llena la fila del navegador.',
+        entrada: 'PÁGINAS WEB',
+        entradaSub: 'imágenes · html · css',
+        motor: 'NAVEGADOR WEB',
+      },
+      {
+        title: (
+          <>
+            <span className={s.accent}>Python</span> es un programa que corre
+            <br />
+            <span className={s.accent}>scripts .py</span>
+          </>
+        ),
+        aria: 'El mismo diagrama con otro ejemplo: los scripts .py, archivos de texto con sus datos, entran a Python, que los corre y produce comportamiento. La tabla llena la fila de Python.',
+        entrada: 'SCRIPTS .PY',
+        entradaSub: 'archivos de texto · datos',
+        motor: 'PYTHON',
+      },
+      {
+        title: (
+          <>
+            Un <span className={s.accent}>game engine</span> es un programa que corre
+            <br />
+            <span className={s.accent}>escenas + scripts</span>
+          </>
+        ),
+        aria: 'El mismo diagrama con otro ejemplo: las escenas y los scripts, con sus texturas, modelos y audios, entran al game engine, que los corre y produce comportamiento. La tabla llena la fila de Unreal / Godot.',
+        entrada: 'ESCENAS + SCRIPTS',
+        entradaSub: 'texturas · modelos · audios',
+        motor: 'GAME ENGINE',
+      },
+      {
+        title: (
+          <>
+            <span className={s.accent}>Wwise</span> es un programa que corre
+            <br />
+            <span className={s.accent}>Wwise objects</span>
+          </>
+        ),
+        aria: 'El mismo diagrama con el último ejemplo: los Wwise objects, con sus canciones, sonidos y voces, entran al sound engine, que los corre y produce comportamiento. La tabla llena la fila de Wwise.',
+        entrada: 'WWISE OBJECTS',
+        entradaSub: 'canciones · sonidos · voces',
+        motor: 'SOUND ENGINE',
+      },
+    ],
     unProgramaCorriendo: 'un programa corriendo',
     comportamiento: 'comportamiento',
     thMotor: 'Motor',
     thCorre: 'Corre',
     filas: [
-      ['navegador', 'HTML + JS'],
+      ['navegador web', 'páginas web (html + css)'],
       ['Python', 'scripts .py'],
       ['Unreal / Godot', 'escenas + scripts'],
       ['Wwise', 'Wwise objects'],
     ],
-  },
-  gameEngines: {
-    eyebrow: 'Concepto 5',
-    title: (
-      <>
-        Un game engine corre <span className={s.accent}>configs y código</span>
-      </>
-    ),
-    aria: 'Los recursos, externos y arriba, alimentan a las configuraciones y al código; el game engine corre todo junto y produce el juego.',
-    caption: 'Configuras y programas; el engine junta todo con los recursos y lo corre.',
-    recursos: 'RECURSOS',
-    recursosDeJuego: 'texturas · modelos · audios',
-    usan: 'usan',
-    configuraciones: 'CONFIGURACIONES',
-    configsDeJuego: 'escenas · maps · prefabs',
-    codigo: 'CÓDIGO',
-    scriptsGameplay: 'scripts · gameplay',
-    gameEngine: 'GAME ENGINE',
-    losCorreJuntos: 'los corre juntos',
-    elJuego: 'el juego',
-  },
-  audioEngines: {
-    eyebrow: 'Concepto 6',
-    title: (
-      <>
-        El motor de audio: <span className={s.accent}>mismo patrón</span>
-      </>
-    ),
-    aria: 'El diagrama del game engine se reduce: quedan los recursos —canciones, sonidos y voces— alimentando las configuraciones de sonido interactivo, y el sound engine que las corre y produce el audio.',
-    caption: 'Mismo patrón: recursos afuera, sonido configurado, un engine que lo corre.',
-    recursosDeAudio: 'canciones · sonidos · voces',
-    configsDeAudioLinea1: 'Configuraciones de',
-    configsDeAudioLinea2: 'Sonido Interactivo',
-    tracksBusesEvents: 'tracks · buses · events',
-    soundEngine: 'SOUND ENGINE',
-    losCorre: 'los corre',
-    audio: 'audio',
   },
 };
 
@@ -248,8 +234,11 @@ const en: MotorTexts = {
     intro: 'intro',
     lenguajes: 'languages',
     compilados: 'compiled',
+    elOs: 'the OS',
     interpretados: 'interpreted',
     queEsUnMotor: 'what is an engine',
+    navegador: 'browser',
+    python: 'python',
     gameEngines: 'game engines',
     audioEngines: 'audio engines',
   },
@@ -264,36 +253,29 @@ const en: MotorTexts = {
     ),
     hint: 'Navigate with ← → · space',
   },
-  lenguajes: {
-    eyebrow: 'Concept 1',
-    title: (
+  compilados: {
+    eyebrow: 'Compiled programs',
+    titles: [
       <>
         Compiled <span className={s.teal}>vs</span> interpreted programs
-      </>
-    ),
-    aria: 'A compiled program is translated once into binary (juego.exe) before running; an interpreted program stays as text and someone has to read it live.',
-    caption: 'Translated once, beforehand — or read live, every time.',
-    compilado: 'COMPILED',
+      </>,
+      <>
+        Your code gets compiled: <span className={s.accent}>it becomes binary</span>
+      </>,
+      <>
+        And <span className={s.accent}>compiled</span> programs are run by <span className={s.accent}>the OS</span>
+      </>,
+    ],
+    arias: [
+      'Only the title: compiled vs interpreted programs.',
+      'A vertical stack: juego.c is text, the compiler translates it once before running and out comes juego.exe in binary.',
+      'The same stack with two more floors below: the OS launches the binary juego.exe and the CPU runs it as is, with direct instructions.',
+    ],
+    caption: 'The binary already speaks machine language — nobody translates it at runtime.',
     texto: 'text',
     compilador: 'COMPILER',
     unaVez: 'once · before running',
     binario: '0110 1001 · binary',
-    listoParaLaCpu: 'ready for the CPU',
-    interpretado: 'INTERPRETED',
-    noSeTraduce: 'not translated',
-    sigueSiendoTexto: 'still just text',
-    quienLoLee: 'so who reads it?',
-  },
-  compilados: {
-    eyebrow: 'Concept 2',
-    title: (
-      <>
-        Compiled programs are run by <span className={s.accent}>the OS</span>
-      </>
-    ),
-    aria: 'The binary juego.exe runs on the OS and the OS on the CPU; the OS just launches the binary, which already speaks the language of the machine.',
-    caption: 'The binary already speaks machine language — nobody translates it at runtime.',
-    binarioCompilado: '0110 1001 · compiled binary',
     elOsLoLanza: 'the OS just launches it',
     os: 'OS',
     sistemas: 'Windows · macOS · Linux',
@@ -302,13 +284,13 @@ const en: MotorTexts = {
     ejecutaTalCual: 'runs the binary as is',
   },
   interpretados: {
-    eyebrow: 'Concept 3',
+    eyebrow: 'Interpreted programs',
     title: (
       <>
-        Interpreted programs are run by <span className={s.accent}>an engine</span>
+        <span className={s.accent}>Interpreted</span> programs are run by <span className={s.accent}>an engine</span>
       </>
     ),
-    aria: 'The same stack as before with a new floor: the script runs on an engine, the engine on the OS and the OS on the CPU.',
+    aria: 'The previous stack leaves to the left and a new one enters from the right with the OS and the CPU in the same place; on top, the script player.gd runs on an engine, and the engine on the OS.',
     caption: 'The CPU never sees your script: it sees the engine reading it.',
     texto: 'text',
     elMotorLoLee: 'the engine reads it live',
@@ -317,66 +299,84 @@ const en: MotorTexts = {
     elOsCorreAlMotor: 'the OS runs the engine',
   },
   queEsUnMotor: {
-    eyebrow: 'Concept 4 · the definition',
-    title: (
-      <>
-        An engine is a program that runs
-        <br />
-        to <span className={s.accent}>run programs</span>
-      </>
-    ),
-    aria: 'The engine receives programs, programmed or configured, made of resources, code and configurations, and produces behavior.',
-    programas: 'programmed/configured programs',
-    recursos: 'resources',
-    codigoYConfigs: ' · code · configurations',
-    motor: 'ENGINE',
+    eyebrow: 'Definition of engine and examples',
+    pasos: [
+      {
+        title: (
+          <>
+            An <span className={s.accent}>engine</span> is a program that runs
+            <br />
+            to <span className={s.accent}>run programs</span>
+          </>
+        ),
+        aria: 'The engine receives programs, programmed or configured, made of resources, code and configurations, and produces behavior. Below, an empty table of engine and what it runs.',
+        entrada: 'programmed/configured programs',
+        entradaSub: 'resources · code · configurations',
+        motor: 'ENGINE',
+      },
+      {
+        title: (
+          <>
+            A <span className={s.accent}>web browser</span> is a program that runs
+            <br />
+            <span className={s.accent}>web pages</span> (html + css)
+          </>
+        ),
+        aria: 'The same diagram with an example: web pages, made of images, html and css, go into the web browser, which runs them and produces behavior. The table fills the browser row.',
+        entrada: 'WEB PAGES',
+        entradaSub: 'images · html · css',
+        motor: 'WEB BROWSER',
+      },
+      {
+        title: (
+          <>
+            <span className={s.accent}>Python</span> is a program that runs
+            <br />
+            <span className={s.accent}>.py scripts</span>
+          </>
+        ),
+        aria: 'The same diagram with another example: .py scripts, text files with their data, go into Python, which runs them and produces behavior. The table fills the Python row.',
+        entrada: '.PY SCRIPTS',
+        entradaSub: 'text files · data',
+        motor: 'PYTHON',
+      },
+      {
+        title: (
+          <>
+            A <span className={s.accent}>game engine</span> is a program that runs
+            <br />
+            <span className={s.accent}>scenes + scripts</span>
+          </>
+        ),
+        aria: 'The same diagram with another example: scenes and scripts, with their textures, models and audio, go into the game engine, which runs them and produces behavior. The table fills the Unreal / Godot row.',
+        entrada: 'SCENES + SCRIPTS',
+        entradaSub: 'textures · models · audio',
+        motor: 'GAME ENGINE',
+      },
+      {
+        title: (
+          <>
+            <span className={s.accent}>Wwise</span> is a program that runs
+            <br />
+            <span className={s.accent}>Wwise objects</span>
+          </>
+        ),
+        aria: 'The same diagram with the last example: Wwise objects, with their songs, sounds and voices, go into the sound engine, which runs them and produces behavior. The table fills the Wwise row.',
+        entrada: 'WWISE OBJECTS',
+        entradaSub: 'songs · sounds · voices',
+        motor: 'SOUND ENGINE',
+      },
+    ],
     unProgramaCorriendo: 'a running program',
     comportamiento: 'behavior',
     thMotor: 'Engine',
     thCorre: 'Runs',
     filas: [
-      ['browser', 'HTML + JS'],
+      ['web browser', 'web pages (html + css)'],
       ['Python', '.py scripts'],
       ['Unreal / Godot', 'scenes + scripts'],
       ['Wwise', 'Wwise objects'],
     ],
-  },
-  gameEngines: {
-    eyebrow: 'Concept 5',
-    title: (
-      <>
-        A game engine runs <span className={s.accent}>configs and code</span>
-      </>
-    ),
-    aria: 'The resources, external and on top, feed the configurations and the code; the game engine runs everything together and produces the game.',
-    caption: 'You configure and code; the engine joins it all with the resources and runs it.',
-    recursos: 'RESOURCES',
-    recursosDeJuego: 'textures · models · audio',
-    usan: 'use',
-    configuraciones: 'CONFIGURATIONS',
-    configsDeJuego: 'scenes · maps · prefabs',
-    codigo: 'CODE',
-    scriptsGameplay: 'scripts · gameplay',
-    gameEngine: 'GAME ENGINE',
-    losCorreJuntos: 'runs them together',
-    elJuego: 'the game',
-  },
-  audioEngines: {
-    eyebrow: 'Concept 6',
-    title: (
-      <>
-        The audio engine: <span className={s.accent}>same pattern</span>
-      </>
-    ),
-    aria: 'The game engine diagram shrinks: the resources —songs, sounds and voices— remain, feeding the interactive sound configurations, and the sound engine that runs them and produces the audio.',
-    caption: 'Same pattern: resources outside, configured sound, an engine that runs it.',
-    recursosDeAudio: 'songs · sounds · voices',
-    configsDeAudioLinea1: 'Interactive Sound',
-    configsDeAudioLinea2: 'Configurations',
-    tracksBusesEvents: 'tracks · buses · events',
-    soundEngine: 'SOUND ENGINE',
-    losCorre: 'runs them',
-    audio: 'audio',
   },
 };
 

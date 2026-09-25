@@ -13,17 +13,11 @@ type WwisePorAdentroTexts = {
     title: ReactNode;
     aria: string;
     caption: string;
-    recursos: string;
+    wwiseObjects: string;
     recursosDeAudio: string;
-    usan: string;
     soundEngine: string;
     losCorre: string;
     audio: string;
-    configsDeAudioLinea1: string;
-    configsDeAudioLinea2: string;
-    tracksBusesEvents: string;
-    wwiseObject: string;
-    segmentsContainersEvents: string;
     soundBanks: string;
   };
   puntaAPunta: {
@@ -67,19 +61,13 @@ const es: WwisePorAdentroTexts = {
         Wwise: <span className={s.accent}>el mismo patrón</span>
       </>
     ),
-    aria: 'Los recursos —canciones, sonidos y voces— alimentan a los Wwise objects; de ahí salen SoundBanks que el sound engine corre para producir el audio.',
+    aria: 'Los Wwise objects, con sus canciones, sonidos y voces, entran como SoundBanks al sound engine, que los corre y produce el audio.',
     caption: 'Mismo patrón: recursos afuera, objects configurados, un engine que los corre.',
-    recursos: 'RECURSOS',
+    wwiseObjects: 'WWISE OBJECTS',
     recursosDeAudio: 'canciones · sonidos · voces',
-    usan: 'usan',
     soundEngine: 'SOUND ENGINE',
     losCorre: 'los corre',
     audio: 'audio',
-    configsDeAudioLinea1: 'Configuraciones de',
-    configsDeAudioLinea2: 'Sonido Interactivo',
-    tracksBusesEvents: 'tracks · buses · events',
-    wwiseObject: 'WWISE OBJECT',
-    segmentsContainersEvents: 'segments · containers · events',
     soundBanks: 'SoundBanks',
   },
   puntaAPunta: {
@@ -127,19 +115,13 @@ const en: WwisePorAdentroTexts = {
         Wwise: <span className={s.accent}>the same pattern</span>
       </>
     ),
-    aria: 'The resources —songs, sounds and voices— feed the Wwise objects; from there come SoundBanks that the sound engine runs to produce the audio.',
+    aria: 'The Wwise objects, with their songs, sounds and voices, go as SoundBanks into the sound engine, which runs them and produces the audio.',
     caption: 'Same pattern: resources outside, configured objects, an engine that runs them.',
-    recursos: 'RESOURCES',
+    wwiseObjects: 'WWISE OBJECTS',
     recursosDeAudio: 'songs · sounds · voices',
-    usan: 'use',
     soundEngine: 'SOUND ENGINE',
     losCorre: 'runs them',
     audio: 'audio',
-    configsDeAudioLinea1: 'Interactive Sound',
-    configsDeAudioLinea2: 'Configurations',
-    tracksBusesEvents: 'tracks · buses · events',
-    wwiseObject: 'WWISE OBJECT',
-    segmentsContainersEvents: 'segments · containers · events',
     soundBanks: 'SoundBanks',
   },
   puntaAPunta: {

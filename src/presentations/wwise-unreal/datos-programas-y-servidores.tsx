@@ -1,140 +1,207 @@
+import type { CSSProperties, ReactNode } from 'react';
 import Deck, { Slide, useSlideStep } from '../../components/learn/Deck';
 import s from '../../components/learn/Deck.module.css';
 import { useT } from '../../i18n/useT';
 import { datosDict } from './datos-programas-y-servidores.dict';
 import type {
   ArranqueTexts,
+  BibliotecaTexts,
   EscenaArranqueTexts,
   MaquinaTexts,
-  RotulosBibliotecaTexts,
-  RotulosComputadorTexts,
+  RotulosBackendTexts,
   RotulosPeticionTexts,
 } from './datos-programas-y-servidores.dict';
 
-const SHELF_XS: number[] = [40, 330, 620];
-const SHELF_SPINE_OFFSETS: number[] = [14, 34, 50, 72, 92, 112, 130, 152, 170, 192, 212, 232, 246];
-const SHELF_SPINES_D: string = SHELF_XS.map((shelfX) =>
-  SHELF_SPINE_OFFSETS.map((offset) => `M ${shelfX + offset} 36 V 54 M ${shelfX + offset} 60 V 78`).join(' ')
-).join(' ');
+const PIEZAS_BASE: string = '/assets/presentations/wwise-unreal/';
 
-/* Libros cerrados en las puntas de la mesa: lejos de los abiertos del centro. */
-const LIBROS_CERRADOS_XY: [number, number][] = [
-  [66, 232],
-  [101, 232],
-  [66, 282],
-  [101, 282],
-  [785, 232],
-  [820, 232],
-  [785, 282],
-  [820, 282],
-];
+type Pieza = { archivo: string; x: number; y: number; width: number; height: number };
 
-function LibroCerrado({ x, y }: { x: number; y: number }) {
-  return (
-    <g>
-      <rect x={x} y={y} width="30" height="20" rx="3" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-      <line x1={x + 6} y1={y} x2={x + 6} y2={y + 20} stroke="#63b6a4" strokeWidth="1.5" />
-    </g>
-  );
+/* Recortes del PNG de la analogía (escala 0.5). Cada pieza del computador
+   ocupa la casilla de su pieza de biblioteca, centrada en ella. */
+const PIEZAS: Record<string, Pieza> = {
+  estanterias: { archivo: 'biblioteca-estanterias.png', x: 275, y: 8, width: 370, height: 119 },
+  discos: { archivo: 'computador-discos.png', x: 292, y: 8, width: 335, height: 119 },
+  mesaIzquierda: { archivo: 'biblioteca-mesa-izquierda.png', x: 153, y: 178, width: 93, height: 233 },
+  ramIzquierda: { archivo: 'computador-ram-izquierda.png', x: 164, y: 178, width: 72, height: 233 },
+  mesaCentral: { archivo: 'biblioteca-mesa-central.png', x: 382, y: 178, width: 155, height: 233 },
+  cpu: { archivo: 'computador-cpu.png', x: 366, y: 178, width: 188, height: 233 },
+  mesaDerecha: { archivo: 'biblioteca-mesa-derecha.png', x: 674, y: 178, width: 93, height: 233 },
+  ramDerecha: { archivo: 'computador-ram-derecha.png', x: 684, y: 178, width: 72, height: 233 },
+};
+
+function Imagen({ pieza }: { pieza: Pieza }) {
+  return <image href={PIEZAS_BASE + pieza.archivo} x={pieza.x} y={pieza.y} width={pieza.width} height={pieza.height} />;
 }
 
-function LibroAbierto({ x, y }: { x: number; y: number }) {
-  return (
-    <g>
-      <path d={`M ${x + 16} ${y + 2} L ${x + 16} ${y + 24}`} stroke="#f2a33c" strokeWidth="1.5" />
-      <path d={`M ${x} ${y + 4} Q ${x + 8} ${y} ${x + 16} ${y + 3} V ${y + 24} Q ${x + 8} ${y + 21} ${x} ${y + 25} Z`} fill="#232730" stroke="#f2a33c" strokeWidth="1.5" strokeLinejoin="round" />
-      <path d={`M ${x + 32} ${y + 4} Q ${x + 24} ${y} ${x + 16} ${y + 3} V ${y + 24} Q ${x + 24} ${y + 21} ${x + 32} ${y + 25} Z`} fill="#232730" stroke="#f2a33c" strokeWidth="1.5" strokeLinejoin="round" />
-      <path d={`M ${x + 4} ${y + 10} h 8 M ${x + 4} ${y + 15} h 8 M ${x + 20} ${y + 10} h 8 M ${x + 20} ${y + 15} h 8`} stroke="currentColor" strokeOpacity=".4" strokeWidth="1" />
-    </g>
-  );
-}
-
-/* Persona sentada a la mesa, vista de frente: una carita. */
-function Cara({ cx, cy }: { cx: number; cy: number }) {
-  return (
-    <g>
-      <circle cx={cx} cy={cy} r="16" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-      <circle cx={cx - 5.5} cy={cy - 4} r="1.8" fill="#f2a33c" />
-      <circle cx={cx + 5.5} cy={cy - 4} r="1.8" fill="#f2a33c" />
-      <path d={`M ${cx - 6} ${cy + 4} Q ${cx} ${cy + 10} ${cx + 6} ${cy + 4}`} fill="none" stroke="#f2a33c" strokeWidth="1.5" strokeLinecap="round" />
-    </g>
-  );
-}
-
-/* Geometría compartida por los dos slides (el z="=" hace morph sobre ella);
-   los textos van aparte porque son lo único que cruza de dominio. */
-function EscenaBiblioteca({ markerPrefix }: { markerPrefix: string }) {
+/* Rótulo de velocidad partido en dos líneas alrededor de la flecha horizontal. */
+function RotuloVelocidad({ x, texto }: { x: number; texto: string }) {
+  const [arriba, abajo] = texto.split(' · ');
   return (
     <>
-      <defs>
-        <marker id={markerPrefix} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M0,0 L10,5 L0,10 z" fill="#f2a33c" />
-        </marker>
-        <marker id={`${markerPrefix}t`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M0,0 L10,5 L0,10 z" fill="#63b6a4" />
-        </marker>
-      </defs>
+      <text x={x} y="284" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{arriba}</text>
+      <text x={x} y="312" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{abajo}</text>
+    </>
+  );
+}
 
-      {SHELF_XS.map((shelfX) => (
-        <g key={shelfX}>
-          <rect x={shelfX} y="30" width="260" height="52" rx="6" fill="#1d2026" stroke="#63b6a4" />
-          <line x1={shelfX} y1="56" x2={shelfX + 260} y2="56" stroke="#63b6a4" strokeOpacity=".6" />
+/* Una casilla de la analogía. En el paso 1 la pieza de biblioteca se desvanece
+   y la del computador entra (deslizándose desde `glideFrom` si se indica); los
+   grupos llevan delays distintos y solapados para que el cruce sea rápido. */
+function GrupoAnalogia({
+  paso,
+  delay,
+  glideFrom,
+  biblioteca,
+  computador,
+}: {
+  paso: number;
+  delay: string;
+  glideFrom?: string;
+  biblioteca: ReactNode;
+  computador: ReactNode;
+}) {
+  if (paso === 0) return <>{biblioteca}</>;
+  const entrada = (
+    <g className={s.morphIn} style={{ animationDelay: delay }}>
+      {computador}
+    </g>
+  );
+  return (
+    <>
+      <g className={s.morphOut} style={{ animationDelay: delay }}>
+        {biblioteca}
+      </g>
+      {glideFrom ? (
+        <g className={s.morphGlide} style={{ animationDelay: delay, '--morph-from': glideFrom } as CSSProperties}>
+          {entrada}
         </g>
-      ))}
-      <path d={SHELF_SPINES_D} fill="none" stroke="#63b6a4" strokeOpacity=".45" strokeWidth="1.5" />
-      <line x1="170" y1="82" x2="170" y2="186" stroke="#63b6a4" strokeWidth="2" markerEnd={`url(#${markerPrefix}t)`} />
-
-      <rect x="40" y="192" width="840" height="140" rx="12" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-      {LIBROS_CERRADOS_XY.map(([x, y]) => (
-        <LibroCerrado key={`${x}-${y}`} x={x} y={y} />
-      ))}
-
-      <line x1="138" y1="262" x2="364" y2="262" stroke="#f2a33c" strokeWidth="2" markerEnd={`url(#${markerPrefix})`} />
-      <rect x="370" y="228" width="180" height="68" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-      <LibroAbierto x={382} y={248} />
-
-      <Cara cx={460} cy={150} />
-      <Cara cx={460} cy={380} />
-      <line x1="460" y1="224" x2="460" y2="172" stroke="#f2a33c" strokeWidth="2" markerEnd={`url(#${markerPrefix})`} />
-      <line x1="460" y1="300" x2="460" y2="358" stroke="#f2a33c" strokeWidth="2" markerEnd={`url(#${markerPrefix})`} />
+      ) : (
+        entrada
+      )}
     </>
   );
 }
 
-function RotulosBiblioteca({ r }: { r: RotulosBibliotecaTexts }) {
+/* Un solo slide con dos pasos: la biblioteca y, al avanzar, el computador. */
+function FiguraBiblioteca({ r }: { r: BibliotecaTexts }) {
+  const paso = useSlideStep();
+  const b = r.biblioteca;
+  const c = r.computador;
   return (
-    <>
-      <text x="40" y="20" fontSize="12" fill="#63b6a4">{r.estanterias}</text>
-      <text x="880" y="20" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="end">{r.todasLasMaterias}</text>
-      <text x="182" y="140" fontSize="10.5" fill="#63b6a4">{r.levantarse}</text>
-      <text x="56" y="212" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.laMesa}</text>
-      <text x="251" y="252" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.alcanzar}</text>
-      <text x="474" y="256" fontSize="12" fill="#f2a33c" textAnchor="middle">{r.librosAbiertos}</text>
-      <text x="474" y="274" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.materiaActual}</text>
-      <text x="474" y="186" fontSize="10.5" fill="#f2a33c">{r.leer}</text>
-    </>
+    <figure>
+      <svg viewBox="0 0 920 455" role="img" aria-label={r.arias[paso]}>
+        <defs>
+          <marker id="arrD1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#f2a33c" />
+          </marker>
+          <marker id="arrD1t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#63b6a4" />
+          </marker>
+        </defs>
+
+        <line x1="460" y1="152" x2="460" y2="172" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrD1t)" />
+        <line x1="254" y1="295" x2="350" y2="295" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD1)" />
+        <line x1="666" y1="295" x2="570" y2="295" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD1)" />
+
+        <GrupoAnalogia
+          paso={paso}
+          delay="0s"
+          biblioteca={
+            <>
+              <Imagen pieza={PIEZAS.mesaCentral} />
+              <text x="455" y="430" fontSize="12" fill="#f2a33c" textAnchor="end">{b.librosAbiertos}</text>
+              <text x="465" y="430" fontSize="10.5" fill="currentColor" opacity=".6">{b.materiaActual}</text>
+              <text x="460" y="446" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{b.leer}</text>
+            </>
+          }
+          computador={
+            <>
+              <Imagen pieza={PIEZAS.cpu} />
+              <text x="455" y="430" fontSize="12" fill="#f2a33c" textAnchor="end">{c.cpu} · {c.cache}</text>
+              <text x="465" y="430" fontSize="10.5" fill="currentColor" opacity=".6">{c.loQueUsas}</text>
+              <text x="460" y="446" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{c.leerCache}</text>
+            </>
+          }
+        />
+
+        <GrupoAnalogia
+          paso={paso}
+          delay="0.25s"
+          glideFrom="translateX(-40px)"
+          biblioteca={
+            <>
+              <Imagen pieza={PIEZAS.mesaIzquierda} />
+              <text x="200" y="430" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2" textAnchor="middle">{b.laMesa}</text>
+              <RotuloVelocidad x={302} texto={b.alcanzar} />
+            </>
+          }
+          computador={
+            <>
+              <Imagen pieza={PIEZAS.ramIzquierda} />
+              <text x="200" y="430" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2" textAnchor="middle">{c.ram}</text>
+              <RotuloVelocidad x={302} texto={c.traer} />
+            </>
+          }
+        />
+
+        <GrupoAnalogia
+          paso={paso}
+          delay="0.25s"
+          glideFrom="translateX(40px)"
+          biblioteca={
+            <>
+              <Imagen pieza={PIEZAS.mesaDerecha} />
+              <text x="720" y="430" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2" textAnchor="middle">{b.laMesa}</text>
+              <RotuloVelocidad x={618} texto={b.alcanzar} />
+            </>
+          }
+          computador={
+            <>
+              <Imagen pieza={PIEZAS.ramDerecha} />
+              <text x="720" y="430" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2" textAnchor="middle">{c.ram}</text>
+              <RotuloVelocidad x={618} texto={c.traer} />
+            </>
+          }
+        />
+
+        <GrupoAnalogia
+          paso={paso}
+          delay="0.5s"
+          glideFrom="translateY(-30px)"
+          biblioteca={
+            <>
+              <Imagen pieza={PIEZAS.estanterias} />
+              <text x="275" y="145" fontSize="12" fill="#63b6a4">{b.estanterias}</text>
+              <text x="645" y="145" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="end">{b.todasLasMaterias}</text>
+              <text x="470" y="166" fontSize="10.5" fill="#63b6a4">{b.levantarse}</text>
+            </>
+          }
+          computador={
+            <>
+              <Imagen pieza={PIEZAS.discos} />
+              <text x="275" y="145" fontSize="12" fill="#63b6a4">{c.discoDuro}</text>
+              <text x="645" y="145" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="end">{c.todosLosDatos}</text>
+              <text x="470" y="166" fontSize="10.5" fill="#63b6a4">{c.cargar}</text>
+            </>
+          }
+        />
+      </svg>
+      <figcaption>{r.caption}</figcaption>
+    </figure>
   );
 }
 
-function RotulosComputador({ r }: { r: RotulosComputadorTexts }) {
+/* Énfasis al entrar el slide: aparece y pulsa, con el delay de su turno. */
+function Resalte({ delay, children }: { delay: string; children: ReactNode }) {
   return (
-    <>
-      <text x="40" y="20" fontSize="12" fill="#63b6a4">{r.discoDuro}</text>
-      <text x="880" y="20" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="end">{r.todosLosDatos}</text>
-      <text x="182" y="140" fontSize="10.5" fill="#63b6a4">{r.cargar}</text>
-      <text x="56" y="212" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.ram}</text>
-      <text x="251" y="252" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.traer}</text>
-      <text x="474" y="256" fontSize="12" fill="#f2a33c" textAnchor="middle">{r.cache}</text>
-      <text x="474" y="274" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.loQueUsas}</text>
-      <text x="474" y="186" fontSize="10.5" fill="#f2a33c">{r.leerCache}</text>
-      <text x="484" y="154" fontSize="10.5" fill="#f2a33c">{r.cpu}</text>
-      <text x="484" y="384" fontSize="10.5" fill="#f2a33c">{r.cpu}</text>
-    </>
+    <g className={s.morphPulse} style={{ animationDelay: delay }}>
+      <g className={s.morphIn} style={{ animationDelay: delay }}>
+        {children}
+      </g>
+    </g>
   );
 }
 
-/* Geometría compartida por "el restaurante" y su morph "cliente-servidor";
-   los textos van aparte porque son lo único que cruza de dominio. */
 function EscenaPeticion({ markerPrefix }: { markerPrefix: string }) {
   return (
     <>
@@ -166,6 +233,52 @@ function RotulosPeticion({ r }: { r: RotulosPeticionTexts }) {
       <text x="431" y="124" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.peticionSub}</text>
       <text x="431" y="188" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.respuesta}</text>
       <text x="431" y="204" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.respuestaSub}</text>
+    </>
+  );
+}
+
+/* El cliente habla con un solo punto del backend (la API); adentro, la API
+   consulta a la autorización y a la base de datos. */
+function EscenaBackend({ r }: { r: RotulosBackendTexts }) {
+  return (
+    <>
+      <defs>
+        <marker id="arrD8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#f2a33c" />
+        </marker>
+        <marker id="arrD8t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#63b6a4" />
+        </marker>
+      </defs>
+
+      <rect x="40" y="110" width="180" height="80" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
+      <text x="130" y="145" fontSize="12" fill="currentColor" textAnchor="middle">{r.cliente}</text>
+      <text x="130" y="165" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.clienteSub}</text>
+
+      <rect x="330" y="20" width="570" height="260" rx="12" fill="#1d2026" stroke="#f2a33c" strokeWidth="2" />
+      <text x="350" y="46" fontSize="11.5" fill="#f2a33c" letterSpacing="2">{r.backend}</text>
+
+      <rect x="350" y="122" width="180" height="56" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
+      <text x="440" y="145" fontSize="12" fill="#f2a33c" textAnchor="middle">{r.api}</text>
+      <text x="440" y="163" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.apiSub}</text>
+
+      <rect x="700" y="60" width="180" height="56" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
+      <text x="790" y="83" fontSize="11" fill="currentColor" textAnchor="middle">{r.autorizacion}</text>
+      <text x="790" y="101" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.autorizacionSub}</text>
+
+      <rect x="700" y="190" width="180" height="56" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
+      <text x="790" y="213" fontSize="12" fill="currentColor" textAnchor="middle">{r.baseDeDatos}</text>
+      <text x="790" y="231" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.baseDeDatosSub}</text>
+
+      <path d="M 530 140 L 603 140 Q 615 140 615 128 L 615 100 Q 615 88 627 88 L 694 88" fill="none" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrD8t)" />
+      <text x="627" y="80" fontSize="10.5" fill="#63b6a4">{r.valida}</text>
+      <path d="M 530 160 L 603 160 Q 615 160 615 172 L 615 206 Q 615 218 627 218 L 694 218" fill="none" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrD8t)" />
+      <text x="627" y="236" fontSize="10.5" fill="#63b6a4">{r.busca}</text>
+
+      <line x1="220" y1="135" x2="344" y2="135" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD8)" />
+      <text x="282" y="125" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.pides}</text>
+      <line x1="350" y1="165" x2="228" y2="165" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD8)" />
+      <text x="282" y="183" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.recibes}</text>
     </>
   );
 }
@@ -216,96 +329,85 @@ function Maquina({ x, r, protagonista }: { x: number; r: MaquinaTexts; protagoni
   );
 }
 
-/* Escena del arranque en el celular. Cada paso del slide añade una pieza y
-   anima solo esa (las anteriores quedan estáticas); paso 3 además hace aparecer
-   soundbank_menus en la posición libre. */
-function EscenaArranque({ paso, markerPrefix, r }: { paso: number; markerPrefix: string; r: EscenaArranqueTexts }) {
-  const flecha = `url(#${markerPrefix})`;
+/* Copia del juego que se desliza desde su origen (`desdeX`) hasta `x`; solo se
+   anima en el paso en que aparece. */
+function CopiaJuego({ x, desdeX, sub, anima, r }: { x: number; desdeX: number; sub: string; anima: boolean; r: EscenaArranqueTexts }) {
+  const caja = (
+    <>
+      <rect x={x} y="140" width="160" height="50" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
+      <text x={x + 80} y="161" fontSize="12" fill="#f2a33c" textAnchor="middle">{r.juego}</text>
+      <text x={x + 80} y="179" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{sub}</text>
+    </>
+  );
+  if (!anima) return caja;
+  return (
+    <g className={s.morphGlide} style={{ animationDuration: '0.9s', '--morph-from': `translateX(${desdeX - x}px)` } as CSSProperties}>
+      {caja}
+    </g>
+  );
+}
+
+/* Instalar y abrir: paso 1 una copia del juego va del servidor al disco del
+   celular; paso 2 otra copia va del disco a la RAM. Los originales se quedan. */
+function EscenaArranque({ paso, r }: { paso: number; r: EscenaArranqueTexts }) {
   return (
     <>
       <defs>
-        <marker id={markerPrefix} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <marker id="arrD6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M0,0 L10,5 L0,10 z" fill="#f2a33c" />
         </marker>
       </defs>
 
-      <rect x="70" y="40" width="780" height="360" rx="12" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-      <text x="90" y="66" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.celular}</text>
+      <rect x="30" y="80" width="190" height="170" rx="8" fill="#1d2026" stroke="#63b6a4" />
+      <text x="45" y="102" fontSize="11.5" fill="#63b6a4" letterSpacing="2">{r.servidor}</text>
+      <text x="45" y="118" fontSize="10" fill="currentColor" opacity=".6">{r.servidorSub}</text>
+      <CopiaJuego x={45} desdeX={45} sub={r.instalado} anima={false} r={r} />
 
-      <rect x="95" y="90" width="270" height="290" rx="8" fill="#1d2026" stroke="#63b6a4" />
-      <text x="110" y="112" fontSize="11.5" fill="#63b6a4" letterSpacing="2">{r.disco}</text>
-      <rect x="110" y="125" width="240" height="240" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-      <text x="125" y="147" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.elJuego}</text>
-      <rect x="125" y="158" width="210" height="46" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-      <text x="230" y="176" fontSize="10.5" fill="currentColor" textAnchor="middle">{r.escenaMainEngine}</text>
-      <text x="230" y="193" fontSize="10.5" fill="currentColor" textAnchor="middle">{r.soundEngine}</text>
-      <rect x="125" y="216" width="210" height="28" rx="8" fill="#1d2026" stroke="#63b6a4" />
-      <text x="230" y="234" fontSize="10.5" fill="#63b6a4" textAnchor="middle">soundbank_init</text>
-      <rect x="125" y="252" width="210" height="32" rx="8" fill="#1d2026" stroke="#63b6a4" />
-      <text x="230" y="272" fontSize="10.5" fill="#63b6a4" textAnchor="middle">soundbank_menus</text>
-      <rect x="125" y="296" width="210" height="28" rx="8" fill="#1d2026" stroke="#63b6a4" />
-      <text x="230" y="314" fontSize="10.5" fill="#63b6a4" textAnchor="middle">soundbank_nivel_1</text>
+      <rect x="250" y="30" width="650" height="250" rx="12" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
+      <text x="270" y="56" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.celular}</text>
 
-      <rect x="555" y="90" width="270" height="290" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-      <text x="570" y="112" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.ram}</text>
-      <rect x="595" y="150" width="200" height="26" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-      <text x="695" y="167" fontSize="12" fill="#f2a33c" textAnchor="middle">{r.gameEngineRam}</text>
-      <rect x="595" y="184" width="200" height="26" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-      <text x="695" y="201" fontSize="12" fill="#f2a33c" textAnchor="middle">{r.escenaMainRam}</text>
-      <rect x="595" y="244" width="200" height="26" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-      <text x="695" y="261" fontSize="12" fill="#f2a33c" textAnchor="middle">{r.soundEngineRam}</text>
-      <rect x="595" y="278" width="200" height="26" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-      <text x="695" y="295" fontSize="10.5" fill="#f2a33c" textAnchor="middle">soundbank_init</text>
+      <rect x="280" y="80" width="280" height="170" rx="8" fill="#1d2026" stroke="#63b6a4" />
+      <text x="295" y="102" fontSize="11.5" fill="#63b6a4" letterSpacing="2">{r.disco}</text>
 
-      <rect x="595" y="336" width="200" height="30" rx="8" fill="none" stroke="currentColor" strokeOpacity=".35" strokeDasharray="6 6" />
+      <rect x="590" y="80" width="280" height="170" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
+      <text x="605" y="102" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.ram}</text>
 
       {paso >= 1 && (
-        <g className={paso === 1 ? s.morphIn : undefined}>
-          <line x1="650" y1="210" x2="650" y2="236" stroke="#f2a33c" strokeWidth="2" markerEnd={flecha} />
-          <text x="664" y="227" fontSize="10.5" fill="#f2a33c">{r.paso1}</text>
-        </g>
+        <>
+          <g className={paso === 1 ? s.morphIn : undefined}>
+            <line x1="220" y1="165" x2="272" y2="165" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD6)" />
+            <text x="246" y="153" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.instalas}</text>
+          </g>
+          <CopiaJuego x={340} desdeX={45} sub={r.instalado} anima={paso === 1} r={r} />
+        </>
       )}
 
       {paso >= 2 && (
-        <g className={paso === 2 ? s.morphIn : undefined}>
-          <line x1="595" y1="257" x2="343" y2="257" stroke="#f2a33c" strokeWidth="2" markerEnd={flecha} />
-          <text x="469" y="247" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.paso2}</text>
-        </g>
-      )}
-
-      {paso >= 3 ? (
         <>
           <g className={s.morphIn}>
-            <path d="M 335 276 L 556 276 Q 568 276 568 288 L 568 339 Q 568 351 580 351 L 587 351" fill="none" stroke="#f2a33c" strokeWidth="2" markerEnd={flecha} />
-            <text x="445" y="294" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.paso3}</text>
+            <line x1="560" y1="165" x2="582" y2="165" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD6)" />
+            <text x="571" y="153" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{r.abres}</text>
           </g>
-          <g className={s.morphOut} style={{ animationDelay: '0.6s' }}>
-            <text x="695" y="355" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.libre}</text>
-          </g>
-          <g className={s.morphPulse} style={{ animationDelay: '0.6s' }}>
-            <g className={s.morphIn} style={{ animationDelay: '0.6s' }}>
-              <rect x="595" y="336" width="200" height="30" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-              <text x="695" y="355" fontSize="10.5" fill="#f2a33c" textAnchor="middle">soundbank_menus</text>
-            </g>
-          </g>
+          <CopiaJuego x={650} desdeX={340} sub={r.corriendo} anima r={r} />
         </>
-      ) : (
-        <text x="695" y="355" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.libre}</text>
       )}
     </>
   );
 }
 
-/* Un solo slide con cuatro pasos; el paso actual lo da el Deck. */
-function FiguraArranque({ r }: { r: ArranqueTexts }) {
+/* Un slide con tres pasos cuyo título cambia al abrir el juego. */
+function ContenidoArranque({ r }: { r: ArranqueTexts }) {
   const paso = useSlideStep();
   return (
-    <figure>
-      <svg viewBox="0 0 920 420" role="img" aria-label={r.arias[paso]}>
-        <EscenaArranque paso={paso} markerPrefix="arrD6" r={r.escena} />
-      </svg>
-      <figcaption>{r.captions[paso]}</figcaption>
-    </figure>
+    <>
+      <h2>{r.titles[paso]}</h2>
+      <figure>
+        <svg viewBox="0 0 920 300" role="img" aria-label={r.arias[paso]}>
+          <EscenaArranque paso={paso} r={r.escena} />
+        </svg>
+        <figcaption>{r.caption}</figcaption>
+      </figure>
+    </>
   );
 }
 
@@ -320,34 +422,10 @@ export default function DatosProgramasYServidores() {
         <p className={s.note}>{t.cover.hint}</p>
       </Slide>
 
-      <Slide z="1" label={t.labels.biblioteca}>
+      <Slide z="1" label={[t.labels.biblioteca, t.labels.computador]} notes={t.biblioteca.notes}>
         <div className={s.eyebrow}>{t.biblioteca.eyebrow}</div>
         <h2>{t.biblioteca.title}</h2>
-        <figure>
-          <svg viewBox="0 0 920 410" role="img" aria-label={t.biblioteca.aria}>
-            <EscenaBiblioteca markerPrefix="arrD1" />
-            <RotulosBiblioteca r={t.biblioteca.rotulos} />
-          </svg>
-          <figcaption>{t.biblioteca.caption}</figcaption>
-        </figure>
-      </Slide>
-
-      <Slide z="=" label={t.labels.computador}>
-        <div className={s.eyebrow}>{t.computador.eyebrow}</div>
-        <h2>{t.computador.title}</h2>
-        <figure>
-          <svg viewBox="0 0 920 410" role="img" aria-label={t.computador.aria}>
-            <EscenaBiblioteca markerPrefix="arrD2" />
-            {/* Paso único, sin espera y más lento que el estándar: los rótulos cruzan de dominio */}
-            <g className={s.morphOut} style={{ animationDuration: '1.2s' }}>
-              <RotulosBiblioteca r={t.biblioteca.rotulos} />
-            </g>
-            <g className={s.morphIn} style={{ animationDuration: '1.2s' }}>
-              <RotulosComputador r={t.computador.rotulos} />
-            </g>
-          </svg>
-          <figcaption>{t.computador.caption}</figcaption>
-        </figure>
+        <FiguraBiblioteca r={t.biblioteca} />
       </Slide>
 
       <Slide z="2" label={t.labels.lenguajes}>
@@ -367,9 +445,15 @@ export default function DatosProgramasYServidores() {
             <text x="220" y="18" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{t.lenguajes.masCercaHumano}</text>
             <text x="700" y="18" fontSize="10.5" fill="#63b6a4" textAnchor="end">{t.lenguajes.masFacil}</text>
 
-            {t.lenguajes.niveles.map(({ titulo, lineas }, i) => {
+            {t.lenguajes.niveles.map(({ titulo, resaltado, lineas }, i) => {
               const y = 34 + i * 94;
               const esMaquina = i === t.lenguajes.niveles.length - 1;
+              const tituloTexto = (
+                <text x="240" y={y + 21} fontSize="12" fill={esMaquina ? '#f2a33c' : 'currentColor'}>
+                  {titulo}
+                  {resaltado ? <tspan fill="#f2a33c">{resaltado}</tspan> : null}
+                </text>
+              );
               return (
                 <g key={titulo}>
                   {esMaquina ? (
@@ -377,12 +461,9 @@ export default function DatosProgramasYServidores() {
                   ) : (
                     <rect x="220" y={y} width="480" height="58" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
                   )}
-                  <text x="240" y={y + 21} fontSize="12" fill={esMaquina ? '#f2a33c' : 'currentColor'}>{titulo}</text>
+                  {resaltado ? <Resalte delay="0.6s">{tituloTexto}</Resalte> : tituloTexto}
                   <text x="240" y={y + 37} fontSize="10.5" fill="currentColor" opacity=".6">{lineas[0]}</text>
                   <text x="240" y={y + 51} fontSize="10.5" fill="currentColor" opacity=".6">{lineas[1]}</text>
-                  {!esMaquina && (
-                    <line x1="460" y1={y + 62} x2="460" y2={y + 88} stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD7)" />
-                  )}
                 </g>
               );
             })}
@@ -390,67 +471,62 @@ export default function DatosProgramasYServidores() {
             <text x="220" y="398" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{t.lenguajes.masCercaMaquina}</text>
             <text x="700" y="398" fontSize="10.5" fill="#f2a33c" textAnchor="end">{t.lenguajes.masRapido}</text>
 
-            <text x="770" y="53" fontSize="10.5" fill="#63b6a4" textAnchor="middle">{t.lenguajes.tuEscribes}</text>
-            <line x1="830" y1="63" x2="708" y2="63" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrD7t)" />
-            <text x="770" y="335" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{t.lenguajes.laCpuLee}</text>
-            <line x1="830" y1="345" x2="708" y2="345" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD7)" />
+            <text x="200" y="67" fontSize="11.5" fill="#63b6a4" letterSpacing="2" textAnchor="end">{t.lenguajes.masAbstracto}</text>
+            <text x="200" y="349" fontSize="11.5" fill="#f2a33c" letterSpacing="2" textAnchor="end">{t.lenguajes.menosAbstracto}</text>
+
+            <Resalte delay="0s">
+              <text x="770" y="53" fontSize="10.5" fill="#63b6a4" textAnchor="middle">{t.lenguajes.tuEscribes}</text>
+              <line x1="830" y1="63" x2="708" y2="63" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrD7t)" />
+            </Resalte>
+            <Resalte delay="1.2s">
+              <text x="770" y="335" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{t.lenguajes.laCpuLee}</text>
+              <line x1="830" y1="345" x2="708" y2="345" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD7)" />
+            </Resalte>
           </svg>
           <figcaption>{t.lenguajes.caption}</figcaption>
         </figure>
       </Slide>
 
-      <Slide z="3" label={t.labels.restaurante}>
-        <div className={s.eyebrow}>{t.restaurante.eyebrow}</div>
-        <h2>{t.restaurante.title}</h2>
-        <figure>
-          <svg viewBox="0 0 920 230" role="img" aria-label={t.restaurante.aria}>
-            <EscenaPeticion markerPrefix="arrD3" />
-            <RotulosPeticion r={t.restaurante.rotulos} />
-          </svg>
-          <figcaption>{t.restaurante.caption}</figcaption>
-        </figure>
-      </Slide>
-
-      <Slide z="=" label={t.labels.clienteServidor}>
+      <Slide z="3" label={t.labels.clienteServidor} notes={t.clienteServidor.notes}>
         <div className={s.eyebrow}>{t.clienteServidor.eyebrow}</div>
         <h2>{t.clienteServidor.title}</h2>
         <figure>
           <svg viewBox="0 0 920 230" role="img" aria-label={t.clienteServidor.aria}>
-            <EscenaPeticion markerPrefix="arrD3b" />
-            {/* Paso único, sin espera y más lento que el estándar: los rótulos cruzan de dominio */}
-            <g className={s.morphOut} style={{ animationDuration: '1.2s' }}>
-              <RotulosPeticion r={t.restaurante.rotulos} />
-            </g>
-            <g className={s.morphIn} style={{ animationDuration: '1.2s' }}>
-              <RotulosPeticion r={t.clienteServidor.rotulos} />
-            </g>
+            <EscenaPeticion markerPrefix="arrD3" />
+            <RotulosPeticion r={t.clienteServidor.rotulos} />
           </svg>
           <figcaption>{t.clienteServidor.caption}</figcaption>
         </figure>
       </Slide>
 
-      <Slide z="4" label={t.labels.servidores}>
+      <Slide z="4" label={t.labels.servidores} notes={t.servidores.notes}>
         <div className={s.eyebrow}>{t.servidores.eyebrow}</div>
         <h2>{t.servidores.title}</h2>
         <figure>
-          <svg viewBox="0 0 920 300" role="img" aria-label={t.servidores.aria}>
+          <svg viewBox="0 0 940 300" role="img" aria-label={t.servidores.aria}>
             <defs>
               <marker id="arrD4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                 <path d="M0,0 L10,5 L0,10 z" fill="#f2a33c" />
               </marker>
             </defs>
 
-            {t.servidores.filas.map(({ servidor, pides, sirve, ejemplos }, i) => {
-              const y = 40 + i * 90;
+            {t.servidores.filas.map(({ servidor, pides, sirve, sirveDetalle, ejemplos }, i) => {
+              const y = 20 + i * 66;
+              const ejemplosY = ejemplos.length > 1 ? [y + 24, y + 38] : [y + 30];
               return (
                 <g key={servidor}>
-                  <rect x="330" y={y} width="280" height="60" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-                  <text x="470" y={y + 35} fontSize="12" fill="#f2a33c" textAnchor="middle">{servidor}</text>
-                  <text x="206" y={y + 8} fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{pides}</text>
-                  <line x1="90" y1={y + 18} x2="322" y2={y + 18} stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD4)" />
-                  <line x1="330" y1={y + 42} x2="98" y2={y + 42} stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD4)" />
-                  <text x="206" y={y + 56} fontSize="10.5" fill="#f2a33c" textAnchor="middle">{sirve}</text>
-                  <text x="628" y={y + 35} fontSize="10.5" fill="currentColor" opacity=".6">{ejemplos}</text>
+                  <rect x="390" y={y} width="250" height="50" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
+                  <text x="515" y={y + 30} fontSize="12" fill="#f2a33c" textAnchor="middle">{servidor}</text>
+                  <text x="221" y={y + 6} fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{pides}</text>
+                  <line x1="60" y1={y + 16} x2="382" y2={y + 16} stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD4)" />
+                  <line x1="390" y1={y + 34} x2="68" y2={y + 34} stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD4)" />
+                  <text x="221" y={y + 48} fontSize="10.5" fill="#f2a33c" textAnchor="middle">{sirve}</text>
+                  {sirveDetalle ? (
+                    <text x="221" y={y + 60} fontSize="10" fill="currentColor" opacity=".6" textAnchor="middle">{sirveDetalle}</text>
+                  ) : null}
+                  {ejemplos.map((linea, j) => (
+                    <text key={linea} x="658" y={ejemplosY[j]} fontSize="10.5" fill="currentColor" opacity=".6">{linea}</text>
+                  ))}
                 </g>
               );
             })}
@@ -459,7 +535,18 @@ export default function DatosProgramasYServidores() {
         </figure>
       </Slide>
 
-      <Slide z="5" label={t.labels.hardware}>
+      <Slide z="5" label={t.labels.backend} notes={t.backend.notes}>
+        <div className={s.eyebrow}>{t.backend.eyebrow}</div>
+        <h2>{t.backend.title}</h2>
+        <figure>
+          <svg viewBox="0 0 920 300" role="img" aria-label={t.backend.aria}>
+            <EscenaBackend r={t.backend.rotulos} />
+          </svg>
+          <figcaption>{t.backend.caption}</figcaption>
+        </figure>
+      </Slide>
+
+      <Slide z="6" label={t.labels.hardware}>
         <div className={s.eyebrow}>{t.hardware.eyebrow}</div>
         <h2>{t.hardware.title}</h2>
         <figure>
@@ -482,10 +569,9 @@ export default function DatosProgramasYServidores() {
         </figure>
       </Slide>
 
-      <Slide z="6" label={[t.labels.arranque, t.labels.pide, t.labels.busca, t.labels.sube]}>
+      <Slide z="7" label={[t.labels.arranque, t.labels.instalas, t.labels.abres]}>
         <div className={s.eyebrow}>{t.arranque.eyebrow}</div>
-        <h2>{t.arranque.title}</h2>
-        <FiguraArranque r={t.arranque} />
+        <ContenidoArranque r={t.arranque} />
       </Slide>
     </Deck>
   );

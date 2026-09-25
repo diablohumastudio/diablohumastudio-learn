@@ -111,6 +111,7 @@ The course menu and the course dropdown are generated from `LEARN_COURSES`; swit
 - `z` — the big amber character in the left rail (a zoom level, number or symbol).
 - `label` — the small vertical text in the rail, also shown uppercase in the footer. An array of labels makes a **stepped slide** (see below), one step per label.
 - `backgroundImage` (optional) — URL of a full-bleed background image for the slide, automatically darkened with a gradient so text stays readable (used for cover slides). Put slide images under `public/assets/presentations/<course-slug>/` and reference them as `/assets/presentations/<course-slug>/<file>`.
+- `notes` (optional) — text for the notes panel: what the slide cannot say in its own texts (the analogy behind a diagram, the longer explanation). One string per slide, from the dictionary; blank lines separate paragraphs, and a stepped slide has the same notes on every step. The panel opens to the right of the slide with `N` or the `notes` button in the footer, stays open across slides and classes (remembered in `localStorage`) and is visible to anyone who opens it.
 
 Content goes inside `Slide` as JSX. Plain `h1`, `h2`, `strong`, `code`, `figure`/`figcaption` and `svg text` are already styled by `Deck.module.css`; for the rest import the module (`import s from '../../components/learn/Deck.module.css'`):
 
@@ -125,7 +126,9 @@ Content goes inside `Slide` as JSX. Plain `h1`, `h2`, `strong`, `code`, `figure`
 | `s.tight` | Bulleted `<ul>` with amber markers |
 | `s.plain` | Data table (first column mono + amber); use `<thead>`/`<tbody>` |
 | `s.svgSans` | On an SVG `<text>` to use the body font (SVG text defaults to mono) |
-| `s.morphOut` / `s.morphIn` / `s.morphGlide` / `s.morphPulse` | On SVG `<g>` wrappers, replay a transition from the previous slide's diagram when the slide mounts (draw the final state; stagger steps with inline `animation-delay`; `morphGlide` reads its start `transform` from `--morph-from`; `morphPulse` scales briefly for emphasis) |
+| `s.morphOut` / `s.morphIn` / `s.morphGlide` / `s.morphGlideOut` / `s.morphPulse` | On SVG `<g>` wrappers (or HTML elements), replay a transition from the previous slide's diagram when the slide mounts (draw the final state; stagger steps with inline `animation-delay`; `morphGlide` reads its start `transform` from `--morph-from`; `morphGlideOut` slides to `--morph-to` while fading out, for the previous diagram leaving; `morphPulse` scales briefly for emphasis) |
+| `s.h2TwoLines` | On an `h2` whose text changes by step (or must line up with a neighbour slide): keeps the height of two lines so the layout never shifts |
+| `s.oculto` | Keeps the layout slot of an element a later step will show (`visibility: hidden`) |
 
 Stepped slides (one slide built up in several steps, like fragments in other slide tools):
 
@@ -158,4 +161,5 @@ Gotchas:
 
 - Keyboard: `←` `→` / space / PageUp / PageDown to move (through the steps of a stepped slide first), Home / End to jump to first/last slide.
 - `F` toggles full screen while a deck is open (Esc exits); the account menu has the same action.
+- `N` toggles the notes panel (also the `notes` button in the footer).
 - Browser back/forward move through the slides you visited, including across presentations.

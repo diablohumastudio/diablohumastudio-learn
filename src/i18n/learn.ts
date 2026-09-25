@@ -10,7 +10,9 @@ const en = {
   goToMenu: 'Go to the courses',
   previousSlide: 'Previous slide',
   nextSlide: 'Next slide',
-  keysHint: '← → · space',
+  keysHint: '← → · space · N notes',
+  notes: 'Notes',
+  noNotes: 'This slide has no notes.',
 
   coursesTitle: 'Courses',
   classesEyebrow: 'Course',
@@ -76,7 +78,9 @@ const es: Record<keyof typeof en, string> = {
   goToMenu: 'Ir a los cursos',
   previousSlide: 'Diapositiva anterior',
   nextSlide: 'Siguiente diapositiva',
-  keysHint: '← → · espacio',
+  keysHint: '← → · espacio · N notas',
+  notes: 'Notas',
+  noNotes: 'Esta diapositiva no tiene notas.',
 
   coursesTitle: 'Cursos',
   classesEyebrow: 'Curso',

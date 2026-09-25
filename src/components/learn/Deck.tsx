@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { Children, createContext, isValidElement, useContext, useEffect } from 'react';
+import { Children, createContext, isValidElement, useContext, useEffect, useState } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 import { classPath, findClass, findCourse, neighborClass, querySlug } from '../../data/learn';
 import { learnDict } from '../../i18n/learn';
@@ -14,6 +14,9 @@ type SlideProps = {
      Content reads the step with useSlideStep(). */
   label: string | string[];
   backgroundImage?: string;
+  /* Shown in the notes panel (N key). One text per slide, the same for every
+     step; blank lines separate paragraphs. */
+  notes?: string;
   children: ReactNode;
 };
 
@@ -64,6 +67,23 @@ type DeckProps = {
 };
 
 const TYPING_TAGS = ['SELECT', 'INPUT', 'TEXTAREA'];
+const NOTES_OPEN_STORAGE_KEY = 'learn-notes-open';
+
+function readNotesOpen(): boolean {
+  try {
+    return window.localStorage.getItem(NOTES_OPEN_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function storeNotesOpen(open: boolean) {
+  try {
+    window.localStorage.setItem(NOTES_OPEN_STORAGE_KEY, open ? '1' : '0');
+  } catch {
+    /* private mode or blocked storage: the panel just does not persist */
+  }
+}
 
 function pad2(value: number): string {
   return value < 10 ? `0${value}` : `${value}`;
@@ -93,6 +113,18 @@ export default function Deck({ name, context, children }: DeckProps) {
   const currentIndex = clampIndex(requestedSlide, total);
   const steps = stepCount(slides[currentIndex]);
   const currentStep = clampIndex(Number(queryParam(router.query.p) ?? '1'), steps);
+  const [notesOpen, setNotesOpen] = useState(false);
+
+  function toggleNotes() {
+    setNotesOpen((open) => {
+      storeNotesOpen(!open);
+      return !open;
+    });
+  }
+
+  useEffect(() => {
+    setNotesOpen(readNotesOpen());
+  }, []);
 
   function goToNeighborClass(offset: number) {
     const course = findCourse(querySlug(router.query.curso));
@@ -185,6 +217,9 @@ export default function Deck({ name, context, children }: DeckProps) {
       } else if (event.key === 'End') {
         event.preventDefault();
         goTo(total - 1, lastStepOf(total - 1));
+      } else if (event.key === 'n' || event.key === 'N') {
+        event.preventDefault();
+        toggleNotes();
       }
     }
     window.addEventListener('keydown', handleKeydown);
@@ -194,17 +229,30 @@ export default function Deck({ name, context, children }: DeckProps) {
   if (total === 0) return null;
 
   const activeSlide = slides[currentIndex];
+  const notesParagraphs = (activeSlide.props.notes ?? '').split(/\n\s*\n/).filter((paragraph) => paragraph.trim() !== '');
 
   return (
     <div className={`${s.deck} ${LEARN_FONT_VARS}`}>
-      <div className={s.stage}>
-        {/* Keyed by slide only: a step change updates the slide in place, so
-            the entrance animation and the diagram's static pieces stay put. */}
-        <div key={currentIndex} className={s.slideHost}>
-          <SlideSectionContext.Provider value={section}>
-            <SlideStepContext.Provider value={currentStep}>{activeSlide}</SlideStepContext.Provider>
-          </SlideSectionContext.Provider>
+      <div className={s.body}>
+        <div className={s.stage}>
+          {/* Keyed by slide only: a step change updates the slide in place, so
+              the entrance animation and the diagram's static pieces stay put. */}
+          <div key={currentIndex} className={s.slideHost}>
+            <SlideSectionContext.Provider value={section}>
+              <SlideStepContext.Provider value={currentStep}>{activeSlide}</SlideStepContext.Provider>
+            </SlideSectionContext.Provider>
+          </div>
         </div>
+        {notesOpen ? (
+          <aside className={s.notes} aria-label={t.notes}>
+            <div className={s.notesTitle}>{t.notes}</div>
+            {notesParagraphs.length > 0 ? (
+              notesParagraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)
+            ) : (
+              <p className={s.notesEmpty}>{t.noNotes}</p>
+            )}
+          </aside>
+        ) : null}
       </div>
       <footer className={s.bar}>
         <div className={s.navbtns}>
@@ -213,6 +261,9 @@ export default function Deck({ name, context, children }: DeckProps) {
           </button>
           <button type="button" onClick={goNext} aria-label={t.nextSlide}>
             →
+          </button>
+          <button type="button" onClick={toggleNotes} aria-pressed={notesOpen} className={s.notesBtn}>
+            {t.notes}
           </button>
         </div>
         <span className={s.deckName}>{name}</span>

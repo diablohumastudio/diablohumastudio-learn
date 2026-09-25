@@ -12,46 +12,27 @@ export default function WwisePorAdentro() {
         <div className={s.eyebrow}>{t.recap.eyebrow}</div>
         <h2>{t.recap.title}</h2>
         <figure>
-          <svg viewBox="0 0 910 330" role="img" aria-label={t.recap.aria}>
+          <svg viewBox="0 0 900 190" role="img" aria-label={t.recap.aria}>
             <defs>
               <marker id="arrW1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                 <path d="M0,0 L10,5 L0,10 z" fill="#f2a33c" />
               </marker>
-              <marker id="arrW1t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                <path d="M0,0 L10,5 L0,10 z" fill="#63b6a4" />
-              </marker>
             </defs>
 
-            {/* Igual que el último slide de que-es-un-motor-de-audio */}
-            <rect x="40" y="20" width="230" height="56" rx="8" fill="#1d2026" stroke="#63b6a4" />
-            <text x="155" y="44" fontSize="12" fill="#63b6a4" textAnchor="middle">{t.recap.recursos}</text>
-            <text x="155" y="63" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{t.recap.recursosDeAudio}</text>
-            <path d="M 210 76 L 210 128 Q 210 140 222 140 L 292 140" fill="none" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrW1t)" />
-            <text x="198" y="112" fontSize="10.5" fill="#63b6a4" textAnchor="end">{t.recap.usan}</text>
-            <line x1="550" y1="140" x2="644" y2="140" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrW1)" />
-            <rect x="650" y="105" width="200" height="70" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-            <text x="750" y="134" fontSize="13" fill="#f2a33c" textAnchor="middle">{t.recap.soundEngine}</text>
-            <text x="750" y="153" fontSize="10.5" fill="currentColor" opacity=".65" textAnchor="middle">{t.recap.losCorre}</text>
-            <line x1="850" y1="140" x2="884" y2="140" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrW1)" />
-            <text className={s.svgSans} x="860" y="128" fontSize="12" fill="currentColor" textAnchor="middle">{t.recap.audio}</text>
+            {/* Igual que el último paso de "qué es un motor" en que-es-un-motor-de-audio */}
+            <rect x="40" y="66" width="280" height="58" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
+            <text x="180" y="89" fontSize="11.5" fill="#f2a33c" textAnchor="middle">{t.recap.wwiseObjects}</text>
+            <text x="180" y="107" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{t.recap.recursosDeAudio}</text>
+            <line x1="320" y1="95" x2="368" y2="95" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrW1)" />
+            <rect x="374" y="66" width="220" height="58" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
+            <text x="484" y="90" fontSize="15" fill="#f2a33c" textAnchor="middle">{t.recap.soundEngine}</text>
+            <text x="484" y="110" fontSize="10.5" fill="currentColor" opacity=".65" textAnchor="middle">{t.recap.losCorre}</text>
+            <line x1="594" y1="95" x2="700" y2="95" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrW1)" />
+            <text className={s.svgSans} x="712" y="100" fontSize="14" fill="currentColor">{t.recap.audio}</text>
 
-            {/* Paso único (al entrar): las configuraciones se vuelven Wwise objects,
-                y el cuadro pulsa y pasa a estilo protagonista */}
-            <g className={s.morphOut}>
-              <rect x="300" y="110" width="250" height="60" rx="8" fill="#1d2026" stroke="#f2a33c" strokeOpacity=".9" />
-              <text x="425" y="129" fontSize="11.5" fill="#f2a33c" textAnchor="middle">{t.recap.configsDeAudioLinea1}</text>
-              <text x="425" y="143" fontSize="11.5" fill="#f2a33c" textAnchor="middle">{t.recap.configsDeAudioLinea2}</text>
-              <text x="425" y="160" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{t.recap.tracksBusesEvents}</text>
-            </g>
-            <g className={s.morphPulse}>
-              <g className={s.morphIn}>
-                <rect x="300" y="110" width="250" height="60" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-                <text x="425" y="134" fontSize="12" fill="#f2a33c" textAnchor="middle">{t.recap.wwiseObject}</text>
-                <text x="425" y="153" fontSize="11" fill="currentColor" opacity=".6" textAnchor="middle">{t.recap.segmentsContainersEvents}</text>
-              </g>
-            </g>
+            {/* Paso único (al entrar): lo nuevo es el nombre del paquete que viaja entre los dos */}
             <g className={s.morphIn}>
-              <text x="597" y="128" fontSize="11" fill="#f2a33c" textAnchor="middle">{t.recap.soundBanks}</text>
+              <text x="344" y="56" fontSize="11" fill="#f2a33c" textAnchor="middle">{t.recap.soundBanks}</text>
             </g>
           </svg>
           <figcaption>{t.recap.caption}</figcaption>
