@@ -18,7 +18,7 @@ export type QuestionBank =
   | { status: 'ready'; questions: PracticeQuestion[] }
   | { status: 'error'; error: unknown };
 
-export { parseQuestionList } from '../../data/practice/parse';
+export { parseImportList } from '../../data/practice/parse';
 
 function withId(answer: PracticeAnswer): PracticeAnswer {
   return answer.id ? answer : { ...answer, id: newAnswerId() };

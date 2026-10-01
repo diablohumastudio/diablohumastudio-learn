@@ -3,15 +3,17 @@ import { useEffect, useState } from 'react';
 import { LEARN_COURSES, TEACHER_PATH } from '../../data/learn';
 import { MIN_CORRECT_ANSWERS, MIN_INCORRECT_ANSWERS, nextQuestionId, questionTopicTitle } from '../../data/practice';
 import type { PracticeAnswer, PracticeQuestion } from '../../data/practice';
+import type { ImportedQuestion } from '../../data/practice/parse';
 import { LOCALES } from '../../i18n/locales';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import type { Dictionary } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import ImportReview from './ImportReview';
 import s from './QuestionEditor.module.css';
 import SignInRedirect from '../learn/SignInRedirect';
 import { isPermissionDenied } from './progress';
-import { parseQuestionList, saveQuestions, toExportJson, useExamOnlyBank, useQuestionBank } from './questions';
+import { parseImportList, saveQuestions, toExportJson, useExamOnlyBank, useQuestionBank } from './questions';
 import ui from '../learn/ui.module.css';
 import { useAuthUser } from '../learn/useAuthUser';
 import { useClassSlides } from '../learn/useClassSlides';
@@ -181,9 +183,12 @@ type QuestionFormProps = {
   bank: PracticeQuestion[];
   editing: PracticeQuestion | null;
   onDone: () => void;
+  /** Editing a question of an import that is still under review: saving hands the result back
+      instead of writing it to the bank. */
+  onEditedImport?: (value: Omit<PracticeQuestion, 'id'>) => void;
 };
 
-function QuestionForm({ bank, editing, onDone }: QuestionFormProps) {
+function QuestionForm({ bank, editing, onDone, onEditedImport }: QuestionFormProps) {
   const t = useT(practiceDict);
   const locale = useLocale();
   const [draft, setDraft] = useState<Draft>(() => (editing ? draftFromQuestion(editing) : emptyDraft()));
@@ -206,6 +211,10 @@ function QuestionForm({ bank, editing, onDone }: QuestionFormProps) {
       setMessage(validation.message);
       return;
     }
+    if (onEditedImport) {
+      onEditedImport(validation.value);
+      return;
+    }
     const id = editing ? editing.id : nextQuestionId(bank, validation.value.topic, examOnly);
     setSaving(true);
     setMessage(null);
@@ -222,10 +231,10 @@ function QuestionForm({ bank, editing, onDone }: QuestionFormProps) {
   return (
     <div className={s.wrap}>
       <button type="button" className={s.back} onClick={onDone}>
-        ← {t.backToQuestions}
+        ← {onEditedImport ? t.backToImport : t.backToQuestions}
       </button>
       <div className={s.heading}>
-        <span className={ui.eyebrow}>{editing ? editing.id : t.editorTitle}</span>
+        <span className={ui.eyebrow}>{editing && editing.id !== '' ? editing.id : t.editorTitle}</span>
         <h1 className={ui.title}>{editing ? t.editQuestion : t.newQuestion}</h1>
       </div>
       <form
@@ -322,7 +331,7 @@ function QuestionForm({ bank, editing, onDone }: QuestionFormProps) {
 
         <div className={s.actions}>
           <button type="submit" className={s.save} disabled={saving}>
-            {saving ? t.saving : t.save}
+            {saving ? t.saving : onEditedImport ? t.applyToImport : t.save}
           </button>
         </div>
       </form>
@@ -330,38 +339,47 @@ function QuestionForm({ bank, editing, onDone }: QuestionFormProps) {
   );
 }
 
-function ImportPanel({ onDone }: { onDone: (count: number) => void }) {
+/** An import the teacher is still reviewing: nothing of it is in the bank yet. */
+type ImportBatch = {
+  questions: ImportedQuestion[];
+  examOnly: boolean;
+};
+
+const JSON_FILE_TYPES: string = '.json,application/json';
+
+function ImportPanel({ onReview }: { onReview: (batch: ImportBatch) => void }) {
   const t = useT(practiceDict);
   const [json, setJson] = useState('');
   const [examOnly, setExamOnly] = useState(false);
-  const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  async function importQuestions() {
-    let questions: PracticeQuestion[];
+  function review() {
     try {
-      questions = parseQuestionList(json);
+      onReview({ questions: parseImportList(json), examOnly });
     } catch (error) {
       setMessage(`${t.invalidJson} ${error instanceof Error ? error.message : String(error)}`);
-      return;
     }
-    setBusy(true);
+  }
+
+  // The browser reads the file by itself: it lands in the text box, where it can still be edited.
+  async function loadFile(file: File | undefined) {
+    if (!file) return;
     setMessage(null);
-    try {
-      await saveQuestions(questions.map((question) => ({ ...question, examOnly })));
-      setJson('');
-      onDone(questions.length);
-    } catch (error) {
-      console.error('Could not import the questions', error);
-      setMessage(isPermissionDenied(error) ? t.notAuthorized : t.errorGeneric);
-    } finally {
-      setBusy(false);
-    }
+    setJson(await file.text());
   }
 
   return (
     <div className={s.importPanel}>
       <p className={ui.lede}>{t.importHint}</p>
+      <label className={ui.field}>
+        <span className={ui.label}>{t.importFile}</span>
+        <input
+          className={s.file}
+          type="file"
+          accept={JSON_FILE_TYPES}
+          onChange={(event) => void loadFile(event.target.files?.[0])}
+        />
+      </label>
       <textarea
         className={s.textarea}
         rows={8}
@@ -375,8 +393,8 @@ function ImportPanel({ onDone }: { onDone: (count: number) => void }) {
       </label>
       {message && <p className={ui.error}>{message}</p>}
       <div className={s.actions}>
-        <button type="button" className={s.save} onClick={() => void importQuestions()} disabled={busy || !json.trim()}>
-          {busy ? t.saving : t.importButton}
+        <button type="button" className={s.save} onClick={review} disabled={!json.trim()}>
+          {t.importReviewButton}
         </button>
       </div>
     </div>
@@ -397,7 +415,24 @@ function downloadQuestions(questions: readonly PracticeQuestion[], fileName: str
   URL.revokeObjectURL(url);
 }
 
-type Screen = { kind: 'list' } | { kind: 'new' } | { kind: 'edit'; question: PracticeQuestion };
+type Screen =
+  | { kind: 'list' }
+  | { kind: 'new' }
+  | { kind: 'edit'; question: PracticeQuestion }
+  | { kind: 'importReview'; batch: ImportBatch }
+  | { kind: 'importEdit'; batch: ImportBatch; index: number };
+
+/** The form edits bank questions, so an imported one borrows the shape: an empty id means "none yet". */
+function importedAsQuestion(imported: ImportedQuestion, examOnly: boolean): PracticeQuestion {
+  return { ...imported, id: imported.id ?? '', examOnly };
+}
+
+function withEditedQuestion(batch: ImportBatch, index: number, value: Omit<PracticeQuestion, 'id'>): ImportBatch {
+  const questions = batch.questions.map((question, candidate) =>
+    candidate === index ? { ...value, id: question.id } : question
+  );
+  return { ...batch, questions };
+}
 
 function Bank() {
   const t = useT(practiceDict);
@@ -427,6 +462,36 @@ function Bank() {
   // the practice bank must stay editable meanwhile.
   const isExamOnlyBankMissing = examOnlyBank.status === 'error';
   const questions = [...bank.questions, ...(examOnlyBank.status === 'ready' ? examOnlyBank.questions : [])];
+  if (screen.kind === 'importReview') {
+    const { batch } = screen;
+    return (
+      <ImportReview
+        imported={batch.questions}
+        bank={questions}
+        examOnly={batch.examOnly}
+        onEdit={(index) => setScreen({ kind: 'importEdit', batch, index })}
+        onCancel={() => setScreen({ kind: 'list' })}
+        onDone={(count) => {
+          setNotice(`${count} ${t.importDone}`);
+          setImporting(false);
+          setScreen({ kind: 'list' });
+        }}
+      />
+    );
+  }
+  if (screen.kind === 'importEdit') {
+    const { batch, index } = screen;
+    return (
+      <QuestionForm
+        bank={questions}
+        editing={importedAsQuestion(batch.questions[index], batch.examOnly)}
+        onDone={() => setScreen({ kind: 'importReview', batch })}
+        onEditedImport={(value) =>
+          setScreen({ kind: 'importReview', batch: withEditedQuestion(batch, index, value) })
+        }
+      />
+    );
+  }
   if (screen.kind !== 'list') {
     return (
       <QuestionForm
@@ -477,12 +542,7 @@ function Bank() {
       </div>
       {isExamOnlyBankMissing && <p className={ui.error}>{t.examOnlyBankMissing}</p>}
       {importing && (
-        <ImportPanel
-          onDone={(count) => {
-            setNotice(`${count} ${t.importDone}`);
-            setImporting(false);
-          }}
-        />
+        <ImportPanel onReview={(batch) => setScreen({ kind: 'importReview', batch })} />
       )}
       <div className={s.card}>
         {questions.length === 0 ? (

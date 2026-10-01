@@ -30,6 +30,10 @@ Marketing and teaching site for DiabloHumaStudio. Next.js 14 (Pages Router) + Ty
 - The site auto-deploys from `main` on Vercel, but `vercel.json` skips the build unless the pushed commit's message contains `[deploy]`. Deployments are per push, so the marker goes on the last commit of the batch (e.g. `feat(Home): ... [deploy]`). Pushes without it cost nothing on Vercel.
 - Every deployment stores a full copy of `public/` (mostly videos), and Vercel keeps at least the last 10 to 20 of them. Keep videos web-sized: H.264, CRF ~24, `-movflags +faststart`.
 
+## Importing questions
+
+- Before preparing or importing a question file, remind the user of the open item in [TODO.md](TODO.md) about answer ids ("Importador: conservar los ids de las respuestas al reemplazar"): replacing a question from a file without answer ids gives its answers new ids, which breaks the link with exam attempts already saved. Drop this note once that item is ticked.
+
 ## Required reading
 
 - [docs/css-and-nextjs-conventions.md](docs/css-and-nextjs-conventions.md) — CSS and Next.js conventions. Read before adding any page, component or styles. Key rule: never add styles to `src/styles/globals.css`; use CSS Modules.

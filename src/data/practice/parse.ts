@@ -63,13 +63,17 @@ export function parseQuestion(id: string, data: unknown): PracticeQuestion {
   return question;
 }
 
-/** Pasted JSON: an array of questions, each carrying its own `id`. */
-export function parseQuestionList(json: string): PracticeQuestion[] {
+/** A question read from an import file. Without an id, the import review gives it one. */
+export type ImportedQuestion = Omit<PracticeQuestion, 'id'> & { id: string | null };
+
+/** Pasted or uploaded JSON: an array of questions. Nothing is written from here: the import
+    review shows what each one would do before the teacher confirms. */
+export function parseImportList(json: string): ImportedQuestion[] {
   const parsed: unknown = JSON.parse(json);
   if (!Array.isArray(parsed)) throw new Error('expected an array of questions');
   return parsed.map((item, index) => {
     const id = isRecord(item) && typeof item.id === 'string' ? item.id.trim() : '';
-    if (id === '') throw new Error(`question ${index + 1}: missing id`);
-    return parseQuestion(id, item);
+    const question = parseQuestion(id === '' ? `question ${index + 1}` : id, item);
+    return { ...question, id: id === '' ? null : id };
   });
 }

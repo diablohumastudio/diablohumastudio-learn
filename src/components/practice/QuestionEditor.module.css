@@ -194,6 +194,10 @@
   gap: 14px;
 }
 
+.file {
+  composes: mono from '../learn/ui.module.css';
+}
+
 .importPanel .textarea {
   font-family: var(--font-mono, Menlo, Consolas, monospace);
   font-size: 13px;
