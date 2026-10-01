@@ -9,6 +9,8 @@ type HomeworkMeterProps = {
   /** Results of the run being played, oldest first (the player). Without it the meter sits under
       a "Today" heading and only names its two numbers: the total and the day's best run. */
   liveRun?: readonly boolean[];
+  /** Answers the day needs: the daily homework's unless a specific homework sets its own. */
+  questionsGoal?: number;
 };
 
 function pipClassName(result: boolean | undefined): string {
@@ -17,10 +19,10 @@ function pipClassName(result: boolean | undefined): string {
 }
 
 /** The two homework numbers of one day: questions answered and the best run. */
-export default function HomeworkMeter({ today, liveRun }: HomeworkMeterProps) {
+export default function HomeworkMeter({ today, liveRun, questionsGoal = DAILY_QUESTIONS_GOAL }: HomeworkMeterProps) {
   const t = useT(practiceDict);
-  const answeredShare = Math.min(1, today.answered / DAILY_QUESTIONS_GOAL);
-  const countDone = today.answered >= DAILY_QUESTIONS_GOAL;
+  const answeredShare = Math.min(1, today.answered / questionsGoal);
+  const countDone = today.answered >= questionsGoal;
   const runDone = today.bestRun >= RUN_CORRECT_GOAL;
   const pips: (boolean | undefined)[] = [];
   for (let index = 0; index < RUN_LENGTH; index += 1) pips.push(liveRun?.[index]);
@@ -29,11 +31,11 @@ export default function HomeworkMeter({ today, liveRun }: HomeworkMeterProps) {
     <div className={s.meter}>
       <div className={s.row}>
         <span className={s.label}>{liveRun ? t.homeworkToday : t.homeworkTotal}</span>
-        <span className={s.track} role="img" aria-label={`${today.answered} / ${DAILY_QUESTIONS_GOAL}`}>
+        <span className={s.track} role="img" aria-label={`${today.answered} / ${questionsGoal}`}>
           <span className={countDone ? s.fillDone : s.fill} style={{ width: `${answeredShare * 100}%` }} />
         </span>
         <span className={countDone ? s.valueDone : s.value}>
-          {today.answered} / {DAILY_QUESTIONS_GOAL}
+          {today.answered} / {questionsGoal}
         </span>
       </div>
 
@@ -56,7 +58,7 @@ export default function HomeworkMeter({ today, liveRun }: HomeworkMeterProps) {
 
       <p className={s.hint}>
         {t.homeworkGoalHint
-          .replace('{count}', String(DAILY_QUESTIONS_GOAL))
+          .replace('{count}', String(questionsGoal))
           .replace('{goal}', String(RUN_CORRECT_GOAL))
           .replace('{length}', String(RUN_LENGTH))}
       </p>

@@ -11,7 +11,7 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import type { DocumentData, Timestamp, Unsubscribe } from 'firebase/firestore';
-import { emptyDay } from '../../data/practice/homework';
+import { emptyDay, emptyHomeworkDay } from '../../data/practice/homework';
 import type { DayProgress } from '../../data/practice/homework';
 import { getFirestoreDb } from '../../lib/firebase';
 
@@ -19,13 +19,16 @@ import { getFirestoreDb } from '../../lib/firebase';
    students/{uid}                         profile + lifetime counters
    students/{uid}/questions/{questionId}  attempts per question
    students/{uid}/sessions/{sessionId}    one doc per visit with at least one answer
-   students/{uid}/days/{course}_{day}     homework of one course on one local day
+   students/{uid}/days/{course}_{day}     daily homework of one course on one local day
+   students/{uid}/days/hw-{id}_{day}      one specific homework on one local day (homeworks.ts)
    teachers/{uid}                         created by hand; grants read access to every student */
 
 const STUDENTS_COLLECTION: string = 'students';
 const QUESTIONS_SUBCOLLECTION: string = 'questions';
 const SESSIONS_SUBCOLLECTION: string = 'sessions';
 const DAYS_SUBCOLLECTION: string = 'days';
+/** No course slug starts like this, so a homework's days never collide with a course's. */
+const HOMEWORK_DAY_ID_PREFIX: string = 'hw-';
 
 export type StudentStats = {
   uid: string;
@@ -42,6 +45,9 @@ export type AnswerRecord = {
   sessionId: string;
   questionId: string;
   courseSlug: string;
+  /** The specific homework being played, or null in normal practice. The answer counts for
+      that homework's day or for the course's daily homework, never for both. */
+  homeworkId: string | null;
   /** Local day of the answer (`dayKey`). */
   day: string;
   isCorrect: boolean;
@@ -62,13 +68,15 @@ function studentRef(uid: string) {
   return doc(getFirestoreDb(), STUDENTS_COLLECTION, uid);
 }
 
-function dayRef(uid: string, courseSlug: string, day: string) {
-  return doc(studentRef(uid), DAYS_SUBCOLLECTION, `${courseSlug}_${day}`);
+function dayRef(uid: string, courseSlug: string, homeworkId: string | null, day: string) {
+  const counterId = homeworkId ? `${HOMEWORK_DAY_ID_PREFIX}${homeworkId}` : courseSlug;
+  return doc(studentRef(uid), DAYS_SUBCOLLECTION, `${counterId}_${day}`);
 }
 
 function toDayProgress(data: DocumentData): DayProgress {
   return {
     courseSlug: data.courseSlug ?? '',
+    ...(typeof data.homeworkId === 'string' ? { homeworkId: data.homeworkId } : {}),
     day: data.day ?? '',
     answered: data.answered ?? 0,
     correct: data.correct ?? 0,
@@ -129,7 +137,8 @@ export function newSessionId(uid: string): string {
 }
 
 export async function recordAnswer(record: AnswerRecord): Promise<void> {
-  const { uid, sessionId, questionId, courseSlug, day, isCorrect, isFirstAnswerOfSession, newBestRun } = record;
+  const { uid, sessionId, questionId, courseSlug, homeworkId, day, isCorrect, isFirstAnswerOfSession, newBestRun } =
+    record;
   const db = getFirestoreDb();
   const batch = writeBatch(db);
   const now = serverTimestamp();
@@ -161,9 +170,10 @@ export async function recordAnswer(record: AnswerRecord): Promise<void> {
     { merge: true }
   );
   batch.set(
-    dayRef(uid, courseSlug, day),
+    dayRef(uid, courseSlug, homeworkId, day),
     {
-      courseSlug,
+      // A homework's day carries no course: whatever reads the daily homework by course skips it.
+      ...(homeworkId ? { homeworkId } : { courseSlug }),
       day,
       answered: increment(1),
       correct: increment(correctDelta),
@@ -180,15 +190,17 @@ export async function recordAnswer(record: AnswerRecord): Promise<void> {
 export function subscribeDay(
   uid: string,
   courseSlug: string,
+  homeworkId: string | null,
   day: string,
   onChange: (progress: DayProgress) => void
 ): Unsubscribe {
-  return onSnapshot(dayRef(uid, courseSlug, day), (snapshot) => {
-    onChange(snapshot.exists() ? toDayProgress(snapshot.data()) : emptyDay(courseSlug, day));
+  return onSnapshot(dayRef(uid, courseSlug, homeworkId, day), (snapshot) => {
+    if (snapshot.exists()) onChange(toDayProgress(snapshot.data()));
+    else onChange(homeworkId ? emptyHomeworkDay(homeworkId, day) : emptyDay(courseSlug, day));
   });
 }
 
-/** Every day of every course: one small doc per day played, filtered by the caller. */
+/** Every day of every course and homework: one small doc per day played, filtered by the caller. */
 export async function fetchStudentDays(uid: string): Promise<DayProgress[]> {
   const snapshot = await getDocs(collection(studentRef(uid), DAYS_SUBCOLLECTION));
   return snapshot.docs.map((dayDoc) => toDayProgress(dayDoc.data()));

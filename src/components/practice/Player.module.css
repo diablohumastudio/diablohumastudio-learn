@@ -221,3 +221,8 @@
 .saveError {
   composes: error from '../learn/ui.module.css';
 }
+
+.dayNotice {
+  font-size: 14px;
+  color: var(--amber);
+}

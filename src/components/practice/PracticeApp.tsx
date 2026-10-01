@@ -1,27 +1,59 @@
 import type { User } from 'firebase/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import { LEARN_BASE_PATH, coursePath, findCourse, practicePlayPath, practiceScope, querySlug } from '../../data/learn';
+import { useEffect, useState } from 'react';
+import {
+  LEARN_BASE_PATH,
+  coursePath,
+  findCourse,
+  homeworkPlayPath,
+  practicePlayPath,
+  practiceScope,
+  querySlug,
+} from '../../data/learn';
 import type { LearnCourse, PracticeScope } from '../../data/learn';
-import { questionsInScope } from '../../data/practice';
+import { dayKey, dayText, isHomeworkOpen, questionsInScope, questionsWithIds } from '../../data/practice';
+import type { Homework } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
-import { useT } from '../../i18n/useT';
+import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
 import SignInRedirect from '../learn/SignInRedirect';
 import ui from '../learn/ui.module.css';
 import { useAuthUser } from '../learn/useAuthUser';
+import { fetchHomework } from './homeworks';
 import Player from './Player';
 import { ensureStudentProfile, isPermissionDenied } from './progress';
 import { activeQuestions, useQuestionBank } from './questions';
+
+type HomeworkLoad = { status: 'loading' } | { status: 'failed' } | { status: 'loaded'; homework: Homework | null };
+
+type CourseNoticeProps = {
+  course: LearnCourse;
+  message: string;
+};
+
+/** A message in place of the player, with the way back to the course. */
+function CourseNotice({ course, message }: CourseNoticeProps) {
+  const t = useT(practiceDict);
+  return (
+    <div className={ui.centered}>
+      <p className={ui.mono}>{message}</p>
+      <Link href={coursePath(course)} className={ui.btn}>
+        ← {t.backToCourse}
+      </Link>
+    </div>
+  );
+}
 
 type StudentAreaProps = {
   user: User;
   course: LearnCourse;
   scope: PracticeScope;
+  /** Set when a specific homework is played: only its questions, counted apart from the daily homework. */
+  homework: Homework | null;
 };
 
-function StudentArea({ user, course, scope }: StudentAreaProps) {
+function StudentArea({ user, course, scope, homework }: StudentAreaProps) {
   const t = useT(practiceDict);
   const bank = useQuestionBank();
 
@@ -53,20 +85,79 @@ function StudentArea({ user, course, scope }: StudentAreaProps) {
     );
   }
 
-  const scopedQuestions = questionsInScope(activeQuestions(bank), scope);
+  const scopedQuestions = homework
+    ? questionsWithIds(activeQuestions(bank), homework.questionIds)
+    : questionsInScope(activeQuestions(bank), scope);
   if (scopedQuestions.length === 0) {
+    return <CourseNotice course={course} message={t.noQuestions} />;
+  }
+  return (
+    <Player
+      uid={user.uid}
+      questions={scopedQuestions}
+      courseSlug={course.slug}
+      homework={homework}
+      stopHref={coursePath(course)}
+    />
+  );
+}
+
+type HomeworkAreaProps = {
+  user: User;
+  course: LearnCourse;
+  homeworkId: string;
+};
+
+/** Loads the homework the link names and lets it be played only on its days. */
+function HomeworkArea({ user, course, homeworkId }: HomeworkAreaProps) {
+  const t = useT(practiceDict);
+  const locale = useLocale();
+  const [load, setLoad] = useState<HomeworkLoad>({ status: 'loading' });
+
+  useEffect(() => {
+    let isCurrent = true;
+    fetchHomework(homeworkId)
+      .then((homework) => {
+        if (isCurrent) setLoad({ status: 'loaded', homework });
+      })
+      .catch((error) => {
+        console.error('Could not load the homework', error);
+        if (isCurrent) setLoad({ status: 'failed' });
+      });
+    return () => {
+      isCurrent = false;
+    };
+  }, [homeworkId]);
+
+  if (load.status === 'loading') {
     return (
       <div className={ui.centered}>
-        <p className={ui.mono}>{t.noQuestions}</p>
-        <Link href={coursePath(course)} className={ui.btn}>
-          ← {t.backToCourse}
-        </Link>
+        <span className={ui.mono}>{t.loading}</span>
       </div>
     );
   }
-  return (
-    <Player uid={user.uid} questions={scopedQuestions} courseSlug={course.slug} stopHref={coursePath(course)} />
-  );
+  if (load.status === 'failed') {
+    return (
+      <div className={ui.centered}>
+        <p className={ui.error}>{t.errorGeneric}</p>
+      </div>
+    );
+  }
+  const { homework } = load;
+  if (!homework || homework.courseSlug !== course.slug) {
+    return <CourseNotice course={course} message={t.homeworkNotFound} />;
+  }
+  if (!isHomeworkOpen(homework, dayKey(new Date()))) {
+    return (
+      <CourseNotice
+        course={course}
+        message={t.homeworkNotOpen
+          .replace('{first}', dayText(homework.firstDay, locale))
+          .replace('{last}', dayText(homework.lastDay, locale))}
+      />
+    );
+  }
+  return <StudentArea user={user} course={course} scope={{ courseSlug: course.slug }} homework={homework} />;
 }
 
 export default function PracticeApp() {
@@ -74,6 +165,7 @@ export default function PracticeApp() {
   const router = useRouter();
   const auth = useAuthUser();
   const scope = practiceScope(querySlug(router.query.course), querySlug(router.query.class));
+  const homeworkId = querySlug(router.query.homework);
   const course = findCourse(scope.courseSlug);
   const isCourseMissing = router.isReady && !course;
 
@@ -101,6 +193,16 @@ export default function PracticeApp() {
     return <SignInRedirect />;
   }
 
+  if (homeworkId) {
+    return (
+      <HomeworkArea
+        key={homeworkPlayPath(course.slug, homeworkId)}
+        user={auth.user}
+        course={course}
+        homeworkId={homeworkId}
+      />
+    );
+  }
   // Keyed by scope so a session never mixes the questions of two scopes.
-  return <StudentArea key={practicePlayPath(scope)} user={auth.user} course={course} scope={scope} />;
+  return <StudentArea key={practicePlayPath(scope)} user={auth.user} course={course} scope={scope} homework={null} />;
 }

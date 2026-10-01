@@ -18,6 +18,8 @@ const en = {
   scopeLabel: 'Practice on',
   wholeCourse: 'whole course',
   backToCourse: 'Back to the course',
+  homeworkNotFound: 'This homework does not exist.',
+  homeworkNotOpen: 'This homework is only open from {first} to {last}.',
   backToTeacher: 'Teacher menu',
 
   correctFeedback: 'Correct!',
@@ -27,6 +29,7 @@ const en = {
   next: 'Next',
   stop: 'Stop',
   thisSession: 'This session',
+  sessionDayNotice: 'It is past midnight: these answers still count for {day}. To make them count for today, press Stop and come back in.',
 
   homeworkTitle: 'Homework',
   homeworkToday: 'Today',
@@ -143,6 +146,8 @@ const es: Record<keyof typeof en, string> = {
   scopeLabel: 'Practicar sobre',
   wholeCourse: 'curso completo',
   backToCourse: 'Volver al curso',
+  homeworkNotFound: 'Este deber no existe.',
+  homeworkNotOpen: 'Este deber solo está abierto del {first} al {last}.',
   backToTeacher: 'Menú de docente',
 
   correctFeedback: '¡Correcto!',
@@ -152,6 +157,7 @@ const es: Record<keyof typeof en, string> = {
   next: 'Siguiente',
   stop: 'Parar',
   thisSession: 'Esta sesión',
+  sessionDayNotice: 'Ya pasó la medianoche: estas respuestas siguen contando para el {day}. Para que cuenten para hoy, pulsa Parar y vuelve a entrar.',
 
   homeworkTitle: 'Tarea',
   homeworkToday: 'Hoy',

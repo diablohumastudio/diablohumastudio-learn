@@ -16,6 +16,8 @@ export default function PlayScopeSelect() {
   if (!router.isReady) return null;
   const course = findCourse(querySlug(router.query.course));
   if (!course) return null;
+  // A homework has its own questions: switching class here would silently leave it.
+  if (querySlug(router.query.homework)) return null;
   const activeClassSlug = course.classes.find((learnClass) => learnClass.slug === querySlug(router.query.class))?.slug;
 
   return (

@@ -3,14 +3,16 @@ import { useEffect, useRef, useState } from 'react';
 import {
   TIMEOUT_COUNTS_AS_ANSWER,
   dayKey,
+  dayText,
   drawChoices,
   emptyDay,
+  emptyHomeworkDay,
   pushRunResult,
   questionTopicTitle,
   runCorrectCount,
   shuffledCycle,
 } from '../../data/practice';
-import type { DayProgress, PracticeQuestion, ShuffledChoice } from '../../data/practice';
+import type { DayProgress, Homework, PracticeQuestion, ShuffledChoice } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import { percentText } from './format';
@@ -29,6 +31,8 @@ type PlayerProps = {
   questions: PracticeQuestion[];
   /** Course the questions belong to: homework is counted per course. */
   courseSlug: string;
+  /** The specific homework being played, or null: its answers are counted apart, with its own goal. */
+  homework: Homework | null;
   /** Leaving is a link so the browser history matches. */
   stopHref: string;
 };
@@ -45,6 +49,10 @@ type Turn = {
 };
 
 type SessionCount = { answered: number; correct: number };
+
+function emptyDayOf(courseSlug: string, homework: Homework | null, day: string): DayProgress {
+  return homework ? emptyHomeworkDay(homework.id, day) : emptyDay(courseSlug, day);
+}
 
 function firstTurn(questions: PracticeQuestion[]): Turn {
   const cycle = shuffledCycle(questions);
@@ -74,7 +82,7 @@ function choiceClassName(choice: ShuffledChoice, index: number, turn: Turn): str
   return `${s.choice} ${s.choiceDim}`;
 }
 
-export default function Player({ uid, questions, courseSlug, stopHref }: PlayerProps) {
+export default function Player({ uid, questions, courseSlug, homework, stopHref }: PlayerProps) {
   const t = useT(practiceDict);
   const locale = useLocale();
   const questionSeconds = useQuestionSeconds();
@@ -82,13 +90,16 @@ export default function Player({ uid, questions, courseSlug, stopHref }: PlayerP
   const [turn, setTurn] = useState<Turn>(() => firstTurn(questions));
   const [session, setSession] = useState<SessionCount>({ answered: 0, correct: 0 });
   const [run, setRun] = useState<boolean[]>([]);
-  const [day, setDay] = useState(() => dayKey(new Date()));
-  const [today, setToday] = useState<DayProgress>(() => emptyDay(courseSlug, day));
+  // A session belongs to the day it started on, even when it runs past midnight.
+  const [sessionDay] = useState(() => dayKey(new Date()));
+  const [today, setToday] = useState<DayProgress>(() => emptyDayOf(courseSlug, homework, sessionDay));
+  const [isDayLoaded, setIsDayLoaded] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(questionSeconds);
   const [saveFailed, setSaveFailed] = useState(false);
   const keyHandlerRef = useRef<(event: KeyboardEvent) => void>(() => {});
   const timeUpHandlerRef = useRef<() => void>(() => {});
 
+  const homeworkId = homework ? homework.id : null;
   const question = turn.cycle[turn.position];
   const answered = turn.picked !== null || turn.timedOut;
   const wasCorrect = turn.picked !== null && turn.choices[turn.picked].isCorrect;
@@ -96,21 +107,20 @@ export default function Player({ uid, questions, courseSlug, stopHref }: PlayerP
   function saveResult(isCorrect: boolean) {
     const nextRun = pushRunResult(run, isCorrect);
     const runCorrect = runCorrectCount(nextRun);
-    // Read at answer time: a session that crosses midnight starts filling the new day.
-    const answerDay = dayKey(new Date());
-    const knownBestRun = today.day === answerDay ? today.bestRun : 0;
+    // Until the day has loaded, its best run is unknown: writing this run could replace a better one.
+    const beatsBestRun = isDayLoaded && runCorrect > today.bestRun;
     setRun(nextRun);
-    setDay(answerDay);
     setSession({ answered: session.answered + 1, correct: session.correct + (isCorrect ? 1 : 0) });
     recordAnswer({
       uid,
       sessionId,
       questionId: question.id,
       courseSlug,
-      day: answerDay,
+      homeworkId,
+      day: sessionDay,
       isCorrect,
       isFirstAnswerOfSession: session.answered === 0,
-      newBestRun: runCorrect > knownBestRun ? runCorrect : null,
+      newBestRun: beatsBestRun ? runCorrect : null,
     }).catch((error) => {
       console.error('Could not save the answer', error);
       setSaveFailed(true);
@@ -135,7 +145,14 @@ export default function Player({ uid, questions, courseSlug, stopHref }: PlayerP
     if (TIMEOUT_COUNTS_AS_ANSWER) saveResult(false);
   };
 
-  useEffect(() => subscribeDay(uid, courseSlug, day, setToday), [uid, courseSlug, day]);
+  useEffect(
+    () =>
+      subscribeDay(uid, courseSlug, homeworkId, sessionDay, (progress) => {
+        setToday(progress);
+        setIsDayLoaded(true);
+      }),
+    [uid, courseSlug, homeworkId, sessionDay]
+  );
 
   // One countdown per question shown; it stops as soon as the question is settled.
   useEffect(() => {
@@ -178,11 +195,13 @@ export default function Player({ uid, questions, courseSlug, stopHref }: PlayerP
 
   const topicTitle = questionTopicTitle(question, locale);
   const timerClassName = secondsLeft <= TIMER_URGENT_SECONDS ? s.timerUrgent : s.timer;
+  // The timer re-renders the player every second, so this turns true by itself at midnight.
+  const isPastSessionDay = dayKey(new Date()) !== sessionDay;
 
   return (
     <div className={s.wrap}>
       <div className={s.topbar}>
-        <span className={s.topic}>{topicTitle ?? t.brand}</span>
+        <span className={s.topic}>{homework ? homework.title : topicTitle ?? t.brand}</span>
         <span className={s.topbarSpacer} />
         <span className={timerClassName} role="timer" aria-label={t.timeLeft}>
           {secondsLeft} s
@@ -235,12 +254,15 @@ export default function Player({ uid, questions, courseSlug, stopHref }: PlayerP
       </div>
 
       <div className={s.homework}>
-        <HomeworkMeter today={today} liveRun={run} />
+        <HomeworkMeter today={today} liveRun={run} questionsGoal={homework?.dailyGoal} />
         <span className={s.sessionCount}>
           {t.thisSession}: {session.correct} / {session.answered} · {percentText(session.correct, session.answered)}
         </span>
       </div>
 
+      {isPastSessionDay && (
+        <p className={s.dayNotice}>{t.sessionDayNotice.replace('{day}', dayText(sessionDay, locale))}</p>
+      )}
       {saveFailed && <p className={s.saveError}>{t.saveError}</p>}
     </div>
   );
