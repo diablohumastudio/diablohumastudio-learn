@@ -7,11 +7,12 @@
 | Piece | Files | Role |
 |---|---|---|
 | Question model | `src/data/practice/types.ts`, `src/data/practice/index.ts` | Types, choice drawing, id numbering, class titles and `questionsInScope()` from the Learn registry |
-| Homework model | `src/data/practice/homework.ts` | The goals (`DAILY_QUESTIONS_GOAL`, `RUN_LENGTH`, `RUN_CORRECT_GOAL`), day keys, the run and `isDayDone()` |
+| Homework model | `src/data/practice/homework.ts` | The goals (`DAILY_QUESTIONS_GOAL`, `RUN_LENGTH`, `RUN_CORRECT_GOAL`), day keys, the run and `isDayDone()`; the `Homework` type of a specific homework and `isHomeworkOpen()` |
+| Specific homeworks | `src/components/practice/homeworks.ts`, `HomeworkManager.tsx`, `CourseHomeworks.tsx` | Firestore reads/writes of `homeworks/{id}`, the teacher page at `/learn/teacher/homeworks` and the cards on the course page |
 | Question selection | `src/data/practice/selection.ts`, `src/components/practice/QuestionPicker.tsx` | Which questions an exam draws from: a list of ids, ticked one by one or all at once after filtering by class or slide (`docs/exam.md`) |
 | Slides of a class | `src/data/learn.ts` (`slideLabels`, `classSlides`), `src/components/learn/useClassSlides.ts` | Slide ids and titles from the deck dictionaries, loaded only by the teacher tools |
 | Question bank | `src/components/practice/questions.ts` | Firestore reads/writes of `questions/{id}`, validation, `useQuestionBank()` |
-| Question editor | `src/components/practice/QuestionEditor.tsx` | Teacher-only list, form and JSON import at `/learn/teacher/questions` |
+| Question editor | `src/components/practice/QuestionEditor.tsx`, `ImportReview.tsx`, `src/data/practice/importReview.ts` | Teacher-only list, form and JSON import (file or pasted, reviewed before writing) at `/learn/teacher/questions` |
 | Firebase init | `src/lib/firebase.ts` | Lazy client init from `NEXT_PUBLIC_FIREBASE_*`; `isFirebaseConfigured()` |
 | Student app | `src/components/practice/PracticeApp.tsx` → `Player`, `HomeworkMeter`, `PlayScopeSelect` | Endless timed play (`/learn/practice/play`) with the day's homework under the card |
 | Course page | `src/components/practice/CourseProgressContext.tsx`, `CourseProgressLoader.tsx`, `CourseProgress.tsx`, `ClassPracticeLink.tsx` | Homework card and per-class answer counts on `/learn/<course>`; the loader is the only part that downloads Firebase |
@@ -21,7 +22,7 @@
 | Teacher hub | `src/components/learn/TeacherHub.tsx` | `/learn/teacher`: links to the board and the editor, teachers only |
 | Account | `src/components/learn/useAuthUser.ts`, `useTeacherStatus.ts`, `AccountMenu.tsx`, `SignIn.tsx`, `SignInGate.tsx`, `SignInRedirect.tsx` | Shared by the whole `/learn` section (see `docs/learn-courses-and-slides.md`) |
 | Layout | `src/components/learn/LearnPageLayout.tsx` | Learn theme and fonts plus the section header |
-| Routes | `src/pages/learn/practice/play.tsx`, `teacher/index.tsx`, `teacher/students-practice-info.tsx`, `teacher/questions.tsx` | All load their app with `next/dynamic` and `ssr: false` |
+| Routes | `src/pages/learn/practice/play.tsx`, `teacher/index.tsx`, `teacher/students-practice-info.tsx`, `teacher/questions.tsx`, `teacher/homeworks.tsx` | All load their app with `next/dynamic` and `ssr: false` |
 | Rules | `firebase/firestore.rules` | Source of truth for the Firestore security rules |
 | Texts | `src/i18n/pages/practice.ts` | UI strings in both languages |
 
@@ -44,7 +45,18 @@ The pair is what makes the count honest: clicking at random reaches 30 answers b
 
 Students see both numbers live under the question while playing ("Today" and the pips of the "Last 10"). On the course page the homework card has two sections split by a line: **Today** (Total and Best 10) and **This week**, the calendar week from Monday to Sunday with a mark per day (filled = done, amber ring = started, dashed = still to come), the days done and the questions answered in the week. The card also holds the course's two buttons, **Practice this course** and **Exams**. Each class row's practice button shows `✓ correct / answered`: every answer the student gave to the questions of that class and how many were right, retired questions included. The teacher board shows a grid of student × day for a course and a date range, each cell `answered · best run`, plus the days done in the range; how that turns into a grade is up to the teacher.
 
-Days use the student's local date, read when the answer is given. Like all progress, the numbers are written by the student's browser, so a student who knows Firestore could forge them; that is accepted for homework (exams are graded by the server, see `docs/exam.md`).
+Days use the student's local date, read when the practice session starts: a session that runs past midnight keeps filling the day it started on, and the player says so (Stop and come back in to count for the new day). Like all progress, the numbers are written by the student's browser, so a student who knows Firestore could forge them; that is accepted for homework (exams are graded by the server, see `docs/exam.md`).
+
+## Specific homeworks
+
+Besides the daily homework, a teacher can set a **specific homework**: a list of questions to practice on given days, for instance to let students recover a grade. It is created at `/learn/teacher/homeworks` with a title, the questions (the same picker the exams use, without the exam-only bank), a first and a last day, and the **answers per day** (`dailyGoal`, 50 by default).
+
+- **It is counted apart.** Playing it (`/learn/practice/play?course=<slug>&homework=<id>`) asks only its questions and fills the homework's own day (`students/{uid}/days/hw-{id}_{day}`). Those answers do **not** count for the daily homework, and normal practice does not count for the specific one, so a student who owes both does both. Lifetime counters, per-question stats and sessions are still updated: they describe the student, not a homework.
+- **A day is done** with `dailyGoal` answers and the same best run as the daily homework (`RUN_CORRECT_GOAL` of `RUN_LENGTH`): `isHomeworkDayDone()`.
+- **It is open** from its first to its last day, in the student's local date (`isHomeworkOpen()`). The play page refuses it on any other day. A session started on the last day keeps counting for it past midnight, like any session (see Homework).
+- **Everyone in the course sees it**: there is no list of assigned students. The course page shows one card per homework from its first day until `HOMEWORK_SHOWN_AFTER_DAYS` (7) days after the last one (`isHomeworkShown()`), with today's meter, a mark per day and the Practice button while it is open. The teacher decides whose homework counts.
+- **The teacher's view** is the same grid as the daily homework (student × day, `answered · best run`), on the homework's own page, restricted to its days.
+- The questions are ordinary practice questions: they are also asked in normal practice. Editing or deleting a homework is always allowed; deleting it leaves the students' days in their accounts, unseen.
 
 ## Question model
 
@@ -74,7 +86,7 @@ Rules of thumb:
 
 Open `/learn/teacher/questions` with a teacher account (see setup step 6). The list shows every question; click one to edit it or use **New question**. The form enforces both languages, at least one correct and three wrong answers, and assigns the id on save.
 
-**Export JSON** downloads the practice bank (and, apart, the exam-only one) in the exact format Import reads, answer ids included, so a file edited outside the site, for instance to tag every question with its slides, goes back in with Import. **Import JSON** takes an array of questions in the model above, each with its own `id`; an existing id is replaced, which is also how you fix many questions at once. Example:
+**Export JSON** downloads the practice bank (and, apart, the exam-only one) in the exact format Import reads, answer ids included, so a file edited outside the site, for instance to tag every question with its slides, goes back in with Import. **Import JSON** takes an array of questions in the model above, from a chosen `.json` file or pasted, and writes nothing by itself: **Review** opens a list of every question with what it would do (`src/data/practice/importReview.ts`). Green, *new*: its id is free. Red, *replaces with changes*: the id exists and the listed fields differ, which is also how you fix many questions at once. Red, *no id*: it gets the next free id of its class, shown in the list. Amber, *identical*: it is in the bank as it is and is not written. Every question has an **Edit** button that changes the import, not the bank, and Import asks for confirmation with the counts whenever something is not new. Answer ids are not compared; a replaced question whose file has no answer ids gets new ones, so do not replace a question an exam already used from a hand-written file. Example:
 
 ```json
 [
@@ -113,12 +125,19 @@ students/{uid}/sessions/{sessionId}
   startedAt, lastAnswerAt, answered, correct         written with the first answer of a visit
 
 students/{uid}/days/{courseSlug}_{YYYY-MM-DD}
-  courseSlug, day, answered, correct, bestRun, updatedAt   homework of one course on one local day
+  courseSlug, day, answered, correct, bestRun, updatedAt   daily homework of one course on one local day
+
+students/{uid}/days/hw-{homeworkId}_{YYYY-MM-DD}
+  homeworkId, day, answered, correct, bestRun, updatedAt   one specific homework on one local day (no courseSlug,
+                                                           so whatever reads the daily homework by course skips it)
+
+homeworks/{homeworkId}
+  title, courseSlug, questionIds[], firstDay, lastDay, dailyGoal, createdAt
 
 teachers/{uid}                                       created by hand; any field
 ```
 
-Each answer is one batched write touching the student doc, the question doc, the session doc and the day doc. Firestore has no `max()` transform, so `bestRun` is written by the player only when the run beats the record it read from the day doc. Any signed-in user can read the question bank, except while an exam is running, when practice is paused for every non-teacher (`docs/exam.md`); only teachers can write it. A student can only read and write their own subtree; an account whose uid exists in `teachers` can read every student.
+Each answer is one batched write touching the student doc, the question doc, the session doc and the day doc (the course's, or the specific homework's when one is being played). Any signed-in user reads `homeworks`; only teachers write it. Firestore has no `max()` transform, so `bestRun` is written by the player only when the run beats the record it read from the day doc, and never before that doc has loaded (it would replace a better run with a worse one). Any signed-in user can read the question bank, except while an exam is running, when practice is paused for every non-teacher (`docs/exam.md`); only teachers can write it. A student can only read and write their own subtree; an account whose uid exists in `teachers` can read every student.
 
 ## Firebase console setup (once)
 
@@ -127,7 +146,7 @@ Each answer is one batched write touching the student doc, the question doc, the
    `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`, `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`, `NEXT_PUBLIC_FIREBASE_APP_ID`. Restart the dev server after editing `.env.local`.
 3. Build → Authentication → Sign-in method: enable **Google** and **Email/Password**. Settings → Authorized domains: add `diablohumastudio.com` (and the `*.vercel.app` preview domain if you test previews). `localhost` is already there.
 4. Build → Firestore Database → Create database, production mode, nearest region.
-5. Firestore → Rules: paste the contents of `firebase/firestore.rules` and publish. Do the same whenever that file changes (`examQuestions` needs it: without the rules the Exam only checkbox is refused and the editor shows a notice).
+5. Firestore → Rules: paste the contents of `firebase/firestore.rules` and publish. Do the same whenever that file changes (`examQuestions` needs it: without the rules the Exam only checkbox is refused and the editor shows a notice; `homeworks` needs it too: without the rules the teacher page shows a notice and the course page simply shows no specific homework).
 6. Make yourself a teacher: sign in once at `/learn/sign-in`, copy your UID from Authentication → Users, then in Firestore create the document `teachers/<your uid>` with any field (e.g. `role: "teacher"`). `/learn/teacher` and its pages now work for that account, which also gets the Teacher links in the header and the menus; everyone else sees "not registered as a teacher".
 7. Load the first questions: open `/learn/teacher/questions`, click **Import JSON** and paste an array in the format above.
 
@@ -136,5 +155,5 @@ The web config values are not secrets: Firebase expects them in the browser, and
 ## Verifying changes
 
 - `npx tsc --noEmit` for any edit; `npm run build` when routes or dependencies change.
-- Open `http://localhost:3000/learn/wwise-unreal` (homework card, class rows) and `http://localhost:3000/learn/practice/play?course=wwise-unreal` (timer, pips), also under `/es`, for the student flow, `http://localhost:3000/learn/teacher/students-practice-info` for the board and `http://localhost:3000/learn/teacher/questions` for the editor (once with a teacher account, once with a student account, which must be denied).
+- Open `http://localhost:3000/learn/wwise-unreal` (homework card, class rows) and `http://localhost:3000/learn/practice/play?course=wwise-unreal` (timer, pips), also under `/es`, for the student flow, `http://localhost:3000/learn/teacher/students-practice-info` for the board, `http://localhost:3000/learn/teacher/homeworks` for the specific homeworks (create one that includes today, then check its card on the course page and that playing it moves its own meter and not the daily one) and `http://localhost:3000/learn/teacher/questions` for the editor (once with a teacher account, once with a student account, which must be denied).
 - Without `.env.local` the pages render a "Firebase is not configured" notice instead of the app.
