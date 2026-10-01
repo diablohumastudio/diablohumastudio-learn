@@ -40,6 +40,7 @@ const en = {
   backToStudentMode: 'Back to student mode',
   studentsPracticeInfo: 'Students practice info',
   practiceQuestions: 'Practice questions',
+  specificHomeworks: 'Specific homeworks',
   notAuthorized: 'This account is not registered as a teacher.',
   notConfigured: 'Firebase is not configured: set the NEXT_PUBLIC_FIREBASE_* variables (see docs/practice.md).',
 
@@ -108,6 +109,7 @@ const es: Record<keyof typeof en, string> = {
   backToStudentMode: 'Volver al modo estudiante',
   studentsPracticeInfo: 'Práctica de los estudiantes',
   practiceQuestions: 'Preguntas de práctica',
+  specificHomeworks: 'Deberes específicos',
   notAuthorized: 'Esta cuenta no está registrada como docente.',
   notConfigured: 'Firebase no está configurado: define las variables NEXT_PUBLIC_FIREBASE_* (ver docs/practice.md).',
 

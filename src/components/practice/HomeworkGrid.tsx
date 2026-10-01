@@ -8,10 +8,11 @@ import {
   dayKey,
   dayKeysBetween,
   isDayDone,
+  isHomeworkDayDone,
   recentDayKeys,
   weekdayInitial,
 } from '../../data/practice';
-import type { DayProgress } from '../../data/practice';
+import type { DayProgress, Homework } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import ui from '../learn/ui.module.css';
@@ -23,20 +24,28 @@ const DAY_OF_MONTH_START: number = 8;
 
 type DaysByStudent = Record<string, DayProgress[]>;
 
-function dayCellClassName(progress: DayProgress | undefined): string {
+type HomeworkGridProps = {
+  students: StudentStats[];
+  /** A specific homework: the grid then shows its days, its answers and its goal, with no
+      controls. Without it, the daily homework of a course in a date range. */
+  homework?: Homework;
+};
+
+function dayCellClassName(progress: DayProgress | undefined, isDone: boolean): string {
   if (!progress) return s.cellEmpty;
-  return isDayDone(progress) ? s.cellDone : s.cellStarted;
+  return isDone ? s.cellDone : s.cellStarted;
 }
 
-/** Homework of every student in one course: a column per day, a cell with answered · best run. */
-export default function HomeworkGrid({ students }: { students: StudentStats[] }) {
+/** Homework of every student: a column per day, a cell with answered · best run. */
+export default function HomeworkGrid({ students, homework }: HomeworkGridProps) {
   const t = useT(practiceDict);
   const locale = useLocale();
   const [courseSlug, setCourseSlug] = useState(LEARN_COURSES[0].slug);
   const [firstDay, setFirstDay] = useState(() => recentDayKeys(RECENT_DAYS_SHOWN, new Date())[0]);
   const [lastDay, setLastDay] = useState(() => dayKey(new Date()));
   const [daysByStudent, setDaysByStudent] = useState<DaysByStudent | null>(null);
-  const days = dayKeysBetween(firstDay, lastDay);
+  const days = homework ? dayKeysBetween(homework.firstDay, homework.lastDay) : dayKeysBetween(firstDay, lastDay);
+  const questionsGoal = homework ? homework.dailyGoal : DAILY_QUESTIONS_GOAL;
 
   useEffect(() => {
     let isCurrent = true;
@@ -57,51 +66,59 @@ export default function HomeworkGrid({ students }: { students: StudentStats[] })
 
   function progressOf(student: StudentStats, day: string): DayProgress | undefined {
     return daysByStudent?.[student.uid]?.find(
-      (candidate) => candidate.courseSlug === courseSlug && candidate.day === day
+      (candidate) =>
+        candidate.day === day &&
+        (homework ? candidate.homeworkId === homework.id : candidate.courseSlug === courseSlug)
     );
   }
 
+  function isDone(progress: DayProgress | undefined): boolean {
+    if (!progress) return false;
+    return homework ? isHomeworkDayDone(progress, homework) : isDayDone(progress);
+  }
+
   function daysDone(student: StudentStats): number {
-    return days.filter((day) => {
-      const progress = progressOf(student, day);
-      return progress !== undefined && isDayDone(progress);
-    }).length;
+    return days.filter((day) => isDone(progressOf(student, day))).length;
   }
 
   return (
     <section className={s.wrap}>
       <div className={s.controls}>
-        <span className={ui.eyebrow}>{t.homeworkTitle}</span>
-        <label className={s.control}>
-          <span className={ui.label}>{t.colCourse}</span>
-          <select className={s.input} value={courseSlug} onChange={(event) => setCourseSlug(event.target.value)}>
-            {LEARN_COURSES.map((course) => (
-              <option key={course.slug} value={course.slug}>
-                {course.title}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className={s.control}>
-          <span className={ui.label}>{t.rangeFrom}</span>
-          <input
-            className={s.input}
-            type="date"
-            value={firstDay}
-            max={lastDay}
-            onChange={(event) => event.target.value && setFirstDay(event.target.value)}
-          />
-        </label>
-        <label className={s.control}>
-          <span className={ui.label}>{t.rangeTo}</span>
-          <input
-            className={s.input}
-            type="date"
-            value={lastDay}
-            min={firstDay}
-            onChange={(event) => event.target.value && setLastDay(event.target.value)}
-          />
-        </label>
+        <span className={ui.eyebrow}>{homework ? t.specificHomework : t.homeworkTitle}</span>
+        {!homework && (
+          <>
+            <label className={s.control}>
+              <span className={ui.label}>{t.colCourse}</span>
+              <select className={s.input} value={courseSlug} onChange={(event) => setCourseSlug(event.target.value)}>
+                {LEARN_COURSES.map((course) => (
+                  <option key={course.slug} value={course.slug}>
+                    {course.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className={s.control}>
+              <span className={ui.label}>{t.rangeFrom}</span>
+              <input
+                className={s.input}
+                type="date"
+                value={firstDay}
+                max={lastDay}
+                onChange={(event) => event.target.value && setFirstDay(event.target.value)}
+              />
+            </label>
+            <label className={s.control}>
+              <span className={ui.label}>{t.rangeTo}</span>
+              <input
+                className={s.input}
+                type="date"
+                value={lastDay}
+                min={firstDay}
+                onChange={(event) => event.target.value && setLastDay(event.target.value)}
+              />
+            </label>
+          </>
+        )}
       </div>
 
       <div className={s.card}>
@@ -132,7 +149,7 @@ export default function HomeworkGrid({ students }: { students: StudentStats[] })
                     {days.map((day) => {
                       const progress = progressOf(student, day);
                       return (
-                        <td key={day} className={dayCellClassName(progress)}>
+                        <td key={day} className={dayCellClassName(progress, isDone(progress))}>
                           {progress ? `${progress.answered} · ${progress.bestRun}` : '–'}
                         </td>
                       );
@@ -146,7 +163,7 @@ export default function HomeworkGrid({ students }: { students: StudentStats[] })
       </div>
       <p className={ui.mono}>
         {t.homeworkGridHint
-          .replace('{count}', String(DAILY_QUESTIONS_GOAL))
+          .replace('{count}', String(questionsGoal))
           .replace('{goal}', String(RUN_CORRECT_GOAL))
           .replace('{length}', String(RUN_LENGTH))}
       </p>
