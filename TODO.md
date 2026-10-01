@@ -4,7 +4,7 @@ Lista de pendientes del sitio. Al terminar uno se marca con `[x]`, no se borra.
 
 ## Learn
 
-- [x] **Importador de preguntas: subir archivo y revisar antes de escribir.** Elegir un `.json` además de pegarlo; lista de todas las preguntas con su estado (nueva en verde, reemplaza con cambios en rojo, sin id en rojo, idéntica en amarillo), botón Editar por pregunta y advertencia con los conteos al confirmar. Diseñado en `docs/new_homeworks_design.md` (ítem 5).
+- [x] **Importador de preguntas: subir archivo y revisar antes de escribir.** Elegir un `.json` además de pegarlo; lista de todas las preguntas con su estado (nueva en verde, reemplaza con cambios en rojo, sin id en rojo, idéntica en amarillo), botón Editar por pregunta y advertencia con los conteos al confirmar. Documentado en `docs/practice.md` (Question editor).
 - [ ] **Deber de entrega.** Un deber donde el alumno sube la foto o el escaneo de un trabajo hecho a mano (por ejemplo una transcripción), creado como un deber aparte. Necesita almacenamiento de archivos (confirmar si Firebase Storage exige el plan Blaze, o usar otro), pantalla de subida, reglas y un visor para el profesor.
 - [ ] **Importador: conservar los ids de las respuestas al reemplazar.** Cada respuesta de una pregunta (cada opción correcta o incorrecta) tiene un id interno propio, y los exámenes lo usan: un intento guarda "en la pregunta X eligió la opción con id tal".
   - **El problema**: si un archivo importado reemplaza una pregunta que ya está en el banco y no trae ids de respuestas (los archivos escritos a mano no los traen), el importador les pone ids nuevos a todas sus respuestas, aunque el texto sea el mismo. Los intentos de examen ya guardados siguen apuntando a los ids viejos.
