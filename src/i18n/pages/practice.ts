@@ -31,7 +31,10 @@ const en = {
   thisSession: 'This session',
   sessionDayNotice: 'It is past midnight: these answers still count for {day}. To make them count for today, press Stop and come back in.',
 
-  homeworkTitle: 'Homework',
+  homeworkTitle: 'Daily homework',
+  specificHomework: 'Specific homework',
+  practiceThisHomework: 'Practice this homework',
+  homeworkFinished: 'Finished',
   homeworkToday: 'Today',
   homeworkTotal: 'Total',
   homeworkThisWeek: 'This week',
@@ -159,7 +162,10 @@ const es: Record<keyof typeof en, string> = {
   thisSession: 'Esta sesión',
   sessionDayNotice: 'Ya pasó la medianoche: estas respuestas siguen contando para el {day}. Para que cuenten para hoy, pulsa Parar y vuelve a entrar.',
 
-  homeworkTitle: 'Tarea',
+  homeworkTitle: 'Deber diario',
+  specificHomework: 'Deber específico',
+  practiceThisHomework: 'Practicar este deber',
+  homeworkFinished: 'Terminado',
   homeworkToday: 'Hoy',
   homeworkTotal: 'Total',
   homeworkThisWeek: 'Esta semana',

@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic';
 import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { LearnCourse } from '../../data/learn';
-import type { DayProgress } from '../../data/practice';
+import type { DayProgress, Homework } from '../../data/practice';
 
 export type ClassAnswers = {
   /** Every answer the student gave to the questions of the class, and how many were right. */
@@ -13,9 +13,13 @@ export type ClassAnswers = {
 };
 
 export type CourseProgressData = {
-  /** Days of this course only. */
+  /** Days of this course's daily homework only. */
   days: DayProgress[];
   answersByClass: Record<string, ClassAnswers>;
+  /** The specific homeworks of this course, whatever their dates. */
+  homeworks: Homework[];
+  /** The student's days of every specific homework: each card picks its own by `homeworkId`. */
+  homeworkDays: DayProgress[];
 };
 
 // Firebase is browser-only and heavy: the loader renders nothing and fills the context, so

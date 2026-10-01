@@ -5,6 +5,7 @@ import type { LearnCourse } from '../../data/learn';
 import { learnDict } from '../../i18n/learn';
 import { useLocale, useT } from '../../i18n/useT';
 import ClassPracticeLink from '../practice/ClassPracticeLink';
+import CourseHomeworks from '../practice/CourseHomeworks';
 import CourseProgress from '../practice/CourseProgress';
 import { CourseProgressProvider } from '../practice/CourseProgressContext';
 import s from './LearnMenu.module.css';
@@ -39,6 +40,7 @@ export default function ClassList({ course }: { course: LearnCourse }) {
           <h1 className={ui.title}>{course.title}</h1>
         </div>
         <CourseProgress course={course} />
+        <CourseHomeworks course={course} />
         {groupClassesBySection(course).map((group) => (
           <div key={group.classes[0].slug} className={s.group}>
             {group.section && <span className={s.groupLabel}>{group.section}</span>}

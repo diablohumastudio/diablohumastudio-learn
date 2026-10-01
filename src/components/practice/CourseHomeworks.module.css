@@ -1,0 +1,97 @@
+/* Same family as the daily homework card: everything shared is composed from it. */
+.card {
+  composes: card from './CourseProgress.module.css';
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.eyebrow {
+  composes: title from './CourseProgress.module.css';
+}
+
+.name {
+  font-family: var(--font-disp, 'Arial Narrow', sans-serif);
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.section {
+  composes: section from './CourseProgress.module.css';
+}
+
+.sectionLabel {
+  composes: sectionLabel from './CourseProgress.module.css';
+}
+
+.daysSection {
+  composes: weekSection from './CourseProgress.module.css';
+}
+
+.week {
+  composes: week from './CourseProgress.module.css';
+}
+
+/* A homework may last longer than a week. */
+.days {
+  composes: days from './CourseProgress.module.css';
+  flex-wrap: wrap;
+}
+
+.day {
+  composes: day from './CourseProgress.module.css';
+}
+
+.dayLabel {
+  composes: dayLabel from './CourseProgress.module.css';
+}
+
+.dayEmpty {
+  composes: dayEmpty from './CourseProgress.module.css';
+}
+
+.dayStarted {
+  composes: dayStarted from './CourseProgress.module.css';
+}
+
+.dayFuture {
+  composes: dayFuture from './CourseProgress.module.css';
+}
+
+.dayDone {
+  composes: dayDone from './CourseProgress.module.css';
+}
+
+.weekNumbers {
+  composes: weekNumbers from './CourseProgress.module.css';
+}
+
+.weekNumber {
+  composes: weekNumber from './CourseProgress.module.css';
+}
+
+.weekNumberLabel {
+  composes: weekNumberLabel from './CourseProgress.module.css';
+}
+
+.weekNumberValue {
+  composes: weekNumberValue from './CourseProgress.module.css';
+}
+
+.actions {
+  composes: actions from './CourseProgress.module.css';
+}
+
+.practice {
+  composes: practice from './CourseProgress.module.css';
+}
+
+.finished {
+  composes: mono from '../learn/ui.module.css';
+  text-transform: uppercase;
+}
