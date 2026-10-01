@@ -15,17 +15,27 @@ export {
   shuffledCycle,
 } from './types';
 
-export type { DayProgress } from './homework';
+export type { DayProgress, Homework, HomeworkSettings } from './homework';
 export {
   DAILY_QUESTIONS_GOAL,
+  DEFAULT_HOMEWORK_DAILY_GOAL,
+  HOMEWORKS_COLLECTION,
+  MAX_GRID_DAYS,
   RECENT_DAYS_SHOWN,
   RUN_CORRECT_GOAL,
   RUN_LENGTH,
   TIMEOUT_COUNTS_AS_ANSWER,
   dayKey,
+  dayKeyAfter,
   dayKeysBetween,
+  dayText,
   emptyDay,
+  emptyHomeworkDay,
   isDayDone,
+  isDayKey,
+  isHomeworkDayDone,
+  isHomeworkOpen,
+  isHomeworkShown,
   pushRunResult,
   recentDayKeys,
   runCorrectCount,

@@ -54,6 +54,13 @@ service cloud.firestore {
       allow read, write: if isTeacher();
     }
 
+    // Specific homeworks (docs/practice.md): which questions, which days, how many answers a day.
+    // Every signed-in student reads them; the answers are counted in each student's own subtree.
+    match /homeworks/{homeworkId} {
+      allow read: if isSignedIn();
+      allow write: if isTeacher();
+    }
+
     // Exams. Browsers only ever write drafts; opening, starting, submitting and grading go
     // through the API routes (src/pages/api/exam), which use the admin SDK and skip these rules.
     match /exams/{examId} {

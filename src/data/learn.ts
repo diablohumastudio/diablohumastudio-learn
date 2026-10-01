@@ -95,6 +95,7 @@ export const STUDENTS_PRACTICE_INFO_PATH: string = `${TEACHER_PATH}/students-pra
 export const QUESTIONS_EDITOR_PATH: string = `${TEACHER_PATH}/questions`;
 const EXAM_PATH: string = `${LEARN_BASE_PATH}/exam`;
 export const TEACHER_EXAM_PATH: string = `${TEACHER_PATH}/exam`;
+export const TEACHER_HOMEWORKS_PATH: string = `${TEACHER_PATH}/homeworks`;
 export const SIGN_IN_PATH: string = `${LEARN_BASE_PATH}/sign-in`;
 
 /** One course or one class of it. Practice always has a course; only an exam may cover everything. */
@@ -169,6 +170,12 @@ function scopeQuery(scope: PracticeScope): string {
 
 export function practicePlayPath(scope: PracticeScope): string {
   return `${PRACTICE_PLAY_PATH}${scopeQuery(scope)}`;
+}
+
+/** Playing a specific homework: its answers count for it and not for the course's daily homework. */
+export function homeworkPlayPath(courseSlug: string, homeworkId: string): string {
+  const params = new URLSearchParams({ course: courseSlug, homework: homeworkId });
+  return `${PRACTICE_PLAY_PATH}?${params.toString()}`;
 }
 
 /** The page a student takes an exam on: the link the teacher shares. */

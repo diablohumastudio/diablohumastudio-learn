@@ -1,6 +1,9 @@
-/* Homework is counted per course and per day with two numbers: how many questions were
-   answered and the best run, the most correct answers within RUN_LENGTH in a row. The run
-   is what makes the count honest: random clicking reaches the daily count, not the run. */
+/* Homework is counted per day with two numbers: how many questions were answered and the
+   best run, the most correct answers within RUN_LENGTH in a row. The run is what makes the
+   count honest: random clicking reaches the daily count, not the run.
+   There are two kinds, and their answers never mix: the daily homework of a course (any of
+   its questions, every day) and the specific homeworks a teacher creates (their own
+   questions, days and answers per day). */
 
 export const DAILY_QUESTIONS_GOAL: number = 30;
 export const RUN_LENGTH: number = 10;
@@ -14,10 +17,34 @@ export const DAYS_PER_WEEK: number = 7;
 /** Widest range the teacher's grid draws: one column per day. */
 export const MAX_GRID_DAYS: number = 92;
 
+export const HOMEWORKS_COLLECTION: string = 'homeworks';
+export const DEFAULT_HOMEWORK_DAILY_GOAL: number = 50;
+/** A finished homework stays on the course page this long, so students see how it ended. */
+export const HOMEWORK_SHOWN_AFTER_DAYS: number = 7;
+
 const DAY_KEY_PART_WIDTH: number = 2;
+const DAY_KEY_PATTERN: RegExp = /^\d{4}-\d{2}-\d{2}$/;
+
+/** What a teacher sets for a specific homework. */
+export type HomeworkSettings = {
+  title: string;
+  courseSlug: string;
+  /** Questions of the practice bank ticked in the picker: the only ones the homework asks. */
+  questionIds: string[];
+  /** Student-local days ('YYYY-MM-DD'), both included. */
+  firstDay: string;
+  lastDay: string;
+  /** Answers a day needs; the best run asked for is the one of every homework. */
+  dailyGoal: number;
+};
+
+export type Homework = HomeworkSettings & { id: string };
 
 export type DayProgress = {
+  /** Course of the daily homework; empty on the days of a specific homework. */
   courseSlug: string;
+  /** Only on the days of a specific homework, which never count for the daily one. */
+  homeworkId?: string;
   /** Local date of the student, 'YYYY-MM-DD'. */
   day: string;
   answered: number;
@@ -72,12 +99,51 @@ export function weekdayInitial(day: string, locale: string): string {
   return dateOfDayKey(day).toLocaleDateString(locale, { weekday: 'narrow' });
 }
 
+/** 'Thu, Oct 1': how a homework names its first and last day. */
+export function dayText(day: string, locale: string): string {
+  return dateOfDayKey(day).toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+export function isDayKey(value: unknown): value is string {
+  return typeof value === 'string' && DAY_KEY_PATTERN.test(value);
+}
+
+/** `day` moved forward by a number of days. */
+export function dayKeyAfter(day: string, days: number): string {
+  const date = dateOfDayKey(day);
+  date.setDate(date.getDate() + days);
+  return dayKey(date);
+}
+
 export function emptyDay(courseSlug: string, day: string): DayProgress {
   return { courseSlug, day, answered: 0, correct: 0, bestRun: 0 };
 }
 
+export function emptyHomeworkDay(homeworkId: string, day: string): DayProgress {
+  return { courseSlug: '', homeworkId, day, answered: 0, correct: 0, bestRun: 0 };
+}
+
+function isGoalMet(progress: DayProgress, questionsGoal: number): boolean {
+  return progress.answered >= questionsGoal && progress.bestRun >= RUN_CORRECT_GOAL;
+}
+
+/** A day of the daily homework. Takes one argument only, so it is safe as an array callback. */
 export function isDayDone(progress: DayProgress): boolean {
-  return progress.answered >= DAILY_QUESTIONS_GOAL && progress.bestRun >= RUN_CORRECT_GOAL;
+  return isGoalMet(progress, DAILY_QUESTIONS_GOAL);
+}
+
+export function isHomeworkDayDone(progress: DayProgress, homework: Homework): boolean {
+  return isGoalMet(progress, homework.dailyGoal);
+}
+
+/** Day keys compare as text: 'YYYY-MM-DD' sorts like the dates. Answers only count on these days. */
+export function isHomeworkOpen(homework: Homework, today: string): boolean {
+  return homework.firstDay <= today && today <= homework.lastDay;
+}
+
+/** From its first day until a few days after the last one. */
+export function isHomeworkShown(homework: Homework, today: string): boolean {
+  return homework.firstDay <= today && today <= dayKeyAfter(homework.lastDay, HOMEWORK_SHOWN_AFTER_DAYS);
 }
 
 /** The run keeps only the last RUN_LENGTH results, oldest first. */
