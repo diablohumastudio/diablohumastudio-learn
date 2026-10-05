@@ -7,7 +7,7 @@
 | Piece | Files | Role |
 |---|---|---|
 | Question model | `src/data/practice/types.ts`, `src/data/practice/index.ts` | Types, choice drawing, id numbering, class titles and `questionsInScope()` from the Learn registry |
-| Homework model | `src/data/practice/homework.ts` | The goals (`DAILY_QUESTIONS_GOAL`, `RUN_LENGTH`, `RUN_CORRECT_GOAL`), day keys, the run and `isDayDone()`; the `Homework` type of a specific homework and `isHomeworkOpen()` |
+| Homework model | `src/data/practice/homework.ts` | The goals (`DAILY_QUESTIONS_GOAL`, `RUN_LENGTH`, `RUN_CORRECT_GOAL`), day keys, the run and `isDayDone()`; the `Homework` type of a specific homework, its rounds (`HomeworkRound`, `isRoundDone()`, `isHomeworkDayDone()`) and `isHomeworkOpen()` |
 | Specific homeworks | `src/components/practice/homeworks.ts`, `HomeworkManager.tsx`, `CourseHomeworks.tsx` | Firestore reads/writes of `homeworks/{id}`, the teacher page at `/learn/teacher/homeworks` and the cards on the course page |
 | Question selection | `src/data/practice/selection.ts`, `src/components/practice/QuestionPicker.tsx` | Which questions an exam draws from: a list of ids, ticked one by one or all at once after filtering by class or slide (`docs/exam.md`) |
 | Slides of a class | `src/data/learn.ts` (`slideLabels`, `classSlides`), `src/components/learn/useClassSlides.ts` | Slide ids and titles from the deck dictionaries, loaded only by the teacher tools |
@@ -49,13 +49,15 @@ Days use the student's local date, read when the practice session starts: a sess
 
 ## Specific homeworks
 
-Besides the daily homework, a teacher can set a **specific homework**: a list of questions to practice on given days, for instance to let students recover a grade. It is created at `/learn/teacher/homeworks` with a title, the questions (the same picker the exams use, without the exam-only bank), a first and a last day, and the **answers per day** (`dailyGoal`, 50 by default).
+Besides the daily homework, a teacher can set a **specific homework**: questions to practice on given days, for instance to let students recover a grade. It is created at `/learn/teacher/homeworks` with a title, a course, a first and a last day, and one or more **rounds**. Each round has its own questions (the same picker the exams use, without the exam-only bank) and its own **answers per day** (`goal`, 50 by default).
 
-- **It is counted apart.** Playing it (`/learn/practice/play?course=<slug>&homework=<id>`) asks only its questions and fills the homework's own day (`students/{uid}/days/hw-{id}_{day}`). Those answers do **not** count for the daily homework, and normal practice does not count for the specific one, so a student who owes both does both. Lifetime counters, per-question stats and sessions are still updated: they describe the student, not a homework.
-- **A day is done** with `dailyGoal` answers and the same best run as the daily homework (`RUN_CORRECT_GOAL` of `RUN_LENGTH`): `isHomeworkDayDone()`.
+- **Rounds are what keeps a long homework honest.** The best run is asked once per round. A homework of 200 answers in a single round is passed with ten careful answers and 190 random ones; five rounds of 40 ask for the run five times, which is what five separate homeworks of 40 would. In the form, **Duplicate** copies a round with its questions, **Add round** starts an empty one, and a homework keeps at least one. A homework with a single round looks to students the way every homework did before rounds existed.
+- **It is counted apart, round by round.** Playing a round (`/learn/practice/play?course=<slug>&homework=<id>&round=<roundId>`) asks only its questions and fills that round's own day (`students/{uid}/days/hw-{id}-{roundId}_{day}`). Those answers do **not** count for the daily homework nor for another round, and normal practice does not count for the specific one, so a student who owes both does both. Lifetime counters, per-question stats and sessions are still updated: they describe the student, not a homework. Each round is a session of its own, so its run starts empty.
+- **A round is done** with its `goal` answers and the same best run as the daily homework (`RUN_CORRECT_GOAL` of `RUN_LENGTH`): `isRoundDone()`. **A day is done** when every round is: `isHomeworkDayDone()`. A homework of several days asks for all its rounds again each day. When a round is done the player offers the next one; until the student moves on, the answers keep counting for the round being played.
 - **It is open** from its first to its last day, in the student's local date (`isHomeworkOpen()`). The play page refuses it on any other day. A session started on the last day keeps counting for it past midnight, like any session (see Homework).
-- **Everyone in the course sees it**: there is no list of assigned students. The course page shows one card per homework from its first day until `HOMEWORK_SHOWN_AFTER_DAYS` (7) days after the last one (`isHomeworkShown()`), with today's meter, a mark per day and the Practice button while it is open. The teacher decides whose homework counts.
-- **The teacher's view** is the same grid as the daily homework (student × day, `answered · best run`), on the homework's own page, restricted to its days.
+- **Everyone in the course sees it**: there is no list of assigned students. The course page shows one card per homework from its first day until `HOMEWORK_SHOWN_AFTER_DAYS` (7) days after the last one (`isHomeworkShown()`), with today's meter (a line per round when there are several), a mark per day and the Practice button while it is open, which goes to the first round not done yet. The teacher decides whose homework counts.
+- **The teacher's view** is the same grid as the daily homework (student × day, `answered · best run`), on the homework's own page, restricted to its days, with a column per round under each day when there are several.
+- **Round ids are permanent.** A round gets its id when it is added, and the students' answers are keyed by it: changing its questions or its goal, or adding and removing other rounds, never moves anybody's answers. Removing a round leaves its days in the students' accounts, unseen. The only round of a homework saved before rounds existed has no id (`LEGACY_ROUND_ID`): its days keep their old name, `hw-{id}_{day}`, and its link has no `round`.
 - The questions are ordinary practice questions: they are also asked in normal practice. Editing or deleting a homework is always allowed; deleting it leaves the students' days in their accounts, unseen.
 
 ## Question model
@@ -127,17 +129,21 @@ students/{uid}/sessions/{sessionId}
 students/{uid}/days/{courseSlug}_{YYYY-MM-DD}
   courseSlug, day, answered, correct, bestRun, updatedAt   daily homework of one course on one local day
 
-students/{uid}/days/hw-{homeworkId}_{YYYY-MM-DD}
-  homeworkId, day, answered, correct, bestRun, updatedAt   one specific homework on one local day (no courseSlug,
-                                                           so whatever reads the daily homework by course skips it)
+students/{uid}/days/hw-{homeworkId}-{roundId}_{YYYY-MM-DD}
+  homeworkId, roundId, day, answered, correct, bestRun, updatedAt
+                                                           one round of a specific homework on one local day (no
+                                                           courseSlug, so whatever reads the daily homework by course
+                                                           skips it). The round without id: hw-{homeworkId}_{day}, no roundId
 
 homeworks/{homeworkId}
-  title, courseSlug, questionIds[], firstDay, lastDay, dailyGoal, createdAt
+  title, courseSlug, rounds[{ id, questionIds[], goal }], firstDay, lastDay, createdAt
+                                                           saved before rounds existed: questionIds[] and dailyGoal
+                                                           instead of rounds, read as one round without id
 
 teachers/{uid}                                       created by hand; any field
 ```
 
-Each answer is one batched write touching the student doc, the question doc, the session doc and the day doc (the course's, or the specific homework's when one is being played). Any signed-in user reads `homeworks`; only teachers write it. Firestore has no `max()` transform, so `bestRun` is written by the player only when the run beats the record it read from the day doc, and never before that doc has loaded (it would replace a better run with a worse one). Any signed-in user can read the question bank, except while an exam is running, when practice is paused for every non-teacher (`docs/exam.md`); only teachers can write it. A student can only read and write their own subtree; an account whose uid exists in `teachers` can read every student.
+Each answer is one batched write touching the student doc, the question doc, the session doc and the day doc (the course's, or the round's when a specific homework is being played). Any signed-in user reads `homeworks`; only teachers write it. Firestore has no `max()` transform, so `bestRun` is written by the player only when the run beats the record it read from the day doc, and never before that doc has loaded (it would replace a better run with a worse one). Any signed-in user can read the question bank, except while an exam is running, when practice is paused for every non-teacher (`docs/exam.md`); only teachers can write it. A student can only read and write their own subtree; an account whose uid exists in `teachers` can read every student.
 
 ## Firebase console setup (once)
 
@@ -155,5 +161,5 @@ The web config values are not secrets: Firebase expects them in the browser, and
 ## Verifying changes
 
 - `npx tsc --noEmit` for any edit; `npm run build` when routes or dependencies change.
-- Open `http://localhost:3000/learn/wwise-unreal` (homework card, class rows) and `http://localhost:3000/learn/practice/play?course=wwise-unreal` (timer, pips), also under `/es`, for the student flow, `http://localhost:3000/learn/teacher/students-practice-info` for the board, `http://localhost:3000/learn/teacher/homeworks` for the specific homeworks (create one that includes today, then check its card on the course page and that playing it moves its own meter and not the daily one) and `http://localhost:3000/learn/teacher/questions` for the editor (once with a teacher account, once with a student account, which must be denied).
+- Open `http://localhost:3000/learn/wwise-unreal` (homework card, class rows) and `http://localhost:3000/learn/practice/play?course=wwise-unreal` (timer, pips), also under `/es`, for the student flow, `http://localhost:3000/learn/teacher/students-practice-info` for the board, `http://localhost:3000/learn/teacher/homeworks` for the specific homeworks (create one that includes today, then check its card on the course page and that playing it moves its own meter and not the daily one; give it two rounds with a small goal and check that each fills its own line of the card, that the player offers the next round when one is done and that the grid shows a column per round) and `http://localhost:3000/learn/teacher/questions` for the editor (once with a teacher account, once with a student account, which must be denied).
 - Without `.env.local` the pages render a "Firebase is not configured" notice instead of the app.
