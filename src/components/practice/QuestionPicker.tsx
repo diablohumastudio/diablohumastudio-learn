@@ -15,6 +15,8 @@ type QuestionPickerProps = {
   onChange: (courseSlug: string, questionIds: string[]) => void;
   /** Active questions to choose from; exam-only ones are offered only when they are here. */
   questions: readonly PracticeQuestion[];
+  /** A form with several pickers (the rounds of a homework) has its own course select. */
+  hideCourse?: boolean;
 };
 
 /** What the dropdown narrows the list to; the text search narrows it further. */
@@ -74,7 +76,13 @@ function isInGroup(question: PracticeQuestion, filter: GroupFilter): boolean {
 }
 
 /** The question list is what gets saved; the filter decides which questions "Select all" ticks. */
-export default function QuestionPicker({ courseSlug, questionIds, onChange, questions }: QuestionPickerProps) {
+export default function QuestionPicker({
+  courseSlug,
+  questionIds,
+  onChange,
+  questions,
+  hideCourse = false,
+}: QuestionPickerProps) {
   const t = useT(practiceDict);
   const locale = useLocale();
   const [search, setSearch] = useState('');
@@ -121,24 +129,26 @@ export default function QuestionPicker({ courseSlug, questionIds, onChange, ques
 
   return (
     <div className={s.picker}>
-      <label className={ui.field}>
-        <span className={ui.label}>{t.colCourse}</span>
-        <select
-          className={s.select}
-          value={courseSlug}
-          // The questions belong to a course: another course starts with none ticked.
-          onChange={(event) => {
-            setFilterValue(COURSE_FILTER_VALUE);
-            onChange(event.target.value, []);
-          }}
-        >
-          {LEARN_COURSES.map((candidate) => (
-            <option key={candidate.slug} value={candidate.slug}>
-              {candidate.title}
-            </option>
-          ))}
-        </select>
-      </label>
+      {!hideCourse && (
+        <label className={ui.field}>
+          <span className={ui.label}>{t.colCourse}</span>
+          <select
+            className={s.select}
+            value={courseSlug}
+            // The questions belong to a course: another course starts with none ticked.
+            onChange={(event) => {
+              setFilterValue(COURSE_FILTER_VALUE);
+              onChange(event.target.value, []);
+            }}
+          >
+            {LEARN_COURSES.map((candidate) => (
+              <option key={candidate.slug} value={candidate.slug}>
+                {candidate.title}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
       <fieldset className={s.group}>
         <legend className={ui.label}>{t.pickerQuestions}</legend>

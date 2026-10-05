@@ -9,8 +9,9 @@ import {
   dayText,
   isDayKey,
   isHomeworkOpen,
+  newRoundId,
 } from '../../data/practice';
-import type { Homework, HomeworkSettings } from '../../data/practice';
+import type { Homework, HomeworkSettings, PracticeQuestion } from '../../data/practice';
 import type { Locale } from '../../i18n/locales';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
@@ -31,14 +32,20 @@ const DEFAULT_HOMEWORK_DAYS: number = 4;
 
 type PracticeTexts = Record<keyof typeof practiceDict.en, string>;
 
-/** The form's values: numbers stay text until they are validated. */
+/** A round in the form: its answers per day stay text until they are validated. */
+type RoundDraft = {
+  id: string;
+  questionIds: string[];
+  goal: string;
+};
+
+/** The form's values. */
 type Draft = {
   title: string;
   courseSlug: string;
-  questionIds: string[];
+  rounds: RoundDraft[];
   firstDay: string;
   lastDay: string;
-  dailyGoal: string;
 };
 
 type DraftValidation = { ok: true; settings: HomeworkSettings } | { ok: false; message: string };
@@ -51,19 +58,17 @@ function draftOf(homework: Homework | null): Draft {
     return {
       title: '',
       courseSlug: LEARN_COURSES[0].slug,
-      questionIds: [],
+      rounds: [{ id: newRoundId(), questionIds: [], goal: String(DEFAULT_HOMEWORK_DAILY_GOAL) }],
       firstDay: today,
       lastDay: dayKeyAfter(today, DEFAULT_HOMEWORK_DAYS - 1),
-      dailyGoal: String(DEFAULT_HOMEWORK_DAILY_GOAL),
     };
   }
   return {
     title: homework.title,
     courseSlug: homework.courseSlug,
-    questionIds: homework.questionIds,
+    rounds: homework.rounds.map((round) => ({ ...round, goal: String(round.goal) })),
     firstDay: homework.firstDay,
     lastDay: homework.lastDay,
-    dailyGoal: String(homework.dailyGoal),
   };
 }
 
@@ -75,25 +80,20 @@ function areDaysValid(firstDay: string, lastDay: string): boolean {
 
 function validateDraft(draft: Draft, t: PracticeTexts): DraftValidation {
   const title = draft.title.trim();
-  const dailyGoal = Number(draft.dailyGoal);
+  const rounds = draft.rounds.map((round) => ({ ...round, goal: Number(round.goal) }));
   if (title === '') return { ok: false, message: t.validationHomeworkTitle };
-  if (!findCourse(draft.courseSlug) || draft.questionIds.length === 0) {
+  if (!findCourse(draft.courseSlug) || rounds.some((round) => round.questionIds.length === 0)) {
     return { ok: false, message: t.validationHomeworkQuestions };
   }
   if (!areDaysValid(draft.firstDay, draft.lastDay)) {
     return { ok: false, message: t.validationHomeworkDays.replace('{days}', String(MAX_GRID_DAYS)) };
   }
-  if (!Number.isInteger(dailyGoal) || dailyGoal < 1) return { ok: false, message: t.validationHomeworkGoal };
+  if (rounds.some((round) => !Number.isInteger(round.goal) || round.goal < 1)) {
+    return { ok: false, message: t.validationHomeworkGoal };
+  }
   return {
     ok: true,
-    settings: {
-      title,
-      courseSlug: draft.courseSlug,
-      questionIds: draft.questionIds,
-      firstDay: draft.firstDay,
-      lastDay: draft.lastDay,
-      dailyGoal,
-    },
+    settings: { title, courseSlug: draft.courseSlug, rounds, firstDay: draft.firstDay, lastDay: draft.lastDay },
   };
 }
 
@@ -106,6 +106,94 @@ function statusText(homework: Homework, today: string, t: PracticeTexts): string
   return today < homework.firstDay ? t.homeworkUpcoming : t.homeworkFinished;
 }
 
+/** Two rounds may ask the same question: it is counted once. */
+function questionCount(homework: Homework): number {
+  return new Set(homework.rounds.flatMap((round) => round.questionIds)).size;
+}
+
+function answersPerDay(homework: Homework): number {
+  return homework.rounds.reduce((sum, round) => sum + round.goal, 0);
+}
+
+type RoundEditorProps = {
+  /** 1 for the first round. */
+  number: number;
+  round: RoundDraft;
+  courseSlug: string;
+  questions: readonly PracticeQuestion[];
+  isOpen: boolean;
+  /** A homework keeps at least one round. */
+  isOnlyRound: boolean;
+  onToggle: () => void;
+  onChange: (round: RoundDraft) => void;
+  onDuplicate: () => void;
+  onRemove: () => void;
+};
+
+/** One round of the form. Only the open one shows its picker: a homework may have many. */
+function RoundEditor({
+  number,
+  round,
+  courseSlug,
+  questions,
+  isOpen,
+  isOnlyRound,
+  onToggle,
+  onChange,
+  onDuplicate,
+  onRemove,
+}: RoundEditorProps) {
+  const t = useT(practiceDict);
+
+  return (
+    <div className={s.round}>
+      <div className={s.roundHead}>
+        <button type="button" className={s.roundToggle} onClick={onToggle} aria-expanded={isOpen}>
+          <span className={s.roundName}>
+            {isOpen ? '▾' : '▸'} {t.roundLabel} {number}
+          </span>
+          <span className={ui.mono}>
+            {t.roundSummary
+              .replace('{questions}', String(round.questionIds.length))
+              .replace('{answers}', round.goal)}
+          </span>
+        </button>
+        <button type="button" className={s.duplicate} onClick={onDuplicate}>
+          {t.duplicateRound}
+        </button>
+        <button type="button" className={s.remove} onClick={onRemove} disabled={isOnlyRound} aria-label={t.removeRound}>
+          ×
+        </button>
+      </div>
+
+      {isOpen && (
+        <>
+          <label className={s.goalField}>
+            <span className={ui.label}>{t.homeworkDailyGoalLabel}</span>
+            <input
+              className={ui.input}
+              type="number"
+              min={1}
+              value={round.goal}
+              onChange={(event) => onChange({ ...round, goal: event.target.value })}
+            />
+          </label>
+          {/* Exam-only questions are left out: students cannot read that bank. */}
+          <QuestionPicker
+            // Its class filter belongs to the course: another course starts it over.
+            key={courseSlug}
+            hideCourse
+            courseSlug={courseSlug}
+            questionIds={round.questionIds}
+            onChange={(_courseSlug, questionIds) => onChange({ ...round, questionIds })}
+            questions={questions}
+          />
+        </>
+      )}
+    </div>
+  );
+}
+
 type HomeworkFormProps = {
   homework: Homework | null;
   onDone: () => void;
@@ -115,6 +203,10 @@ function HomeworkForm({ homework, onDone }: HomeworkFormProps) {
   const t = useT(practiceDict);
   const bank = useQuestionBank();
   const [draft, setDraft] = useState<Draft>(() => draftOf(homework));
+  // A homework with a single round opens on it, the way the form looked before rounds existed.
+  const [openRoundId, setOpenRoundId] = useState<string | null>(() =>
+    draft.rounds.length === 1 ? draft.rounds[0].id : null
+  );
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -149,6 +241,28 @@ function HomeworkForm({ homework, onDone }: HomeworkFormProps) {
     );
   }
 
+  function replaceRound(changed: RoundDraft) {
+    setDraft({ ...draft, rounds: draft.rounds.map((round) => (round.id === changed.id ? changed : round)) });
+  }
+
+  /** The new round starts without questions and opens, ready to pick them. */
+  function addRound() {
+    const lastRound = draft.rounds[draft.rounds.length - 1];
+    const added: RoundDraft = { id: newRoundId(), questionIds: [], goal: lastRound.goal };
+    setDraft({ ...draft, rounds: [...draft.rounds, added] });
+    setOpenRoundId(added.id);
+  }
+
+  /** The copy goes right after its original, with an id of its own: its answers are counted apart. */
+  function duplicateRound(index: number) {
+    const copy: RoundDraft = { ...draft.rounds[index], id: newRoundId() };
+    setDraft({ ...draft, rounds: [...draft.rounds.slice(0, index + 1), copy, ...draft.rounds.slice(index + 1)] });
+  }
+
+  function removeRound(roundId: string) {
+    setDraft({ ...draft, rounds: draft.rounds.filter((round) => round.id !== roundId) });
+  }
+
   return (
     <form
       className={s.form}
@@ -167,13 +281,51 @@ function HomeworkForm({ homework, onDone }: HomeworkFormProps) {
         />
       </label>
 
-      {/* Exam-only questions are left out: students cannot read that bank. */}
-      <QuestionPicker
-        courseSlug={draft.courseSlug}
-        questionIds={draft.questionIds}
-        onChange={(courseSlug, questionIds) => setDraft({ ...draft, courseSlug, questionIds })}
-        questions={activeQuestions(bank)}
-      />
+      <label className={ui.field}>
+        <span className={ui.label}>{t.colCourse}</span>
+        <select
+          className={s.select}
+          value={draft.courseSlug}
+          // The questions belong to a course: another course starts every round with none ticked.
+          onChange={(event) =>
+            setDraft({
+              ...draft,
+              courseSlug: event.target.value,
+              rounds: draft.rounds.map((round) => ({ ...round, questionIds: [] })),
+            })
+          }
+        >
+          {LEARN_COURSES.map((course) => (
+            <option key={course.slug} value={course.slug}>
+              {course.title}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <div className={ui.field}>
+        <span className={ui.label}>{t.colRounds}</span>
+        <div className={s.rounds}>
+          {draft.rounds.map((round, index) => (
+            <RoundEditor
+              key={round.id}
+              number={index + 1}
+              round={round}
+              courseSlug={draft.courseSlug}
+              questions={activeQuestions(bank)}
+              isOpen={round.id === openRoundId}
+              isOnlyRound={draft.rounds.length === 1}
+              onToggle={() => setOpenRoundId(round.id === openRoundId ? null : round.id)}
+              onChange={replaceRound}
+              onDuplicate={() => duplicateRound(index)}
+              onRemove={() => removeRound(round.id)}
+            />
+          ))}
+        </div>
+        <button type="button" className={s.add} onClick={addRound}>
+          + {t.addRound}
+        </button>
+      </div>
 
       <div className={s.numbers}>
         <label className={ui.field}>
@@ -193,16 +345,6 @@ function HomeworkForm({ homework, onDone }: HomeworkFormProps) {
             value={draft.lastDay}
             min={draft.firstDay}
             onChange={(event) => setDraft({ ...draft, lastDay: event.target.value })}
-          />
-        </label>
-        <label className={ui.field}>
-          <span className={ui.label}>{t.homeworkDailyGoalLabel}</span>
-          <input
-            className={ui.input}
-            type="number"
-            min={1}
-            value={draft.dailyGoal}
-            onChange={(event) => setDraft({ ...draft, dailyGoal: event.target.value })}
           />
         </label>
       </div>
@@ -326,6 +468,7 @@ function Homeworks() {
                   <th>{t.colTitle}</th>
                   <th>{t.colCourse}</th>
                   <th>{t.colDays}</th>
+                  <th className={ui.num}>{t.colRounds}</th>
                   <th className={ui.num}>{t.colQuestions}</th>
                   <th className={ui.num}>{t.colDailyGoal}</th>
                   <th>{t.colStatus}</th>
@@ -341,8 +484,9 @@ function Homeworks() {
                     <td className={s.name}>{homework.title}</td>
                     <td>{findCourse(homework.courseSlug)?.title ?? homework.courseSlug}</td>
                     <td>{daysText(homework, locale)}</td>
-                    <td className={ui.num}>{homework.questionIds.length}</td>
-                    <td className={ui.num}>{homework.dailyGoal}</td>
+                    <td className={ui.num}>{homework.rounds.length}</td>
+                    <td className={ui.num}>{questionCount(homework)}</td>
+                    <td className={ui.num}>{answersPerDay(homework)}</td>
                     <td>{statusText(homework, today, t)}</td>
                   </tr>
                 ))}

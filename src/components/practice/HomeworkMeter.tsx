@@ -11,6 +11,8 @@ type HomeworkMeterProps = {
   liveRun?: readonly boolean[];
   /** Answers the day needs: the daily homework's unless a specific homework sets its own. */
   questionsGoal?: number;
+  /** The meter counts one round of a homework that has several: the hint says so. */
+  isRound?: boolean;
 };
 
 function pipClassName(result: boolean | undefined): string {
@@ -19,7 +21,12 @@ function pipClassName(result: boolean | undefined): string {
 }
 
 /** The two homework numbers of one day: questions answered and the best run. */
-export default function HomeworkMeter({ today, liveRun, questionsGoal = DAILY_QUESTIONS_GOAL }: HomeworkMeterProps) {
+export default function HomeworkMeter({
+  today,
+  liveRun,
+  questionsGoal = DAILY_QUESTIONS_GOAL,
+  isRound = false,
+}: HomeworkMeterProps) {
   const t = useT(practiceDict);
   const answeredShare = Math.min(1, today.answered / questionsGoal);
   const countDone = today.answered >= questionsGoal;
@@ -57,7 +64,7 @@ export default function HomeworkMeter({ today, liveRun, questionsGoal = DAILY_QU
       </div>
 
       <p className={s.hint}>
-        {t.homeworkGoalHint
+        {(isRound ? t.homeworkRoundGoalHint : t.homeworkGoalHint)
           .replace('{count}', String(questionsGoal))
           .replace('{goal}', String(RUN_CORRECT_GOAL))
           .replace('{length}', String(RUN_LENGTH))}

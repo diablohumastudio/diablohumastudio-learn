@@ -12,8 +12,8 @@ import {
   querySlug,
 } from '../../data/learn';
 import type { LearnCourse, PracticeScope } from '../../data/learn';
-import { dayKey, dayText, isHomeworkOpen, questionsInScope, questionsWithIds } from '../../data/practice';
-import type { Homework } from '../../data/practice';
+import { dayKey, dayText, findRound, isHomeworkOpen, questionsInScope, questionsWithIds } from '../../data/practice';
+import type { Homework, RoundOfHomework } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
@@ -49,11 +49,11 @@ type StudentAreaProps = {
   user: User;
   course: LearnCourse;
   scope: PracticeScope;
-  /** Set when a specific homework is played: only its questions, counted apart from the daily homework. */
-  homework: Homework | null;
+  /** Set when a round of a specific homework is played: only its questions, counted apart from the daily homework. */
+  playedRound: RoundOfHomework | null;
 };
 
-function StudentArea({ user, course, scope, homework }: StudentAreaProps) {
+function StudentArea({ user, course, scope, playedRound }: StudentAreaProps) {
   const t = useT(practiceDict);
   const bank = useQuestionBank();
 
@@ -85,18 +85,20 @@ function StudentArea({ user, course, scope, homework }: StudentAreaProps) {
     );
   }
 
-  const scopedQuestions = homework
-    ? questionsWithIds(activeQuestions(bank), homework.questionIds)
+  const scopedQuestions = playedRound
+    ? questionsWithIds(activeQuestions(bank), playedRound.round.questionIds)
     : questionsInScope(activeQuestions(bank), scope);
   if (scopedQuestions.length === 0) {
     return <CourseNotice course={course} message={t.noQuestions} />;
   }
   return (
     <Player
+      // Each round is a session of its own: the next one starts with an empty run.
+      key={playedRound?.round.id}
       uid={user.uid}
       questions={scopedQuestions}
       courseSlug={course.slug}
-      homework={homework}
+      playedRound={playedRound}
       stopHref={coursePath(course)}
     />
   );
@@ -106,10 +108,12 @@ type HomeworkAreaProps = {
   user: User;
   course: LearnCourse;
   homeworkId: string;
+  /** The round the link names, if it names one. */
+  roundId: string | undefined;
 };
 
-/** Loads the homework the link names and lets it be played only on its days. */
-function HomeworkArea({ user, course, homeworkId }: HomeworkAreaProps) {
+/** Loads the homework the link names and lets one of its rounds be played, only on its days. */
+function HomeworkArea({ user, course, homeworkId, roundId }: HomeworkAreaProps) {
   const t = useT(practiceDict);
   const locale = useLocale();
   const [load, setLoad] = useState<HomeworkLoad>({ status: 'loading' });
@@ -144,7 +148,9 @@ function HomeworkArea({ user, course, homeworkId }: HomeworkAreaProps) {
     );
   }
   const { homework } = load;
-  if (!homework || homework.courseSlug !== course.slug) {
+  const round = homework ? findRound(homework, roundId) : undefined;
+  // A round the teacher removed leaves old links behind: they are as stale as a deleted homework's.
+  if (!homework || !round || homework.courseSlug !== course.slug) {
     return <CourseNotice course={course} message={t.homeworkNotFound} />;
   }
   if (!isHomeworkOpen(homework, dayKey(new Date()))) {
@@ -157,7 +163,9 @@ function HomeworkArea({ user, course, homeworkId }: HomeworkAreaProps) {
       />
     );
   }
-  return <StudentArea user={user} course={course} scope={{ courseSlug: course.slug }} homework={homework} />;
+  return (
+    <StudentArea user={user} course={course} scope={{ courseSlug: course.slug }} playedRound={{ homework, round }} />
+  );
 }
 
 export default function PracticeApp() {
@@ -166,6 +174,7 @@ export default function PracticeApp() {
   const auth = useAuthUser();
   const scope = practiceScope(querySlug(router.query.course), querySlug(router.query.class));
   const homeworkId = querySlug(router.query.homework);
+  const roundId = querySlug(router.query.round);
   const course = findCourse(scope.courseSlug);
   const isCourseMissing = router.isReady && !course;
 
@@ -200,9 +209,12 @@ export default function PracticeApp() {
         user={auth.user}
         course={course}
         homeworkId={homeworkId}
+        roundId={roundId}
       />
     );
   }
   // Keyed by scope so a session never mixes the questions of two scopes.
-  return <StudentArea key={practicePlayPath(scope)} user={auth.user} course={course} scope={scope} homework={null} />;
+  return (
+    <StudentArea key={practicePlayPath(scope)} user={auth.user} course={course} scope={scope} playedRound={null} />
+  );
 }

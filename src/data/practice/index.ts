@@ -15,11 +15,12 @@ export {
   shuffledCycle,
 } from './types';
 
-export type { DayProgress, Homework, HomeworkSettings } from './homework';
+export type { DayProgress, Homework, HomeworkRound, HomeworkSettings, RoundOfHomework } from './homework';
 export {
   DAILY_QUESTIONS_GOAL,
   DEFAULT_HOMEWORK_DAILY_GOAL,
   HOMEWORKS_COLLECTION,
+  LEGACY_ROUND_ID,
   MAX_GRID_DAYS,
   RECENT_DAYS_SHOWN,
   RUN_CORRECT_GOAL,
@@ -31,13 +32,17 @@ export {
   dayText,
   emptyDay,
   emptyHomeworkDay,
+  findRound,
   isDayDone,
   isDayKey,
   isHomeworkDayDone,
   isHomeworkOpen,
   isHomeworkShown,
+  isRoundDone,
+  newRoundId,
   pushRunResult,
   recentDayKeys,
+  roundDay,
   runCorrectCount,
   weekDayKeys,
   weekdayInitial,

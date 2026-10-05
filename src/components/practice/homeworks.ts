@@ -2,6 +2,7 @@ import {
   addDoc,
   collection,
   deleteDoc,
+  deleteField,
   doc,
   getDoc,
   getDocs,
@@ -12,23 +13,47 @@ import {
   where,
 } from 'firebase/firestore';
 import type { DocumentData, Unsubscribe } from 'firebase/firestore';
-import { DEFAULT_HOMEWORK_DAILY_GOAL, HOMEWORKS_COLLECTION, isDayKey, parseQuestionIds } from '../../data/practice';
-import type { Homework, HomeworkSettings } from '../../data/practice';
+import {
+  DEFAULT_HOMEWORK_DAILY_GOAL,
+  HOMEWORKS_COLLECTION,
+  LEGACY_ROUND_ID,
+  isDayKey,
+  parseQuestionIds,
+} from '../../data/practice';
+import type { Homework, HomeworkRound, HomeworkSettings } from '../../data/practice';
 import { getFirestoreDb } from '../../lib/firebase';
 
 /* Firestore layout (rules in firebase/firestore.rules):
    homeworks/{homeworkId}   a specific homework: any signed-in user reads it, only teachers write it.
-   Its answers are counted with the student: students/{uid}/days/hw-{homeworkId}_{day} (progress.ts). */
+   Its answers are counted with the student, one doc per round and day:
+   students/{uid}/days/hw-{homeworkId}-{roundId}_{day} (progress.ts). */
+
+function goalOf(value: unknown): number {
+  return Number(value) || DEFAULT_HOMEWORK_DAILY_GOAL;
+}
+
+function toRounds(data: DocumentData): HomeworkRound[] {
+  const stored: unknown[] = Array.isArray(data.rounds) ? data.rounds : [];
+  const rounds = stored
+    .filter((round): round is DocumentData => typeof round === 'object' && round !== null)
+    .map((round) => ({
+      id: typeof round.id === 'string' ? round.id : LEGACY_ROUND_ID,
+      questionIds: parseQuestionIds(round.questionIds),
+      goal: goalOf(round.goal),
+    }));
+  if (rounds.length > 0) return rounds;
+  // Saved before rounds existed: its questions and its answers per day are its only round.
+  return [{ id: LEGACY_ROUND_ID, questionIds: parseQuestionIds(data.questionIds), goal: goalOf(data.dailyGoal) }];
+}
 
 function toHomework(id: string, data: DocumentData): Homework {
   return {
     id,
     title: data.title ?? '',
     courseSlug: data.courseSlug ?? '',
-    questionIds: parseQuestionIds(data.questionIds),
+    rounds: toRounds(data),
     firstDay: isDayKey(data.firstDay) ? data.firstDay : '',
     lastDay: isDayKey(data.lastDay) ? data.lastDay : '',
-    dailyGoal: Number(data.dailyGoal) || DEFAULT_HOMEWORK_DAILY_GOAL,
   };
 }
 
@@ -66,7 +91,12 @@ export async function createHomework(settings: HomeworkSettings): Promise<void> 
 }
 
 export async function updateHomework(homeworkId: string, settings: HomeworkSettings): Promise<void> {
-  await updateDoc(doc(getFirestoreDb(), HOMEWORKS_COLLECTION, homeworkId), { ...settings });
+  await updateDoc(doc(getFirestoreDb(), HOMEWORKS_COLLECTION, homeworkId), {
+    ...settings,
+    // Where a homework older than the rounds kept what is now in its round.
+    questionIds: deleteField(),
+    dailyGoal: deleteField(),
+  });
 }
 
 /** The days students already filled stay in their accounts; nothing shows them any more. */

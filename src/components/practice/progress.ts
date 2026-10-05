@@ -11,7 +11,7 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import type { DocumentData, Timestamp, Unsubscribe } from 'firebase/firestore';
-import { emptyDay, emptyHomeworkDay } from '../../data/practice/homework';
+import { LEGACY_ROUND_ID, emptyDay, emptyHomeworkDay } from '../../data/practice/homework';
 import type { DayProgress } from '../../data/practice/homework';
 import { getFirestoreDb } from '../../lib/firebase';
 
@@ -20,7 +20,8 @@ import { getFirestoreDb } from '../../lib/firebase';
    students/{uid}/questions/{questionId}  attempts per question
    students/{uid}/sessions/{sessionId}    one doc per visit with at least one answer
    students/{uid}/days/{course}_{day}     daily homework of one course on one local day
-   students/{uid}/days/hw-{id}_{day}      one specific homework on one local day (homeworks.ts)
+   students/{uid}/days/hw-{id}-{round}_{day}  one round of a specific homework on one local day
+                                          (homeworks.ts); hw-{id}_{day} for the round without id
    teachers/{uid}                         created by hand; grants read access to every student */
 
 const STUDENTS_COLLECTION: string = 'students';
@@ -48,6 +49,8 @@ export type AnswerRecord = {
   /** The specific homework being played, or null in normal practice. The answer counts for
       that homework's day or for the course's daily homework, never for both. */
   homeworkId: string | null;
+  /** The round of that homework being played (`HomeworkRound.id`); unused in normal practice. */
+  roundId: string;
   /** Local day of the answer (`dayKey`). */
   day: string;
   isCorrect: boolean;
@@ -68,15 +71,23 @@ function studentRef(uid: string) {
   return doc(getFirestoreDb(), STUDENTS_COLLECTION, uid);
 }
 
-function dayRef(uid: string, courseSlug: string, homeworkId: string | null, day: string) {
-  const counterId = homeworkId ? `${HOMEWORK_DAY_ID_PREFIX}${homeworkId}` : courseSlug;
+/** The round without id adds nothing, so the days filled before rounds existed keep their name. */
+function homeworkCounterId(homeworkId: string, roundId: string): string {
+  const roundPart = roundId === LEGACY_ROUND_ID ? '' : `-${roundId}`;
+  return `${HOMEWORK_DAY_ID_PREFIX}${homeworkId}${roundPart}`;
+}
+
+function dayRef(uid: string, courseSlug: string, homeworkId: string | null, roundId: string, day: string) {
+  const counterId = homeworkId ? homeworkCounterId(homeworkId, roundId) : courseSlug;
   return doc(studentRef(uid), DAYS_SUBCOLLECTION, `${counterId}_${day}`);
 }
 
 function toDayProgress(data: DocumentData): DayProgress {
   return {
     courseSlug: data.courseSlug ?? '',
-    ...(typeof data.homeworkId === 'string' ? { homeworkId: data.homeworkId } : {}),
+    ...(typeof data.homeworkId === 'string'
+      ? { homeworkId: data.homeworkId, roundId: typeof data.roundId === 'string' ? data.roundId : LEGACY_ROUND_ID }
+      : {}),
     day: data.day ?? '',
     answered: data.answered ?? 0,
     correct: data.correct ?? 0,
@@ -137,8 +148,18 @@ export function newSessionId(uid: string): string {
 }
 
 export async function recordAnswer(record: AnswerRecord): Promise<void> {
-  const { uid, sessionId, questionId, courseSlug, homeworkId, day, isCorrect, isFirstAnswerOfSession, newBestRun } =
-    record;
+  const {
+    uid,
+    sessionId,
+    questionId,
+    courseSlug,
+    homeworkId,
+    roundId,
+    day,
+    isCorrect,
+    isFirstAnswerOfSession,
+    newBestRun,
+  } = record;
   const db = getFirestoreDb();
   const batch = writeBatch(db);
   const now = serverTimestamp();
@@ -170,10 +191,10 @@ export async function recordAnswer(record: AnswerRecord): Promise<void> {
     { merge: true }
   );
   batch.set(
-    dayRef(uid, courseSlug, homeworkId, day),
+    dayRef(uid, courseSlug, homeworkId, roundId, day),
     {
       // A homework's day carries no course: whatever reads the daily homework by course skips it.
-      ...(homeworkId ? { homeworkId } : { courseSlug }),
+      ...(homeworkId ? { homeworkId, ...(roundId === LEGACY_ROUND_ID ? {} : { roundId }) } : { courseSlug }),
       day,
       answered: increment(1),
       correct: increment(correctDelta),
@@ -191,16 +212,17 @@ export function subscribeDay(
   uid: string,
   courseSlug: string,
   homeworkId: string | null,
+  roundId: string,
   day: string,
   onChange: (progress: DayProgress) => void
 ): Unsubscribe {
-  return onSnapshot(dayRef(uid, courseSlug, homeworkId, day), (snapshot) => {
+  return onSnapshot(dayRef(uid, courseSlug, homeworkId, roundId, day), (snapshot) => {
     if (snapshot.exists()) onChange(toDayProgress(snapshot.data()));
-    else onChange(homeworkId ? emptyHomeworkDay(homeworkId, day) : emptyDay(courseSlug, day));
+    else onChange(homeworkId ? emptyHomeworkDay(homeworkId, roundId, day) : emptyDay(courseSlug, day));
   });
 }
 
-/** Every day of every course and homework: one small doc per day played, filtered by the caller. */
+/** Every day of every course and homework round: one small doc per day played, filtered by the caller. */
 export async function fetchStudentDays(uid: string): Promise<DayProgress[]> {
   const snapshot = await getDocs(collection(studentRef(uid), DAYS_SUBCOLLECTION));
   return snapshot.docs.map((dayDoc) => toDayProgress(dayDoc.data()));

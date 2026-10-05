@@ -29,6 +29,48 @@
   composes: sectionLabel from './CourseProgress.module.css';
 }
 
+/* Today in a homework with several rounds: one line per round, made of the meter's parts. */
+.rounds {
+  composes: meter from './HomeworkMeter.module.css';
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.round {
+  composes: row from './HomeworkMeter.module.css';
+}
+
+.roundLabel {
+  composes: label from './HomeworkMeter.module.css';
+}
+
+.roundTrack {
+  composes: track from './HomeworkMeter.module.css';
+}
+
+.roundFill {
+  composes: fill from './HomeworkMeter.module.css';
+}
+
+.roundFillDone {
+  composes: fillDone from './HomeworkMeter.module.css';
+}
+
+/* Answered and best run side by side: each turns teal when its own goal is met. */
+.roundValue {
+  composes: value from './HomeworkMeter.module.css';
+  white-space: nowrap;
+}
+
+.roundPartDone {
+  color: var(--teal);
+}
+
+.roundsHint {
+  composes: hint from './HomeworkMeter.module.css';
+}
+
 .daysSection {
   composes: weekSection from './CourseProgress.module.css';
 }

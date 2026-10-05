@@ -44,6 +44,94 @@
   gap: 22px;
 }
 
+.select {
+  composes: input from '../learn/ui.module.css';
+  cursor: pointer;
+}
+
+.rounds {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* One round: a line that opens into its answers per day and its question picker. */
+.round {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-width: 0;
+}
+
+.roundHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.roundToggle {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  padding: 6px 4px;
+  cursor: pointer;
+}
+
+.roundToggle:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.roundName {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.duplicate {
+  composes: btnGhost from '../learn/ui.module.css';
+  flex: none;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.remove {
+  composes: btnGhost from '../learn/ui.module.css';
+  flex: none;
+  padding: 6px 12px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.remove:hover:enabled {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.goalField {
+  composes: field from '../learn/ui.module.css';
+  max-width: 220px;
+}
+
+.add {
+  composes: btnGhost from '../learn/ui.module.css';
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
 .numbers {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));

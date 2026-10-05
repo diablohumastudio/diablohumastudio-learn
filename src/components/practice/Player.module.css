@@ -213,6 +213,24 @@
   padding: 18px 24px;
 }
 
+/* A round that is done offers the next one; until then its answers keep counting for it. */
+.roundDone {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.roundDoneText {
+  composes: notice from '../learn/ui.module.css';
+}
+
+.nextRound {
+  composes: btnPrimary from '../learn/ui.module.css';
+  text-decoration: none;
+}
+
 .sessionCount {
   composes: mono from '../learn/ui.module.css';
   font-variant-numeric: tabular-nums;

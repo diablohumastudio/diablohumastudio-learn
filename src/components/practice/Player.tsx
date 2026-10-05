@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { homeworkPlayPath } from '../../data/learn';
 import {
   TIMEOUT_COUNTS_AS_ANSWER,
   dayKey,
@@ -7,12 +8,13 @@ import {
   drawChoices,
   emptyDay,
   emptyHomeworkDay,
+  isRoundDone,
   pushRunResult,
   questionTopicTitle,
   runCorrectCount,
   shuffledCycle,
 } from '../../data/practice';
-import type { DayProgress, Homework, PracticeQuestion, ShuffledChoice } from '../../data/practice';
+import type { DayProgress, PracticeQuestion, RoundOfHomework, ShuffledChoice } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import { percentText } from './format';
@@ -31,8 +33,8 @@ type PlayerProps = {
   questions: PracticeQuestion[];
   /** Course the questions belong to: homework is counted per course. */
   courseSlug: string;
-  /** The specific homework being played, or null: its answers are counted apart, with its own goal. */
-  homework: Homework | null;
+  /** The round of a specific homework being played, or null: its answers are counted apart, with its own goal. */
+  playedRound: RoundOfHomework | null;
   /** Leaving is a link so the browser history matches. */
   stopHref: string;
 };
@@ -50,8 +52,9 @@ type Turn = {
 
 type SessionCount = { answered: number; correct: number };
 
-function emptyDayOf(courseSlug: string, homework: Homework | null, day: string): DayProgress {
-  return homework ? emptyHomeworkDay(homework.id, day) : emptyDay(courseSlug, day);
+function emptyDayOf(courseSlug: string, playedRound: RoundOfHomework | null, day: string): DayProgress {
+  if (!playedRound) return emptyDay(courseSlug, day);
+  return emptyHomeworkDay(playedRound.homework.id, playedRound.round.id, day);
 }
 
 function firstTurn(questions: PracticeQuestion[]): Turn {
@@ -82,7 +85,7 @@ function choiceClassName(choice: ShuffledChoice, index: number, turn: Turn): str
   return `${s.choice} ${s.choiceDim}`;
 }
 
-export default function Player({ uid, questions, courseSlug, homework, stopHref }: PlayerProps) {
+export default function Player({ uid, questions, courseSlug, playedRound, stopHref }: PlayerProps) {
   const t = useT(practiceDict);
   const locale = useLocale();
   const questionSeconds = useQuestionSeconds();
@@ -92,14 +95,15 @@ export default function Player({ uid, questions, courseSlug, homework, stopHref 
   const [run, setRun] = useState<boolean[]>([]);
   // A session belongs to the day it started on, even when it runs past midnight.
   const [sessionDay] = useState(() => dayKey(new Date()));
-  const [today, setToday] = useState<DayProgress>(() => emptyDayOf(courseSlug, homework, sessionDay));
+  const [today, setToday] = useState<DayProgress>(() => emptyDayOf(courseSlug, playedRound, sessionDay));
   const [isDayLoaded, setIsDayLoaded] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(questionSeconds);
   const [saveFailed, setSaveFailed] = useState(false);
   const keyHandlerRef = useRef<(event: KeyboardEvent) => void>(() => {});
   const timeUpHandlerRef = useRef<() => void>(() => {});
 
-  const homeworkId = homework ? homework.id : null;
+  const homeworkId = playedRound ? playedRound.homework.id : null;
+  const roundId = playedRound ? playedRound.round.id : '';
   const question = turn.cycle[turn.position];
   const answered = turn.picked !== null || turn.timedOut;
   const wasCorrect = turn.picked !== null && turn.choices[turn.picked].isCorrect;
@@ -117,6 +121,7 @@ export default function Player({ uid, questions, courseSlug, homework, stopHref 
       questionId: question.id,
       courseSlug,
       homeworkId,
+      roundId,
       day: sessionDay,
       isCorrect,
       isFirstAnswerOfSession: session.answered === 0,
@@ -147,11 +152,11 @@ export default function Player({ uid, questions, courseSlug, homework, stopHref 
 
   useEffect(
     () =>
-      subscribeDay(uid, courseSlug, homeworkId, sessionDay, (progress) => {
+      subscribeDay(uid, courseSlug, homeworkId, roundId, sessionDay, (progress) => {
         setToday(progress);
         setIsDayLoaded(true);
       }),
-    [uid, courseSlug, homeworkId, sessionDay]
+    [uid, courseSlug, homeworkId, roundId, sessionDay]
   );
 
   // One countdown per question shown; it stops as soon as the question is settled.
@@ -180,6 +185,8 @@ export default function Player({ uid, questions, courseSlug, homework, stopHref 
       answer(digit - 1);
       return;
     }
+    // Enter on a focused link (Stop, the next round) follows the link.
+    if (event.key === 'Enter' && event.target instanceof Element && event.target.closest('a')) return;
     if (answered && (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowRight')) {
       event.preventDefault();
       next();
@@ -197,11 +204,20 @@ export default function Player({ uid, questions, courseSlug, homework, stopHref 
   const timerClassName = secondsLeft <= TIMER_URGENT_SECONDS ? s.timerUrgent : s.timer;
   // The timer re-renders the player every second, so this turns true by itself at midnight.
   const isPastSessionDay = dayKey(new Date()) !== sessionDay;
+  const rounds = playedRound ? playedRound.homework.rounds : [];
+  // A homework with a single round reads as it did before rounds existed.
+  const hasRounds = rounds.length > 1;
+  const roundNumber = rounds.findIndex((round) => round.id === roundId) + 1;
+  const nextRound = rounds[roundNumber];
 
   return (
     <div className={s.wrap}>
       <div className={s.topbar}>
-        <span className={s.topic}>{homework ? homework.title : topicTitle ?? t.brand}</span>
+        <span className={s.topic}>
+          {playedRound ? playedRound.homework.title : topicTitle ?? t.brand}
+          {hasRounds &&
+            ` · ${t.roundOf.replace('{number}', String(roundNumber)).replace('{total}', String(rounds.length))}`}
+        </span>
         <span className={s.topbarSpacer} />
         <span className={timerClassName} role="timer" aria-label={t.timeLeft}>
           {secondsLeft} s
@@ -254,7 +270,21 @@ export default function Player({ uid, questions, courseSlug, homework, stopHref 
       </div>
 
       <div className={s.homework}>
-        <HomeworkMeter today={today} liveRun={run} questionsGoal={homework?.dailyGoal} />
+        <HomeworkMeter today={today} liveRun={run} questionsGoal={playedRound?.round.goal} isRound={hasRounds} />
+        {playedRound && hasRounds && isRoundDone(today, playedRound.round) && (
+          <div className={s.roundDone}>
+            <span className={s.roundDoneText}>✓ {t.roundDone.replace('{number}', String(roundNumber))}</span>
+            {nextRound ? (
+              <Link href={homeworkPlayPath(courseSlug, playedRound.homework.id, nextRound.id)} className={s.nextRound}>
+                {t.nextRound} →
+              </Link>
+            ) : (
+              <Link href={stopHref} className={s.nextRound}>
+                ← {t.backToCourse}
+              </Link>
+            )}
+          </div>
+        )}
         <span className={s.sessionCount}>
           {t.thisSession}: {session.correct} / {session.answered} · {percentText(session.correct, session.answered)}
         </span>

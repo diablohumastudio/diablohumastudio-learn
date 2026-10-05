@@ -2,16 +2,19 @@ import Link from 'next/link';
 import { homeworkPlayPath } from '../../data/learn';
 import type { LearnCourse } from '../../data/learn';
 import {
+  RUN_CORRECT_GOAL,
+  RUN_LENGTH,
   dayKey,
   dayKeysBetween,
   dayText,
-  emptyHomeworkDay,
   isHomeworkDayDone,
   isHomeworkOpen,
   isHomeworkShown,
+  isRoundDone,
+  roundDay,
   weekdayInitial,
 } from '../../data/practice';
-import type { DayProgress, Homework } from '../../data/practice';
+import type { DayProgress, Homework, HomeworkRound } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import s from './CourseHomeworks.module.css';
@@ -27,24 +30,80 @@ type HomeworkCardProps = {
   today: string;
 };
 
-function dayOf(homeworkDays: readonly DayProgress[], homework: Homework, day: string): DayProgress {
-  return (
-    homeworkDays.find((candidate) => candidate.homeworkId === homework.id && candidate.day === day) ??
-    emptyHomeworkDay(homework.id, day)
-  );
+/** One day of a homework in the student's account. */
+type HomeworkDay = {
+  day: string;
+  /** The progress in each round, in the order of the rounds. */
+  rounds: DayProgress[];
+  isDone: boolean;
+};
+
+function homeworkDayOf(homeworkDays: readonly DayProgress[], homework: Homework, day: string): HomeworkDay {
+  return {
+    day,
+    rounds: homework.rounds.map((round) => roundDay(homeworkDays, homework, round, day)),
+    isDone: isHomeworkDayDone(homeworkDays, homework, day),
+  };
 }
 
-function dayMarkClassName(progress: DayProgress, homework: Homework, isFuture: boolean): string {
+function answeredOn(homeworkDay: HomeworkDay): number {
+  return homeworkDay.rounds.reduce((sum, progress) => sum + progress.answered, 0);
+}
+
+function dayMarkClassName(homeworkDay: HomeworkDay, isFuture: boolean): string {
   if (isFuture) return s.dayFuture;
-  if (isHomeworkDayDone(progress, homework)) return s.dayDone;
-  return progress.answered > 0 ? s.dayStarted : s.dayEmpty;
+  if (homeworkDay.isDone) return s.dayDone;
+  return answeredOn(homeworkDay) > 0 ? s.dayStarted : s.dayEmpty;
+}
+
+type RoundRowProps = {
+  /** 1 for the first round. */
+  number: number;
+  round: HomeworkRound;
+  progress: DayProgress;
+};
+
+/** Today in one round: the two numbers of the meter on a single line. */
+function RoundRow({ number, round, progress }: RoundRowProps) {
+  const t = useT(practiceDict);
+  const countDone = progress.answered >= round.goal;
+  const runDone = progress.bestRun >= RUN_CORRECT_GOAL;
+  const answeredShare = Math.min(1, progress.answered / round.goal);
+
+  return (
+    <li className={s.round}>
+      <span className={s.roundLabel}>
+        {t.roundLabel} {number}
+      </span>
+      <span className={s.roundTrack} role="img" aria-label={`${progress.answered} / ${round.goal}`}>
+        <span className={countDone ? s.roundFillDone : s.roundFill} style={{ width: `${answeredShare * 100}%` }} />
+      </span>
+      <span className={s.roundValue}>
+        <span className={countDone ? s.roundPartDone : undefined}>
+          {progress.answered} / {round.goal}
+        </span>
+        {' · '}
+        <span className={runDone ? s.roundPartDone : undefined}>
+          {progress.bestRun} / {RUN_LENGTH}
+        </span>
+      </span>
+    </li>
+  );
 }
 
 function HomeworkCard({ course, homework, homeworkDays, today }: HomeworkCardProps) {
   const t = useT(practiceDict);
   const locale = useLocale();
-  const days = dayKeysBetween(homework.firstDay, homework.lastDay).map((day) => dayOf(homeworkDays, homework, day));
+  const days = dayKeysBetween(homework.firstDay, homework.lastDay).map((day) =>
+    homeworkDayOf(homeworkDays, homework, day)
+  );
+  const todayRounds = homeworkDayOf(homeworkDays, homework, today).rounds;
   const isOpen = isHomeworkOpen(homework, today);
+  // A homework with a single round reads as it did before rounds existed.
+  const hasRounds = homework.rounds.length > 1;
+  const pendingIndex = homework.rounds.findIndex((round, index) => !isRoundDone(todayRounds[index], round));
+  // With every round done, the button goes back to the first one.
+  const roundToPlay = homework.rounds[Math.max(pendingIndex, 0)];
 
   return (
     <section className={s.card}>
@@ -58,22 +117,39 @@ function HomeworkCard({ course, homework, homeworkDays, today }: HomeworkCardPro
       {isOpen && (
         <div className={s.section}>
           <span className={s.sectionLabel}>{t.homeworkToday}</span>
-          <HomeworkMeter today={dayOf(homeworkDays, homework, today)} questionsGoal={homework.dailyGoal} />
+          {hasRounds ? (
+            <>
+              <ol className={s.rounds}>
+                {homework.rounds.map((round, index) => (
+                  <RoundRow key={round.id} number={index + 1} round={round} progress={todayRounds[index]} />
+                ))}
+              </ol>
+              <p className={s.roundsHint}>
+                {t.homeworkRoundsHint
+                  .replace('{goal}', String(RUN_CORRECT_GOAL))
+                  .replace('{length}', String(RUN_LENGTH))}
+              </p>
+            </>
+          ) : (
+            <HomeworkMeter today={todayRounds[0]} questionsGoal={homework.rounds[0].goal} />
+          )}
         </div>
       )}
 
       <div className={s.daysSection}>
         <div className={s.week}>
           <ol className={s.days}>
-            {days.map((dayProgress) => (
+            {days.map((homeworkDay) => (
               <li
-                key={dayProgress.day}
+                key={homeworkDay.day}
                 className={s.day}
-                title={`${dayProgress.day} · ${dayProgress.answered} · ${dayProgress.bestRun}`}
+                title={`${homeworkDay.day} · ${homeworkDay.rounds
+                  .map((progress) => `${progress.answered} · ${progress.bestRun}`)
+                  .join(' | ')}`}
               >
-                <span className={s.dayLabel}>{weekdayInitial(dayProgress.day, locale)}</span>
-                <span className={dayMarkClassName(dayProgress, homework, dayProgress.day > today)}>
-                  {isHomeworkDayDone(dayProgress, homework) ? '✓' : ''}
+                <span className={s.dayLabel}>{weekdayInitial(homeworkDay.day, locale)}</span>
+                <span className={dayMarkClassName(homeworkDay, homeworkDay.day > today)}>
+                  {homeworkDay.isDone ? '✓' : ''}
                 </span>
               </li>
             ))}
@@ -82,12 +158,12 @@ function HomeworkCard({ course, homework, homeworkDays, today }: HomeworkCardPro
             <div className={s.weekNumber}>
               <dt className={s.weekNumberLabel}>{t.weekDaysDone}</dt>
               <dd className={s.weekNumberValue}>
-                {days.filter((dayProgress) => isHomeworkDayDone(dayProgress, homework)).length} / {days.length}
+                {days.filter((homeworkDay) => homeworkDay.isDone).length} / {days.length}
               </dd>
             </div>
             <div className={s.weekNumber}>
               <dt className={s.weekNumberLabel}>{t.weekAnswered}</dt>
-              <dd className={s.weekNumberValue}>{days.reduce((sum, dayProgress) => sum + dayProgress.answered, 0)}</dd>
+              <dd className={s.weekNumberValue}>{days.reduce((sum, homeworkDay) => sum + answeredOn(homeworkDay), 0)}</dd>
             </div>
           </dl>
         </div>
@@ -95,8 +171,10 @@ function HomeworkCard({ course, homework, homeworkDays, today }: HomeworkCardPro
 
       <div className={s.actions}>
         {isOpen ? (
-          <Link href={homeworkPlayPath(course.slug, homework.id)} className={s.practice}>
-            {t.practiceThisHomework}
+          <Link href={homeworkPlayPath(course.slug, homework.id, roundToPlay.id)} className={s.practice}>
+            {hasRounds && pendingIndex >= 0
+              ? t.practiceRound.replace('{number}', String(pendingIndex + 1))
+              : t.practiceThisHomework}
           </Link>
         ) : (
           <span className={s.finished}>{t.homeworkFinished}</span>

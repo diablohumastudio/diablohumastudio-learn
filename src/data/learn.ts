@@ -172,9 +172,12 @@ export function practicePlayPath(scope: PracticeScope): string {
   return `${PRACTICE_PLAY_PATH}${scopeQuery(scope)}`;
 }
 
-/** Playing a specific homework: its answers count for it and not for the course's daily homework. */
-export function homeworkPlayPath(courseSlug: string, homeworkId: string): string {
+/** Playing a specific homework: its answers count for it and not for the course's daily homework.
+    `roundId` names the round to play; a round without id (a homework older than the rounds) adds
+    nothing, and the link is then the homework's own. */
+export function homeworkPlayPath(courseSlug: string, homeworkId: string, roundId?: string): string {
   const params = new URLSearchParams({ course: courseSlug, homework: homeworkId });
+  if (roundId) params.set('round', roundId);
   return `${PRACTICE_PLAY_PATH}?${params.toString()}`;
 }
 

@@ -3,7 +3,10 @@
    count honest: random clicking reaches the daily count, not the run.
    There are two kinds, and their answers never mix: the daily homework of a course (any of
    its questions, every day) and the specific homeworks a teacher creates (their own
-   questions, days and answers per day). */
+   questions, days and answers per day).
+   A specific homework is made of rounds, each with its own questions and its own count, and
+   the run is asked of every round: one good stretch of answers passes one round, never a
+   whole long homework. */
 
 export const DAILY_QUESTIONS_GOAL: number = 30;
 export const RUN_LENGTH: number = 10;
@@ -22,29 +25,47 @@ export const DEFAULT_HOMEWORK_DAILY_GOAL: number = 50;
 /** A finished homework stays on the course page this long, so students see how it ended. */
 export const HOMEWORK_SHOWN_AFTER_DAYS: number = 7;
 
+/** The only round of a homework saved before rounds existed has no id: the days its students
+    already filled carry no round, and keep counting for it. */
+export const LEGACY_ROUND_ID: string = '';
+
 const DAY_KEY_PART_WIDTH: number = 2;
 const DAY_KEY_PATTERN: RegExp = /^\d{4}-\d{2}-\d{2}$/;
+const ROUND_ID_LENGTH: number = 6;
+
+/** One round of a specific homework: counted apart from the others, with its own best run. */
+export type HomeworkRound = {
+  /** Opaque and never reused within its homework: the students' answers are keyed by it. */
+  id: string;
+  /** Questions of the practice bank ticked in the picker: the only ones the round asks. */
+  questionIds: string[];
+  /** Answers the round needs each day; the best run asked for is the one of every homework. */
+  goal: number;
+};
 
 /** What a teacher sets for a specific homework. */
 export type HomeworkSettings = {
   title: string;
   courseSlug: string;
-  /** Questions of the practice bank ticked in the picker: the only ones the homework asks. */
-  questionIds: string[];
+  /** At least one, offered in this order. A day is done when every round is. */
+  rounds: HomeworkRound[];
   /** Student-local days ('YYYY-MM-DD'), both included. */
   firstDay: string;
   lastDay: string;
-  /** Answers a day needs; the best run asked for is the one of every homework. */
-  dailyGoal: number;
 };
 
 export type Homework = HomeworkSettings & { id: string };
+
+/** A round together with its homework: what the play screen is given. */
+export type RoundOfHomework = { homework: Homework; round: HomeworkRound };
 
 export type DayProgress = {
   /** Course of the daily homework; empty on the days of a specific homework. */
   courseSlug: string;
   /** Only on the days of a specific homework, which never count for the daily one. */
   homeworkId?: string;
+  /** With `homeworkId`: the round the answers were given in (`HomeworkRound.id`). */
+  roundId?: string;
   /** Local date of the student, 'YYYY-MM-DD'. */
   day: string;
   answered: number;
@@ -119,8 +140,19 @@ export function emptyDay(courseSlug: string, day: string): DayProgress {
   return { courseSlug, day, answered: 0, correct: 0, bestRun: 0 };
 }
 
-export function emptyHomeworkDay(homeworkId: string, day: string): DayProgress {
-  return { courseSlug: '', homeworkId, day, answered: 0, correct: 0, bestRun: 0 };
+export function emptyHomeworkDay(homeworkId: string, roundId: string, day: string): DayProgress {
+  return { courseSlug: '', homeworkId, roundId, day, answered: 0, correct: 0, bestRun: 0 };
+}
+
+export function newRoundId(): string {
+  return Array.from({ length: ROUND_ID_LENGTH }, () => Math.floor(Math.random() * 36).toString(36)).join('');
+}
+
+/** The round a play link names. A link without one is the link of the round without id, the
+    way every homework was linked before rounds existed; failing that, of the first round. */
+export function findRound(homework: Homework, roundId: string | undefined): HomeworkRound | undefined {
+  if (!roundId) return homework.rounds.find((round) => round.id === LEGACY_ROUND_ID) ?? homework.rounds[0];
+  return homework.rounds.find((round) => round.id === roundId);
 }
 
 function isGoalMet(progress: DayProgress, questionsGoal: number): boolean {
@@ -132,8 +164,28 @@ export function isDayDone(progress: DayProgress): boolean {
   return isGoalMet(progress, DAILY_QUESTIONS_GOAL);
 }
 
-export function isHomeworkDayDone(progress: DayProgress, homework: Homework): boolean {
-  return isGoalMet(progress, homework.dailyGoal);
+/** One round of a homework on one day. */
+export function isRoundDone(progress: DayProgress, round: HomeworkRound): boolean {
+  return isGoalMet(progress, round.goal);
+}
+
+/** One round on one day, out of a student's days of every homework. */
+export function roundDay(
+  homeworkDays: readonly DayProgress[],
+  homework: Homework,
+  round: HomeworkRound,
+  day: string
+): DayProgress {
+  return (
+    homeworkDays.find(
+      (candidate) => candidate.homeworkId === homework.id && candidate.roundId === round.id && candidate.day === day
+    ) ?? emptyHomeworkDay(homework.id, round.id, day)
+  );
+}
+
+/** A day of a homework is done when every one of its rounds is. */
+export function isHomeworkDayDone(homeworkDays: readonly DayProgress[], homework: Homework, day: string): boolean {
+  return homework.rounds.every((round) => isRoundDone(roundDay(homeworkDays, homework, round, day), round));
 }
 
 /** Day keys compare as text: 'YYYY-MM-DD' sorts like the dates. Answers only count on these days. */
