@@ -4,7 +4,8 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { isExamOver, isExamRunning, questionsPerStudent } from '../../data/exam/types';
 import type { Exam, ExamAnswers, ExamAttempt, ExamGrade, ExamQuestion } from '../../data/exam/types';
-import { LEARN_BASE_PATH, courseExamsPath, findCourse, querySlug } from '../../data/learn';
+import { courseExamsPath, findCourse, querySlug } from '../../data/learn';
+import type { LearnCourse } from '../../data/learn';
 import { examDict } from '../../i18n/pages/exam';
 import { useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
@@ -39,7 +40,7 @@ function useServerNowMs(clockOffsetMs: number): number {
   return nowMs;
 }
 
-function ExamRoom({ user, examId }: { user: User; examId: string }) {
+function ExamRoom({ user, course, examId }: { user: User; course: LearnCourse; examId: string }) {
   const t = useT(examDict);
   const uid = user.uid;
   const [exam, setExam] = useState<Exam | null | undefined>(undefined);
@@ -59,9 +60,7 @@ function ExamRoom({ user, examId }: { user: User; examId: string }) {
   const running = exam ? isExamRunning(exam, nowMs) : false;
   const over = exam ? isExamOver(exam, nowMs) : false;
   const attemptStatus = attempt?.status;
-  // An exam still loading, or one left without a course, has no list to go back to.
-  const examCourse = findCourse(exam?.courseSlug ?? undefined);
-  const examsHref = examCourse ? courseExamsPath(examCourse) : LEARN_BASE_PATH;
+  const examsHref = courseExamsPath(course);
 
   const refreshAttempt = useCallback(async () => {
     try {
@@ -174,7 +173,11 @@ function ExamRoom({ user, examId }: { user: User; examId: string }) {
   }
 
   if (exam === undefined || attempt === undefined) return message(t.loading, false);
-  if (exam === null || exam.status !== 'opened' || exam.closesAtMs === null) return message(t.examNotFound, true);
+  // The URL names the course, so an exam reached under another course's path is not shown.
+  const isMisplaced = exam !== null && exam.courseSlug !== course.slug;
+  if (exam === null || isMisplaced || exam.status !== 'opened' || exam.closesAtMs === null) {
+    return message(t.examNotFound, true);
+  }
 
   if (submitPending && attempt?.status === 'started') {
     return (
@@ -266,6 +269,7 @@ export default function ExamApp() {
   const t = useT(examDict);
   const router = useRouter();
   const auth = useAuthUser();
+  const course = findCourse(querySlug(router.query.curso));
   const examId = querySlug(router.query.examId);
 
   if (!isFirebaseConfigured()) {
@@ -283,12 +287,12 @@ export default function ExamApp() {
     );
   }
   if (auth.status === 'signedOut') return <SignInRedirect />;
-  if (!examId) {
+  if (!course || !examId) {
     return (
       <div className={ui.centered}>
         <p className={ui.error}>{t.examNotFound}</p>
       </div>
     );
   }
-  return <ExamRoom key={`${examId}:${auth.user.uid}`} user={auth.user} examId={examId} />;
+  return <ExamRoom key={`${examId}:${auth.user.uid}`} user={auth.user} course={course} examId={examId} />;
 }

@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { LEARN_BASE_PATH, querySlug } from '../../data/learn';
+import { COURSES_PATH, querySlug } from '../../data/learn';
 import { learnDict } from '../../i18n/learn';
 import { useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
@@ -8,10 +8,10 @@ import SignIn from './SignIn';
 import ui from './ui.module.css';
 import { useAuthUser } from './useAuthUser';
 
-/** `next` comes from the URL, so only paths inside the section are followed. */
+/** `next` comes from the URL, so only paths of this site are followed (`//host` would leave it). */
 function returnPath(next: string | undefined): string {
-  const staysInSection = next !== undefined && (next === LEARN_BASE_PATH || next.startsWith(`${LEARN_BASE_PATH}/`));
-  return staysInSection ? next : LEARN_BASE_PATH;
+  const staysOnSite = next !== undefined && next.startsWith('/') && !next.startsWith('//');
+  return staysOnSite ? next : COURSES_PATH;
 }
 
 export default function SignInGate() {

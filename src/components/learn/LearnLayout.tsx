@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 import {
-  LEARN_BASE_PATH,
+  COURSES_PATH,
   LEARN_COURSES,
   classPath,
   findClass,
@@ -30,7 +30,7 @@ export function LearnMissing() {
   return (
     <div className={s.missing}>
       <p>{t.classNotFound}</p>
-      <Link href={LEARN_BASE_PATH}>{t.goToMenu}</Link>
+      <Link href={COURSES_PATH}>{t.goToMenu}</Link>
     </div>
   );
 }

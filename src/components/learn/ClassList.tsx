@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { LEARN_BASE_PATH, classPath, groupClassesBySection } from '../../data/learn';
+import { COURSES_PATH, classPath, groupClassesBySection } from '../../data/learn';
 import type { LearnCourse } from '../../data/learn';
 import { learnDict } from '../../i18n/learn';
 import { useLocale, useT } from '../../i18n/useT';
@@ -20,7 +20,7 @@ export function CourseMissing() {
   return (
     <div className={s.missing}>
       <p>{t.courseNotFound}</p>
-      <Link href={LEARN_BASE_PATH}>{t.goToMenu}</Link>
+      <Link href={COURSES_PATH}>{t.goToMenu}</Link>
     </div>
   );
 }
@@ -32,7 +32,7 @@ export default function ClassList({ course }: { course: LearnCourse }) {
   return (
     <CourseProgressProvider course={course}>
       <div className={s.wrap}>
-        <Link href={LEARN_BASE_PATH} className={ui.backLink}>
+        <Link href={COURSES_PATH} className={ui.backLink}>
           ← {t.allCourses}
         </Link>
         <div className={s.heading}>

@@ -14,7 +14,7 @@ Cada deck tiene un diccionario hermano `<slug>.dict.tsx` con todos sus textos en
 
 - Nada de texto literal en el deck: `h1`/`h2`, eyebrows, `figcaption`, `aria-label`, cada `<text>` del SVG, los `label` de los slides y el `name`/`context` del `Deck` salen del diccionario. Los `Rotulos*` reciben su objeto de textos por prop; las `Escena*` (geometría) no reciben textos.
 - El inglés se elige del mismo largo que el español (±15 % de caracteres) para que los rótulos no se salgan de sus cajas ni pisen flechas; si no alcanza, se absorbe con `textAnchor` antes de mover coordenadas. Nombres de producto (views, editors, layouts, `juego.exe`, `player.gd`) quedan en inglés en ambos idiomas.
-- Al tocar una frase en español, revisar su gemela en inglés en el mismo cambio, y abrir el slide en `/learn/...` y `/es/learn/...`.
+- Al tocar una frase en español, revisar su gemela en inglés en el mismo cambio, y abrir el slide en `/course/...` y `/es/course/...`.
 
 ## Color
 

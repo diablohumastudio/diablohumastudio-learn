@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import {
-  LEARN_BASE_PATH,
+  COURSES_PATH,
   QUESTIONS_EDITOR_PATH,
   STUDENTS_PRACTICE_INFO_PATH,
   TEACHER_EXAM_PATH,
@@ -45,7 +45,7 @@ export default function TeacherHub() {
 
   return (
     <div className={s.wrap}>
-      <Link href={LEARN_BASE_PATH} className={ui.backLink}>
+      <Link href={COURSES_PATH} className={ui.backLink}>
         ← {t.backToStudentMode}
       </Link>
       <div className={s.heading}>

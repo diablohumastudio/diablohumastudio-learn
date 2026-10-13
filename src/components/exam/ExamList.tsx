@@ -63,7 +63,7 @@ function OpenedExams({ course }: { course: LearnCourse }) {
             // The list only needs to tell running from finished; the exam page keeps the exact clock.
             const running = isExamRunning(exam, Date.now());
             return (
-              <Link key={exam.id} href={examPath(exam.id)} className={menu.item}>
+              <Link key={exam.id} href={examPath(course, exam.id)} className={menu.item}>
                 {exam.title}
                 <span className={running ? s.running : s.finished}>
                   {running ? `${t.stateRunning} · ${t.endsAt} ` : `${t.stateFinished} · `}

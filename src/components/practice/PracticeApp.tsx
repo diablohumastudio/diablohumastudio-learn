@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import {
-  LEARN_BASE_PATH,
+  COURSES_PATH,
   coursePath,
   findCourse,
   homeworkPlayPath,
@@ -180,7 +180,7 @@ export default function PracticeApp() {
 
   // Practice never mixes courses: a link without a known course goes back to the course menu.
   useEffect(() => {
-    if (isCourseMissing) router.replace(LEARN_BASE_PATH);
+    if (isCourseMissing) router.replace(COURSES_PATH);
   }, [isCourseMissing, router]);
 
   if (!isFirebaseConfigured()) {

@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
-import CourseList from '../../components/learn/CourseList';
-import LearnPageLayout from '../../components/learn/LearnPageLayout';
-import type { NextPageWithLayout } from '../_app';
+import CourseList from '../components/learn/CourseList';
+import LearnPageLayout from '../components/learn/LearnPageLayout';
+import type { NextPageWithLayout } from './_app';
 
 const LearnIndexPage: NextPageWithLayout = () => <CourseList />;
 

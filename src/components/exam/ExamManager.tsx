@@ -285,6 +285,7 @@ function DraftForm({ exam, onDone }: DraftFormProps) {
 function OpenedExam({ exam }: { exam: Exam }) {
   const t = useT(examDict);
   const locale = useLocale();
+  const course = findCourse(exam.courseSlug ?? undefined);
   const running = useIsRunning(exam);
   const [attempts, setAttempts] = useState<ExamAttempt[]>([]);
   const [grades, setGrades] = useState<ExamGrade[]>([]);
@@ -361,12 +362,14 @@ function OpenedExam({ exam }: { exam: Exam }) {
         <span className={ui.mono}>
           {questionsPerStudent(exam)} {t.colQuestions.toLowerCase()} · {exam.durationMinutes} {t.colMinutes.toLowerCase()}
         </span>
-        <span className={ui.mono}>
-          {t.studentLink}:{' '}
-          <Link href={examPath(exam.id)} className={s.link}>
-            {examPath(exam.id)}
-          </Link>
-        </span>
+        {course && (
+          <span className={ui.mono}>
+            {t.studentLink}:{' '}
+            <Link href={examPath(course, exam.id)} className={s.link}>
+              {examPath(course, exam.id)}
+            </Link>
+          </span>
+        )}
         {running && <span className={ui.notice}>{t.practicePausedNote}</span>}
       </div>
 

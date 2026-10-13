@@ -2,10 +2,10 @@ import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { ReactElement } from 'react';
-import LearnLayout, { LearnMissing } from '../../../components/learn/LearnLayout';
-import { findClass, findCourse, querySlug } from '../../../data/learn';
-import { useLocale } from '../../../i18n/useT';
-import type { NextPageWithLayout } from '../../_app';
+import LearnLayout, { LearnMissing } from '../../../../components/learn/LearnLayout';
+import { findClass, findCourse, querySlug } from '../../../../data/learn';
+import { useLocale } from '../../../../i18n/useT';
+import type { NextPageWithLayout } from '../../../_app';
 
 // Forces SSR so route params reach useRouter on the first render:
 // the slide is in the initial HTML instead of appearing after hydration.

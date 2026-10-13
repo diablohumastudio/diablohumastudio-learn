@@ -2,8 +2,16 @@ import dynamic from 'next/dynamic';
 import type { ComponentType } from 'react';
 import type { Dictionary } from '../i18n/useT';
 
-/** URL prefix of the section; every route the section builds goes through `classPath`. */
-export const LEARN_BASE_PATH: string = '/learn';
+/** Every route of the site is built from these constants and the path helpers below. */
+export const COURSES_PATH: string = '/courses';
+export const PRACTICE_PLAY_PATH: string = '/practice/play';
+export const TEACHER_PATH: string = '/teacher';
+export const STUDENTS_PRACTICE_INFO_PATH: string = `${TEACHER_PATH}/students-practice-info`;
+export const QUESTIONS_EDITOR_PATH: string = `${TEACHER_PATH}/questions`;
+export const TEACHER_EXAM_PATH: string = `${TEACHER_PATH}/exam`;
+export const TEACHER_HOMEWORKS_PATH: string = `${TEACHER_PATH}/homeworks`;
+export const SIGN_IN_PATH: string = '/sign-in';
+const COURSE_PATH_PREFIX: string = '/course';
 
 /** The `labels` of a deck dictionary: one key per slide (a stepped slide has one per step). */
 export type SlideLabels = Record<string, string | readonly string[]>;
@@ -89,15 +97,6 @@ export const LEARN_COURSES: LearnCourse[] = [
   },
 ];
 
-export const PRACTICE_PLAY_PATH: string = `${LEARN_BASE_PATH}/practice/play`;
-export const TEACHER_PATH: string = `${LEARN_BASE_PATH}/teacher`;
-export const STUDENTS_PRACTICE_INFO_PATH: string = `${TEACHER_PATH}/students-practice-info`;
-export const QUESTIONS_EDITOR_PATH: string = `${TEACHER_PATH}/questions`;
-const EXAM_PATH: string = `${LEARN_BASE_PATH}/exam`;
-export const TEACHER_EXAM_PATH: string = `${TEACHER_PATH}/exam`;
-export const TEACHER_HOMEWORKS_PATH: string = `${TEACHER_PATH}/homeworks`;
-export const SIGN_IN_PATH: string = `${LEARN_BASE_PATH}/sign-in`;
-
 /** One course or one class of it. Practice always has a course; only an exam may cover everything. */
 export type PracticeScope = {
   courseSlug?: string;
@@ -105,16 +104,16 @@ export type PracticeScope = {
 };
 
 export function coursePath(course: LearnCourse): string {
-  return `${LEARN_BASE_PATH}/${course.slug}`;
+  return `${COURSE_PATH_PREFIX}/${course.slug}`;
 }
 
-/** Exams belong to a course, like practice: the list lives under it, never under /learn. */
+/** Exams belong to a course, like practice: the list lives under it, never at the top level. */
 export function courseExamsPath(course: LearnCourse): string {
-  return `${LEARN_BASE_PATH}/${course.slug}/exams`;
+  return `${coursePath(course)}/exams`;
 }
 
 export function classPath(course: LearnCourse, learnClass: LearnClass): string {
-  return `${LEARN_BASE_PATH}/${course.slug}/${learnClass.slug}`;
+  return `${coursePath(course)}/class/${learnClass.slug}`;
 }
 
 export function findCourse(slug: string | undefined): LearnCourse | undefined {
@@ -182,8 +181,8 @@ export function homeworkPlayPath(courseSlug: string, homeworkId: string, roundId
 }
 
 /** The page a student takes an exam on: the link the teacher shares. */
-export function examPath(examId: string): string {
-  return `${EXAM_PATH}/${examId}`;
+export function examPath(course: LearnCourse, examId: string): string {
+  return `${courseExamsPath(course)}/${examId}`;
 }
 
 export function neighborClass(

@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { LEARN_BASE_PATH } from '../../data/learn';
+import { COURSES_PATH } from '../../data/learn';
 import { learnDict } from '../../i18n/learn';
 import { useT } from '../../i18n/useT';
 import s from './LearnHeader.module.css';
@@ -19,7 +19,7 @@ export default function LearnHeader({ center }: LearnHeaderProps) {
 
   return (
     <header className={s.header}>
-      <Link href={LEARN_BASE_PATH} className={s.brand}>
+      <Link href={COURSES_PATH} className={s.brand}>
         <span className={s.led} />
         {t.brand}
       </Link>
