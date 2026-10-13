@@ -17,10 +17,20 @@ const nextConfig = {
         destination: '/courses',
         permanent: true,
       },
+      // Per locale with `locale: false`: on Vercel the locale-aware form prefixed the
+      // destination with /en, a duplicate URL. With the flag, the default-locale source is
+      // matched with its prefix already added, so it is written /en/learn/:path*.
       {
-        source: '/learn/:path*',
+        source: '/en/learn/:path*',
         destination: '/:path*',
         permanent: true,
+        locale: false,
+      },
+      {
+        source: '/es/learn/:path*',
+        destination: '/es/:path*',
+        permanent: true,
+        locale: false,
       },
       {
         source: '/wwise-unreal',
