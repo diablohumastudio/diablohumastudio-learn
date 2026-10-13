@@ -7,45 +7,61 @@ const nextConfig = {
     locales: ['en', 'es'],
     defaultLocale: 'en',
   },
+  // Old URL shapes. The platform lived under /learn on the marketing site, which now sends
+  // /learn/* here unchanged; courses had no /course prefix and only wwise-unreal existed then.
   async redirects() {
     return [
+      // The bare prefix needs its own rule: with nothing after it, `/:path*` renders as an empty Location.
       {
-        source: '/discord',
-        destination: 'https://discord.gg/5JNJcmHSQ',
-        permanent: false,
-      },
-      // Class links shared before the section moved to /learn.
-      {
-        source: '/incine/:path*',
-        destination: '/learn/:path*',
-        permanent: true,
-      },
-      // Practice has no home of its own any more: it starts from a course (/learn/<course>).
-      {
-        source: '/learn/practice',
-        destination: '/learn',
-        permanent: false,
-      },
-      // Exams are listed per course (/learn/<course>/exams); /learn/exam/<id> still takes one.
-      {
-        source: '/learn/exam',
-        destination: '/learn',
-        permanent: false,
-      },
-      // Links shared before the quiz became /learn/practice and /learn/teacher.
-      {
-        source: '/learn/quiz',
-        destination: '/learn',
+        source: '/learn',
+        destination: '/courses',
         permanent: true,
       },
       {
-        source: '/learn/quiz/teacher',
-        destination: '/learn/teacher/students-practice-info',
+        source: '/learn/:path*',
+        destination: '/:path*',
         permanent: true,
       },
       {
-        source: '/learn/quiz/questions',
-        destination: '/learn/teacher/questions',
+        source: '/wwise-unreal',
+        destination: '/course/wwise-unreal',
+        permanent: true,
+      },
+      {
+        source: '/wwise-unreal/exams',
+        destination: '/course/wwise-unreal/exams',
+        permanent: true,
+      },
+      {
+        source: '/wwise-unreal/:clase',
+        destination: '/course/wwise-unreal/class/:clase',
+        permanent: true,
+      },
+      // Practice has no home of its own (it starts from a course) and exams are listed per course.
+      {
+        source: '/practice',
+        destination: '/courses',
+        permanent: false,
+      },
+      {
+        source: '/exam',
+        destination: '/courses',
+        permanent: false,
+      },
+      // Links shared before the quiz became practice and teacher.
+      {
+        source: '/quiz',
+        destination: '/courses',
+        permanent: true,
+      },
+      {
+        source: '/quiz/teacher',
+        destination: '/teacher/students-practice-info',
+        permanent: true,
+      },
+      {
+        source: '/quiz/questions',
+        destination: '/teacher/questions',
         permanent: true,
       },
     ]
