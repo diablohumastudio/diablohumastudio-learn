@@ -1,6 +1,6 @@
 # Learn: Adding Courses, Classes and Slides
 
-The `/learn` section serves class presentations. It is unlisted (`noindex, nofollow`, never linked from the site) and reachable only by direct URL.
+The platform serves class presentations. It is unlisted (`noindex, nofollow`, never linked from the marketing site) and reachable only by direct URL.
 
 ## How it is wired
 
@@ -11,15 +11,15 @@ The `/learn` section serves class presentations. It is unlisted (`noindex, nofol
 | Deck engine | `src/components/learn/Deck.tsx` + `Deck.module.css` | Slide state, keyboard navigation, playhead/counter, `?s=` URL sync |
 | Deck layout | `src/components/learn/LearnLayout.tsx` | Full-height shell for the decks; puts the course/class dropdowns and the Practice link in the header; `F` toggles full screen |
 | Page layout | `src/components/learn/LearnPageLayout.tsx` | Scrolling column for the menus, practice, teacher and sign-in pages |
-| Header | `src/components/learn/LearnHeader.tsx`, `AccountMenu.tsx`, `ConfigDialog.tsx`, `TeacherLink.tsx`, `useFullscreen.ts` | Shared by both layouts: `LEARN` links to `/learn`; the account name (or Guest user) opens a menu with Teacher (teachers only), language, full screen, Config (language and practice time per question) and sign in / sign out |
-| Menus | `src/components/learn/CourseList.tsx`, `ClassList.tsx` | `/learn` is a course dropdown with a Go to course link; `/learn/<course-slug>` shows the daily homework card, one card per specific homework that is open, and a row per class with its slides link and its practice button (see [practice.md](practice.md)) |
-| Routes | `src/pages/learn/index.tsx`, `src/pages/learn/[curso]/index.tsx` and `src/pages/learn/[curso]/[clase].tsx` | `/learn` is the course menu; `/learn/<course-slug>` is the class menu of a course; the dynamic route renders the selected class |
+| Header | `src/components/learn/LearnHeader.tsx`, `AccountMenu.tsx`, `ConfigDialog.tsx`, `TeacherLink.tsx`, `useFullscreen.ts` | Shared by both layouts: `LEARN` links to `/courses`; the account name (or Guest user) opens a menu with Teacher (teachers only), language, full screen, Config (language and practice time per question) and sign in / sign out |
+| Menus | `src/components/learn/CourseList.tsx`, `ClassList.tsx` | `/courses` is a course dropdown with a Go to course link; `/course/<course-slug>` shows the daily homework card, one card per specific homework that is open, and a row per class with its slides link and its practice button (see [practice.md](practice.md)) |
+| Routes | `src/pages/index.tsx` (redirects to `/courses`), `src/pages/courses.tsx`, `src/pages/course/[curso]/index.tsx` and `src/pages/course/[curso]/class/[clase].tsx` | `/courses` is the course menu; `/course/<course-slug>` is the class menu of a course; the dynamic route renders the selected class |
 
-URLs look like `/learn/<course-slug>/<class-slug>` (e.g. `/learn/wwise-unreal/el-editor-wwise`). The current slide is kept in the `?s=<n>` query param (and the current step of a stepped slide in `&p=<n>`), so browser back/forward walk through visited slides and steps, and a link can point to an exact slide or step.
+URLs look like `/course/<course-slug>/class/<class-slug>` (e.g. `/course/wwise-unreal/class/el-editor-wwise`). The current slide is kept in the `?s=<n>` query param (and the current step of a stepped slide in `&p=<n>`), so browser back/forward walk through visited slides and steps, and a link can point to an exact slide or step.
 
-Practice and the teacher tools live under the same prefix (`/learn/practice`, `/learn/teacher`, `/learn/sign-in`, see [practice.md](practice.md)); static routes win over `[curso]`, so a course can never be slugged `practice`, `teacher`, `exam` or `sign-in`, nor a class `exams` (`/learn/<course>/exams`, see [exam.md](exam.md)). Navigation is always a `next/link` styled as a button, never a `<button>` with `router.push`, so the destination shows in the browser.
+Practice, sign-in and the teacher tools are top-level routes (`/practice/play`, `/sign-in`, `/teacher`, see [practice.md](practice.md)); courses live under `/course/<slug>` and classes under `/course/<slug>/class/<slug>`, so no course or class slug can collide with a static route (the exams of a course are `/course/<slug>/exams`, see [exam.md](exam.md)). Navigation is always a `next/link` styled as a button, never a `<button>` with `router.push`, so the destination shows in the browser.
 
-The `/learn` prefix lives in one place, `LEARN_BASE_PATH` in the registry, and every internal route is built with the registry's helpers (`classPath`, `coursePath`, `practicePlayPath`, `TEACHER_PATH`…). To move the section (another path, or later a subdomain via a host-conditioned rewrite), change the constant and rename `src/pages/learn/`. Links already shared under the old `/incine` prefix are kept alive by a permanent redirect in `next.config.js`.
+Every internal route is built with the registry's constants and helpers (`COURSES_PATH`, `coursePath`, `classPath`, `courseExamsPath`, `examPath`, `practicePlayPath`, `TEACHER_PATH`…); never write a route literal in a component. Until 2026-10 the platform lived under `/learn` on the marketing site: that site now redirects `/learn/*` and `/incine/*` here, and `next.config.js` maps the old shapes (`/learn/...`, `/wwise-unreal/...`, `/quiz/...`) to the current routes.
 
 ## Adding a class (presentation) to an existing course
 
@@ -140,7 +140,7 @@ Stepped slides (one slide built up in several steps, like fragments in other sli
 Texts and languages:
 
 - Every visible text of a deck lives in its `.dict.tsx`: `h1`/`h2` (as JSX, with the amber `span`), eyebrows, `figcaption`, the SVG `aria-label`, every `<text>`, the `Slide` labels and the `Deck` name and context. The SVG `<text>` nodes are JSX, so `{t.key}` goes inside them like anywhere else. Functions that draw labels (the `Rotulos*` pattern) receive their texts object as a prop; geometry helpers take no texts.
-- Keep the two languages about the same length (±15 % characters) so labels stay inside their boxes; absorb a difference with `textAnchor` (`middle`/`end`) before moving coordinates. When a phrase must change length by more, check the slide in both `/learn/...` and `/es/learn/...`.
+- Keep the two languages about the same length (±15 % characters) so labels stay inside their boxes; absorb a difference with `textAnchor` (`middle`/`end`) before moving coordinates. When a phrase must change length by more, check the slide in both `/course/...` and `/es/course/...`.
 - Product names (Wwise views, editors, layouts, file names such as `juego.exe`) stay in English in both dictionaries.
 
 Gotchas:

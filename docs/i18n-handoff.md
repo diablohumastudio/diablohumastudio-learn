@@ -1,5 +1,7 @@
 # Localización (es / en) — propuesta y handoff
 
+> Nota (2026-10-12): este documento se escribió cuando la plataforma vivía en `/learn` dentro del sitio de marketing. Hoy es este repo, servido en `learn.diablohumastudio.com` con las rutas en la raíz (`/courses`, `/course/<slug>/class/<slug>`, `/teacher`…). Las menciones a `/learn`, `/incine`, `hreflang`/`Alternates` y la detección de idioma en `/` describen el sitio de marketing; las decisiones (D1–D8) y los gotchas siguen vigentes aquí.
+
 Estado (2026-09-04): **todas las fases hechas**, incluida `/courses`. Nada pendiente del plan; lo que sigue es que el usuario corrija el copy en español propuesto por Claude (una línea por texto en `src/i18n/` y en los `.dict.tsx`). Desviación respecto al plan: como los cuatro decks recibieron diccionario en el mismo paso, no existe el campo `locales` por clase ni la nota "esta clase está en español" (5.4/L2): el tipo `Dictionary` obliga a tener ambos idiomas, y el título de cada clase en el registro también es por idioma. Las reglas de los diccionarios de deck viven en `docs/learn-courses-and-slides.md` y en `reglas-de-estilo.md` del curso; este documento queda como registro de decisiones.
 
 Quien retome esto: leer primero `CLAUDE.md`, `docs/css-and-nextjs-conventions.md` y `docs/learn-courses-and-slides.md`. Cada ítem de abajo se propone y se aprueba por separado antes de implementarse, y va en su propio commit (`<type>(<scope>): <summary>`, scope `I18n` para la infraestructura y el scope de la página para el copy).

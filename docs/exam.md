@@ -1,6 +1,6 @@
 # Exams: Timed Tests, Server Grading and Setup
 
-`/learn/exam/<id>` is where students take a real, timed test and `/learn/<course>/exams` lists the opened exams of a course; `/learn/teacher/exam` is where a teacher creates, opens and reviews them. Like the rest of `/learn` it is unlisted. **An exam always belongs to one course** (the whole course or one class of it), like practice: the list is reached from the Exams button of the course page's homework card, there is no list under `/learn` (`/learn/exam` redirects there), and the exam room's back links go to the exam's course. It reuses the practice question bank (`docs/practice.md`), but unlike practice **the browser is never trusted**: opening, drawing questions, receiving answers and grading all run on the server (Next API routes on Vercel using the Firebase admin SDK).
+`/course/<course>/exams/<id>` is where students take a real, timed test and `/course/<course>/exams` lists the opened exams of a course; `/teacher/exam` is where a teacher creates, opens and reviews them. Like the rest of the platform it is unlisted. **An exam always belongs to one course** (the whole course or one class of it), like practice: the list is reached from the Exams button of the course page's homework card, there is no global list (`/exam` redirects to `/courses`), and the exam room's back links go to the exam's course. It reuses the practice question bank (`docs/practice.md`), but unlike practice **the browser is never trusted**: opening, drawing questions, receiving answers and grading all run on the server (Next API routes on Vercel using the Firebase admin SDK).
 
 ## What the teacher and the student see
 
@@ -26,11 +26,11 @@
 | Student | `src/components/exam/ExamList.tsx`, `ExamApp.tsx`, `ExamTaker.tsx` | List, exam room (start, resume, submit and retry, result), the one-page taker |
 | Teacher | `src/components/exam/ExamManager.tsx` | Drafts, open, close early, live attempts, replay |
 | Shared | `AttemptReplay.tsx`, `ConfirmPanel.tsx`, `format.ts` | Replay of an attempt, inline confirmation, countdown and error texts |
-| Routes | `src/pages/learn/[curso]/exams.tsx`, `exam/[examId].tsx`, `teacher/exam.tsx` | `next/dynamic` + `ssr: false` like practice; a static `exams.tsx` wins over `[clase]`, so a class can never be slugged `exams` |
+| Routes | `src/pages/course/[curso]/exams/index.tsx`, `course/[curso]/exams/[examId].tsx`, `teacher/exam.tsx` | `next/dynamic` + `ssr: false` like practice; the exam room shows "not found" when the exam does not belong to the course in the URL |
 | Rules | `firebase/firestore.rules` | What browsers may read; they write drafts only |
 | Texts | `src/i18n/pages/exam.ts` | UI strings in both languages |
 
-No course may ever use the slug `exam`: the static route wins over `/learn/[curso]`.
+The exam URL carries the course (`/course/<course>/exams/<id>`); the room checks that the exam's `courseSlug` matches it.
 
 ### API routes
 
@@ -83,7 +83,7 @@ settings/examLock                       written by the API only
 
 ### Exam-only questions
 
-Questions written for exams live in a second bank, `examQuestions/{id}`, with the same model and the same editor (`/learn/teacher/questions`, the **Exam only** checkbox on a new question or on Import JSON). The practice bank cannot hold them because students read it. Only teachers can read `examQuestions`; `open` reads it with the admin SDK. They are never practiced and only reach a paper when ticked in the picker, which has a filter for them. Their ids start with `x-` so they cannot collide with practice ids, and a question never moves between banks.
+Questions written for exams live in a second bank, `examQuestions/{id}`, with the same model and the same editor (`/teacher/questions`, the **Exam only** checkbox on a new question or on Import JSON). The practice bank cannot hold them because students read it. Only teachers can read `examQuestions`; `open` reads it with the admin SDK. They are never practiced and only reach a paper when ticked in the picker, which has a filter for them. Their ids start with `x-` so they cannot collide with practice ids, and a question never moves between banks.
 
 The attempt stores the **texts** next to the ids, so a replay stays exact after the bank is edited. Option ids come from the bank (`id` on every entry of `correct[]` / `incorrect[]`): opaque, assigned by the editor on save or by `open`, kept when the text is edited. A JSON import that leaves them out gets new ones.
 
@@ -109,6 +109,6 @@ Without the variable the routes answer `serverNotConfigured` and the pages show 
 ## Verifying changes
 
 - `npx tsc --noEmit` for any edit; `npm run build` when routes or dependencies change.
-- Teacher: `http://localhost:3000/learn/teacher/exam` → create a draft, open it. Student (another account, another browser): `http://localhost:3000/learn/wwise-unreal/exams` → start, answer, reload mid-exam (answers and draw must survive), submit. Check "Submitted", then the result after the clock ends, and the replay on the teacher side.
-- While it runs, `http://localhost:3000/learn/practice` with the student account must show the pause notice.
+- Teacher: `http://localhost:3000/teacher/exam` → create a draft, open it. Student (another account, another browser): `http://localhost:3000/course/wwise-unreal/exams` → start, answer, reload mid-exam (answers and draw must survive), submit. Check "Submitted", then the result after the clock ends, and the replay on the teacher side.
+- While it runs, `http://localhost:3000/practice/play?course=wwise-unreal` with the student account must show the pause notice.
 - Turn the network off before submitting: the page must show the retry message and send once the network is back.
