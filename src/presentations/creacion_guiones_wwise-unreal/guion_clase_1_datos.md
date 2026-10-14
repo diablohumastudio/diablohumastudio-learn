@@ -12,26 +12,28 @@ Formato, proceso, convenciones y reglas de revisión: `../screenplay_creation_gu
 
 ### s=0 · intro · Portada
 
-Pantalla: portada con una foto de computador de fondo. Kicker: «Intro a Wwise · del disco al servidor». Título: «Datos, programas y servidores». Pista: «Navega con ← → · espacio».
+Pantalla: portada con una foto de computador de fondo. Kicker: «Intro a Wwise · Bases Teoricas. Título: «Datos, programas y servidores». Pista: «Navega con ← → · espacio».
 
 Objetivo: 12 s · 23 palabras ≈ 10 s
 
 ```text
-Bienvenidos a la clase teórica de Intro a Wwise.
+[El kiker ya esta en pantalla]
+Bienvenidos a la clase Intro a Wwise. [Aparece el titulo con animacion de entrada por escala]
 
-Avanza con la flecha derecha o la barra espaciadora. Retrocede con la flecha izquierda.
+Avanza con la flecha derecha o la barra espaciadora. Retrocede con la flecha izquierda. [Aparece la pista con animacion de entrada por escala]
 ```
 
 ### s=1 · Tres ideas (PROPUESTA: diapositiva nueva, con dos pasos)
 
-Pantalla propuesta: tres recuadros en fila: «Los datos dentro del computador», «Qué es un programa» y «Qué es un servidor». En el paso 2, el primer recuadro se resalta en ámbar y los otros dos se atenúan. El mismo esquema aparece después en pequeño en una esquina de cada diapositiva, con la idea actual resaltada, y vuelve a pantalla completa antes de cada idea.
+Pantalla propuesta: tres recuadros en fila: «Los datos dentro del computador», «Qué es un programa» y «Qué es un servidor». Kicker : "Tres temas introductorios" 
 
 #### s=1 p=0 · ideas
 
 Objetivo: 20 s · 44 palabras ≈ 18 s
 
 ```text
-Veremos tres ideas que te servirán como bases teóricas: los datos dentro del computador, qué es un programa y qué es un servidor.
+[ya esta el kiker]
+Veremos tres ideas que te servirán como bases teóricas: los datos dentro del computador, qué es un programa y qué es un servidor. [cada recuadro aparece cuando se lo mensiona]
 ```
 
 #### s=1 p=1 · datos
@@ -39,7 +41,7 @@ Veremos tres ideas que te servirán como bases teóricas: los datos dentro del c
 Objetivo: 5 s · 7 palabras ≈ 3 s
 
 ```text
-Ahora veamos los datos dentro del computador.
+Ahora veamos los datos dentro del computador. [el primer recuadro se resalta en ámbar y los otros dos se atenúan. El mismo esquema se hace pequeño y queda en una esquina de la diapositiva quedara para las siguientes tambien]
 ```
 
 ### s=2 · dato · Qué es un dato (PROPUESTA: diapositiva nueva)
@@ -49,7 +51,8 @@ Pantalla propuesta: título «Un dato es información guardada» y tres ejemplos
 Objetivo: 8 s · 12 palabras ≈ 5 s
 
 ```text
-Un dato es cualquier información guardada: un texto, una imagen, un sonido.
+[El titulo ya esta]
+Un dato es cualquier información guardada: un texto, una imagen, un sonido. [Aparecen cada uno de los dibujos cuando se los mensiona]
 ```
 
 ### s=3 · Analogía de un PC a una biblioteca (diapositiva con dos pasos)
