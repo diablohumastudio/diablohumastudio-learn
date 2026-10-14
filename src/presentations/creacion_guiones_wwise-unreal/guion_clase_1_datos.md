@@ -31,7 +31,7 @@ Pantalla propuesta: tres recuadros en fila: «Los datos dentro del computador»,
 Objetivo: 20 s · 44 palabras ≈ 18 s
 
 ```text
-Veremos tres ideas que te servirán como bases teóricas para entender el funcionamiento de Wwise: los datos dentro del computador, qué es un programa y qué es un servidor. Este esquema te acompaña en una esquina de cada diapositiva, con la idea actual resaltada.
+Veremos tres ideas que te servirán como bases teóricas: los datos dentro del computador, qué es un programa y qué es un servidor.
 ```
 
 #### s=1 p=1 · datos
@@ -67,7 +67,7 @@ En las estanterías cabe de todo, pero buscar un libro ahí es lento: hay que le
 
 En las mesas de los lados hay libros cerrados de las materias en uso. Cabe menos, pero alcanzar uno es rápido.
 
-En la mesa del centro, tú y tres compañeros leen los libros abiertos de la materia de ahora mismo. Caben muy pocos, pero leerlos es instantáneo.
+En la mesa del centro, tú y tres compañeros leen los libros abiertos de la materia en que trabajan ahora mismo. Caben muy pocos, pero leerlos es instantáneo.
 
 La regla: cuanto más cerca de las manos, más rápido, pero menos cabe.
 ```
@@ -81,11 +81,11 @@ Objetivo: 35 s · 94 palabras ≈ 39 s
 ```text
 Ahora veamos las piezas del computador análogas a la biblioteca. [pausa]
 
-Las estanterías son el disco duro. Guarda de todo permanentemente, pero es el más lento de los tres.
+Las estanterías son el disco duro. Guarda de todo permanentemente, pero es el más lento de los tres y su comunicacion es mas lenta porque tambien esta mas lejos. La coneccion suele ser mediante cables o pistas largas en la mainboard.
 
-Las mesas son la memoria RAM: más pequeña, mucho más rápida.
+Las mesas son la memoria RAM: es mucho más pequeña pero mucho más rápida y esta mas cercana. La coneccion suele ser con pistas mas pequenas en la mainboard, osea esta mas cerca. En algunas computadoras incluso, los pines de la ram estan directamente conectadas a los del CPU.
 
-Tú y tus compañeros son la CPU, el procesador: cada persona es un núcleo, que trabaja solo con lo que tiene enfrente. Los libros abiertos son la caché: una memoria diminuta pegada al procesador, con lo que se usa en este instante.
+Tú y tus compañeros son la CPU, el procesador: cada persona es un núcleo, que trabaja solo con lo que tiene enfrente. Los libros abiertos son la caché: una memoria diminuta pegada al procesador, con lo que se usa en este instante. La coneccion es todavia mas pequena pues son pistas del mismo chip.
 
 Cuando un programa dice «cargando», son datos copiándose del disco a la RAM.
 ```
