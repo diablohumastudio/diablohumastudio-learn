@@ -11,9 +11,10 @@ Un archivo por clase, `guion_clase_<n>_<tema>.md`, dentro de `creacion_guiones_<
 - Una sección por diapositiva: `### s=N · label · Título`. Una diapositiva con pasos lleva `### s=N · Título (diapositiva con K pasos)` y una subsección por paso: `#### s=N p=K · label`. `s` es el índice de la diapositiva en la plataforma (`?s=`) y `p` el paso (`&p=`), los dos desde cero. Cuando el guion propone diapositivas nuevas, se numera según la estructura propuesta y el encabezado anota la correspondencia con los índices actuales de la plataforma.
 - Dentro de cada unidad, en este orden:
   - «Pantalla:» lo que el estudiante ve mientras suena la narración: kicker, título, rótulos, dibujo y animación, tal como están hoy en la diapositiva. No se narra; es el contexto para quien revisa sin abrir la plataforma, incluidos los agentes revisores, que no leen nada más.
-  - «Objetivo: N s · P palabras ≈ T s»: duración prevista, cuenta de palabras y estimación a 2,4 palabras por segundo, con tolerancia del 15 %. La cuenta excluye las líneas del bloque de código y el marcador `[pausa]`.
+  - «Objetivo: N s · P palabras ≈ T s»: duración prevista, cuenta de palabras y estimación a 2,4 palabras por segundo, con tolerancia del 15 %. La cuenta excluye las líneas del bloque de código, las instrucciones de voz entre corchetes y las acciones en pantalla entre llaves.
   - El texto narrado, dentro de un bloque de código (```` ```text ````) para que resalte del resto del archivo, en párrafos de una a tres frases separados por una línea en blanco. Cada párrafo ancla un elemento visual o una idea.
-- `[pausa]` marca un silencio de dos a tres segundos, para dejar que una animación termine antes de describirla. Es el único marcador.
+- Entre corchetes, dentro de la narración, van las instrucciones para la voz: cómo decir lo que sigue, por ejemplo `[pausa]` (silencio de dos a tres segundos, para dejar que una animación termine antes de describirla), `[más lento]` o `[énfasis]`. No se leen en voz alta.
+- Entre llaves van las acciones en pantalla: lo que debe cambiar o aparecer en ese punto exacto del texto hablado, por ejemplo `{aparece la flecha de la petición}` o `{se resalta el recuadro de la RAM}`. No se leen. Sirven para escribir el guion viendo las ideas y son la lista de cambios que después se piden a las diapositivas (regla 6).
 - Al final del archivo, una sección «Propuestas de cambio en las diapositivas», numerada y pendiente de aprobación, con lo que la revisión encontró en el contenido de las diapositivas: pertinencia con el curso, completitud para principiantes, gramática y especificidad, y lo que piden las reglas de revisión. Una diapositiva nueva se escribe como una unidad normal marcada «PROPUESTA».
 
 ## Proceso
@@ -26,7 +27,7 @@ Clase por clase, sin flujos de varios agentes: consumen la cuota en minutos.
    - Verificador de pedagogía: de lo general a lo específico; términos simples, explícitos y concisos, definidos al usarse; que no aburra ni sea largo; completo para principiantes; gramática, tildes y especificidad; guía de la mirada coherente con «Pantalla»; pertinencia de cada diapositiva con el curso; cumplimiento de las reglas de revisión.
 3. Aplicar solo las observaciones acertadas, informar las descartadas con su razón, y anotar al final del guion las propuestas de cambio de diapositivas.
 4. Hacer commit del guion corregido, un commit por archivo.
-5. El docente indica cambios. Se aplican sin commit, para que pueda revisar el diff en VS Code y aprobar o volver a corregir. Cada versión aprobada se vuelve a commitear.
+5. El docente indica cambios, o edita el guion directamente y pide el commit. Los cambios indicados se aplican sin commit, para que pueda revisar el diff en VS Code y aprobar o volver a corregir. Cada versión aprobada se vuelve a commitear.
 6. Los cambios en las diapositivas (diccionarios y componentes) solo se hacen con aprobación explícita, en español e inglés con largos parecidos, en commits aparte.
 7. Al cerrar una clase, actualizar `handoff.md` (estado, pendientes, siguiente clase) para empezar la siguiente en una conversación nueva.
 
@@ -53,3 +54,9 @@ Se aplican a todo guion, nuevo o existente, y los revisores comprueban su cumpli
 4. **Qué se aprende y por qué.** La apertura dice, con gramática clara, qué va a ver el estudiante y para qué le sirve: «En esta clase verás tres ideas que te servirán como bases teóricas para entender el funcionamiento de Wwise».
 5. **Narración resaltada.** En el archivo, el texto hablado de cada unidad va dentro de un bloque de código, separado de «Pantalla» y «Objetivo».
 6. **Ojos en movimiento.** La mirada del estudiante debe cambiar de punto como máximo cada 6 segundos y en promedio cada 2,5. Las diapositivas necesitan cambios visuales con ese ritmo (pasos, resaltes, animaciones) y, donde hay pocas gráficas, se minimiza el texto hablado. Por ahora solo se minimiza el texto; el rediseño de las diapositivas queda pendiente.
+7. **Voz entre corchetes, pantalla entre llaves.** Las instrucciones para la voz (`[pausa]`, `[más lento]`, `[énfasis]`) van entre corchetes, y lo que debe cambiar o aparecer en pantalla mientras se habla va entre llaves, en el punto exacto de la narración. Así el guion se escribe viendo las ideas y deja anotados los cambios que piden las diapositivas.
+8. **Una definición, una diapositiva.** Un concepto nuevo (qué es un dato) va en su propia diapositiva, no dentro de otra.
+9. **Transición con el esquema de ideas.** Cada segmento abre con el esquema de ideas a pantalla completa y solo «Ahora veamos…» más el título del segmento. La diapositiva de contenido no repite la introducción ni numera la idea.
+10. **Señalar con frase completa.** «En las estanterías cabe de todo…», no «Arriba, las estanterías: …». Sin pausas de coma para ubicar.
+11. **Decir lo que se hace, sin coloquialismos.** «Veamos las piezas del computador análogas a la biblioteca», no «cada pieza se convierte en…». Las analogías se nombran como analogías.
+12. **Un hecho por concepto en la narración; los matices van a la lectura.** Variantes y precisiones (SSD, memoria del celular) salen del guion hablado y se guardan para el texto de lectura.
