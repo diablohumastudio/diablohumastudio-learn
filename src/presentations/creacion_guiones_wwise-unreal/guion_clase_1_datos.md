@@ -1,8 +1,8 @@
 # Guion · Clase 1 · Datos, programas y servidores
 
-Narración hablada de cada diapositiva de la clase, para que un estudiante la vea solo, sin profesor, con la diapositiva en pantalla. Estado: borrador revisado por un verificador de veracidad y uno de pedagogía y corregido según sus observaciones (2026-10-13); pendiente de revisión del docente. Al final hay una lista de cambios propuestos para las diapositivas, pendientes de aprobación.
+Narración hablada de cada diapositiva de la clase, para que un estudiante la vea solo, sin profesor, con la diapositiva en pantalla. Estado: borrador revisado por un verificador de veracidad y uno de pedagogía, corregido, y ajustado a las reglas de revisión de la guía (2026-10-14); pendiente de revisión del docente. Al final hay una lista de cambios propuestos para las diapositivas, pendientes de aprobación.
 
-Formato, proceso y convenciones de escritura: `../screenplay_creation_guide.md`. Estado del proyecto y archivos de las demás clases: `handoff.md`.
+Formato, proceso, convenciones y reglas de revisión: `../screenplay_creation_guide.md`. Estado del proyecto y archivos de las demás clases: `handoff.md`.
 
 ## Clase 1 · Datos, programas y servidores
 
@@ -12,11 +12,23 @@ Formato, proceso y convenciones de escritura: `../screenplay_creation_guide.md`.
 
 Pantalla: portada con una foto de computador de fondo. Kicker: «Intro a Wwise · del disco al servidor». Título: «Datos, programas y servidores». Pista: «Navega con ← → · espacio».
 
-Objetivo: 35 s · 87 palabras ≈ 36 s
+Objetivo: 25 s · 56 palabras ≈ 23 s
 
-Te doy la bienvenida al curso de Wwise con Unreal. Esta es la primera clase de Intro a Wwise, y todavía no vamos a abrir Wwise. Antes necesitas tres ideas que valen para cualquier computadora: cómo se mueven los datos, qué es un programa y qué es un servidor. Con ellas vas a entender, más adelante, por qué un juego carga sus sonidos en memoria y cómo se comunica con Wwise.
+```text
+Bienvenidos a la clase teórica de Intro a Wwise. Verás tres ideas que te servirán como bases teóricas para entender el funcionamiento de Wwise: cómo se mueven los datos dentro de un computador, qué es un programa y qué es un servidor.
 
-Avanza con la flecha derecha o con la barra espaciadora, y retrocede con la flecha izquierda.
+Avanza con la flecha derecha o la barra espaciadora. Retrocede con la flecha izquierda.
+```
+
+### s=0b · ideas · Tres ideas (PROPUESTA: diapositiva nueva; al aprobarse, las siguientes se renumeran)
+
+Pantalla propuesta: tres recuadros en fila, «Datos: cómo se mueven», «Programa: qué es» y «Servidor: qué es». El mismo esquema aparece después en pequeño en una esquina de cada diapositiva, con el recuadro de la idea actual resaltado en ámbar. Si se aprueba, la portada deja de enumerar las tres ideas: pasan aquí.
+
+Objetivo: 12 s · 26 palabras ≈ 11 s
+
+```text
+Vamos a ver tres ideas como bases teóricas. Este esquema te acompaña en una esquina de cada diapositiva, con la idea en la que estamos resaltada.
+```
 
 ### s=1 · Analogía de un PC a una biblioteca (diapositiva con dos pasos)
 
@@ -24,33 +36,37 @@ Avanza con la flecha derecha o con la barra espaciadora, y retrocede con la flec
 
 Pantalla: kicker «Los datos tienen que llegar al procesador». Título: «Analogía de un PC a una biblioteca». Dibujo de una biblioteca vista desde arriba: arriba, tres estanterías con el rótulo «todas las materias» y la nota «levantarse · lento»; abajo, dos mesas laterales con libros cerrados, rótulo «la mesa», nota «alcanzar · rápido»; en el centro, una mesa con cuatro personas leyendo libros abiertos, rótulo «la materia actual», nota «leer · al instante».
 
-Objetivo: 55 s · 144 palabras ≈ 60 s
+Objetivo: 45 s · 116 palabras ≈ 48 s
 
-Primera idea: cómo se mueven los datos. Un dato es cualquier información guardada: un texto, una imagen, un sonido. Para usarlo, la computadora tiene que llevarlo hasta el procesador, la pieza que hace los cálculos. Para verlo, imagina esta biblioteca vista desde arriba.
+```text
+Primera idea: cómo se mueven los datos dentro de un computador. Un dato es cualquier información guardada: un texto, una imagen, un sonido. Para usarlo, hay que llevarlo hasta el procesador, la pieza que hace los cálculos. Míralo en esta biblioteca.
 
-Arriba están las estanterías, con los libros de todas las materias. Ahí cabe todo, pero ir a buscar un libro es lo más lento: tienes que levantarte y caminar.
+Arriba, las estanterías: todas las materias. Cabe todo, pero buscar un libro ahí es lento: hay que levantarse.
 
-Abajo, a los lados, hay dos mesas con libros cerrados de las materias que estás usando. Cabe mucho menos, pero alcanzar uno es rápido: basta estirar el brazo.
+A los lados, dos mesas con libros cerrados de las materias en uso. Cabe menos, pero alcanzar uno es rápido.
 
 En el centro, tú y tres compañeros leen los libros abiertos de la materia de ahora mismo. Caben muy pocos, pero leerlos es instantáneo.
 
-Esa es la regla: cuanto más cerca de las manos está la información, más rápido la usas, pero menos cabe.
+La regla: cuanto más cerca de las manos, más rápido, pero menos cabe.
+```
 
 #### s=1 p=1 · computador
 
 Pantalla: la misma escena, pero cada pieza cruza a su equivalente en un computador, con animación: las estanterías se vuelven discos duros («todos los datos», «cargar del disco · lento»), las mesas laterales se vuelven módulos de memoria RAM («traer de RAM · rápido») y la mesa central se vuelve una CPU de cuatro núcleos con su caché («lo que usas ya mismo», «leer la caché · al instante»). Leyenda: «Mientras más cerca está la información, más rápido se procesa cuando se necesita».
 
-Objetivo: 50 s · 136 palabras ≈ 57 s
+Objetivo: 45 s · 113 palabras ≈ 47 s
 
-Ahora mira cómo cada pieza de la biblioteca se convierte en una pieza de tu computadora. [pausa]
+```text
+Ahora cada pieza se convierte en una pieza de tu computadora. [pausa]
 
-Las estanterías son el disco: el almacenamiento de la máquina, sea un disco duro, un SSD o la memoria interna de un celular. Ahí vive todo: tus programas y tus archivos, incluidos tus audios. Pero es el más lento de los tres lugares.
+Las estanterías son el disco: el almacenamiento, sea un disco duro, un SSD o la memoria interna de un celular. Guarda todo, programas y archivos, incluidos tus audios, pero es el más lento de los tres.
 
-Las mesas laterales son la memoria RAM: más pequeña que el disco, pero mucho más rápida.
+Las mesas son la memoria RAM: más pequeña, mucho más rápida.
 
-Tú y tus compañeros son la CPU, el procesador: cada persona es un núcleo, que trabaja por su cuenta y solo con lo que tiene enfrente. Los libros abiertos son la caché: una memoria diminuta, pegada al procesador, con lo que se usa en este instante.
+Tú y tus compañeros son la CPU, el procesador: cada persona es un núcleo, que trabaja solo con lo que tiene enfrente. Los libros abiertos son la caché: una memoria diminuta pegada al procesador, con lo que se usa en este instante.
 
-Cuando un programa dice «cargando», casi siempre son datos copiándose del disco a la RAM.
+Cuando un programa dice «cargando», son datos copiándose del disco a la RAM.
+```
 
 ### s=2 · lenguajes · Más abstracto significa menos detalle
 
