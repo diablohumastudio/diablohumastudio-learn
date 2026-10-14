@@ -12,122 +12,143 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Plausible | Del tema pero de otra categoría, o del mismo tipo que la correcta pero un elemento que no se le parece. |
 | 1 | Descartable | Fuera de tema, absurda o descartable con sentido común, sin haber visto la clase. |
 
-**Modo difícil:** una pregunta entra solo si tiene al menos 3 distractores de nivel 5; si no, se excluye (no se rellena con niveles menores). Con los niveles propuestos entran **28 de 103** preguntas activas. El resumen de abajo dice cuántos distractores de nivel 5 faltan en cada una; escribir esos distractores nuevos es el paso siguiente a esta revisión.
+**Modo difícil:** una pregunta entra solo si tiene al menos 3 distractores de nivel 5; si no, se excluye (no se rellena con niveles menores). Con los niveles propuestos entran **28 de 103** preguntas activas; si se aceptan las propuestas de distractores nuevos, entrarían **85 de 103**.
+
+## Propuestas de distractores nuevos
+
+Donde faltan distractores de nivel 5 hay una lista **Propuestas de nivel 5** con el texto propuesto (➕) y por qué sería un 5. Son solo en español; la versión en inglés se escribe al cargarlas. Donde una propuesta sería forzada, o resultaría defendible como correcta, no se propone y se explica (✋). En total: 101 propuestas.
+
+## Revisión de las preguntas
+
+Cada pregunta se revisó en cuatro aspectos: gramática y completitud, especificación de la fuente («según la clase», «según la lectura», o un absoluto), veracidad frente a fuentes externas y posibles ambigüedades. Los hallazgos están en las líneas *Nota* de cada pregunta (60 notas en 50 preguntas); las preguntas sin nota pasaron los cuatro aspectos. Hallazgos que cruzan varias preguntas:
+
+- **Fuentes del curso.** Las clases 1 a 5 están en `src/presentations/wwise-unreal/lectura.es.md` y en las diapositivas; las preguntas wu-001 a wu-wo-038 son coherentes con ellas. Las preguntas wu-wo-101 a 153 salen del handout `handouts/wwise-objects-clasificacion.es.md` (también en PDF), que todavía no pasó por una verificación de veracidad; esa revisión queda anotada en TODO.md.
+- **Nombres de Wwise 2025.1.** El proyecto del laboratorio (Wwise 2025.1.9) organiza la pestaña Audio en Containers, Busses y Devices, y su bus principal es Main Audio Bus; la lectura ya usa esos nombres. Por defecto solo existe Main Audio Bus con los dispositivos System y No_Output: el «Master Motion Bus» y el «Secondary Bus» de la clase son busses principales con otro Audio Device, no objetos por defecto (wu-wo-018, wu-wo-019).
+- **Acciones de Event.** El esquema oficial de Wwise 2025.1.9 no tiene «Set RTPC»; la acción se llama «Set Game Parameter» (wu-wo-028). También existen «Set Voice Volume», «Set Bus Volume», «Set Switch» y «Set State», así que la regla «muchos valores → Game Syncs» es una simplificación de la lectura (wu-wo-130, 133 a 137, 139).
+- **Tipos de ShareSet.** Además de Effects, Attenuations, Conversion Settings y Modulators, el proyecto trae Metadata, Virtual Acoustics y Sidechain Mixes (wu-wo-025).
+- **Random Container.** Nace en modo Standard con «Limit Repetition» = 1, no en Shuffle (wu-wo-013).
+- **Ejemplo de carga de bancos.** wu-005 y wu-wo-117 cuentan el arranque de distinta manera (el banco de menús sube al abrir el juego o cuando la escena lo pide).
+- **Confirmado como correcto:** un solo Output Bus por objeto (wu-wo-017), efectos por voz en el objeto y una instancia en el bus (wu-wo-022), layouts de fábrica (wu-013), suma de volúmenes (wu-wo-014), funciones del plugin de Unreal (wu-wo-127) y la carga previa del Init bank (wu-005).
+
+Fuentes consultadas: el esquema de objetos de Wwise 2025.1.9 (`WObjects.xml` de la instalación local), el proyecto `Laboratorio01_WW` (Wwise 2025.1.9), el plugin de Wwise del proyecto `Laboratorio01_UE` (`AkGameplayStatics.h`, `AkComponent.h`), la lectura de repaso y las diapositivas del curso, y en la web: el blog de Audiokinetic sobre Wwise 2017.2 (busses de motion por Audio Device), la Q&A de Audiokinetic sobre Init.bnk y sobre el Master Secondary Bus (PS4), la Q&A de Audiokinetic sobre efectos por voz frente a efectos en bus, la documentación de la integración Wwise–Unreal (funciones de Blueprint) y la guía de usuario de Wwise sobre Standard y Shuffle. El sitio de documentación de Audiokinetic bloquea la consulta automática, así que los textos oficiales se verificaron con la instalación local y no con la ayuda en línea.
 
 ## Cómo revisar
 
 - Cambia el número de la columna **Nivel** donde no estés de acuerdo; el motivo es solo la justificación de la propuesta.
-- Las líneas *Nota* son observaciones sobre la pregunta misma (ambigüedades, repeticiones, erratas), no sobre los niveles.
+- Marca las propuestas ➕ que aceptas (o edítalas); las que no, bórralas.
+- Las líneas *Nota* son observaciones sobre la pregunta misma, no sobre los niveles; no se ha cambiado ninguna pregunta.
 - Las preguntas con varias respuestas correctas muestran todas; el nivel se asigna a la incorrecta en relación con cualquiera de ellas.
 
 ## Resumen
 
-| Pregunta | Clase | Nivel 5 | Nivel 3 | Nivel 1 | Modo difícil |
-|---|---|:---:|:---:|:---:|---|
-| wu-001 | datos-programas-y-servidores | 2 | 1 | 0 | ❌ falta 1 |
-| wu-002 | datos-programas-y-servidores | 1 | 2 | 0 | ❌ faltan 2 |
-| wu-003 | datos-programas-y-servidores | 1 | 1 | 1 | ❌ faltan 2 |
-| wu-004 | datos-programas-y-servidores | 0 | 2 | 1 | ❌ faltan 3 |
-| wu-005 | datos-programas-y-servidores | 1 | 2 | 0 | ❌ faltan 2 |
-| wu-006 | que-es-un-motor-de-audio | 2 | 0 | 1 | ❌ falta 1 |
-| wu-007 | que-es-un-motor-de-audio | 2 | 0 | 1 | ❌ falta 1 |
-| wu-008 | que-es-un-motor-de-audio | 0 | 3 | 0 | ❌ faltan 3 |
-| wu-009 | wwise-por-adentro | 1 | 1 | 1 | ❌ faltan 2 |
-| wu-010 | wwise-por-adentro | 1 | 2 | 0 | ❌ faltan 2 |
-| wu-011 | el-editor-wwise | 1 | 2 | 0 | ❌ faltan 2 |
-| wu-012 | el-editor-wwise | 0 | 1 | 2 | ❌ faltan 3 |
-| wu-013 | el-editor-wwise | 1 | 2 | 0 | ❌ faltan 2 |
-| wu-wo-001 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 |
-| wu-wo-002 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 |
-| wu-wo-003 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 |
-| wu-wo-004 | wwise-objects | 1 | 4 | 1 | ❌ faltan 2 |
-| wu-wo-005 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-006 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-007 | wwise-objects | 1 | 7 | 0 | ❌ faltan 2 |
-| wu-wo-008 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 |
-| wu-wo-009 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-010 | wwise-objects | 1 | 5 | 1 | ❌ faltan 2 |
-| wu-wo-011 | wwise-objects | 3 | 3 | 0 | ✅ |
-| wu-wo-012 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 |
-| wu-wo-013 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-014 | wwise-objects | 4 | 1 | 1 | ✅ |
-| wu-wo-015 | wwise-objects | 3 | 3 | 0 | ✅ |
-| wu-wo-016 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-017 | wwise-objects | 3 | 3 | 0 | ✅ |
-| wu-wo-018 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-019 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-020 | wwise-objects | 3 | 3 | 0 | ✅ |
-| wu-wo-021 | wwise-objects | 4 | 1 | 1 | ✅ |
-| wu-wo-022 | wwise-objects | 3 | 3 | 0 | ✅ |
-| wu-wo-023 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 |
-| wu-wo-024 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 |
-| wu-wo-025 | wwise-objects | 6 | 0 | 0 | ✅ |
-| wu-wo-026 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-027 | wwise-objects | 3 | 3 | 0 | ✅ |
-| wu-wo-028 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 |
-| wu-wo-029 | wwise-objects | 1 | 3 | 2 | ❌ faltan 2 |
-| wu-wo-030 | wwise-objects | 3 | 3 | 0 | ✅ |
-| wu-wo-031 | wwise-objects | 3 | 3 | 0 | ✅ |
-| wu-wo-032 | wwise-objects | 3 | 3 | 0 | ✅ |
-| wu-wo-033 | wwise-objects | 4 | 2 | 0 | ✅ |
-| wu-wo-034 | wwise-objects | 2 | 2 | 2 | ❌ falta 1 |
-| wu-wo-035 | wwise-objects | 3 | 2 | 1 | ✅ |
-| wu-wo-036 | wwise-objects | 2 | 3 | 0 | ❌ falta 1 |
-| wu-wo-037 | wwise-objects | 4 | 2 | 0 | ✅ |
-| wu-wo-038 | wwise-objects | 3 | 3 | 0 | ✅ |
-| wu-wo-101 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 |
-| wu-wo-102 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-103 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 |
-| wu-wo-104 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-105 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 |
-| wu-wo-106 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-107 | wwise-objects | 3 | 2 | 1 | ✅ |
-| wu-wo-108 | wwise-objects | 6 | 0 | 0 | ✅ |
-| wu-wo-109 | wwise-objects | 3 | 3 | 0 | ✅ |
-| wu-wo-110 | wwise-objects | 1 | 4 | 1 | ❌ faltan 2 |
-| wu-wo-111 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 |
-| wu-wo-112 | wwise-objects | 2 | 2 | 2 | ❌ falta 1 |
-| wu-wo-113 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-114 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 |
-| wu-wo-115 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 |
-| wu-wo-116 | wwise-objects | 1 | 4 | 1 | ❌ faltan 2 |
-| wu-wo-117 | wwise-objects | 1 | 3 | 2 | ❌ faltan 2 |
-| wu-wo-118 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-119 | wwise-objects | 0 | 5 | 1 | ❌ faltan 3 |
-| wu-wo-120 | wwise-objects | 1 | 3 | 2 | ❌ faltan 2 |
-| wu-wo-121 | wwise-objects | 3 | 3 | 0 | ✅ |
-| wu-wo-122 | wwise-objects | 1 | 3 | 2 | ❌ faltan 2 |
-| wu-wo-123 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-124 | wwise-objects | 0 | 5 | 1 | ❌ faltan 3 |
-| wu-wo-125 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-126 | wwise-objects | 0 | 5 | 1 | ❌ faltan 3 |
-| wu-wo-127 | wwise-objects | 4 | 1 | 0 | ✅ |
-| wu-wo-128 | wwise-objects | 3 | 3 | 0 | ✅ |
-| wu-wo-129 | wwise-objects | 1 | 4 | 1 | ❌ faltan 2 |
-| wu-wo-130 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 |
-| wu-wo-131 | wwise-objects | 1 | 4 | 1 | ❌ faltan 2 |
-| wu-wo-132 | wwise-objects | 3 | 3 | 0 | ✅ |
-| wu-wo-133 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-134 | wwise-objects | 1 | 4 | 1 | ❌ faltan 2 |
-| wu-wo-135 | wwise-objects | 3 | 1 | 0 | ✅ |
-| wu-wo-136 | wwise-objects | 4 | 0 | 0 | ✅ |
-| wu-wo-137 | wwise-objects | 4 | 0 | 0 | ✅ |
-| wu-wo-138 | wwise-objects | 2 | 3 | 0 | ❌ falta 1 |
-| wu-wo-139 | wwise-objects | 0 | 5 | 1 | ❌ faltan 3 |
-| wu-wo-140 | wwise-objects | 0 | 6 | 0 | ❌ faltan 3 |
-| wu-wo-141 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-142 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 |
-| wu-wo-143 | wwise-objects | 2 | 3 | 0 | ❌ falta 1 |
-| wu-wo-144 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 |
-| wu-wo-145 | wwise-objects | 3 | 3 | 0 | ✅ |
-| wu-wo-146 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 |
-| wu-wo-147 | wwise-objects | 1 | 4 | 1 | ❌ faltan 2 |
-| wu-wo-148 | wwise-objects | 0 | 5 | 1 | ❌ faltan 3 |
-| wu-wo-149 | wwise-objects | 0 | 2 | 3 | ❌ faltan 3 |
-| wu-wo-150 | wwise-objects | 1 | 4 | 1 | retirada |
-| wu-wo-151 | wwise-objects | 2 | 3 | 0 | ❌ falta 1 |
-| wu-wo-152 | wwise-objects | 1 | 3 | 2 | ❌ faltan 2 |
-| wu-wo-153 | wwise-objects | 3 | 1 | 2 | ✅ |
+La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones sobre la pregunta misma (gramática, fuente, veracidad o ambigüedad); 🟢 no tiene ninguna.
+
+| Pregunta | Clase | Nivel 5 | Nivel 3 | Nivel 1 | Modo difícil | Propuestas | Con propuestas | Notas |
+|---|---|:---:|:---:|:---:|---|:---:|:---:|:---:|
+| wu-001 | datos-programas-y-servidores | 2 | 1 | 0 | ❌ falta 1 | 0 | ❌ | 🟢 0 |
+| wu-002 | datos-programas-y-servidores | 1 | 2 | 0 | ❌ faltan 2 | 1 | ❌ | 🔴 2 |
+| wu-003 | datos-programas-y-servidores | 1 | 1 | 1 | ❌ faltan 2 | 2 | ✅ | 🔴 1 |
+| wu-004 | datos-programas-y-servidores | 0 | 2 | 1 | ❌ faltan 3 | 0 | ❌ | 🔴 2 |
+| wu-005 | datos-programas-y-servidores | 1 | 2 | 0 | ❌ faltan 2 | 2 | ✅ | 🔴 2 |
+| wu-006 | que-es-un-motor-de-audio | 2 | 0 | 1 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-007 | que-es-un-motor-de-audio | 2 | 0 | 1 | ❌ falta 1 | 1 | ✅ | 🔴 2 |
+| wu-008 | que-es-un-motor-de-audio | 0 | 3 | 0 | ❌ faltan 3 | 2 | ❌ | 🔴 1 |
+| wu-009 | wwise-por-adentro | 1 | 1 | 1 | ❌ faltan 2 | 2 | ✅ | 🔴 1 |
+| wu-010 | wwise-por-adentro | 1 | 2 | 0 | ❌ faltan 2 | 2 | ✅ | 🔴 1 |
+| wu-011 | el-editor-wwise | 1 | 2 | 0 | ❌ faltan 2 | 2 | ✅ | 🔴 2 |
+| wu-012 | el-editor-wwise | 0 | 1 | 2 | ❌ faltan 3 | 3 | ✅ | 🟢 0 |
+| wu-013 | el-editor-wwise | 1 | 2 | 0 | ❌ faltan 2 | 1 | ❌ | 🔴 1 |
+| wu-wo-001 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 | 1 | ✅ | 🔴 1 |
+| wu-wo-002 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-003 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-004 | wwise-objects | 1 | 4 | 1 | ❌ faltan 2 | 2 | ✅ | 🔴 1 |
+| wu-wo-005 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-006 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-007 | wwise-objects | 1 | 7 | 0 | ❌ faltan 2 | 0 | ❌ | 🔴 2 |
+| wu-wo-008 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 | 2 | ✅ | 🟢 0 |
+| wu-wo-009 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-010 | wwise-objects | 1 | 5 | 1 | ❌ faltan 2 | 2 | ✅ | 🟢 0 |
+| wu-wo-011 | wwise-objects | 3 | 3 | 0 | ✅ | 0 | ✅ | 🟢 0 |
+| wu-wo-012 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-013 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🔴 1 |
+| wu-wo-014 | wwise-objects | 4 | 1 | 1 | ✅ | 0 | ✅ | 🔴 1 |
+| wu-wo-015 | wwise-objects | 3 | 3 | 0 | ✅ | 0 | ✅ | 🔴 1 |
+| wu-wo-016 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-017 | wwise-objects | 3 | 3 | 0 | ✅ | 0 | ✅ | 🔴 1 |
+| wu-wo-018 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🔴 1 |
+| wu-wo-019 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🔴 1 |
+| wu-wo-020 | wwise-objects | 3 | 3 | 0 | ✅ | 0 | ✅ | 🟢 0 |
+| wu-wo-021 | wwise-objects | 4 | 1 | 1 | ✅ | 0 | ✅ | 🔴 1 |
+| wu-wo-022 | wwise-objects | 3 | 3 | 0 | ✅ | 0 | ✅ | 🔴 1 |
+| wu-wo-023 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 | 2 | ✅ | 🟢 0 |
+| wu-wo-024 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 | 2 | ✅ | 🟢 0 |
+| wu-wo-025 | wwise-objects | 6 | 0 | 0 | ✅ | 0 | ✅ | 🔴 2 |
+| wu-wo-026 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-027 | wwise-objects | 3 | 3 | 0 | ✅ | 0 | ✅ | 🟢 0 |
+| wu-wo-028 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 | 1 | ✅ | 🔴 1 |
+| wu-wo-029 | wwise-objects | 1 | 3 | 2 | ❌ faltan 2 | 1 | ❌ | 🟢 0 |
+| wu-wo-030 | wwise-objects | 3 | 3 | 0 | ✅ | 0 | ✅ | 🟢 0 |
+| wu-wo-031 | wwise-objects | 3 | 3 | 0 | ✅ | 0 | ✅ | 🔴 1 |
+| wu-wo-032 | wwise-objects | 3 | 3 | 0 | ✅ | 0 | ✅ | 🟢 0 |
+| wu-wo-033 | wwise-objects | 4 | 2 | 0 | ✅ | 0 | ✅ | 🟢 0 |
+| wu-wo-034 | wwise-objects | 2 | 2 | 2 | ❌ falta 1 | 0 | ❌ | 🔴 1 |
+| wu-wo-035 | wwise-objects | 3 | 2 | 1 | ✅ | 0 | ✅ | 🟢 0 |
+| wu-wo-036 | wwise-objects | 2 | 3 | 0 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-037 | wwise-objects | 4 | 2 | 0 | ✅ | 0 | ✅ | 🔴 1 |
+| wu-wo-038 | wwise-objects | 3 | 3 | 0 | ✅ | 0 | ✅ | 🔴 1 |
+| wu-wo-101 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 | 1 | ❌ | 🔴 2 |
+| wu-wo-102 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-103 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 | 1 | ✅ | 🔴 1 |
+| wu-wo-104 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-105 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 | 1 | ✅ | 🔴 1 |
+| wu-wo-106 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-107 | wwise-objects | 3 | 2 | 1 | ✅ | 0 | ✅ | 🔴 1 |
+| wu-wo-108 | wwise-objects | 6 | 0 | 0 | ✅ | 0 | ✅ | 🔴 1 |
+| wu-wo-109 | wwise-objects | 3 | 3 | 0 | ✅ | 0 | ✅ | 🟢 0 |
+| wu-wo-110 | wwise-objects | 1 | 4 | 1 | ❌ faltan 2 | 2 | ✅ | 🟢 0 |
+| wu-wo-111 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 | 2 | ✅ | 🟢 0 |
+| wu-wo-112 | wwise-objects | 2 | 2 | 2 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-113 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🔴 1 |
+| wu-wo-114 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-115 | wwise-objects | 2 | 3 | 1 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-116 | wwise-objects | 1 | 4 | 1 | ❌ faltan 2 | 2 | ✅ | 🟢 0 |
+| wu-wo-117 | wwise-objects | 1 | 3 | 2 | ❌ faltan 2 | 2 | ✅ | 🔴 1 |
+| wu-wo-118 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 0 | ❌ | 🟢 0 |
+| wu-wo-119 | wwise-objects | 0 | 5 | 1 | ❌ faltan 3 | 2 | ❌ | 🟢 0 |
+| wu-wo-120 | wwise-objects | 1 | 3 | 2 | ❌ faltan 2 | 2 | ✅ | 🟢 0 |
+| wu-wo-121 | wwise-objects | 3 | 3 | 0 | ✅ | 0 | ✅ | 🔴 1 |
+| wu-wo-122 | wwise-objects | 1 | 3 | 2 | ❌ faltan 2 | 2 | ✅ | 🟢 0 |
+| wu-wo-123 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-124 | wwise-objects | 0 | 5 | 1 | ❌ faltan 3 | 3 | ✅ | 🔴 1 |
+| wu-wo-125 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-126 | wwise-objects | 0 | 5 | 1 | ❌ faltan 3 | 2 | ❌ | 🟢 0 |
+| wu-wo-127 | wwise-objects | 4 | 1 | 0 | ✅ | 0 | ✅ | 🔴 2 |
+| wu-wo-128 | wwise-objects | 3 | 3 | 0 | ✅ | 0 | ✅ | 🟢 0 |
+| wu-wo-129 | wwise-objects | 1 | 4 | 1 | ❌ faltan 2 | 2 | ✅ | 🟢 0 |
+| wu-wo-130 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 | 2 | ✅ | 🔴 1 |
+| wu-wo-131 | wwise-objects | 1 | 4 | 1 | ❌ faltan 2 | 2 | ✅ | 🔴 1 |
+| wu-wo-132 | wwise-objects | 3 | 3 | 0 | ✅ | 0 | ✅ | 🟢 0 |
+| wu-wo-133 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🔴 1 |
+| wu-wo-134 | wwise-objects | 1 | 4 | 1 | ❌ faltan 2 | 2 | ✅ | 🔴 1 |
+| wu-wo-135 | wwise-objects | 3 | 1 | 0 | ✅ | 0 | ✅ | 🔴 1 |
+| wu-wo-136 | wwise-objects | 4 | 0 | 0 | ✅ | 0 | ✅ | 🔴 1 |
+| wu-wo-137 | wwise-objects | 4 | 0 | 0 | ✅ | 0 | ✅ | 🔴 1 |
+| wu-wo-138 | wwise-objects | 2 | 3 | 0 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-139 | wwise-objects | 0 | 5 | 1 | ❌ faltan 3 | 1 | ❌ | 🔴 1 |
+| wu-wo-140 | wwise-objects | 0 | 6 | 0 | ❌ faltan 3 | 2 | ❌ | 🔴 2 |
+| wu-wo-141 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-142 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 | 2 | ✅ | 🔴 1 |
+| wu-wo-143 | wwise-objects | 2 | 3 | 0 | ❌ falta 1 | 1 | ✅ | 🟢 0 |
+| wu-wo-144 | wwise-objects | 2 | 4 | 0 | ❌ falta 1 | 0 | ❌ | 🔴 1 |
+| wu-wo-145 | wwise-objects | 3 | 3 | 0 | ✅ | 0 | ✅ | 🟢 0 |
+| wu-wo-146 | wwise-objects | 1 | 5 | 0 | ❌ faltan 2 | 2 | ✅ | 🟢 0 |
+| wu-wo-147 | wwise-objects | 1 | 4 | 1 | ❌ faltan 2 | 2 | ✅ | 🟢 0 |
+| wu-wo-148 | wwise-objects | 0 | 5 | 1 | ❌ faltan 3 | 2 | ❌ | 🟢 0 |
+| wu-wo-149 | wwise-objects | 0 | 2 | 3 | ❌ faltan 3 | 1 | ❌ | 🔴 1 |
+| wu-wo-150 | wwise-objects | 1 | 4 | 1 | retirada | 0 | — | 🔴 1 |
+| wu-wo-151 | wwise-objects | 2 | 3 | 0 | ❌ falta 1 | 0 | ❌ | 🟢 0 |
+| wu-wo-152 | wwise-objects | 1 | 3 | 2 | ❌ faltan 2 | 2 | ✅ | 🟢 0 |
+| wu-wo-153 | wwise-objects | 3 | 1 | 2 | ✅ | 0 | ✅ | 🟢 0 |
 
 ## datos-programas-y-servidores (5)
 
@@ -145,6 +166,9 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 
 **Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
 
+**Propuestas de nivel 5: ninguna**
+- ✋ Las cuatro piezas de la analogía ya están; una quinta memoria (VRAM, registros) no aparece en la clase y sería forzada.
+
 ### wu-002 · lenguajes
 
 **Pregunta:** ¿Cuál es el único lenguaje que la CPU entiende?
@@ -157,7 +181,15 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | C++ | Lenguaje compilado, «cercano a la máquina», pero igual se traduce |
 | 5 | Ensamblador | El lenguaje más cercano al código máquina; se confunden fácilmente |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas seguiría fuera (2)
+
+**Propuestas de nivel 5**
+- ➕ «El lenguaje del sistema operativo» — Según la clase 2 el OS «corre» los binarios; el estudiante que mezcla las dos clases lo elige
+- ✋ Una tercera opción (Rust, C) sería del mismo tipo pero no parecida: nivel 3, no 5.
+
+> *Nota:* Ambigüedad: «entiende» admite al ensamblador, que la diapositiva describe como «instrucciones directas al procesador». La lectura dice «el único lenguaje que el procesador lee».
+
+> *Nota:* Fuente: proponer «Según la diapositiva «Los lenguajes», ¿cuál es el único lenguaje que la CPU lee directamente?». Como absoluto también es cierto: el ensamblador se traduce con un ensamblador.
 
 ### wu-003 · restaurante
 
@@ -171,7 +203,13 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 1 | Un cable de red muy rápido | Hardware de red, otra categoría |
 | 3 | Un archivo .exe | Es un programa, pero un archivo quieto que no atiende peticiones |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Una computadora potente que está encendida todo el día» — La confusión servidor = máquina sin el detalle de la GPU que delata al distractor actual
+- ➕ «El programa que hace la petición» — El rol hermano (cliente) dentro de la misma analogía
+
+> *Nota:* Veracidad: fuera de la clase, «servidor» también nombra a la máquina; el «Según la clase» del enunciado es necesario y ya está.
 
 ### wu-004 · hardware
 
@@ -187,6 +225,13 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 
 **Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3)
 
+**Propuestas de nivel 5: ninguna**
+- ✋ Las piezas parecidas a la tarjeta de video (tarjeta de sonido, pantalla) también faltan en un servidor: añadirlas haría la pregunta ambigua.
+
+> *Nota:* Fuente: falta «según la clase». Veracidad: muchos servidores sí traen video básico (integrado o de gestión) y existen servidores con GPU; la diapositiva «La máquina» lo simplifica a cuatro piezas.
+
+> *Nota:* Ambigüedad: «suele no existir» admite otras respuestas reales (pantalla, tarjeta de sonido, teclado). Acotar: «De las cuatro piezas de la diapositiva «La máquina», ¿cuál no tiene el servidor?».
+
 ### wu-005 · arranque
 
 **Pregunta:** Al arrancar el juego, ¿qué SoundBank ya está cargado en la RAM?
@@ -199,9 +244,15 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | soundbank_nivel_1 | SoundBank real, pero sube cuando la escena lo pide |
 | 3 | Todos a la vez | La idea ingenua de que todo sube al inicio |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
 
-> *Nota:* La correcta puede chocar con wu-wo-117, donde el banco de menús se carga al abrir el juego. Conviene precisar el enunciado: «¿qué SoundBank carga Wwise siempre primero?».
+**Propuestas de nivel 5**
+- ➕ «soundbank_init y soundbank_menus» — Mitad cierta: añade el banco que sube justo después
+- ➕ «Ninguno: los SoundBanks suben cuando la escena los pide» — La regla de la clase aplicada también al banco inicial
+
+> *Nota:* Fuente: coherente con la lectura de la clase 1 («El arranque»): al arrancar sube soundbank_init y soundbank_menus sube cuando la escena lo pide. Pero wu-wo-117, de otra lectura, dice que el banco de menús se carga al abrir el juego. Unificar el ejemplo o decir «según el ejemplo de la clase 1».
+
+> *Nota:* Veracidad: en Wwise el banco inicial se llama Init.bnk y debe cargarse antes que cualquier otro porque trae la estructura de busses (Audiokinetic Q&A). Los nombres soundbank_* son del ejemplo.
 
 ## que-es-un-motor-de-audio (3)
 
@@ -217,7 +268,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 5 | necesita un motor que lo lea en vivo | También describe al interpretado: el motor lo lee en vivo |
 | 1 | solo funciona en Windows | Nada que ver con compilar |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «se traduce a binario cada vez que corre» — La afirmación correcta con la frecuencia cambiada
 
 ### wu-007 · interpretados
 
@@ -231,7 +285,14 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 5 | La CPU, directamente | La idea ingenua que la clase corrige: la CPU ve al motor, no al script |
 | 1 | La tarjeta de red | Hardware sin relación |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «El compilador» — El otro traductor de la clase; confunde el momento de compilar con el de correr
+
+> *Nota:* Gramática: «¿Quién corre a un programa interpretado?» lleva una «a» que sobra: «¿Quién corre un programa interpretado?» o «¿Quién ejecuta…?».
+
+> *Nota:* Fuente: «motor (intérprete)» es terminología de la clase; añadir «según la clase».
 
 ### wu-008 · queEsUnMotor
 
@@ -245,7 +306,14 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | un archivo de configuración | Es una de las entradas que recibe un motor, no el motor |
 | 3 | un lenguaje de programación | Python es motor y lenguaje en la clase, pero son cosas distintas |
 
-**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3)
+**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3) · con las propuestas seguiría fuera (2)
+
+**Propuestas de nivel 5**
+- ➕ «Un programa que traduce código a binario antes de correr» — El compilador: el otro programa de la clase que «procesa» programas
+- ➕ «Un conjunto de recursos, código y configuraciones listo para correr» — Lo que el motor recibe, puesto como si fuera el motor
+- ✋ «El sistema operativo» sería el tercer nivel 5 natural, pero según la definición de la clase podría defenderse como correcto.
+
+> *Nota:* Ambigüedad: con la definición «programa que corre para correr programas», el sistema operativo también encaja (la lectura dice que «a los compilados los corre el OS»). La clase lo excluye sin decirlo; conviene aclararlo en la diapositiva o aceptar la respuesta.
 
 ## wwise-por-adentro (2)
 
@@ -261,7 +329,13 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 5 | Wwise calls | La otra flecha hacia el engine, solo que la hace el juego |
 | 1 | El binario del juego | Lo genera Unreal, no Wwise |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «El Wwise project (.wproj) con sus Work Units» — Lo que el editor produce, pero se queda en el editor
+- ➕ «Los archivos de audio convertidos para la plataforma» — Mitad cierta: la media va dentro de los SoundBanks, no suelta
+
+> *Nota:* Fuente: añadir «según el diagrama de punta a punta». Veracidad: la integración también genera assets de Unreal, pero la clase lo atribuye al plugin, no al editor.
 
 ### wu-010 · puntaAPunta
 
@@ -275,7 +349,13 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Lee los audio clips directamente | Saltarse Wwise; el juego nunca ve los audios |
 | 3 | Recompila los SoundBanks | Los bancos ya vienen generados; el juego solo los carga |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Carga el Wwise project y lee los Wwise Objects» — El juego nunca toca los objects; la confusión que el diagrama quiere evitar
+- ➕ «Genera los SoundBanks al arrancar» — Confunde generar (editor) con cargar (juego)
+
+> *Nota:* Gramática: «¿cómo usa el juego a Wwise?» lleva «a» con un objeto no personal; mejor «¿cómo se comunica el juego con Wwise?».
 
 ## el-editor-wwise (3)
 
@@ -291,7 +371,15 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 5 | Event Editor, Switch Editor y State Editor | Views reales de edición que también se usan a diario |
 | 3 | Profiler, Utilities y Editors | Un layout y dos grupos del menú Views, no tres views |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Project Explorer, Property Editor y Event Editor» — Tres views reales; dos están en el layout Designer
+- ➕ «Project Explorer, Contextual Help y Transport Control» — Los tres views de la columna izquierda del Designer según la lectura
+
+> *Nota:* Fuente: «de todos los días» es un criterio de la clase (lectura «Los de todos los días»): añadir «según la clase».
+
+> *Nota:* Veracidad: el view «Audio Device Meter» del distractor aparece en la lectura como view directo del menú Views; no pude confirmarlo en la documentación (el sitio de Audiokinetic bloquea la consulta automática). Comprobar en el editor.
 
 ### wu-012 · layouts
 
@@ -305,7 +393,12 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 1 | Un SoundBank especial | Nada que ver con la pantalla |
 | 1 | Un plugin de efectos | Nada que ver con la pantalla |
 
-**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3)
+**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Un conjunto fijo de views que no se puede cambiar» — La definición correcta con un detalle invertido
+- ➕ «Un view grande que contiene a los demás» — Confunde view con layout
+- ➕ «El menú desde donde se abren todos los views» — Confunde el menú Views con el layout
 
 ### wu-013 · designer
 
@@ -319,7 +412,13 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | SoundBank | Layout real, pero para generar bancos |
 | 5 | Mixer | Layout real de uso diario; el más cercano en propósito |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas seguiría fuera (2)
+
+**Propuestas de nivel 5**
+- ➕ «Interactive Music» — Layout real que también sirve para crear y configurar objetos, pero solo de música
+- ✋ Los demás layouts son de perfilado: nivel 3, no 5.
+
+> *Nota:* Fuente: «de diario» es de la clase: añadir «según la clase». Veracidad: layouts de fábrica en Wwise 2025.1.9 confirmados: Designer, Profiler, SoundBank, Mixer, Schematic, Audio Object Profiler, Voice Profiler, Game Object Profiler e Interactive Music.
 
 ## wwise-objects (91)
 
@@ -338,7 +437,12 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Todas: el juego llama a cada familia por separado | La idea ingenua; contradice el diagrama |
 | 1 | Ninguna: Wwise decide solo qué suena y cuándo | Sin el juego no suena nada |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Game Input y Packaging: postea Events y carga SoundBanks» — Mitad cierta, y recoge que el juego sí carga bancos
+
+> *Nota:* Fuente: añadir «de nuestra clasificación». Ambigüedad: la lectura dice que los SoundBanks son «lo que el juego carga», así que el juego también toca Packaging; precisar «la única familia que el juego toca para hacer sonar algo».
 
 ### wu-wo-002 · flujo
 
@@ -355,7 +459,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Nace en los SoundBanks y va directo al dispositivo, sin pasar por busses | El audio viaja en los bancos, pero siempre pasa por busses |
 | 5 | Nace en Contenido y sale por el dispositivo sin pasar por Mixing | Origen correcto; solo omite los busses |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Nace en Contenido, pasa por Procesamiento y sale por el dispositivo, sin Mixing» — Cambia Mixing por Procesamiento, la familia vecina
 
 ### wu-wo-003 · flujo
 
@@ -372,7 +479,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 5 | Solo la salida | Acierta la salida; solo olvida el juego |
 | 1 | Nada: el marco encierra todo el diagrama | El juego nunca está dentro de un SoundBank |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «El juego, la salida y el Game Input» — La correcta más una familia que parece «del juego»
 
 ### wu-wo-004 · clasificacion
 
@@ -389,7 +499,13 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 1 | ¿Quién edita el proyecto? | Ninguna familia responde eso |
 | 3 | ¿Por qué dispositivo sale? | Variante de la pregunta de Mixing |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «¿Cuándo suena?» — La lectura dice que los Events «dicen cuándo»: pregunta de Game Input
+- ➕ «¿Cómo suena, con qué efectos?» — Pregunta de Procesamiento con el «cómo» de la correcta
+
+> *Nota:* Fuente: añadir «en nuestra clasificación».
 
 ### wu-wo-005 · clasificacion
 
@@ -406,7 +522,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 5 | Packaging, con los SoundBanks | Su pregunta es «¿cómo viaja?», casi la misma frase que «¿a dónde va?» |
 | 3 | Procesamiento, con los ShareSets | Misma familia que los efectos, pero el ShareSet es una definición |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Contenido, con el output bus de cada objeto» — El ruteo se configura en el objeto; parece que lo decide Contenido
 
 ### wu-wo-006 · clasificacion
 
@@ -423,7 +542,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Son los cinco layouts del editor de Wwise | Concepto real, pero hay más layouts y no clasifican objetos |
 | 3 | Son las cinco secciones de un SoundBank | Concepto real; un banco tiene Events, estructuras y media |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Es la clasificación del curso Wwise-101 de Audiokinetic» — Otro origen «oficial» creíble
 
 ### wu-wo-007 · sonido
 
@@ -447,6 +569,13 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 
 **Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
 
+**Propuestas de nivel 5: ninguna**
+- ✋ Las hermanas directas que faltan (Music Segment, plug-in source) son correctas según la clase: añadirlas haría la pregunta ambigua.
+
+> *Nota:* Veracidad: la explicación incluye Music Segment entre los que «apuntan a audio»; en Wwise el Music Segment contiene Music Tracks y son los tracks (clips) los que referencian audio. La lectura (clase 5, «Sonido») también cuenta cinco con el Segment. Decidir si se corrige la clase o la pregunta dice «según la clase».
+
+> *Nota:* Ambigüedad: con «apunta a audio de verdad», las plug-in sources (fuentes sin archivo) quedan en zona gris.
+
 ### wu-wo-008 · sonido
 
 **Pregunta:** ¿En qué se diferencia un Sound Voice de un Sound SFX?
@@ -462,7 +591,11 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Elige al azar entre sus hijos cada vez que suena | Describe al Random Container |
 | 5 | Solo puede tener una fuente para todo el proyecto | Habla de fuentes, igual que la correcta, pero al revés |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Puede tener varias fuentes y elige una al azar» — Eso lo hace el Sound SFX con varias fuentes; se lo atribuye al Voice
+- ➕ «Tiene una fuente por plataforma» — Plataforma en vez de idioma: un detalle cambiado
 
 ### wu-wo-009 · sonido
 
@@ -479,7 +612,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 5 | Un container que elige música según un State | Music Switch Container, hermano directo |
 | 3 | Un SoundBank que solo contiene archivos de música | Packaging; otra familia |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Una pista de audio con sub-tracks y clips» — Es el Music Track, su hijo directo
 
 ### wu-wo-010 · estructura
 
@@ -497,7 +633,11 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Music Switch | Container del sistema de música |
 | 1 | Folder | Organización del proyecto; se descarta con sentido común |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Blend Track» — Pieza real dentro del Blend Container; se confunde con el container
+- ➕ «Property Container con un RTPC en el volumen» — Un RTPC en el padre también «mezcla» hijos; mecanismo parecido
 
 ### wu-wo-011 · estructura
 
@@ -531,7 +671,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Music Playlist | Container del sistema de música |
 | 1 | Folder | Organización del proyecto; se descarta con sentido común |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Music Switch Container» — El hermano de música que también elige según el juego
 
 ### wu-wo-013 · estructura
 
@@ -548,7 +691,12 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Ninguna: es solo organización del proyecto | Folder: sin regla |
 | 3 | Encadena segmentos de música con transiciones | Music Playlist: otro sistema |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Hace sonar varios hijos a la vez, elegidos al azar» — Mezcla la regla del Random con la del Blend
+
+> *Nota:* Veracidad: «sin repetir» es relativo. En Wwise 2025.1.9 el Random Container nace en modo Standard con «Limit Repetition» activado en 1 (evita repetir el último); Shuffle evita repetir hasta agotar la lista. «Evitando repeticiones» es más exacto.
 
 ### wu-wo-014 · herencia
 
@@ -567,6 +715,8 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 
 **Modo difícil:** ✅ entra (4 de nivel 5)
 
+> *Nota:* Veracidad: confirmado; el volumen (Voice Volume) es aditivo a lo largo de la jerarquía. Absoluto.
+
 ### wu-wo-015 · herencia
 
 **Pregunta:** ¿Cómo bajan las propiedades del padre a sus hijos?
@@ -584,6 +734,8 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 
 **Modo difícil:** ✅ entra (3 de nivel 5)
 
+> *Nota:* Fuente: «relativas» y «absolutas» es la terminología de la clase (lectura «Herencia»). En Wwise, Volume, Pitch, LPF y HPF se suman en la jerarquía y Output Bus, Effects y Positioning se heredan salvo «Override parent»: el contenido es correcto.
+
 ### wu-wo-016 · herencia
 
 **Pregunta:** footsteps sale por el bus SFX. ¿Por qué footstep_metal sale por el bus Metal?
@@ -599,7 +751,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Porque el juego elige el bus al postear el Event | El juego solo postea Events |
 | 3 | Porque su padre enemy es un Switch Container | El tipo de container no cambia el bus |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Porque enemy, su padre, ya sale por Metal y lo hereda» — Explica el bus por herencia en vez de por override
 
 ### wu-wo-017 · busses
 
@@ -618,6 +773,8 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 
 **Modo difícil:** ✅ entra (3 de nivel 5)
 
+> *Nota:* Veracidad: confirmado en el esquema oficial de Wwise 2025.1.9: cada objeto tiene una sola referencia Output Bus.
+
 ### wu-wo-018 · busses
 
 **Pregunta:** ¿Para qué sirve el Master Motion Bus?
@@ -633,7 +790,12 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Para mezclar solo la música interactiva | Uso corriente de un bus normal |
 | 3 | Para aplicar el efecto Doppler a los sonidos | Efecto, no bus; «movimiento» como anzuelo |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Para el parlante del control (controller speaker)» — Mezcla el Secondary Bus (parlante del control) con el bus de motion
+
+> *Nota:* Fuente: añadir «según la clase». Veracidad: en Wwise 2025.1.9 no existe un objeto «Master Motion Bus» por defecto: el proyecto del laboratorio trae solo Main Audio Bus y los dispositivos System y No_Output. Desde Wwise 2017.2 cualquier bus se vuelve de motion asignándole un Audio Device de motion (blog de Audiokinetic). La clase lo presenta como un bus con nombre propio.
 
 ### wu-wo-019 · busses
 
@@ -650,7 +812,12 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Para mezclar la música aparte de los SFX | Uso corriente de un bus normal |
 | 3 | Para la segunda fuente de un Sound Voice | «Segunda» como anzuelo; las fuentes son otra cosa |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Para una segunda copia de la mezcla principal, con otro volumen» — Mezcla la idea de copia (Aux) con «secundario»
+
+> *Nota:* Fuente: añadir «según la clase». Veracidad: «Master Secondary Bus» fue el bus por defecto para el parlante del control (Audiokinetic Q&A sobre PS4); hoy es cualquier bus principal con otro Audio Device. «Audífonos» es el ejemplo de la clase.
 
 ### wu-wo-020 · aux
 
@@ -686,6 +853,8 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 
 **Modo difícil:** ✅ entra (4 de nivel 5)
 
+> *Nota:* Veracidad: «Main Audio Bus» es el nombre en Wwise 2025.1; en versiones anteriores era «Master Audio Bus». Una diapositiva del curso todavía dice «Master Audio Bus».
+
 ### wu-wo-022 · efectos
 
 **Pregunta:** Suenan tres voces de un objeto que tiene un efecto insertado en el objeto. ¿Cuántas instancias del efecto corren?
@@ -703,6 +872,8 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 
 **Modo difícil:** ✅ entra (3 de nivel 5)
 
+> *Nota:* Veracidad: confirmado por Audiokinetic (Q&A): en el bus una sola instancia procesa la suma; en el objeto hay una instancia por voz.
+
 ### wu-wo-023 · efectos, aux
 
 **Pregunta:** ¿Por qué la reverb suele vivir en un Aux Bus y no en cada objeto?
@@ -718,7 +889,11 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Porque así el juego puede postear la reverb por nombre | Confunde con los Events |
 | 3 | Porque los efectos en el objeto no viajan en los SoundBanks | Los efectos viajan en los bancos |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Porque en el bus la reverb corre después de la mezcla y por eso suena mejor» — Hecho cierto (corre después de mezclar) con la razón equivocada
+- ➕ «Porque los efectos en el objeto no pueden ser ShareSets» — Mezcla ShareSet con la ubicación del efecto
 
 ### wu-wo-024 · sharesets
 
@@ -735,7 +910,11 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Un container que comparte propiedades con sus hijos | Property Container; «comparte» como anzuelo |
 | 3 | Un Game Sync global, compartido por todo el juego | Game Sync; «global» como anzuelo |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Un preset de fábrica que no se puede editar» — Definición central, pero con el detalle de edición invertido
+- ➕ «Un efecto puesto en un bus para que lo compartan muchas voces» — Confunde compartir una definición con compartir una instancia
 
 ### wu-wo-025 · sharesets
 
@@ -757,6 +936,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 
 **Modo difícil:** ✅ entra (6 de nivel 5)
 
+> *Nota:* Gramática: hay tres respuestas correctas: «¿Cuáles de estos NO son tipos de ShareSet?».
+
+> *Nota:* Veracidad: la explicación lista cuatro tipos. En Wwise 2025.1.9 el proyecto trae además Metadata, Virtual Acoustics (Acoustic Textures) y Sidechain Mixes como ShareSets, y los Audio Devices están en Devices. Los distractores siguen siendo correctos; completar la explicación o decir «según la clase».
+
 ### wu-wo-026 · sharesets
 
 **Pregunta:** ¿Cuándo conviene un efecto Custom en vez de un ShareSet?
@@ -772,7 +955,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Siempre: los ShareSets solo sirven para atenuaciones | Falso y absoluto |
 | 3 | Cuando el juego necesita cambiarlo con un RTPC | El RTPC no decide ShareSet o Custom |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Cuando el efecto se usa en varios busses a la vez» — La correcta con el detalle invertido: ese es el caso del ShareSet
 
 ### wu-wo-027 · events
 
@@ -806,7 +992,12 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Nada: las Actions no pueden tocar un RTPC | Contradice la premisa de la pregunta |
 | 3 | Un State por cada valor posible de car_rpm | Otro Game Sync, discreto; no sirve para un valor continuo |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Un solo Event con un RTPC como parámetro de entrada» — Variante de la confusión central: el Event con argumento
+
+> *Nota:* Veracidad: no existe una Action llamada «Set RTPC»; en Wwise 2025.1.9 se llama «Set Game Parameter» (esquema oficial de acciones). La diapositiva de Events usa «Set RTPC». Fuente: «los Events no reciben argumentos» es de la clase; la pregunta ya lo asume.
 
 ### wu-wo-029 · events
 
@@ -823,7 +1014,11 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 1 | Cada Action corre en su propio hilo del juego | Sin relación con los Events |
 | 5 | Los programadores pueden editar las Actions desde el código | La inversa de la ventaja real |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas seguiría fuera (2)
+
+**Propuestas de nivel 5**
+- ➕ «El diseñador puede cambiar el sonido sin regenerar SoundBanks» — Ventaja parecida y falsa: los bancos sí se regeneran
+- ✋ Las otras variantes repiten «argumentos» o «editar desde el código», que ya están.
 
 ### wu-wo-030 · gameSyncs
 
@@ -858,6 +1053,8 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Un Effect ShareSet | Procesamiento; otra familia |
 
 **Modo difícil:** ✅ entra (3 de nivel 5)
+
+> *Nota:* Veracidad: en Wwise el objeto se llama Game Parameter y RTPC es el mecanismo; la clase usa RTPC para ambos. Coherente con la clase.
 
 ### wu-wo-032 · gameSyncs
 
@@ -910,6 +1107,8 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 
 **Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
 
+> *Nota:* Veracidad: confirmado; los Auto-Defined SoundBanks existen desde Wwise 2022.1.
+
 ### wu-wo-035 · packaging
 
 **Pregunta:** ¿Qué es un Work Unit?
@@ -944,7 +1143,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | La media incluida en un SoundBank | Dice «incluida en un SoundBank»: se descarta leyendo |
 | 3 | Las estructuras incluidas en un SoundBank | Dice «incluidas en un SoundBank»: se descarta leyendo |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Los Effect ShareSets» — Viajan dentro de los bancos como estructuras; parecen cosa del editor
 
 ### wu-wo-037 · cierre, flujo
 
@@ -963,6 +1165,8 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 
 **Modo difícil:** ✅ entra (4 de nivel 5)
 
+> *Nota:* Fuente: añadir «en nuestra clasificación».
+
 ### wu-wo-038 · cierre, flujo
 
 **Pregunta:** ¿Sobre qué familias actúa Procesamiento?
@@ -980,6 +1184,8 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 
 **Modo difícil:** ✅ entra (3 de nivel 5)
 
+> *Nota:* Fuente: añadir «en nuestra clasificación».
+
 ### wu-wo-101 · flujo
 
 **Pregunta:** ¿Como maneja los datos Wwise por adentro?
@@ -995,9 +1201,15 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Con los Blueprints que el juego le envía | Dirección invertida; los Blueprints llaman, no alimentan |
 | 3 | Con una consola de mezcla conectada a los parlantes | Es la metáfora de los busses, no del almacenamiento |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas seguiría fuera (2)
 
-> *Nota:* Falta la tilde en «¿Cómo».
+**Propuestas de nivel 5**
+- ➕ «Con el Project Explorer, que guarda los objetos en pestañas» — Confunde la pantalla con los datos
+- ✋ «Con los Work Units» sería el otro nivel 5, pero es cierto: los .wwu guardan esa base de datos.
+
+> *Nota:* Gramática: «¿Como maneja los datos Wwise por adentro?» → «¿Cómo maneja Wwise los datos por dentro?».
+
+> *Nota:* Fuente: falta «Según la lectura». La lectura de las preguntas wu-wo-101 a 153 es el handout `handouts/wwise-objects-clasificacion.es.md`; conviene citarlo por su nombre en los enunciados que dicen «según la lectura».
 
 ### wu-wo-102 · flujo
 
@@ -1014,7 +1226,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | El motor que procesa el audio dentro del juego | Es quien procesa, no un ítem |
 | 5 | Cada pestaña del Project Explorer | Las pestañas agrupan objetos; se confunden con ellos |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Cada propiedad que se puede editar en el Property Editor» — Propiedad en vez de objeto
 
 ### wu-wo-103 · flujo
 
@@ -1031,7 +1246,12 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | La base de datos donde se guardan los audios | Vive dentro del editor, no es el editor |
 | 1 | El bus principal por el que sale todo el audio | Un bus como herramienta: absurdo |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «El Project Explorer, el view principal donde se crean los objetos» — La parte por el todo
+
+> *Nota:* Veracidad: el nombre oficial es «Wwise Authoring» (la aplicación de autoría); «Wwise Authoring Tool» se usa de forma informal.
 
 ### wu-wo-104 · flujo
 
@@ -1048,7 +1268,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Contextual Help | View de ayuda |
 | 3 | Loudness Meter | View de medición |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Schematic View» — View real que también muestra la estructura de objetos
 
 ### wu-wo-105 · flujo
 
@@ -1069,7 +1292,12 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 5 | El Property Editor | Vive dentro del editor, pero es un view, no un objeto |
 | 3 | El motor del juego | Es Unreal, fuera de Wwise |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Un layout guardado (User Layout)» — Vive en el editor, pero es un acomodo de pantalla, no un objeto
+
+> *Nota:* Gramática: «Un property container» en minúscula; las demás respuestas escriben los nombres de objeto con mayúsculas (Property Container).
 
 ### wu-wo-106 · flujo
 
@@ -1086,7 +1314,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | No: los Wwise Objects solo se ven en el Property Editor | El Property Editor edita, no lista |
 | 5 | Sí: por eso el editor no necesita ningún otro view | La posición del «sí» con otra justificación |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «No: los Events y los Game Syncs se crean fuera del Project Explorer» — Acierta el «no» con una justificación falsa: tienen pestaña propia
 
 ### wu-wo-107 · flujo
 
@@ -1104,6 +1335,8 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 1 | Un bloque de Blueprint y un asset de Unreal | Cosas de Unreal; absurdo como campos |
 
 **Modo difícil:** ✅ entra (3 de nivel 5)
+
+> *Nota:* Fuente: «nombre, tipo, id, hijos, propiedades y referencias» es el modelo de la lectura, no terminología oficial de Wwise: añadir «según la lectura».
 
 ### wu-wo-108 · flujo
 
@@ -1124,6 +1357,8 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 5 | Referencias | Campo universal real |
 
 **Modo difícil:** ✅ entra (6 de nivel 5)
+
+> *Nota:* Fuente: igual que wu-wo-107: «según la lectura».
 
 ### wu-wo-109 · flujo
 
@@ -1157,7 +1392,11 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 1 | Del orden en que se creó | Absurdo |
 | 3 | Del juego que lo llama | El juego llama, no define |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «De la pestaña del Project Explorer donde está» — Las pestañas agrupan tipos; parece que la pestaña decide
+- ➕ «De su padre en la jerarquía» — Confunde herencia de valores con el conjunto de propiedades
 
 ### wu-wo-111 · flujo
 
@@ -1174,7 +1413,11 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | En una sola lista, sin agrupar | Otra forma de agrupar, pero no se parece a pestañas |
 | 3 | En carpetas, una por cada Event | Carpetas existen, pero no por Event |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «En Work Units» — Agrupación real dentro de cada pestaña, pero no de los tipos
+- ➕ «En jerarquías: Containers, Busses, Devices» — Carpetas reales de la pestaña Audio, pero no la agrupación de todos los tipos
 
 ### wu-wo-112 · flujo, clasificacion
 
@@ -1191,7 +1434,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 1 | Listar todos los views del editor | Sin relación con el diagrama |
 | 3 | Mostrar qué objetos consumen más CPU | Una clasificación por costo es imaginable, pero no es esta |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Agrupar los objetos como lo hace la documentación de Wwise» — El contraste exacto que hace la clase
 
 ### wu-wo-113 · flujo, packaging
 
@@ -1208,7 +1454,12 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Las pestañas del Project Explorer | Agrupación del editor |
 | 3 | Los efectos que se aplican a la señal | Procesamiento; otra familia |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «El proyecto de Wwise completo, copiado a la carpeta del juego» — Confunde exportar con copiar el proyecto
+
+> *Nota:* Gramática: «Wwise Objects de nuestro proyecto de Wwise exportado» → «exportados».
 
 ### wu-wo-114 · flujo, packaging
 
@@ -1225,7 +1476,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 5 | Solo de archivos de audio, sin Wwise Objects | Mitad cierta: le faltan los Wwise Objects |
 | 5 | Solo de Events, sin archivos de audio | Mitad cierta: le faltan los audios |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «De Events y de los Work Units que los contienen» — Mitad cierta con una pieza del editor
 
 ### wu-wo-115 · flujo, packaging
 
@@ -1242,7 +1496,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 1 | Porque el juego necesita dos copias de cada sonido | Absurdo |
 | 3 | Porque cada persona del equipo exporta el suyo | Confunde con los Work Units |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Porque cada nivel del juego exige su propio SoundBank» — Regla de partición plausible, pero no es obligatoria
 
 ### wu-wo-116 · flujo, packaging
 
@@ -1259,7 +1516,11 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 1 | Aplicar efectos sin usar busses | Sin relación |
 | 3 | Llamar a los Events sin instalar el plugin | El plugin siempre hace falta |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Cargar todo el audio a memoria al abrir el juego, de una vez» — La inversa de la ventaja real
+- ➕ «Que el juego cargue solo los Events, sin la media» — Partición falsa del contenido de un banco
 
 ### wu-wo-117 · flujo, packaging
 
@@ -1276,7 +1537,13 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Con un Game Sync que silencia los sonidos del juego | Game Input; no toca la memoria |
 | 1 | Borrando del proyecto los sonidos del juego | Absurdo |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Con un solo SoundBank, cargando primero los Events de los menús» — Mitad cierta: un banco no se carga por partes
+- ➕ «Con dos SoundBanks cargados al abrir y descargando el del juego en el menú» — El enfoque inverso: cargar todo y descargar
+
+> *Nota:* Coherencia: ver wu-005. Aquí el banco de menús se carga al abrir el juego; en la lectura de la clase 1 sube cuando la escena lo pide. Ambas son válidas, pero conviene unificar el ejemplo.
 
 ### wu-wo-118 · flujo, packaging
 
@@ -1310,7 +1577,12 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 1 | Qué bloques de Blueprint se exponen en Unreal | Lo hace el plugin en Unreal |
 | 3 | El nombre, tipo e id de cada objeto | Campos del objeto; no se configuran ahí |
 
-**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3)
+**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3) · con las propuestas seguiría fuera (2)
+
+**Propuestas de nivel 5**
+- ➕ «Qué archivos de audio se importan al proyecto y en qué formato» — Configuración vecina (importación y conversión), no del Manager
+- ➕ «Qué Events dispara el juego al cargar cada SoundBank» — Mezcla bancos con Events
+- ✋ «En qué carpeta se generan los SoundBanks» o «qué Work Units entran en cada banco» son ciertos; no sirven.
 
 ### wu-wo-120 · flujo, packaging
 
@@ -1327,7 +1599,11 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 1 | Se abre el juego para probarlo | Sin relación |
 | 3 | Se borra la configuración anterior del proyecto | Generar no borra configuración |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Se exporta el proyecto de Wwise a Unreal como assets» — Confunde generar bancos con lo que hace el plugin
+- ➕ «Se revisan y convierten los audios, sin crear archivos .bnk» — Mitad cierta: convierte, pero sí crea los .bnk
 
 ### wu-wo-121 · flujo, packaging
 
@@ -1346,7 +1622,7 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 
 **Modo difícil:** ✅ entra (3 de nivel 5)
 
-> *Nota:* La correcta termina en punto; las demás respuestas del banco no.
+> *Nota:* Gramática: la correcta termina en punto y «el primero que procesa el audio según el segundo» es confusa: «El motor y los SoundBanks: el motor procesa el audio según los SoundBanks».
 
 ### wu-wo-122 · flujo, packaging
 
@@ -1363,7 +1639,11 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 1 | La carpeta con los audios originales | Sin relación |
 | 1 | El diagrama de las cinco familias | Sin relación |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «El proyecto de Unreal empaquetado junto con el proyecto de Wwise» — Confunde proyecto con exportación
+- ➕ «Los SoundBanks junto con el motor de Wwise» — Lo que se integra al entregable, no el entregable
 
 ### wu-wo-123 · flujo
 
@@ -1380,7 +1660,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Los views que el usuario abre en el editor | Cosas del editor |
 | 3 | Los archivos de audio que entran al proyecto | Materia prima, no familia |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Los bloques de Blueprint que llaman a Wwise desde Unreal» — El lado expuesto en Unreal, no los objetos
 
 ### wu-wo-124 · flujo
 
@@ -1397,7 +1680,14 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Los direcciona al bus principal | El ruteo es cosa de Wwise |
 | 3 | Los agrupa en pestañas nuevas del Project Explorer | El plugin no toca el editor de Wwise |
 
-**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3)
+**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Los copia como assets de Unreal, sin conectarlos al motor de Wwise» — Mitad cierta: crea assets, pero conectados
+- ➕ «Los convierte en bloques de Blueprint listos para usar» — Cerca de «exponer», pero el plugin crea assets, no bloques
+- ➕ «Los carga a memoria para que el juego pueda llamarlos» — Confunde exponer con cargar
+
+> *Nota:* Gramática: «PLUGIN» en mayúsculas; en el resto del banco va «plugin».
 
 ### wu-wo-125 · flujo
 
@@ -1416,7 +1706,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Que lo conecta a un bus de salida | Eso es ruteo |
 | 5 | Que lo vuelve visible en el Project Explorer | «Exponer» leído como «hacer visible» |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Que lo integra al entregable del juego junto con el motor» — Confunde integrar con exponer
 
 ### wu-wo-126 · flujo
 
@@ -1433,7 +1726,12 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Nada: los Game Inputs solo organizan el proyecto | Los Game Inputs hacen cosas, no organizan |
 | 3 | Se editan sus propiedades en el Property Editor | Eso es del editor |
 
-**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3)
+**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3) · con las propuestas seguiría fuera (2)
+
+**Propuestas de nivel 5**
+- ➕ «Unreal reproduce directamente el archivo de audio del objeto» — Saltarse al motor de Wwise
+- ➕ «El plugin manda el Wwise Object al motor para que lo cargue» — Confunde llamar con cargar
+- ✋ «Se carga el SoundBank que lo contiene y recién después suena» puede ser cierto con bancos automáticos; no sirve.
 
 ### wu-wo-127 · flujo, events
 
@@ -1450,6 +1748,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 5 | PlaySound2D | Nodo nativo de Unreal que «reproduce»: trampa de vocabulario |
 
 **Modo difícil:** ✅ entra (4 de nivel 5)
+
+> *Nota:* Veracidad: en el plugin de Wwise para Unreal (AkGameplayStatics) las funciones son PostEvent, PostEventAtLocation, SetRTPCValue, SetState, SetSwitch y PostTrigger; en Blueprint se ven con espacios («Post Event», «Set RTPC Value») y el AkComponent tiene además «Post Ak Event». No hay una función «LoadBank» en AkGameplayStatics (los bancos se cargan por asset o automáticamente): el distractor sigue siendo incorrecto, pero no nombra un nodo actual.
+
+> *Nota:* Fuente: la lectura de repaso de las clases no menciona Blueprints; la fuente es el handout `wwise-objects-clasificacion.es.md`, pendiente de verificación (TODO.md).
 
 ### wu-wo-128 · flujo
 
@@ -1483,7 +1785,11 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Expone el objeto en la interfaz de Unreal | Eso lo hace el plugin |
 | 1 | Crea un Wwise Object nuevo en el proyecto | Absurdo |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Setea el Game Sync que tiene configurado» — El Game Input hermano
+- ➕ «Ejecuta una sola acción, la primera de su lista» — La correcta con un detalle cambiado
 
 ### wu-wo-130 · flujo, events
 
@@ -1500,7 +1806,13 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Otro Event que la llame | Los Events no se encadenan así en la clase |
 | 3 | Un efecto aplicado | Procesamiento; otra cosa |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Un Game Sync que la active» — Mezcla los dos Game Inputs
+- ➕ «Una duración o un fade configurados» — Parámetros reales de una acción, pero opcionales
+
+> *Nota:* Veracidad: cierto para la mayoría de las acciones; Set State y Set Game Parameter apuntan a Game Syncs, no a un objeto de Contenido. La lectura lo simplifica: «según la lectura».
 
 ### wu-wo-131 · flujo, events
 
@@ -1520,7 +1832,13 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | SoundBank | Packaging |
 | 1 | Project Explorer | Un view como acción: absurdo |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Load» — Suena a acción (como Play o Stop), pero cargar bancos no es una acción de Event
+- ➕ «Fade» — Suena a acción; en Wwise el fade es un parámetro de la acción
+
+> *Nota:* Veracidad: la lista oficial de acciones de Wwise 2025.1.9 confirma Play, Stop y Pause (y muchas más: Resume, Break, Seek, Mute, Set Voice Volume, Set Game Parameter, Set State, Set Switch, Trigger…). Cuidado al añadir distractores: Resume, Mute, Seek o Break son acciones reales.
 
 ### wu-wo-132 · flujo, events
 
@@ -1554,7 +1872,12 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Para agrupar sonidos en carpetas | Organización del proyecto |
 | 3 | Para editar propiedades desde el editor | Cosa del editor |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Para subir o bajar el volumen según la distancia» — Valor continuo: cosa de Game Sync o atenuación
+
+> *Nota:* Veracidad: existe la acción «Set Voice Volume», así que un Event sí puede fijar un volumen; la regla «Sí o No → Events, muchos valores → Game Syncs» es una simplificación de la lectura: añadir «según la lectura».
 
 ### wu-wo-134 · flujo, gameSyncs
 
@@ -1571,7 +1894,13 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 1 | Para instalar el plugin en Unreal | Sin relación |
 | 3 | Para cargar los SoundBanks a memoria | Lo hace el juego, no un Game Sync |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Para aplicar o quitar un filtro» — El ejemplo de Sí o No de la lectura: cosa de Events
+- ➕ «Para elegir qué Event postea el juego» — Eso lo decide el código, no un Game Sync
+
+> *Nota:* Veracidad: igual que wu-wo-133 («Set Voice Volume»): «según la lectura».
 
 ### wu-wo-135 · flujo, gameSyncs
 
@@ -1587,6 +1916,8 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Ninguno: el volumen solo se cambia en el editor | Falso: el juego sí cambia el volumen |
 
 **Modo difícil:** ✅ entra (3 de nivel 5)
+
+> *Nota:* Veracidad y ambigüedad: con la acción «Set Voice Volume» un Event también puede poner el volumen en un valor; la respuesta es correcta «según la lectura». Añadir la fuente al enunciado.
 
 ### wu-wo-136 · flujo, gameSyncs
 
@@ -1604,6 +1935,8 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 5 | Aplicar un filtro | Caso de Event, el Game Input hermano |
 
 **Modo difícil:** ✅ entra (4 de nivel 5)
+
+> *Nota:* Veracidad: igual que wu-wo-135: «según la lectura».
 
 ### wu-wo-137 · flujo, events
 
@@ -1623,6 +1956,8 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 
 **Modo difícil:** ✅ entra (4 de nivel 5)
 
+> *Nota:* Veracidad: igual que wu-wo-135: «según la lectura».
+
 ### wu-wo-138 · flujo
 
 **Pregunta:** ¿Qué representa el grupo Contenido?
@@ -1637,7 +1972,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | El proyecto exportado que el juego carga a memoria | Definición de Packaging; familia lejana |
 | 3 | Los views donde se editan las propiedades | Cosas del editor |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Los archivos de audio importados al proyecto» — La media en vez de los objetos que la reproducen
 
 ### wu-wo-139 · flujo
 
@@ -1654,7 +1992,13 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Sobre los Work Units | Wwise Objects, pero de organización |
 | 1 | Sobre los parlantes y controles | Equipo físico |
 
-**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3)
+**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3) · con las propuestas seguiría fuera (1)
+
+**Propuestas de nivel 5**
+- ➕ «Sobre los Events, que a su vez tocan el Contenido» — Un paso de indirección de más
+- ✋ «Sobre los busses» o «sobre los efectos» serían nivel 5, pero en Wwise son parcialmente ciertos.
+
+> *Nota:* Veracidad: en Wwise las acciones también apuntan a busses (Set Bus Volume) y los RTPC pueden mover propiedades de busses y efectos; la lectura lo simplifica: «según la lectura».
 
 ### wu-wo-140 · flujo, busses
 
@@ -1671,7 +2015,16 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Una plataforma y un idioma | Campos de la exportación |
 | 3 | Un bloque de Blueprint | Cosas de Unreal |
 
-**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3)
+**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3) · con las propuestas seguiría fuera (2)
+
+**Propuestas de nivel 5**
+- ➕ «Un archivo de audio asignado» — Cierto para Sonido, falso para Estructura: «todos» lo hace incorrecto
+- ➕ «Un Game Sync que decida cuál suena» — Solo los Switch Containers lo necesitan
+- ✋ «Un Event con una acción Play» es defendible como correcto; no sirve.
+
+> *Nota:* Veracidad: cierto; el Output Bus es obligatorio en todo objeto de Contenido.
+
+> *Nota:* Ambigüedad: para sonar desde el juego también hace falta un Event; el enunciado debería decir «configurado en el objeto».
 
 ### wu-wo-141 · flujo, clasificacion
 
@@ -1688,7 +2041,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 5 | SFX | El otro eje de clasificación; «sound effects» como anzuelo |
 | 3 | SoundBanks | Packaging |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Audio» — Anzuelo de vocabulario: es la pestaña, no el grupo
 
 ### wu-wo-142 · flujo, clasificacion
 
@@ -1705,7 +2061,13 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Los que definen para qué plataforma se exporta | Exportación |
 | 3 | Los que solo sirven para voces | Las voces son otro subgrupo de Contenido, pero lejano |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Los que contienen un solo objeto de Sonido» — La correcta con un detalle cambiado
+- ➕ «Los que contienen varios archivos de audio directamente» — Eso es un Sound SFX con varias fuentes: Sonido, no Estructura
+
+> *Nota:* Veracidad: la explicación dice que la documentación oficial usa la misma nomenclatura; Wwise habla de «Sound objects» y «containers» (hoy carpeta «Containers»), y «Structures» aparece en el contenido de un SoundBank. Matizar.
 
 ### wu-wo-143 · flujo, clasificacion
 
@@ -1721,7 +2083,10 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Nombre o tipo, e hijos o referencias | Campos del objeto, no clasificación |
 | 5 | Sí o No, y muchos valores | Pareja real de la clase, pero de Game Input |
 
-**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
+**Modo difícil:** ❌ no entra (2 de nivel 5, falta 1) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Sonido o Estructura, y Contenido o Mixing» — Mitad cierta con dos familias en vez del segundo eje
 
 ### wu-wo-144 · flujo, clasificacion
 
@@ -1776,7 +2141,11 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Los archivos de audio | Materia prima |
 | 3 | Los views del editor | Cosas del editor |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Los Devices por donde sale el audio» — La carpeta vecina de Busses en la pestaña Audio
+- ➕ «El Master Motion Bus y los Secondary Busses solamente» — Subconjunto de los busses
 
 ### wu-wo-147 · flujo, busses
 
@@ -1793,7 +2162,11 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Una carpeta del proyecto | Organización |
 | 1 | Un bloque de Blueprint | Cosas de Unreal; sin relación |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «Un cable que lleva la señal al parlante» — Metáfora vecina: transporta, pero no mezcla
+- ➕ «Un amplificador» — Equipo de audio real que no simboliza al bus
 
 ### wu-wo-148 · flujo, busses
 
@@ -1810,7 +2183,12 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Los guarda en la base de datos del proyecto | Es el interior de Wwise |
 | 1 | Los convierte en Events | Absurdo |
 
-**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3)
+**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3) · con las propuestas seguiría fuera (2)
+
+**Propuestas de nivel 5**
+- ➕ «Les aplica efectos, pero no toca su volumen» — Mitad cierta
+- ➕ «Pasa la señal a los equipos físicos sin modificarla» — Mitad cierta
+- ✋ «Suma sus señales y las manda al Main Audio Bus» es cierto para los busses hijos; no sirve.
 
 ### wu-wo-149 · flujo, busses
 
@@ -1826,7 +2204,13 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 3 | Pantallas y proyectores | Equipo de salida, pero de video |
 | 1 | Servidores de internet | Sin relación |
 
-**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3)
+**Modo difícil:** ❌ no entra (0 de nivel 5, faltan 3) · con las propuestas seguiría fuera (1)
+
+**Propuestas de nivel 5**
+- ➕ «Solo a los parlantes» — Incompleta: el «solo» la hace incorrecta
+- ✋ «Parlantes y audífonos» es cierto según la clase (Secondary Bus); no sirve.
+
+> *Nota:* Veracidad: también audífonos o el parlante del control, según el Audio Device; mejor «por ejemplo» en la respuesta.
 
 ### wu-wo-150 · flujo, busses · RETIRADA
 
@@ -1844,6 +2228,9 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 1 | Se convierte en un Game Sync | Absurdo |
 
 **Modo difícil:** no aplica (pregunta retirada)
+
+**Propuestas de nivel 5: ninguna**
+- ✋ Pregunta retirada: no se proponen distractores.
 
 > *Nota:* Retirada: no se muestra; se califica solo por completitud.
 
@@ -1878,7 +2265,11 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 | 1 | En el plugin de Unreal | Herramienta de integración; sin relación |
 | 3 | En un Work Unit | Organización del proyecto |
 
-**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2)
+**Modo difícil:** ❌ no entra (1 de nivel 5, faltan 2) · con las propuestas entraría (3)
+
+**Propuestas de nivel 5**
+- ➕ «En cada objeto de Contenido, con un ShareSet compartido» — Comparte la definición, pero sigue habiendo una instancia por voz
+- ➕ «En un Aux Bus de filtro, con sends desde la música y los SFX» — Enfoque de copia: la señal seca seguiría sin filtrar
 
 ### wu-wo-153 · flujo, efectos
 
