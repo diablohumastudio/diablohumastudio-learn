@@ -35,3 +35,6 @@ next-env.d.ts
 # Question bank exports: they hold the correct answers.
 practice-questions*.json
 exam-only-questions*.json
+
+# Question bank exports made by questions/scripts: they hold the correct answers.
+questions/exports/
