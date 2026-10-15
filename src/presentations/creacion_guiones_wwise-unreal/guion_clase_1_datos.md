@@ -14,7 +14,7 @@ Formato, proceso, convenciones y reglas de revisión: `../screenplay_creation_gu
 
 Pantalla: portada con una foto de computador de fondo. Kicker: «Intro a Wwise · Bases Teoricas. Título: «Datos, programas y servidores». Pista: «Navega con ← → · espacio».
 
-Objetivo: 12 s · 23 palabras ≈ 10 s
+Objetivo: 12 s · 21 palabras ≈ 9 s
 
 ```text
 [El kiker ya esta en pantalla]
@@ -29,7 +29,7 @@ Pantalla propuesta: tres recuadros en fila: «Los datos dentro del computador»,
 
 #### s=1 p=0 · ideas
 
-Objetivo: 20 s · 44 palabras ≈ 18 s
+Objetivo: 20 s · 23 palabras ≈ 10 s
 
 ```text
 [ya esta el kiker]
@@ -59,38 +59,45 @@ Un dato es cualquier información guardada: un texto, una imagen, un sonido. [Ap
 
 #### s=3 p=0 · biblioteca
 
-Pantalla: kicker «Los datos tienen que llegar al procesador». Título: «Analogía de un PC a una biblioteca». Dibujo de una biblioteca vista desde arriba: arriba, tres estanterías con el rótulo «todas las materias» y la nota «levantarse · lento»; abajo, dos mesas laterales con libros cerrados, rótulo «la mesa», nota «alcanzar · rápido»; en el centro, una mesa con cuatro personas leyendo libros abiertos, rótulo «la materia actual», nota «leer · al instante».
-
-Objetivo: 35 s · 92 palabras ≈ 38 s
-
-```text
-Ahora entendamos los datos dentro de una computadora a través de esta analogía con una biblioteca.
-
-En las estanterías cabe de todo, pero buscar un libro ahí es lento: hay que levantarse.
-
-En las mesas de los lados hay libros cerrados de las materias en uso. Cabe menos, pero alcanzar uno es rápido.
-
-En la mesa del centro, tú y tres compañeros leen los libros abiertos de la materia en que trabajan ahora mismo. Caben muy pocos, pero leerlos es instantáneo.
-
-La regla: cuanto más cerca de las manos, más rápido, pero menos cabe.
-```
-
-#### s=3 p=1 · computador
-
-Pantalla: la misma escena, pero cada pieza cruza a su equivalente en un computador, con animación: las estanterías se vuelven discos duros («todos los datos», «cargar del disco · lento»), las mesas laterales se vuelven módulos de memoria RAM («traer de RAM · rápido») y la mesa central se vuelve una CPU de cuatro núcleos con su caché («lo que usas ya mismo», «leer la caché · al instante»). Leyenda: «Mientras más cerca está la información, más rápido se procesa cuando se necesita».
+Pantalla: kicker «Para trabajar los libros tienen que llegar a tus manos». Título: «Analogía de un PC a una biblioteca». Dibujo de una biblioteca vista desde arriba: arriba, tres estanterías con el rótulo «todas las materias» y la nota «levantarse · lento»; abajo, dos mesas laterales con libros cerrados, rótulo «la mesa», nota «alcanzar · rápido»; en el centro, una mesa con cuatro personas leyendo libros abiertos, rótulo «la materia actual», nota «leer · al instante».
 
 Objetivo: 35 s · 94 palabras ≈ 39 s
 
 ```text
-Ahora veamos las piezas del computador análogas a la biblioteca. [pausa]
+Ahora entendamos los datos dentro de una computadora a través de esta analogía con una biblioteca.[La biblioteca, El título, el Kicker entran con animacion de entrada por escala uno por uno en el orden mensionado]
 
-Las estanterías son el disco duro. Guarda de todo permanentemente, pero es el más lento de los tres y su comunicacion es mas lenta porque tambien esta mas lejos. La coneccion suele ser mediante cables o pistas largas en la mainboard.
+Tú y tres compañeros trabajan en algunos proyectos. [se resaltan las personas] Para trabajar en cualquier proyecto, los libros de ese tema tienen que llegar a sus manos. [Se resalta el kicker]
 
-Las mesas son la memoria RAM: es mucho más pequeña pero mucho más rápida y esta mas cercana. La coneccion suele ser con pistas mas pequenas en la mainboard, osea esta mas cerca. En algunas computadoras incluso, los pines de la ram estan directamente conectadas a los del CPU.
+Leen los libros abiertos de la materia en que trabajan ahora mismo. [Se resaltan los libros de la mesa principal] Caben muy pocos, pero leerlos es instantáneo. [Aparece «leer · al instante»]
 
-Tú y tus compañeros son la CPU, el procesador: cada persona es un núcleo, que trabaja solo con lo que tiene enfrente. Los libros abiertos son la caché: una memoria diminuta pegada al procesador, con lo que se usa en este instante. La coneccion es todavia mas pequena pues son pistas del mismo chip.
+En las mesas de los lados [se resaltan las dos mesas laterales y aparece «la mesa»] hay libros cerrados de los proyectos en que trabajan. Cabe un poco mas de libros, y alcanzar uno es rápido. [Aparece «alcanzar · rápido»]
 
-Cuando un programa dice «cargando», son datos copiándose del disco a la RAM.
+En las estanterías [se resaltan las estanterías de arriba y aparece «todas las materias»] cabe de todo, pero buscar un libro ahí es lento: hay que levantarse. [Aparece «levantarse · lento»]
+
+La regla: cuanto más cerca de las manos, más rápido, pero menos cabe. [Se resaltan y desresaltan los tres rótulos de velocidad: lento, rápido, al instante]
+```
+
+#### s=3 p=1 · computador
+
+Pantalla: la misma escena, pero cada pieza cruza a su equivalente en un computador, con animación: las estanterías se vuelven discos duros («todos los datos», «cargar del disco · lento»), las mesas laterales se vuelven módulos de memoria RAM («traer de RAM · rápido») y la mesa central se vuelve una CPU de cuatro núcleos con su caché («lo que usas ya mismo», «leer la caché · al instante»). Leyenda: «Mientras más cerca está la información, más rápido se procesa cuando se necesita». Nota: borrar «lo que usas ya mismo».
+
+Objetivo: 35 s · 169 palabras ≈ 70 s
+
+```text
+[La biblioteca sigue en pantalla con sus rótulos; el kicker y el título no cambian]
+Ahora veamos las piezas del computador análogas a la biblioteca.
+
+Tú y tus compañeros son los nucleos del CPU. [La mesa central se convierte en una CPU de cuatro núcleos]
+
+Los datos tienen que llegar al CPU para que corra un programa o se use un archivo. [El kicker cambia a "Los datos tienen que llegar al CPU para usarse"] 
+
+Los libros abiertos son la caché: [se resalta la caché dentro de la CPU] una memoria dentro del chip del procesador [Aparece «leer la caché · al instante»], con lo que se usa en este instante. [se muestra una foto de un procesador con las secciones de transistores en una dice nucleo y en otra memoria cache, y luego se borra]
+
+Las mesas son la memoria RAM. [Las mesas laterales se convierten en módulos de RAM] Es mas grande que la cache, pero más lenta, y mas lejos[Aparece «traer de RAM · rápido»]. La conexión suele ser con pistas más pequeñas en la mainboard, o sea, está más cerca. En algunas computadoras, incluso, los pines de la RAM están directamente conectados a los de la CPU. [se muestra la ram y cpu de una mac mini que son unidas]
+
+Las estanterías son el disco duro. [Las estanterías se convierten en discos duros]. Guarda de todo permanentemente, [aparece «todos los datos»] pero es el más lento de los tres, y su comunicación es más lenta porque también está más lejos[Aparece «cargar del disco · lento»]. La conexión suele ser mediante cables o pistas largas en la mainboard. [se muestra un disco duro con cables]
+
+Cuando un programa dice «cargando», son datos copiándose del disco a la RAM. [Una flecha animada va del disco a la RAM y aparece la leyenda]
 ```
 
 ### s=4 · ideas · Qué es un programa (PROPUESTA: transición con el esquema de las tres ideas)
@@ -110,17 +117,21 @@ Pantalla: kicker «Los niveles de abstracción de los lenguajes de programación
 Objetivo: 70 s · 179 palabras ≈ 75 s
 
 ```text
-Un programa es una lista de instrucciones para la computadora, escrita en un lenguaje de programación. Aquí hay cuatro niveles de lenguajes. Abstracto quiere decir que esconde detalles: cuanto más arriba, menos detalle escribes tú.
+Un programa es una lista de instrucciones para la computadora, escrita en un lenguaje de programación. 
 
-Abajo, en la caja ámbar, el código máquina: unos y ceros, señales eléctricas dentro del procesador. Es el único lenguaje que la CPU entiende: por eso dice «la CPU lee aquí».
+A los lenguajes los podemos clasificar en cuatro niveles abstraccion. 
+
+Abstracto quiere decir que esconde detalles: cuanto más arriba, menos detalle escribes tú.
+
+Abajo, en la caja ámbar, el código máquina: unos y ceros, señales eléctricas dentro del procesador. Al final lo unico que el CPU procesa.
 
 Encima, el ensamblador: las mismas instrucciones con palabras cortas en vez de unos y ceros. Cuesta mucho leerlo.
 
-Más arriba, C++ y Rust: mucho control sobre el hardware, las piezas físicas, y la memoria. Se compilan: se traducen a código máquina antes de correr.
+Más arriba, los lejuages que tienen control sobre el hardware, las piezas físicas, y la memoria. Por lo general son programas compilados.
 
-Arriba de todo, Python, JavaScript, GDScript y Blueprints: se leen casi como inglés y, casi siempre, el lenguaje maneja la memoria por ti. Blueprints, el de Unreal, ni siquiera es texto: son cajas conectadas.
+Arriba los lenguajes que se leen casi como inglés y, casi siempre, la memoria se maneja sola. 
 
-Escribas donde escribas, todo termina en unos y ceros. Arriba es más fácil para ti. Abajo, por lo general, corre más rápido. Por eso Unreal y Wwise están escritos en C++: un juego necesita velocidad.
+Escribas donde escribas, todo termina en unos y ceros. Arriba es más fácil para ti. Abajo, por lo general, corre más rápido. Por eso los motores están escritos en C++: un juego necesita velocidad de procesamiento. Y el codigo que los motores corren estan escritos en leguajes de alto nivel: los desarrolladores necesitan velocidad de desarrollo.
 ```
 
 ### s=6 · ideas · Qué es un servidor (PROPUESTA: transición con el esquema de las tres ideas)
@@ -142,13 +153,15 @@ Objetivo: 60 s · 145 palabras ≈ 60 s
 ```text
 Hasta aquí todo pasaba dentro de una computadora. Ahora son dos, conectadas por una red, como internet.
 
-A la izquierda, la PC cliente: la que pide. Puede ser un navegador o un juego, en tu computadora, tu celular o tu consola. A la derecha, la PC servidor: la que responde.
+A la izquierda, la PC cliente: la que pide. Puede ser un navegador o un juego, dentro de tu computadora, tu celular o tu consola. A la derecha, la PC servidor: la que responde.
 
-La flecha que va hacia el servidor es la petición: qué quieres y cómo lo quieres. La que vuelve es la respuesta, o un error si no se pudo.
+La flecha que va hacia el servidor es la petición: qué quieres y cómo lo quieres. 
 
-Dentro del servidor, tres pasos. Uno: si hace falta, valida al usuario: quién eres y si tienes permiso. Dos: busca los datos o archivos necesarios. Tres: arma la respuesta y la envía.
+Dentro del servidor, si hace falta valida al usuario, busca los datos o archivos necesarios, arma la respuesta y la envía.
 
-Un servidor es, ante todo, un programa que atiende peticiones. El cliente también es un programa, y los dos pueden estar en la misma computadora: así conversan Wwise y Unreal en tu propia máquina.
+La que vuelve es la respuesta, o un error si no se pudo.
+
+Un servidor es, ante todo, un programa que atiende peticiones. El cliente también es un programa, y los dos pueden estar en la misma computadora.
 ```
 
 ### s=8 · tipos y ejemplos de servidores · Cada servidor sirve lo suyo
@@ -226,7 +239,7 @@ Pantalla: aparece la flecha «instalas el juego» y una copia del «JUEGO» se d
 Objetivo: 20 s · 47 palabras ≈ 20 s
 
 ```text
-Instalas el juego. [pausa] Tu celular es el cliente: pide el juego, y la respuesta es una copia que viaja del servidor al disco y queda ahí, instalada. El original sigue en el servidor.
+Instalas el juego. {pausa} Tu celular es el cliente: pide el juego, y la respuesta es una copia que viaja del servidor al disco y queda ahí, instalada. El original sigue en el servidor.
 
 Instalar es, en esencia, copiar el programa del servidor al disco. Todavía no corre.
 ```
@@ -238,7 +251,7 @@ Pantalla: el título cambia a «Abrir un programa es copiarlo del disco a la RAM
 Objetivo: 35 s · 78 palabras ≈ 32 s
 
 ```text
-Abres el juego. [pausa] Otra copia viaja del disco a la RAM, al menos lo que necesita para empezar, y ahí queda corriendo: el procesador trabaja con lo que está en la RAM. Al cerrarlo, esa copia se borra de la RAM, pero el original sigue en el disco: por eso puedes abrirlo mañana.
+Abres el juego. {pausa} Otra copia viaja del disco a la RAM, al menos lo que necesita para empezar, y ahí queda corriendo: el procesador trabaja con lo que está en la RAM. Al cerrarlo, esa copia se borra de la RAM, pero el original sigue en el disco: por eso puedes abrirlo mañana.
 
 En Wwise, los SoundBanks, los paquetes de sonido del juego, hacen el mismo viaje: pasan del disco a la RAM cuando el juego los necesita.
 ```
