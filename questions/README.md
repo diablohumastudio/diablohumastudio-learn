@@ -35,7 +35,7 @@ Los cambios a enunciados, respuestas correctas o explicaciones no van por el Mar
 Lo escribe `build-review.js` y lo lee `review-to-import.js`; `scripts/review-md.js` documenta cada línea. Por pregunta:
 
 ```
-### wu-wo-012 · estructura
+### <span style="color: cyan;">wu-wo-012 · estructura</span>
 **Pregunta:** …
 **Correcta:** …                      (o **Correctas (n):** con lista)
 | Nivel | Incorrecta | Por qué |

@@ -3,7 +3,7 @@
 
    Bloque de una pregunta, tal como lo escribe render() y lo lee parse():
 
-     ### wu-wo-012 · estructura
+     ### <span style="color: cyan;">wu-wo-012 · estructura</span>   (el título va en cyan para verlo al recorrer el archivo)
      **Pregunta:** …
      **Correcta:** …                         (o **Correctas (n):** con una lista)
      | Nivel | Incorrecta | Por qué |
@@ -49,7 +49,7 @@ function parse(markdown) {
   for (const rawLine of markdown.split('\n')) {
     const line = rawLine.trimEnd();
     let match;
-    if ((match = line.match(/^### (\S+)/))) {
+    if ((match = line.replace(/<[^>]+>/g, '').match(/^### (\S+)/))) {
       current = { incorrect: [], proposals: [], noProposal: [], notes: [] };
       questions.set(match[1], current);
       continue;
@@ -156,7 +156,7 @@ function render(bank, entries, header) {
         ? question.correct[0].es
         : '\n' + question.correct.map((answer) => `- ${answer.es}`).join('\n');
       const lines = [
-        `### ${question.id}${slides ? ' · ' + slides : ''}${question.retired ? ' · RETIRADA' : ''}`,
+        `### <span style="color: cyan;">${question.id}${slides ? ' · ' + slides : ''}${question.retired ? ' · RETIRADA' : ''}</span>`,
         '',
         `**Pregunta:** ${question.prompt.es}`,
         '',
