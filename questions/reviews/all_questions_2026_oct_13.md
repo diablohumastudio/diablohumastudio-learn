@@ -16,7 +16,7 @@ Cada respuesta incorrecta lleva el nivel propuesto y el motivo. Los niveles son 
 
 ## Propuestas de distractores nuevos
 
-Donde faltan distractores de nivel 5 hay una lista **Propuestas de nivel 5** con el texto propuesto (➕) y por qué sería un 5. Son solo en español; la versión en inglés se escribe al cargarlas. Donde una propuesta sería forzada, o resultaría defendible como correcta, no se propone y se explica (✋). En total: 101 propuestas.
+Donde faltan distractores de nivel 5 hay una lista **Propuestas de nivel 5** con el texto propuesto (➕) y por qué sería un 5. Antes de importar, cada propuesta aceptada necesita su versión en inglés (`· en: «…»` después del texto; `review-to-import.js` se detiene si falta). Donde una propuesta sería forzada, o resultaría defendible como correcta, no se propone y se explica (✋). En total: 101 propuestas.
 
 ## Revisión de las preguntas
 
@@ -34,8 +34,9 @@ Fuentes consultadas: el esquema de objetos de Wwise 2025.1.9 (`WObjects.xml` de 
 
 ## Cómo revisar
 
+- Cada pregunta empieza con la casilla `- [ ] Revisada`: cámbiala a `- [x]` al terminar con ella (niveles decididos, propuestas aceptadas o borradas, notas aplicadas en el editor si las había). Es solo para seguir el avance en este archivo: los scripts la ignoran y el resumen no la cuenta; para contar las hechas, buscar `[x] Revisada`.
 - Cambia el número de la columna **Nivel** donde no estés de acuerdo; el motivo es solo la justificación de la propuesta.
-- Marca las propuestas ➕ que aceptas (o edítalas); las que no, bórralas.
+- Marca las propuestas ➕ que aceptas añadiendo su inglés (`· en: «…»`); las que no, bórralas. No cambies el texto de la columna **Incorrecta**: es la llave para volver a unir la revisión con el banco.
 - Las líneas *Nota* son observaciones sobre la pregunta misma, no sobre los niveles; no se ha cambiado ninguna pregunta.
 - Las preguntas con varias respuestas correctas muestran todas; el nivel se asigna a la incorrecta en relación con cualquiera de ellas.
 
@@ -154,6 +155,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-001 · biblioteca, computador</span>
 
+- [ ] Revisada
+
 **Pregunta:** En la analogía de la biblioteca, ¿qué parte del computador es la mesa?
 
 **Correcta:** La memoria RAM
@@ -170,6 +173,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ✋ Las cuatro piezas de la analogía ya están; una quinta memoria (VRAM, registros) no aparece en la clase y sería forzada.
 
 ### <span style="color: cyan;">wu-002 · lenguajes</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Cuál es el único lenguaje que la CPU entiende?
 
@@ -193,6 +198,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-003 · restaurante</span>
 
+- [ ] Revisada
+
 **Pregunta:** Según la clase, ¿qué es un servidor?
 
 **Correcta:** Un programa que atiende peticiones
@@ -212,6 +219,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Veracidad: fuera de la clase, «servidor» también nombra a la máquina; el «Según la clase» del enunciado es necesario y ya está.
 
 ### <span style="color: cyan;">wu-004 · hardware</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Qué pieza suele no existir en una computadora servidor?
 
@@ -233,6 +242,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Ambigüedad: «suele no existir» admite otras respuestas reales (pantalla, tarjeta de sonido, teclado). Acotar: «De las cuatro piezas de la diapositiva «La máquina», ¿cuál no tiene el servidor?».
 
 ### <span style="color: cyan;">wu-005 · arranque</span>
+
+- [ ] Revisada
 
 **Pregunta:** Al arrancar el juego, ¿qué SoundBank ya está cargado en la RAM?
 
@@ -258,6 +269,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-006 · compilados</span>
 
+- [ ] Revisada
+
 **Pregunta:** Un programa compilado…
 
 **Correcta:** se traduce a binario una vez, antes de correr
@@ -274,6 +287,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «se traduce a binario cada vez que corre» — La afirmación correcta con la frecuencia cambiada
 
 ### <span style="color: cyan;">wu-007 · interpretados</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Quién corre a un programa interpretado?
 
@@ -295,6 +310,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Fuente: «motor (intérprete)» es terminología de la clase; añadir «según la clase».
 
 ### <span style="color: cyan;">wu-008 · queEsUnMotor</span>
+
+- [ ] Revisada
 
 **Pregunta:** Según la definición de la clase, un motor es…
 
@@ -319,6 +336,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-009 · puntaAPunta</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué genera el Wwise editor hacia el proyecto del engine?
 
 **Correcta:** SoundBanks (.bnk)
@@ -338,6 +357,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Fuente: añadir «según el diagrama de punta a punta». Veracidad: la integración también genera assets de Unreal, pero la clase lo atribuye al plugin, no al editor.
 
 ### <span style="color: cyan;">wu-010 · puntaAPunta</span>
+
+- [ ] Revisada
 
 **Pregunta:** En el build, ¿cómo usa el juego a Wwise?
 
@@ -361,6 +382,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-011 · losUtiles</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Cuáles son los tres views de todos los días en Wwise?
 
 **Correcta:** Project Explorer, Transport Control y Soundcaster
@@ -383,6 +406,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-012 · layouts</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué es un layout en Wwise?
 
 **Correcta:** Un acomodo de views en la pantalla
@@ -401,6 +426,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «El menú desde donde se abren todos los views» — Confunde el menú Views con el layout
 
 ### <span style="color: cyan;">wu-013 · designer</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Cuál es el layout de diario para crear y configurar Wwise Objects y Events?
 
@@ -424,6 +451,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-001 · flujo</span>
 
+- [ ] Revisada
+
 **Pregunta:** De las cinco familias de objetos, ¿cuál es la única que el juego toca directamente?
 
 **Correcta:** Game Input: postea Events y setea Game Syncs
@@ -446,6 +475,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-002 · flujo</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué camino sigue la señal de audio entre las familias?
 
 **Correcta:** Nace en Contenido, baja a Mixing y sale por el dispositivo
@@ -466,6 +497,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-003 · flujo</span>
 
+- [ ] Revisada
+
 **Pregunta:** En el diagrama del camino, ¿qué queda fuera del marco de los SoundBanks?
 
 **Correcta:** El juego y la salida
@@ -485,6 +518,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «El juego, la salida y el Game Input» — La correcta más una familia que parece «del juego»
 
 ### <span style="color: cyan;">wu-wo-004 · clasificacion</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Qué pregunta responde la familia Contenido?
 
@@ -509,6 +544,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-005 · clasificacion</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué familia responde a la pregunta «¿a dónde va la señal?»?
 
 **Correcta:** Mixing · Routing, con los busses
@@ -529,6 +566,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-006 · clasificacion</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿De dónde sale la clasificación en cinco familias que usamos en la clase?
 
 **Correcta:** Es nuestra, didáctica, para entender el camino de un sonido
@@ -548,6 +587,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «Es la clasificación del curso Wwise-101 de Audiokinetic» — Otro origen «oficial» creíble
 
 ### <span style="color: cyan;">wu-wo-007 · sonido</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Cuál de estos objetos apunta a audio de verdad?
 
@@ -578,6 +619,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-008 · sonido</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿En qué se diferencia un Sound Voice de un Sound SFX?
 
 **Correcta:** Tiene una fuente de audio por idioma
@@ -599,6 +642,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-009 · sonido</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué es un Music Segment?
 
 **Correcta:** Un timeline que contiene tracks, con cues, tempo y compás
@@ -618,6 +663,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «Una pista de audio con sub-tracks y clips» — Es el Music Track, su hijo directo
 
 ### <span style="color: cyan;">wu-wo-010 · estructura</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Qué container responde a «¿cuánto de cada uno?» y hace sonar varios hijos a la vez según un RTPC?
 
@@ -641,6 +688,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-011 · estructura</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué tienen en común todos los containers?
 
 **Correcta:** No producen audio: tienen hijos y deciden cómo suenan
@@ -657,6 +706,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 **Modo difícil:** ✅ entra (3 de nivel 5)
 
 ### <span style="color: cyan;">wu-wo-012 · estructura</span>
+
+- [ ] Revisada
 
 **Pregunta:** Los pasos deben sonar distinto según la superficie que informa el juego. ¿Qué container corresponde?
 
@@ -677,6 +728,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «Music Switch Container» — El hermano de música que también elige según el juego
 
 ### <span style="color: cyan;">wu-wo-013 · estructura</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Qué regla aplica un Random Container?
 
@@ -700,6 +753,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-014 · herencia</span>
 
+- [ ] Revisada
+
 **Pregunta:** footsteps tiene Volume −6 dB, su hijo enemy −4 dB y footstep_metal, hijo de enemy, −4 dB. ¿Con qué volumen suena footstep_metal?
 
 **Correcta:** −14 dB
@@ -719,6 +774,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-015 · herencia</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Cómo bajan las propiedades del padre a sus hijos?
 
 **Correcta:** Las relativas (volumen, pitch) se suman; las absolutas (bus, efectos) se heredan salvo override
@@ -737,6 +794,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Fuente: «relativas» y «absolutas» es la terminología de la clase (lectura «Herencia»). En Wwise, Volume, Pitch, LPF y HPF se suman en la jerarquía y Output Bus, Effects y Positioning se heredan salvo «Override parent»: el contenido es correcto.
 
 ### <span style="color: cyan;">wu-wo-016 · herencia</span>
+
+- [ ] Revisada
 
 **Pregunta:** footsteps sale por el bus SFX. ¿Por qué footstep_metal sale por el bus Metal?
 
@@ -758,6 +817,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-017 · busses</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿A cuántos output busses apunta un objeto y qué pasa con su señal?
 
 **Correcta:** A exactamente uno: la señal se mueve, no se copia
@@ -776,6 +837,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Veracidad: confirmado en el esquema oficial de Wwise 2025.1.9: cada objeto tiene una sola referencia Output Bus.
 
 ### <span style="color: cyan;">wu-wo-018 · busses</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Para qué sirve el Master Motion Bus?
 
@@ -799,6 +862,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-019 · busses</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Para qué sirve un Secondary Bus?
 
 **Correcta:** Para llevar audio a otro hardware, como unos audífonos
@@ -821,6 +886,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-020 · aux</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué es un send hacia un Aux Bus?
 
 **Correcta:** Una copia de la señal, con un nivel de send por objeto
@@ -837,6 +904,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 **Modo difícil:** ✅ entra (3 de nivel 5)
 
 ### <span style="color: cyan;">wu-wo-021 · aux</span>
+
+- [ ] Revisada
 
 **Pregunta:** Un Sound SFX sale por Audio Bus · SFX y tiene un send a Aux Bus · Reverb. ¿Qué llega al Main Audio Bus?
 
@@ -857,6 +926,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-022 · efectos</span>
 
+- [ ] Revisada
+
 **Pregunta:** Suenan tres voces de un objeto que tiene un efecto insertado en el objeto. ¿Cuántas instancias del efecto corren?
 
 **Correcta:** Tres: una por voz, antes de mezclar
@@ -875,6 +946,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Veracidad: confirmado por Audiokinetic (Q&A): en el bus una sola instancia procesa la suma; en el objeto hay una instancia por voz.
 
 ### <span style="color: cyan;">wu-wo-023 · efectos, aux</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Por qué la reverb suele vivir en un Aux Bus y no en cada objeto?
 
@@ -897,6 +970,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-024 · sharesets</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué es un ShareSet?
 
 **Correcta:** Una definición central reutilizable: se edita en un solo lugar
@@ -917,6 +992,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «Un efecto puesto en un bus para que lo compartan muchas voces» — Confunde compartir una definición con compartir una instancia
 
 ### <span style="color: cyan;">wu-wo-025 · sharesets</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Cuál de estos NO es un tipo de ShareSet?
 
@@ -942,6 +1019,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-026 · sharesets</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Cuándo conviene un efecto Custom en vez de un ShareSet?
 
 **Correcta:** Cuando es una versión propia para un caso puntual
@@ -962,6 +1041,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-027 · events</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué ve el código del juego cuando hace sonar unos pasos?
 
 **Correcta:** Solo el Event, que postea por nombre
@@ -978,6 +1059,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 **Modo difícil:** ✅ entra (3 de nivel 5)
 
 ### <span style="color: cyan;">wu-wo-028 · events</span>
+
+- [ ] Revisada
 
 **Pregunta:** Quieres usar Actions Set RTPC para poner car_rpm en 4200 y en 6000. ¿Qué necesitas?
 
@@ -1001,6 +1084,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-029 · events</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué ventaja tiene que el juego nunca vea las Actions de un Event?
 
 **Correcta:** Cambiar el comportamiento del sonido no toca el código
@@ -1022,6 +1107,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-030 · gameSyncs</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿En qué se diferencian un Switch y un State?
 
 **Correcta:** El Switch es local, por Game Object; el State es global, para todo el juego
@@ -1038,6 +1125,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 **Modo difícil:** ✅ entra (3 de nivel 5)
 
 ### <span style="color: cyan;">wu-wo-031 · gameSyncs</span>
+
+- [ ] Revisada
 
 **Pregunta:** Las RPM del auto deben controlar el pitch del motor de forma continua. ¿Qué Game Sync corresponde?
 
@@ -1058,6 +1147,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-032 · gameSyncs</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Para qué se usa un Trigger?
 
 **Correcta:** Para una señal momentánea, como un stinger de música
@@ -1075,6 +1166,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-033 · gameSyncs</span>
 
+- [ ] Revisada
+
 **Pregunta:** Cuando el jugador tiene poca vida, toda la mezcla debe cambiar con una transición. ¿Qué Game Sync corresponde?
 
 **Correcta:** State
@@ -1091,6 +1184,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 **Modo difícil:** ✅ entra (4 de nivel 5)
 
 ### <span style="color: cyan;">wu-wo-034 · packaging</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Qué contiene un SoundBank?
 
@@ -1111,6 +1206,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-035 · packaging</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué es un Work Unit?
 
 **Correcta:** Un archivo .wwu que parte el proyecto, para control de versiones y trabajo en equipo
@@ -1127,6 +1224,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 **Modo difícil:** ✅ entra (3 de nivel 5)
 
 ### <span style="color: cyan;">wu-wo-036 · packaging</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Cuál de estos se queda en el editor y NO viaja con el juego?
 
@@ -1150,6 +1249,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-037 · cierre, flujo</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Cuál es un camino completo de un sonido?
 
 **Correcta:** Game Input → Contenido → Mixing → Salida
@@ -1169,6 +1270,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-038 · cierre, flujo</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Sobre qué familias actúa Procesamiento?
 
 **Correcta:** Sobre Contenido y sobre Mixing
@@ -1187,6 +1290,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Fuente: añadir «en nuestra clasificación».
 
 ### <span style="color: cyan;">wu-wo-101 · flujo</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Como maneja los datos Wwise por adentro?
 
@@ -1213,6 +1318,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-102 · flujo</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué es un Wwise Object?
 
 **Correcta:** Cada ítem de la base de datos del proyecto: un objeto que el usuario puede crear en el editor
@@ -1232,6 +1339,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «Cada propiedad que se puede editar en el Property Editor» — Propiedad en vez de objeto
 
 ### <span style="color: cyan;">wu-wo-103 · flujo</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Qué es el Wwise Authoring Tool?
 
@@ -1255,6 +1364,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-104 · flujo</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿En qué view se encuentran principalmente los Wwise Objects?
 
 **Correcta:** Project Explorer
@@ -1274,6 +1385,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «Schematic View» — View real que también muestra la estructura de objetos
 
 ### <span style="color: cyan;">wu-wo-105 · flujo</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Cuál de estos es un Wwise Object?
 
@@ -1301,6 +1414,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-106 · flujo</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Todos los tipos de Wwise Object se encuentran en el Project Explorer?
 
 **Correcta:** No: algunos tipos se encuentran en otros views especializados
@@ -1321,6 +1436,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-107 · flujo</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué campos tienen todos los Wwise Objects?
 
 **Correcta:** Nombre, tipo, id, hijos, propiedades y referencias
@@ -1339,6 +1456,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Fuente: «nombre, tipo, id, hijos, propiedades y referencias» es el modelo de la lectura, no terminología oficial de Wwise: añadir «según la lectura».
 
 ### <span style="color: cyan;">wu-wo-108 · flujo</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Cuál de estos campos NO lo tienen todos los Wwise Objects?
 
@@ -1362,6 +1481,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-109 · flujo</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Desde qué view se pueden editar las propiedades de cualquier Wwise Object, sea del tipo que sea?
 
 **Correcta:** Property Editor
@@ -1378,6 +1499,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 **Modo difícil:** ✅ entra (3 de nivel 5)
 
 ### <span style="color: cyan;">wu-wo-110 · flujo</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿De qué depende qué propiedades tiene un Wwise Object?
 
@@ -1400,6 +1523,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-111 · flujo</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Cómo están agrupados los distintos tipos de Wwise Object en el Project Explorer?
 
 **Correcta:** En pestañas
@@ -1421,6 +1546,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-112 · flujo, clasificacion</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Cuál es la finalidad del diagrama de las cinco familias?
 
 **Correcta:** Clasificar los Wwise Objects de una manera que facilite el aprendizaje
@@ -1440,6 +1567,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «Agrupar los objetos como lo hace la documentación de Wwise» — El contraste exacto que hace la clase
 
 ### <span style="color: cyan;">wu-wo-113 · flujo, packaging</span>
+
+- [ ] Revisada
 
 **Pregunta:** Según la lectura, ¿qué son los SoundBanks?
 
@@ -1463,6 +1592,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-114 · flujo, packaging</span>
 
+- [ ] Revisada
+
 **Pregunta:** Un SoundBank es como una lista. ¿De qué?
 
 **Correcta:** De otros Wwise Objects y archivos de audio
@@ -1482,6 +1613,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «De Events y de los Work Units que los contienen» — Mitad cierta con una pieza del editor
 
 ### <span style="color: cyan;">wu-wo-115 · flujo, packaging</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Por qué se habla de SoundBanks, en plural?
 
@@ -1503,6 +1636,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-116 · flujo, packaging</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué nos permite tener el proyecto exportado en varios SoundBanks?
 
 **Correcta:** Cargar cada SoundBank a memoria desde el juego cuando lo queramos
@@ -1523,6 +1658,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «Que el juego cargue solo los Events, sin la media» — Partición falsa del contenido de un banco
 
 ### <span style="color: cyan;">wu-wo-117 · flujo, packaging</span>
+
+- [ ] Revisada
 
 **Pregunta:** Al abrir el juego solo quieres en memoria la música y los efectos de los menús. ¿Cómo lo logras?
 
@@ -1547,6 +1684,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-118 · flujo, packaging</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿En qué view del editor se configuran los SoundBanks?
 
 **Correcta:** SoundBank Manager
@@ -1563,6 +1702,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 **Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
 
 ### <span style="color: cyan;">wu-wo-119 · flujo, packaging</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Qué se configura en el SoundBank Manager?
 
@@ -1586,6 +1727,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-120 · flujo, packaging</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué pasa al dar clic en Generar en el SoundBank Manager?
 
 **Correcta:** Se crean los SoundBanks donde lo hayamos configurado
@@ -1607,6 +1750,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-121 · flujo, packaging</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué se le integra al entregable del juego para procesar el audio?
 
 **Correcta:** El motor y los SoundBanks, el primero que procesa el audio según el segundo.
@@ -1625,6 +1770,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Gramática: la correcta termina en punto y «el primero que procesa el audio según el segundo» es confusa: «El motor y los SoundBanks: el motor procesa el audio según los SoundBanks».
 
 ### <span style="color: cyan;">wu-wo-122 · flujo, packaging</span>
+
+- [ ] Revisada
 
 **Pregunta:** Según la lectura, ¿qué es el entregable del juego?
 
@@ -1647,6 +1794,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-123 · flujo</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué representa el grupo Game Input?
 
 **Correcta:** Los Wwise Objects que sirven para comunicarse con el juego
@@ -1666,6 +1815,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «Los bloques de Blueprint que llaman a Wwise desde Unreal» — El lado expuesto en Unreal, no los objetos
 
 ### <span style="color: cyan;">wu-wo-124 · flujo</span>
+
+- [ ] Revisada
 
 **Pregunta:** Al instalar el PLUGIN de Wwise en el motor del juego, ¿qué hace con los Wwise Objects de tipo Game Input?
 
@@ -1691,6 +1842,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-125 · flujo</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué significa que el plugin «expone» un Wwise Object?
 
 **Correctas (2):** 
@@ -1712,6 +1865,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «Que lo integra al entregable del juego junto con el motor» — Confunde integrar con exponer
 
 ### <span style="color: cyan;">wu-wo-126 · flujo</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Qué pasa cuando el juego «llama» a un Wwise Object de tipo Game Input?
 
@@ -1735,6 +1890,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-127 · flujo, events</span>
 
+- [ ] Revisada
+
 **Pregunta:** En Unreal, ¿con qué tipo de bloque de Blueprint se llama a un Event?
 
 **Correcta:** PostEvent
@@ -1755,6 +1912,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-128 · flujo</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué dos tipos de Game Input hay?
 
 **Correcta:** Events y Game Syncs
@@ -1771,6 +1930,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 **Modo difícil:** ✅ entra (3 de nivel 5)
 
 ### <span style="color: cyan;">wu-wo-129 · flujo, events</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Qué hace un Event al ser llamado?
 
@@ -1792,6 +1953,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «Ejecuta una sola acción, la primera de su lista» — La correcta con un detalle cambiado
 
 ### <span style="color: cyan;">wu-wo-130 · flujo, events</span>
+
+- [ ] Revisada
 
 **Pregunta:** Además de su tipo (Play, Stop, Pause…), ¿qué tiene que tener cada acción de un Event?
 
@@ -1815,6 +1978,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Veracidad: cierto para la mayoría de las acciones; Set State y Set Game Parameter apuntan a Game Syncs, no a un objeto de Contenido. La lectura lo simplifica: «según la lectura».
 
 ### <span style="color: cyan;">wu-wo-131 · flujo, events</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Cuál de estos es un tipo de acción de un Event?
 
@@ -1842,6 +2007,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-132 · flujo, events</span>
 
+- [ ] Revisada
+
 **Pregunta:** Un Event tiene una acción Play que apunta a un Music Segment con una canción. ¿Qué pasa cuando el juego llama a ese Event?
 
 **Correcta:** Se reproduce la canción del Music Segment
@@ -1858,6 +2025,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 **Modo difícil:** ✅ entra (3 de nivel 5)
 
 ### <span style="color: cyan;">wu-wo-133 · flujo, events</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Para qué tipo de cosas se usan principalmente los Events?
 
@@ -1880,6 +2049,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Veracidad: existe la acción «Set Voice Volume», así que un Event sí puede fijar un volumen; la regla «Sí o No → Events, muchos valores → Game Syncs» es una simplificación de la lectura: añadir «según la lectura».
 
 ### <span style="color: cyan;">wu-wo-134 · flujo, gameSyncs</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Para qué se usan los Game Syncs?
 
@@ -1904,6 +2075,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-135 · flujo, gameSyncs</span>
 
+- [ ] Revisada
+
 **Pregunta:** Desde el juego quieres subir el volumen a 85/100. ¿Qué tipo de Game Input corresponde?
 
 **Correcta:** Un Game Sync
@@ -1920,6 +2093,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Veracidad y ambigüedad: con la acción «Set Voice Volume» un Event también puede poner el volumen en un valor; la respuesta es correcta «según la lectura». Añadir la fuente al enunciado.
 
 ### <span style="color: cyan;">wu-wo-136 · flujo, gameSyncs</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Cuál de estos casos es para un Game Sync y no para un Event?
 
@@ -1939,6 +2114,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Veracidad: igual que wu-wo-135: «según la lectura».
 
 ### <span style="color: cyan;">wu-wo-137 · flujo, events</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Cuál de estos casos es para un Event?
 
@@ -1960,6 +2137,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-138 · flujo</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué representa el grupo Contenido?
 
 **Correcta:** Los objetos «que se reproducen»
@@ -1978,6 +2157,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «Los archivos de audio importados al proyecto» — La media en vez de los objetos que la reproducen
 
 ### <span style="color: cyan;">wu-wo-139 · flujo</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Sobre qué objetos se aplican los Game Syncs y las acciones de los Events?
 
@@ -2001,6 +2182,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Veracidad: en Wwise las acciones también apuntan a busses (Set Bus Volume) y los RTPC pueden mover propiedades de busses y efectos; la lectura lo simplifica: «según la lectura».
 
 ### <span style="color: cyan;">wu-wo-140 · flujo, busses</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Qué tienen que tener configurado todos los elementos de Contenido para ser reproducidos?
 
@@ -2028,6 +2211,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-141 · flujo, clasificacion</span>
 
+- [ ] Revisada
+
 **Pregunta:** En nuestra clasificación, ¿cómo se llaman los objetos de Contenido que contienen directamente el audio?
 
 **Correcta:** Sonido
@@ -2047,6 +2232,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «Audio» — Anzuelo de vocabulario: es la pestaña, no el grupo
 
 ### <span style="color: cyan;">wu-wo-142 · flujo, clasificacion</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Qué son los objetos de Estructura?
 
@@ -2071,6 +2258,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-143 · flujo, clasificacion</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Cuáles son las dos clasificaciones internas de Contenido?
 
 **Correcta:** Sonido o Estructura, y Música o SFX
@@ -2089,6 +2278,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «Sonido o Estructura, y Contenido o Mixing» — Mitad cierta con dos familias en vez del segundo eje
 
 ### <span style="color: cyan;">wu-wo-144 · flujo, clasificacion</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Qué objetos de Contenido quedan fuera de la clasificación Música / SFX?
 
@@ -2111,6 +2302,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-145 · flujo, estructura</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué tienen en común las carpetas virtuales y los property containers?
 
 **Correcta:** Agrupan objetos independientemente de si son de música o de SFX
@@ -2127,6 +2320,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 **Modo difícil:** ✅ entra (3 de nivel 5)
 
 ### <span style="color: cyan;">wu-wo-146 · flujo, busses</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Qué representa el grupo Mixing · Routing?
 
@@ -2149,6 +2344,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-147 · flujo, busses</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué simbolizan los busses?
 
 **Correcta:** Una consola de mezcla de audio
@@ -2169,6 +2366,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «Un amplificador» — Equipo de audio real que no simboliza al bus
 
 ### <span style="color: cyan;">wu-wo-148 · flujo, busses</span>
+
+- [ ] Revisada
 
 **Pregunta:** ¿Qué hace un bus con los elementos de Contenido conectados a él cuando se reproducen?
 
@@ -2192,6 +2391,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-149 · flujo, busses</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿A qué equipo físico pueden estar conectados los busses?
 
 **Correcta:** Parlantes o controles que vibran
@@ -2213,6 +2414,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 > *Nota:* Veracidad: también audífonos o el parlante del control, según el Audio Device; mejor «por ejemplo» en la respuesta.
 
 ### <span style="color: cyan;">wu-wo-150 · flujo, busses · RETIRADA</span>
+
+- [ ] Revisada
 
 **Pregunta:** Un bus que no llega directo a los equipos físicos y entra a otro bus. ¿Qué pasa con su señal?
 
@@ -2236,6 +2439,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 
 ### <span style="color: cyan;">wu-wo-151 · flujo, efectos</span>
 
+- [ ] Revisada
+
 **Pregunta:** ¿Qué representa el grupo Procesamiento?
 
 **Correcta:** Los Wwise Objects que manipulan la señal de audio aplicando efectos
@@ -2251,6 +2456,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 **Modo difícil:** ❌ no entra (2 de nivel 5, falta 1)
 
 ### <span style="color: cyan;">wu-wo-152 · flujo, efectos</span>
+
+- [ ] Revisada
 
 **Pregunta:** El jugador entra al agua y quieres que la música y los SFX suenen filtrados a la vez. ¿Dónde conviene aplicar el efecto?
 
@@ -2272,6 +2479,8 @@ La columna **Notas** marca la prioridad de revisión: 🔴 tiene observaciones s
 - ➕ «En un Aux Bus de filtro, con sends desde la música y los SFX» — Enfoque de copia: la señal seca seguiría sin filtrar
 
 ### <span style="color: cyan;">wu-wo-153 · flujo, efectos</span>
+
+- [ ] Revisada
 
 **Pregunta:** Quieres que cambie un solo sonido concreto, sin afectar a los demás. ¿Dónde conviene aplicar el efecto?
 

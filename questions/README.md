@@ -22,7 +22,7 @@ Todo lo pertinente al banco de preguntas de práctica y examen vive en esta carp
 1. **Exportar el banco.** `node questions/scripts/export-bank.js` escribe `questions/exports/AAAA-MM-DD/questions.json` (más `examQuestions.json` y una vista legible). Solo lectura; usa la cuenta de servicio de `.env.local`.
 2. **Generar la revisión.** `node questions/scripts/build-review.js --bank questions/exports/AAAA-MM-DD/questions.json --out questions/reviews/all_questions_AAAA_mes_DD.md --from questions/reviews/<revisión anterior>.md`. Con `--from`, los niveles, motivos, propuestas y notas de la ronda anterior se arrastran por id y por texto de la incorrecta; lo que ya está en el banco (`level`) manda. `--findings hallazgos.md` inserta los hallazgos generales de la ronda.
 3. **Commit** del archivo generado: es el punto de partida contra el que se verá cada cambio.
-4. **Revisar en el Markdown.** Cambiar niveles, aceptar o borrar propuestas ➕ (una propuesta aceptada necesita su inglés: `· en: «…»`), añadir notas. El resumen del inicio ordena la prioridad: 🔴 tiene notas, 🟢 no.
+4. **Revisar en el Markdown.** Cambiar niveles, aceptar o borrar propuestas ➕ (una propuesta aceptada necesita su inglés: `· en: «…»`), añadir notas. El resumen del inicio ordena la prioridad: 🔴 tiene notas, 🟢 no. Al terminar una pregunta, marcar su casilla `- [x] Revisada`; `grep -c "\[x\] Revisada"` sobre el archivo dice cuántas van.
 5. **Commit por ronda** (y vuelta al paso 4 las veces que haga falta; cada commit deja el diff a la vista).
 6. **Generar el archivo de importación.** `node questions/scripts/review-to-import.js --bank questions/exports/AAAA-MM-DD/questions.json --review questions/reviews/<revisión>.md --out questions/exports/AAAA-MM-DD/import.json`. Se detiene si una incorrecta quedó sin nivel o una propuesta sin inglés; `--default-level 3` solo para una migración, nunca para una ronda normal.
 7. **Importar** en `/teacher/questions` → Import JSON → Revisar → Importar. Las preguntas cuyo texto no cambió salen en amarillo y no se escriben.
@@ -36,6 +36,7 @@ Lo escribe `build-review.js` y lo lee `review-to-import.js`; `scripts/review-md.
 
 ```
 ### <span style="color: cyan;">wu-wo-012 · estructura</span>
+- [ ] Revisada                       avance dentro de este archivo; los scripts la ignoran
 **Pregunta:** …
 **Correcta:** …                      (o **Correctas (n):** con lista)
 | Nivel | Incorrecta | Por qué |
@@ -47,7 +48,9 @@ Lo escribe `build-review.js` y lo lee `review-to-import.js`; `scripts/review-md.
 > *Nota:* observación sobre la pregunta
 ```
 
-Se puede editar: el número de **Nivel**, las propuestas ➕ (texto, inglés, borrarlas), las notas. No se edita el texto de la columna **Incorrecta**: es la llave que une la revisión con el banco. Un nivel que no sea 1, 3 o 5 se conserva, pero solo el 5 cuenta para el modo difícil.
+Se puede editar: el número de **Nivel**, las propuestas ➕ (texto, inglés, borrarlas), las notas y la casilla **Revisada**. No se edita el texto de la columna **Incorrecta**: es la llave que une la revisión con el banco. Un nivel que no sea 1, 3 o 5 se conserva, pero solo el 5 cuenta para el modo difícil.
+
+La casilla `- [ ] Revisada` se añade a mano al archivo de la ronda (una línea bajo cada título) y vive solo ahí: `build-review.js` no la escribe, `parse` no la lee y no pasa al banco ni a la ronda siguiente. Su historial está en los commits del archivo. Si algún día hace falta un registro de revisiones que sobreviva a la ronda, va como campo del banco con un diseño propio, no como arrastre entre archivos.
 
 ## Cómo se califican los distractores
 
