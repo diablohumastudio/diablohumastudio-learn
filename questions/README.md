@@ -8,11 +8,12 @@ Todo lo pertinente al banco de preguntas de práctica y examen vive en esta carp
 |---|---|
 | `reviews/` | Un archivo de revisión por ronda, con fecha en el nombre (`all_questions_2026_oct_13.md`). Se commitea en cada paso para poder ver el diff. |
 | `scripts/` | `export-bank.js` (banco → JSON), `build-review.js` (JSON → Markdown de revisión), `review-to-import.js` (Markdown + JSON → archivo para Import JSON) y `review-md.js` (el formato compartido). |
-| `exports/` | Exportaciones del banco, ignoradas por git: traen las respuestas correctas. Una carpeta por fecha. |
+| `exports/` | Exportaciones del banco, una carpeta por fecha, ignoradas por git: `examQuestions.json` es el banco solo de examen y no debe salir del disco; el resto es un paso de la importación y se borra al cerrar la ronda. |
 
 ## Principios
 
 - **La fuente de verdad es el banco en Firestore** (`questions` y `examQuestions`). El Markdown de revisión es un documento de trabajo: se genera desde el banco y se devuelve al banco con los scripts. No se edita el banco con JSON escritos a mano.
+- **Fuera del banco no se mantiene nada.** Los archivos de `reviews/` son de trabajo: un JSON mientras se escribe un set nuevo, un Markdown mientras se revisa una ronda. Se commitean para ver los diffs entre pasos y pueden borrarse cuando lo que dicen ya está en el banco.
 - **Los ids de las respuestas se conservan.** Los exámenes guardan «en la pregunta X eligió la opción con id tal». Todo archivo de importación se construye desde un Export reciente, nunca desde cero (ver el pendiente del importador en [TODO.md](../TODO.md)).
 - **Nada se escribe sin revisión.** Import JSON muestra qué haría cada pregunta (nueva, reemplaza con cambios, idéntica) antes de escribir.
 - **Español es el idioma fuente.** Los nombres de producto y de objetos de Wwise van en inglés y con el nombre oficial de la versión del curso (Wwise 2025.1).
@@ -20,7 +21,7 @@ Todo lo pertinente al banco de preguntas de práctica y examen vive en esta carp
 ## El ciclo de revisión
 
 1. **Exportar el banco.** `node questions/scripts/export-bank.js` escribe `questions/exports/AAAA-MM-DD/questions.json` (más `examQuestions.json` y una vista legible). Solo lectura; usa la cuenta de servicio de `.env.local`.
-2. **Generar la revisión.** `node questions/scripts/build-review.js --bank questions/exports/AAAA-MM-DD/questions.json --out questions/reviews/all_questions_AAAA_mes_DD.md --from questions/reviews/<revisión anterior>.md`. Con `--from`, los niveles, motivos, propuestas y notas de la ronda anterior se arrastran por id y por texto de la incorrecta; lo que ya está en el banco (`level`) manda. `--findings hallazgos.md` inserta los hallazgos generales de la ronda.
+2. **Generar la revisión.** `node questions/scripts/build-review.js --bank questions/exports/AAAA-MM-DD/questions.json --out questions/reviews/all_questions_AAAA_mes_DD.md --from questions/reviews/<revisión anterior>.md`. `--from` se puede repetir (la ronda anterior y la revisión de un set nuevo, por ejemplo): los niveles, motivos, propuestas y notas se arrastran por id y por texto de la incorrecta, y si una pregunta está en varios archivos manda el último; lo que ya está en el banco (`level`) manda sobre todo lo arrastrado. `--findings hallazgos.md` inserta los hallazgos generales de la ronda.
 3. **Commit** del archivo generado: es el punto de partida contra el que se verá cada cambio.
 4. **Revisar en el Markdown.** Cambiar niveles, aceptar o borrar propuestas ➕ (una propuesta aceptada necesita su inglés: `· en: «…»`), añadir notas. El resumen del inicio ordena la prioridad: 🔴 tiene notas, 🟢 no. Al terminar una pregunta, marcar su casilla `- [x] Revisada`; `grep -c "\[x\] Revisada"` sobre el archivo dice cuántas van.
 5. **Commit por ronda** (y vuelta al paso 4 las veces que haga falta; cada commit deja el diff a la vista).
@@ -86,7 +87,7 @@ Cada pregunta se revisa en cuatro aspectos; los hallazgos van en líneas *Nota* 
 
 ## Cómo crear un set nuevo de preguntas
 
-**Formato.** Un archivo JSON con un arreglo de preguntas en el formato de Import JSON (`docs/practice.md`), con el nivel en cada incorrecta:
+**Formato.** Un archivo JSON en `reviews/` (`reviews/<clase>_AAAA_mes_DD.json`) con un arreglo de preguntas en el formato de Import JSON (`docs/practice.md`), con el nivel en cada incorrecta. Una vez importado, el archivo y su revisión pueden borrarse:
 
 ```json
 {
@@ -125,8 +126,12 @@ Sin `id`, el importador asigna el siguiente de la clase (`wu-wo-`); un id nunca 
 - *Congruencia:* misma terminología que las diapositivas, la lectura de repaso y el handout; ningún ejemplo que contradiga otra pregunta del banco (buscar el término en `exports/…/questions.compact.txt`).
 - *Niveles:* calificados con la escala, con motivo, y al menos tres niveles 5 reales, no forzados.
 
-La forma más cómoda de escribir y verificar un set es generar su revisión con `build-review.js` sobre el JSON nuevo (sirve cualquier arreglo con el formato del banco), leerla como se lee una ronda, e importar cuando esté limpia.
+La forma más cómoda de escribir y verificar un set es generar su revisión con `build-review.js` sobre el JSON nuevo (sirve cualquier arreglo con el formato del banco), leerla como se lee una ronda, corregir los textos en el JSON y regenerar, e importar cuando esté limpia: todas salen en verde, nuevas.
 
 ## Estado del sistema
 
-Decisiones tomadas el 2026-10-13: nivel por distractor con la escala de arriba; el modo lo elige el alumno en Config para la práctica libre y el profesor por ronda de deber y por examen; las preguntas sin tres distractores de nivel 5 quedan fuera del modo difícil; nivel por defecto 3 solo en migración. Pendiente de implementar en la plataforma: el campo `level` en el modelo y el importador (hoy el importador lo descarta), el selector de nivel en el editor, el modo en el jugador, los deberes y los exámenes. Hasta entonces, `review-to-import.js` produce el archivo correcto, pero el banco no guarda el nivel.
+Decisiones tomadas el 2026-10-13: nivel por distractor con la escala de arriba; el modo lo elige el alumno en Config para la práctica libre y el profesor por ronda de deber y por examen; las preguntas sin tres distractores de nivel 5 quedan fuera del modo difícil; nivel por defecto 3 solo en migración.
+
+Hecho el 2026-10-15: el banco guarda `level` en cada incorrecta; el editor lo exige al guardar (selector 1, 3, 5) e Import JSON lo exige en cada incorrecta del archivo; un cambio solo de niveles cuenta como cambio y se escribe. Las preguntas que todavía no lo tienen se leen igual hasta que se califiquen: la primera importación de `all_questions_2026_oct_13.md` las cubre todas.
+
+Pendiente: el modo en el jugador, los deberes y los exámenes, y que el banco guarde el estado de revisión para que el Markdown sea solo una vista regenerable. El diseño está en `TODO.md`: «Estado de revisión y versión de las preguntas» e «Historial de versiones de contenido».
