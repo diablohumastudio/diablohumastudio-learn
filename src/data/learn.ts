@@ -63,7 +63,7 @@ export const LEARN_COURSES: LearnCourse[] = [
       },
       {
         slug: 'datos-programas-y-servidores',
-        title: { es: 'Datos, programas y servidores', en: 'Data, programs and servers' },
+        title: { es: 'Servidores', en: 'Servers' },
         section: 'Intro',
         component: dynamic(() => import('../presentations/wwise-unreal/datos-programas-y-servidores')),
         slideLabels: () =>

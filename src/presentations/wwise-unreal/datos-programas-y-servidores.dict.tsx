@@ -4,39 +4,6 @@ import s from '../../components/learn/Deck.module.css';
 /* Texts of the deck, one object per language. `es` is the source; keep the `en`
    phrases about the same length (±15 %) so the SVG labels stay in their boxes. */
 
-export type RotulosBibliotecaTexts = {
-  estanterias: string;
-  todasLasMaterias: string;
-  levantarse: string;
-  laMesa: string;
-  alcanzar: string;
-  librosAbiertos: string;
-  materiaActual: string;
-  leer: string;
-};
-
-export type RotulosComputadorTexts = {
-  discoDuro: string;
-  todosLosDatos: string;
-  cargar: string;
-  ram: string;
-  traer: string;
-  cache: string;
-  loQueUsas: string;
-  leerCache: string;
-  cpu: string;
-};
-
-export type BibliotecaTexts = {
-  eyebrow: string;
-  title: ReactNode;
-  arias: [string, string];
-  caption: string;
-  notes: string;
-  biblioteca: RotulosBibliotecaTexts;
-  computador: RotulosComputadorTexts;
-};
-
 export type RotulosBackendTexts = {
   cliente: string;
   clienteSub: string;
@@ -92,17 +59,11 @@ export type EscenaArranqueTexts = {
   abres: string;
 };
 
-/* `resaltado` is a trailing part of the title drawn in amber and pulsed on entry. */
-export type NivelDeLenguaje = { titulo: string; resaltado?: string; lineas: [string, string] };
-
 type DatosTexts = {
   name: string;
   context: string;
   labels: {
     intro: string;
-    biblioteca: string;
-    computador: string;
-    lenguajes: string;
     clienteServidor: string;
     servidores: string;
     backend: string;
@@ -112,22 +73,6 @@ type DatosTexts = {
     abres: string;
   };
   cover: { eyebrow: string; title: ReactNode; hint: string };
-  biblioteca: BibliotecaTexts;
-  lenguajes: {
-    eyebrow: string;
-    title: ReactNode;
-    aria: string;
-    caption: string;
-    masCercaHumano: string;
-    masFacil: string;
-    masCercaMaquina: string;
-    masRapido: string;
-    masAbstracto: string;
-    menosAbstracto: string;
-    tuEscribes: string;
-    laCpuLee: string;
-    niveles: [NivelDeLenguaje, NivelDeLenguaje, NivelDeLenguaje, NivelDeLenguaje];
-  };
   clienteServidor: { eyebrow: string; title: ReactNode; aria: string; caption: string; notes: string; rotulos: RotulosPeticionTexts };
   servidores: {
     eyebrow: string;
@@ -165,13 +110,10 @@ export type ArranqueTexts = {
 export type FilaServidor = { servidor: string; pides: string; sirve: string; sirveDetalle?: string; ejemplos: string[] };
 
 const es: DatosTexts = {
-  name: 'Datos, programas y servidores',
+  name: 'Servidores',
   context: 'Intro a Wwise · Wwise + Unreal',
   labels: {
     intro: 'intro',
-    biblioteca: 'biblioteca',
-    computador: 'computador',
-    lenguajes: 'lenguajes',
     clienteServidor: 'cliente-servidor',
     servidores: 'tipos y ejemplos de servidores',
     backend: 'backend',
@@ -182,74 +124,8 @@ const es: DatosTexts = {
   },
   cover: {
     eyebrow: 'Intro a Wwise · del disco al servidor',
-    title: (
-      <>
-        Datos, programas
-        <br />
-        y <span className={s.accent}>servidores</span>
-      </>
-    ),
+    title: <>Servidores</>,
     hint: 'Navega con ← → · espacio',
-  },
-  biblioteca: {
-    eyebrow: 'Los datos tienen que llegar al procesador',
-    title: (
-      <>
-        Analogía de un PC a una <span className={s.accent}>biblioteca</span>
-      </>
-    ),
-    arias: [
-      'Una biblioteca vista desde arriba: arriba, tres estanterías con todas las materias; abajo, dos mesas laterales con libros cerrados y, en el centro, una mesa con cuatro personas leyendo libros abiertos. Levantarse a las estanterías es lento, alcanzar las mesas laterales es rápido y leer el libro abierto es instantáneo.',
-      'La misma escena con las piezas de un computador: las estanterías se vuelven discos duros, las mesas laterales se vuelven módulos de memoria RAM y la mesa central se vuelve un CPU de cuatro núcleos con su caché. Cargar del disco es lento, traer de RAM es rápido y leer la caché es instantáneo.',
-    ],
-    caption: 'Mientras más cerca está la información, más rápido se procesa cuando se necesita.',
-    notes:
-      'Cuanto más cerca del procesador está el lugar donde reside la información que necesita una tarea, más rápido se puede empezar a trabajar en ella; a cambio, ese lugar es más pequeño.\n\nLas estanterías son el disco duro: cabe todo, pero ir a buscarlo es lento. Las mesas laterales son la memoria RAM: cabe menos, pero está al alcance de la mano. Los libros abiertos frente a cada persona son la caché del CPU: cabe muy poco, pero se lee al instante.',
-    biblioteca: {
-      estanterias: 'ESTANTERÍAS',
-      todasLasMaterias: 'todas las materias',
-      levantarse: 'levantarse · lento',
-      laMesa: 'LA MESA',
-      alcanzar: 'alcanzar · rápido',
-      librosAbiertos: 'LIBROS ABIERTOS',
-      materiaActual: 'la materia actual',
-      leer: 'leer · al instante',
-    },
-    computador: {
-      discoDuro: 'DISCO DURO',
-      todosLosDatos: 'todos los datos',
-      cargar: 'cargar del disco · lento',
-      ram: 'MEMORIA RAM',
-      traer: 'traer de RAM · rápido',
-      cache: 'CACHÉ',
-      loQueUsas: 'lo que usas ya mismo',
-      leerCache: 'leer la caché · al instante',
-      cpu: 'CPU',
-    },
-  },
-  lenguajes: {
-    eyebrow: 'Los niveles de abstracción de los lenguajes de programación',
-    title: (
-      <>
-        Más abstracto significa <span className={s.accent}>menos detalle</span>
-      </>
-    ),
-    aria: 'Cuatro niveles de lenguaje apilados de arriba hacia abajo, del más abstracto al menos abstracto: Python, JavaScript, GDScript y Blueprints (se leen casi como inglés y el lenguaje maneja la memoria por ti), C++ y Rust (control total del hardware y la memoria, se compilan antes de correr), ensamblador (instrucciones directas al procesador, difícil de leer para un humano) y código máquina en unos y ceros (el único lenguaje que la CPU entiende: pulsos eléctricos, 1 encendido y 0 apagado). Tú escribes en el nivel de arriba; la CPU lee el de abajo.',
-    caption: 'Mientras más abstracto es un lenguaje, menos detalle tienes que escribir y más fácil es de entender.',
-    masCercaHumano: 'MÁS CERCA DEL HUMANO',
-    masFacil: 'más fácil para ti',
-    masCercaMaquina: 'MÁS CERCA DE LA MÁQUINA',
-    masRapido: 'más rápido para la CPU',
-    masAbstracto: 'MÁS ABSTRACTO',
-    menosAbstracto: 'MENOS ABSTRACTO',
-    tuEscribes: 'tú escribes aquí',
-    laCpuLee: 'la CPU lee aquí',
-    niveles: [
-      { titulo: 'PYTHON / JAVASCRIPT / ', resaltado: 'GDSCRIPT / BLUEPRINTS', lineas: ['se lee casi como inglés', 'la memoria la maneja el lenguaje por ti'] },
-      { titulo: 'C++ / RUST', lineas: ['control total del hardware y la memoria', 'se compila antes de correr'] },
-      { titulo: 'ENSAMBLADOR (ASSEMBLY)', lineas: ['instrucciones directas al procesador', 'difícil de leer para un humano'] },
-      { titulo: 'CÓDIGO MÁQUINA · 1s y 0s', lineas: ['el único lenguaje que la CPU entiende', 'pulsos eléctricos: 1 = encendido · 0 = apagado'] },
-    ],
   },
   clienteServidor: {
     eyebrow: 'Modelo cliente-servidor',
@@ -398,13 +274,10 @@ const es: DatosTexts = {
 };
 
 const en: DatosTexts = {
-  name: 'Data, programs and servers',
+  name: 'Servers',
   context: 'Intro to Wwise · Wwise + Unreal',
   labels: {
     intro: 'intro',
-    biblioteca: 'library',
-    computador: 'computer',
-    lenguajes: 'languages',
     clienteServidor: 'client-server',
     servidores: 'types and examples of servers',
     backend: 'backend',
@@ -415,74 +288,8 @@ const en: DatosTexts = {
   },
   cover: {
     eyebrow: 'Intro to Wwise · from disk to server',
-    title: (
-      <>
-        Data, programs
-        <br />
-        and <span className={s.accent}>servers</span>
-      </>
-    ),
+    title: <>Servers</>,
     hint: 'Navigate with ← → · space',
-  },
-  biblioteca: {
-    eyebrow: 'Data has to reach the processor',
-    title: (
-      <>
-        Analogy of a PC to a <span className={s.accent}>library</span>
-      </>
-    ),
-    arias: [
-      'A library seen from above: on top, three shelves with every subject; below, two side tables with closed books and, in the middle, a table with four people reading open books. Getting up to the shelves is slow, reaching the side tables is fast and reading the open book is instant.',
-      'The same scene with the parts of a computer: the shelves become hard disks, the side tables become RAM memory modules and the central table becomes a four-core CPU with its cache. Loading from disk is slow, fetching from RAM is fast and reading the cache is instant.',
-    ],
-    caption: 'The closer the information is, the faster it gets processed when it is needed.',
-    notes:
-      'The closer to the processor the place where the information a task needs lives, the sooner that task can start; in exchange, that place is smaller.\n\nThe shelves are the hard disk: everything fits, but going to get it is slow. The side tables are the RAM memory: less fits, but it is within reach. The open books in front of each person are the CPU cache: very little fits, but it is read instantly.',
-    biblioteca: {
-      estanterias: 'SHELVES',
-      todasLasMaterias: 'every subject',
-      levantarse: 'get up · slow',
-      laMesa: 'THE TABLE',
-      alcanzar: 'reach · fast',
-      librosAbiertos: 'OPEN BOOKS',
-      materiaActual: 'the current subject',
-      leer: 'read · instant',
-    },
-    computador: {
-      discoDuro: 'HARD DISK',
-      todosLosDatos: 'all the data',
-      cargar: 'load from disk · slow',
-      ram: 'RAM MEMORY',
-      traer: 'fetch from RAM · fast',
-      cache: 'CACHE',
-      loQueUsas: 'what you use right now',
-      leerCache: 'read the cache · instant',
-      cpu: 'CPU',
-    },
-  },
-  lenguajes: {
-    eyebrow: 'The abstraction levels of programming languages',
-    title: (
-      <>
-        More abstract means <span className={s.accent}>less detail</span>
-      </>
-    ),
-    aria: 'Four language levels stacked top to bottom, from the most abstract to the least abstract: Python, JavaScript, GDScript and Blueprints (read almost like English and the language manages memory for you), C++ and Rust (full control of hardware and memory, compiled before running), assembly (direct instructions to the processor, hard for a human to read) and machine code in ones and zeros (the only language the CPU understands: electric pulses, 1 on and 0 off). You write at the top level; the CPU reads the bottom one.',
-    caption: 'The more abstract a language is, the less detail you have to write and the easier it is to understand.',
-    masCercaHumano: 'CLOSER TO THE HUMAN',
-    masFacil: 'easier for you',
-    masCercaMaquina: 'CLOSER TO THE MACHINE',
-    masRapido: 'faster for the CPU',
-    masAbstracto: 'MORE ABSTRACT',
-    menosAbstracto: 'LESS ABSTRACT',
-    tuEscribes: 'you write here',
-    laCpuLee: 'the CPU reads here',
-    niveles: [
-      { titulo: 'PYTHON / JAVASCRIPT / ', resaltado: 'GDSCRIPT / BLUEPRINTS', lineas: ['reads almost like English', 'the language manages memory for you'] },
-      { titulo: 'C++ / RUST', lineas: ['full control of hardware and memory', 'compiled before it runs'] },
-      { titulo: 'ASSEMBLY', lineas: ['direct instructions to the processor', 'hard for a human to read'] },
-      { titulo: 'MACHINE CODE · 1s and 0s', lineas: ['the only language the CPU understands', 'electric pulses: 1 = on · 0 = off'] },
-    ],
   },
   clienteServidor: {
     eyebrow: 'Client-server model',

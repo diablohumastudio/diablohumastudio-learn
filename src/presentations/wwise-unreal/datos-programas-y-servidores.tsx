@@ -1,206 +1,15 @@
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties } from 'react';
 import Deck, { Slide, useSlideStep } from '../../components/learn/Deck';
 import s from '../../components/learn/Deck.module.css';
 import { useT } from '../../i18n/useT';
 import { datosDict } from './datos-programas-y-servidores.dict';
 import type {
   ArranqueTexts,
-  BibliotecaTexts,
   EscenaArranqueTexts,
   MaquinaTexts,
   RotulosBackendTexts,
   RotulosPeticionTexts,
 } from './datos-programas-y-servidores.dict';
-
-const PIEZAS_BASE: string = '/assets/presentations/wwise-unreal/';
-
-type Pieza = { archivo: string; x: number; y: number; width: number; height: number };
-
-/* Recortes del PNG de la analogía (escala 0.5). Cada pieza del computador
-   ocupa la casilla de su pieza de biblioteca, centrada en ella. */
-const PIEZAS: Record<string, Pieza> = {
-  estanterias: { archivo: 'biblioteca-estanterias.png', x: 275, y: 8, width: 370, height: 119 },
-  discos: { archivo: 'computador-discos.png', x: 292, y: 8, width: 335, height: 119 },
-  mesaIzquierda: { archivo: 'biblioteca-mesa-izquierda.png', x: 153, y: 178, width: 93, height: 233 },
-  ramIzquierda: { archivo: 'computador-ram-izquierda.png', x: 164, y: 178, width: 72, height: 233 },
-  mesaCentral: { archivo: 'biblioteca-mesa-central.png', x: 382, y: 178, width: 155, height: 233 },
-  cpu: { archivo: 'computador-cpu.png', x: 366, y: 178, width: 188, height: 233 },
-  mesaDerecha: { archivo: 'biblioteca-mesa-derecha.png', x: 674, y: 178, width: 93, height: 233 },
-  ramDerecha: { archivo: 'computador-ram-derecha.png', x: 684, y: 178, width: 72, height: 233 },
-};
-
-function Imagen({ pieza }: { pieza: Pieza }) {
-  return <image href={PIEZAS_BASE + pieza.archivo} x={pieza.x} y={pieza.y} width={pieza.width} height={pieza.height} />;
-}
-
-/* Rótulo de velocidad partido en dos líneas alrededor de la flecha horizontal. */
-function RotuloVelocidad({ x, texto }: { x: number; texto: string }) {
-  const [arriba, abajo] = texto.split(' · ');
-  return (
-    <>
-      <text x={x} y="284" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{arriba}</text>
-      <text x={x} y="312" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{abajo}</text>
-    </>
-  );
-}
-
-/* Una casilla de la analogía. En el paso 1 la pieza de biblioteca se desvanece
-   y la del computador entra (deslizándose desde `glideFrom` si se indica); los
-   grupos llevan delays distintos y solapados para que el cruce sea rápido. */
-function GrupoAnalogia({
-  paso,
-  delay,
-  glideFrom,
-  biblioteca,
-  computador,
-}: {
-  paso: number;
-  delay: string;
-  glideFrom?: string;
-  biblioteca: ReactNode;
-  computador: ReactNode;
-}) {
-  if (paso === 0) return <>{biblioteca}</>;
-  const entrada = (
-    <g className={s.morphIn} style={{ animationDelay: delay }}>
-      {computador}
-    </g>
-  );
-  return (
-    <>
-      <g className={s.morphOut} style={{ animationDelay: delay }}>
-        {biblioteca}
-      </g>
-      {glideFrom ? (
-        <g className={s.morphGlide} style={{ animationDelay: delay, '--morph-from': glideFrom } as CSSProperties}>
-          {entrada}
-        </g>
-      ) : (
-        entrada
-      )}
-    </>
-  );
-}
-
-/* Un solo slide con dos pasos: la biblioteca y, al avanzar, el computador. */
-function FiguraBiblioteca({ r }: { r: BibliotecaTexts }) {
-  const paso = useSlideStep();
-  const b = r.biblioteca;
-  const c = r.computador;
-  return (
-    <figure>
-      <svg viewBox="0 0 920 455" role="img" aria-label={r.arias[paso]}>
-        <defs>
-          <marker id="arrD1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#f2a33c" />
-          </marker>
-          <marker id="arrD1t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#63b6a4" />
-          </marker>
-        </defs>
-
-        <line x1="460" y1="152" x2="460" y2="172" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrD1t)" />
-        <line x1="254" y1="295" x2="350" y2="295" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD1)" />
-        <line x1="666" y1="295" x2="570" y2="295" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD1)" />
-
-        <GrupoAnalogia
-          paso={paso}
-          delay="0s"
-          biblioteca={
-            <>
-              <Imagen pieza={PIEZAS.mesaCentral} />
-              <text x="455" y="430" fontSize="12" fill="#f2a33c" textAnchor="end">{b.librosAbiertos}</text>
-              <text x="465" y="430" fontSize="10.5" fill="currentColor" opacity=".6">{b.materiaActual}</text>
-              <text x="460" y="446" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{b.leer}</text>
-            </>
-          }
-          computador={
-            <>
-              <Imagen pieza={PIEZAS.cpu} />
-              <text x="455" y="430" fontSize="12" fill="#f2a33c" textAnchor="end">{c.cpu} · {c.cache}</text>
-              <text x="465" y="430" fontSize="10.5" fill="currentColor" opacity=".6">{c.loQueUsas}</text>
-              <text x="460" y="446" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{c.leerCache}</text>
-            </>
-          }
-        />
-
-        <GrupoAnalogia
-          paso={paso}
-          delay="0.25s"
-          glideFrom="translateX(-40px)"
-          biblioteca={
-            <>
-              <Imagen pieza={PIEZAS.mesaIzquierda} />
-              <text x="200" y="430" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2" textAnchor="middle">{b.laMesa}</text>
-              <RotuloVelocidad x={302} texto={b.alcanzar} />
-            </>
-          }
-          computador={
-            <>
-              <Imagen pieza={PIEZAS.ramIzquierda} />
-              <text x="200" y="430" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2" textAnchor="middle">{c.ram}</text>
-              <RotuloVelocidad x={302} texto={c.traer} />
-            </>
-          }
-        />
-
-        <GrupoAnalogia
-          paso={paso}
-          delay="0.25s"
-          glideFrom="translateX(40px)"
-          biblioteca={
-            <>
-              <Imagen pieza={PIEZAS.mesaDerecha} />
-              <text x="720" y="430" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2" textAnchor="middle">{b.laMesa}</text>
-              <RotuloVelocidad x={618} texto={b.alcanzar} />
-            </>
-          }
-          computador={
-            <>
-              <Imagen pieza={PIEZAS.ramDerecha} />
-              <text x="720" y="430" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2" textAnchor="middle">{c.ram}</text>
-              <RotuloVelocidad x={618} texto={c.traer} />
-            </>
-          }
-        />
-
-        <GrupoAnalogia
-          paso={paso}
-          delay="0.5s"
-          glideFrom="translateY(-30px)"
-          biblioteca={
-            <>
-              <Imagen pieza={PIEZAS.estanterias} />
-              <text x="275" y="145" fontSize="12" fill="#63b6a4">{b.estanterias}</text>
-              <text x="645" y="145" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="end">{b.todasLasMaterias}</text>
-              <text x="470" y="166" fontSize="10.5" fill="#63b6a4">{b.levantarse}</text>
-            </>
-          }
-          computador={
-            <>
-              <Imagen pieza={PIEZAS.discos} />
-              <text x="275" y="145" fontSize="12" fill="#63b6a4">{c.discoDuro}</text>
-              <text x="645" y="145" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="end">{c.todosLosDatos}</text>
-              <text x="470" y="166" fontSize="10.5" fill="#63b6a4">{c.cargar}</text>
-            </>
-          }
-        />
-      </svg>
-      <figcaption>{r.caption}</figcaption>
-    </figure>
-  );
-}
-
-/* Énfasis al entrar el slide: aparece y pulsa, con el delay de su turno. */
-function Resalte({ delay, children }: { delay: string; children: ReactNode }) {
-  return (
-    <g className={s.morphPulse} style={{ animationDelay: delay }}>
-      <g className={s.morphIn} style={{ animationDelay: delay }}>
-        {children}
-      </g>
-    </g>
-  );
-}
 
 function EscenaPeticion({ markerPrefix }: { markerPrefix: string }) {
   return (
@@ -422,72 +231,7 @@ export default function DatosProgramasYServidores() {
         <p className={s.note}>{t.cover.hint}</p>
       </Slide>
 
-      <Slide z="1" label={[t.labels.biblioteca, t.labels.computador]} notes={t.biblioteca.notes}>
-        <div className={s.eyebrow}>{t.biblioteca.eyebrow}</div>
-        <h2>{t.biblioteca.title}</h2>
-        <FiguraBiblioteca r={t.biblioteca} />
-      </Slide>
-
-      <Slide z="2" label={t.labels.lenguajes}>
-        <div className={s.eyebrow}>{t.lenguajes.eyebrow}</div>
-        <h2>{t.lenguajes.title}</h2>
-        <figure>
-          <svg viewBox="0 0 920 420" role="img" aria-label={t.lenguajes.aria}>
-            <defs>
-              <marker id="arrD7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                <path d="M0,0 L10,5 L0,10 z" fill="#f2a33c" />
-              </marker>
-              <marker id="arrD7t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                <path d="M0,0 L10,5 L0,10 z" fill="#63b6a4" />
-              </marker>
-            </defs>
-
-            <text x="220" y="18" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{t.lenguajes.masCercaHumano}</text>
-            <text x="700" y="18" fontSize="10.5" fill="#63b6a4" textAnchor="end">{t.lenguajes.masFacil}</text>
-
-            {t.lenguajes.niveles.map(({ titulo, resaltado, lineas }, i) => {
-              const y = 34 + i * 94;
-              const esMaquina = i === t.lenguajes.niveles.length - 1;
-              const tituloTexto = (
-                <text x="240" y={y + 21} fontSize="12" fill={esMaquina ? '#f2a33c' : 'currentColor'}>
-                  {titulo}
-                  {resaltado ? <tspan fill="#f2a33c">{resaltado}</tspan> : null}
-                </text>
-              );
-              return (
-                <g key={titulo}>
-                  {esMaquina ? (
-                    <rect x="220" y={y} width="480" height="58" rx="8" fill="#232730" stroke="#f2a33c" strokeWidth="2" />
-                  ) : (
-                    <rect x="220" y={y} width="480" height="58" rx="8" fill="#1d2026" stroke="currentColor" strokeOpacity=".35" />
-                  )}
-                  {resaltado ? <Resalte delay="0.6s">{tituloTexto}</Resalte> : tituloTexto}
-                  <text x="240" y={y + 37} fontSize="10.5" fill="currentColor" opacity=".6">{lineas[0]}</text>
-                  <text x="240" y={y + 51} fontSize="10.5" fill="currentColor" opacity=".6">{lineas[1]}</text>
-                </g>
-              );
-            })}
-
-            <text x="220" y="398" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{t.lenguajes.masCercaMaquina}</text>
-            <text x="700" y="398" fontSize="10.5" fill="#f2a33c" textAnchor="end">{t.lenguajes.masRapido}</text>
-
-            <text x="200" y="67" fontSize="11.5" fill="#63b6a4" letterSpacing="2" textAnchor="end">{t.lenguajes.masAbstracto}</text>
-            <text x="200" y="349" fontSize="11.5" fill="#f2a33c" letterSpacing="2" textAnchor="end">{t.lenguajes.menosAbstracto}</text>
-
-            <Resalte delay="0s">
-              <text x="770" y="53" fontSize="10.5" fill="#63b6a4" textAnchor="middle">{t.lenguajes.tuEscribes}</text>
-              <line x1="830" y1="63" x2="708" y2="63" stroke="#63b6a4" strokeWidth="2" markerEnd="url(#arrD7t)" />
-            </Resalte>
-            <Resalte delay="1.2s">
-              <text x="770" y="335" fontSize="10.5" fill="#f2a33c" textAnchor="middle">{t.lenguajes.laCpuLee}</text>
-              <line x1="830" y1="345" x2="708" y2="345" stroke="#f2a33c" strokeWidth="2" markerEnd="url(#arrD7)" />
-            </Resalte>
-          </svg>
-          <figcaption>{t.lenguajes.caption}</figcaption>
-        </figure>
-      </Slide>
-
-      <Slide z="3" label={t.labels.clienteServidor} notes={t.clienteServidor.notes}>
+      <Slide z="1" label={t.labels.clienteServidor} notes={t.clienteServidor.notes}>
         <div className={s.eyebrow}>{t.clienteServidor.eyebrow}</div>
         <h2>{t.clienteServidor.title}</h2>
         <figure>
@@ -499,7 +243,7 @@ export default function DatosProgramasYServidores() {
         </figure>
       </Slide>
 
-      <Slide z="4" label={t.labels.servidores} notes={t.servidores.notes}>
+      <Slide z="2" label={t.labels.servidores} notes={t.servidores.notes}>
         <div className={s.eyebrow}>{t.servidores.eyebrow}</div>
         <h2>{t.servidores.title}</h2>
         <figure>
@@ -535,7 +279,7 @@ export default function DatosProgramasYServidores() {
         </figure>
       </Slide>
 
-      <Slide z="5" label={t.labels.backend} notes={t.backend.notes}>
+      <Slide z="3" label={t.labels.backend} notes={t.backend.notes}>
         <div className={s.eyebrow}>{t.backend.eyebrow}</div>
         <h2>{t.backend.title}</h2>
         <figure>
@@ -546,7 +290,7 @@ export default function DatosProgramasYServidores() {
         </figure>
       </Slide>
 
-      <Slide z="6" label={t.labels.hardware}>
+      <Slide z="4" label={t.labels.hardware}>
         <div className={s.eyebrow}>{t.hardware.eyebrow}</div>
         <h2>{t.hardware.title}</h2>
         <figure>
@@ -569,7 +313,7 @@ export default function DatosProgramasYServidores() {
         </figure>
       </Slide>
 
-      <Slide z="7" label={[t.labels.arranque, t.labels.instalas, t.labels.abres]}>
+      <Slide z="5" label={[t.labels.arranque, t.labels.instalas, t.labels.abres]}>
         <div className={s.eyebrow}>{t.arranque.eyebrow}</div>
         <ContenidoArranque r={t.arranque} />
       </Slide>
