@@ -1,0 +1,299 @@
+[
+  {
+    "topic": "datos-y-programas",
+    "slides": ["dato"],
+    "prompt": { "es": "Según la clase, ¿qué es un dato?", "en": "According to the class, what is data?" },
+    "correct": [
+      { "es": "Cualquier información guardada, como un texto, una imagen o un sonido", "en": "Any stored information, such as a text, a picture or a sound" }
+    ],
+    "incorrect": [
+      { "es": "Solo los números que procesa la CPU", "en": "Only the numbers the CPU processes", "level": 5 },
+      { "es": "Las instrucciones que ejecuta el procesador", "en": "The instructions the processor runs", "level": 5 },
+      { "es": "Un archivo de texto, pero no una imagen ni un sonido", "en": "A text file, but not a picture or a sound", "level": 5 },
+      { "es": "Un programa pequeño", "en": "A small program", "level": 3 },
+      { "es": "La memoria RAM del computador", "en": "The RAM memory of the computer", "level": 3 },
+      { "es": "El cable que conecta el disco a la mainboard", "en": "The cable that connects the disk to the mainboard", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Un dato es cualquier información guardada: un texto, una imagen, un sonido. Las instrucciones que ejecuta el procesador son un programa, la otra idea de la clase.",
+      "en": "Data is any stored information: a text, a picture, a sound. The instructions the processor runs are a program, the other idea of the class."
+    },
+    "retired": false
+  },
+  {
+    "topic": "datos-y-programas",
+    "slides": ["dato"],
+    "prompt": { "es": "Según la clase, ¿cuál de estos es un dato?", "en": "According to the class, which of these is data?" },
+    "correct": [
+      { "es": "Una imagen guardada en el disco", "en": "A picture stored on the disk" },
+      { "es": "Un sonido guardado en el disco", "en": "A sound stored on the disk" },
+      { "es": "Un texto guardado en el disco", "en": "A text stored on the disk" }
+    ],
+    "incorrect": [
+      { "es": "La CPU que procesa el texto", "en": "The CPU that processes the text", "level": 5 },
+      { "es": "La memoria RAM donde se carga el sonido", "en": "The RAM memory where the sound is loaded", "level": 5 },
+      { "es": "El disco donde se guarda la imagen", "en": "The disk where the picture is stored", "level": 5 },
+      { "es": "La pantalla que muestra la imagen", "en": "The screen that shows the picture", "level": 3 },
+      { "es": "El parlante que reproduce el sonido", "en": "The speaker that plays the sound", "level": 3 },
+      { "es": "La silla frente al computador", "en": "The chair in front of the computer", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Texto, imagen y sonido son información guardada: datos. La CPU, la RAM, el disco, la pantalla y el parlante son piezas del computador que los procesan, los guardan o los muestran, no el dato.",
+      "en": "Text, picture and sound are stored information: data. The CPU, the RAM, the disk, the screen and the speaker are parts of the computer that process, store or show it, not the data itself."
+    },
+    "retired": false
+  },
+  {
+    "topic": "datos-y-programas",
+    "slides": ["biblioteca", "computador"],
+    "prompt": { "es": "En la analogía de la biblioteca de la clase, ¿qué representan las estanterías?", "en": "In the library analogy of the class, what do the shelves represent?" },
+    "correct": [{ "es": "El disco duro", "en": "The hard disk" }],
+    "incorrect": [
+      { "es": "La memoria RAM", "en": "The RAM memory", "level": 5 },
+      { "es": "La caché de la CPU", "en": "The CPU cache", "level": 5 },
+      { "es": "La memoria más rápida del computador", "en": "The fastest memory of the computer", "level": 5 },
+      { "es": "Los núcleos de la CPU", "en": "The CPU cores", "level": 3 },
+      { "es": "La mainboard", "en": "The mainboard", "level": 3 },
+      { "es": "El teclado", "en": "The keyboard", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Las estanterías son el disco duro: cabe de todo, pero buscar ahí es lento porque hay que levantarse. Las mesas laterales son la RAM y los libros abiertos de la mesa central son la caché.",
+      "en": "The shelves are the hard disk: everything fits, but looking there is slow because you have to get up. The side tables are the RAM and the open books on the central table are the cache."
+    },
+    "retired": false
+  },
+  {
+    "topic": "datos-y-programas",
+    "slides": ["biblioteca", "computador"],
+    "prompt": {
+      "es": "En la analogía de la biblioteca de la clase, ¿qué representan los libros abiertos sobre la mesa central?",
+      "en": "In the library analogy of the class, what do the open books on the central table represent?"
+    },
+    "correct": [{ "es": "La caché de la CPU", "en": "The CPU cache" }],
+    "incorrect": [
+      { "es": "La memoria RAM", "en": "The RAM memory", "level": 5 },
+      { "es": "El disco duro", "en": "The hard disk", "level": 5 },
+      { "es": "Los núcleos de la CPU", "en": "The CPU cores", "level": 5 },
+      { "es": "La tarjeta de video", "en": "The video card", "level": 3 },
+      { "es": "La mainboard", "en": "The mainboard", "level": 3 },
+      { "es": "La lámpara de la biblioteca", "en": "The library lamp", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Los libros abiertos son la caché: una memoria dentro del chip del procesador con lo que se usa en este instante; caben muy pocos, pero se leen al instante. Las personas que los leen son los núcleos de la CPU.",
+      "en": "The open books are the cache: a memory inside the processor chip with what is being used right now; very few fit, but they are read instantly. The people reading them are the CPU cores."
+    },
+    "retired": false
+  },
+  {
+    "topic": "datos-y-programas",
+    "slides": ["biblioteca", "computador"],
+    "prompt": {
+      "es": "Según la analogía de la biblioteca de la clase, ¿qué pasa cuando los datos están más cerca de quien los usa?",
+      "en": "According to the library analogy of the class, what happens when data is closer to whoever uses it?"
+    },
+    "correct": [{ "es": "Se usan más rápido, pero caben menos", "en": "It is used faster, but less of it fits" }],
+    "incorrect": [
+      { "es": "Se usan más rápido y caben más", "en": "It is used faster and more of it fits", "level": 5 },
+      { "es": "Se usan más lento, pero caben más", "en": "It is used slower, but more of it fits", "level": 5 },
+      { "es": "Caben menos y se usan igual de rápido", "en": "Less of it fits and it is used just as fast", "level": 5 },
+      { "es": "Ocupan menos espacio en el disco", "en": "It takes less space on the disk", "level": 3 },
+      { "es": "Se guardan de forma permanente", "en": "It is stored permanently", "level": 3 },
+      { "es": "Cambian de idioma", "en": "It changes language", "level": 1 }
+    ],
+    "explanation": {
+      "es": "La regla de la analogía: cuanto más cerca de las manos, más rápido, pero menos cabe. Los libros abiertos se leen al instante pero caben muy pocos; en las estanterías cabe de todo, pero levantarse es lento.",
+      "en": "The rule of the analogy: the closer to the hands, the faster, but the less fits. The open books are read instantly but very few fit; everything fits on the shelves, but getting up is slow."
+    },
+    "retired": false
+  },
+  {
+    "topic": "datos-y-programas",
+    "slides": ["computador"],
+    "prompt": { "es": "Según la clase, ¿cuál de estas memorias está dentro del chip del procesador?", "en": "According to the class, which of these memories is inside the processor chip?" },
+    "correct": [{ "es": "La caché", "en": "The cache" }],
+    "incorrect": [
+      { "es": "La memoria RAM", "en": "The RAM memory", "level": 5 },
+      { "es": "El disco duro", "en": "The hard disk", "level": 5 },
+      { "es": "Los módulos de memoria de la mainboard", "en": "The memory modules on the mainboard", "level": 5 },
+      { "es": "La tarjeta de video", "en": "The video card", "level": 3 },
+      { "es": "La fuente de poder", "en": "The power supply", "level": 3 },
+      { "es": "El cable SATA", "en": "The SATA cable", "level": 1 }
+    ],
+    "explanation": {
+      "es": "La caché es una memoria dentro del chip del procesador, con lo que se usa en este instante. La RAM va en módulos aparte, unidos a la CPU por pistas de la mainboard, y el disco está más lejos todavía.",
+      "en": "The cache is a memory inside the processor chip, holding what is being used right now. RAM comes in separate modules, joined to the CPU by traces on the mainboard, and the disk is even farther away."
+    },
+    "retired": false
+  },
+  {
+    "topic": "datos-y-programas",
+    "slides": ["computador"],
+    "prompt": {
+      "es": "Según la clase, ¿cuál es el orden de las memorias del computador, de la más rápida a la más lenta?",
+      "en": "According to the class, what is the order of the computer's memories, from fastest to slowest?"
+    },
+    "correct": [{ "es": "Caché, RAM, disco duro", "en": "Cache, RAM, hard disk" }],
+    "incorrect": [
+      { "es": "RAM, caché, disco duro", "en": "RAM, cache, hard disk", "level": 5 },
+      { "es": "Disco duro, RAM, caché", "en": "Hard disk, RAM, cache", "level": 5 },
+      { "es": "Caché, disco duro, RAM", "en": "Cache, hard disk, RAM", "level": 5 },
+      { "es": "RAM, disco duro, tarjeta de video", "en": "RAM, hard disk, video card", "level": 3 },
+      { "es": "Disco duro, caché, pantalla", "en": "Hard disk, cache, screen", "level": 3 },
+      { "es": "Teclado, ratón, pantalla", "en": "Keyboard, mouse, screen", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Leer la caché es al instante, traer de RAM es rápido y cargar del disco es lento: cuanto más lejos de la CPU, más lenta pero más grande es la memoria.",
+      "en": "Reading the cache is instant, fetching from RAM is fast and loading from the disk is slow: the farther from the CPU, the slower but the bigger the memory."
+    },
+    "retired": false
+  },
+  {
+    "topic": "datos-y-programas",
+    "slides": ["computador"],
+    "prompt": { "es": "Según la clase, cuando un programa dice «cargando», ¿qué está pasando?", "en": "According to the class, when a program says \"loading\", what is happening?" },
+    "correct": [{ "es": "Datos copiándose del disco a la RAM", "en": "Data being copied from the disk to the RAM" }],
+    "incorrect": [
+      { "es": "Datos copiándose de la RAM al disco", "en": "Data being copied from the RAM to the disk", "level": 5 },
+      { "es": "Datos copiándose de la caché al disco", "en": "Data being copied from the cache to the disk", "level": 5 },
+      { "es": "Datos descargándose de internet al disco", "en": "Data being downloaded from the internet to the disk", "level": 5 },
+      { "es": "El procesador se está enfriando", "en": "The processor is cooling down", "level": 3 },
+      { "es": "El programa se está compilando", "en": "The program is being compiled", "level": 3 },
+      { "es": "El computador se está apagando", "en": "The computer is shutting down", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Para usar un dato tiene que llegar a la CPU: del disco a la RAM y de ahí a la caché. «Cargando» es ese viaje del disco, lento, a la RAM.",
+      "en": "To be used, data has to reach the CPU: from the disk to the RAM and from there to the cache. \"Loading\" is that trip from the slow disk to the RAM."
+    },
+    "retired": false
+  },
+  {
+    "topic": "datos-y-programas",
+    "slides": ["computador"],
+    "prompt": { "es": "Según la clase, ¿cuál de las tres memorias guarda los datos de forma permanente?", "en": "According to the class, which of the three memories stores data permanently?" },
+    "correct": [{ "es": "El disco duro", "en": "The hard disk" }],
+    "incorrect": [
+      { "es": "La memoria RAM", "en": "The RAM memory", "level": 5 },
+      { "es": "La caché", "en": "The cache", "level": 5 },
+      { "es": "Las tres por igual", "en": "All three alike", "level": 5 },
+      { "es": "La CPU", "en": "The CPU", "level": 3 },
+      { "es": "La mainboard", "en": "The mainboard", "level": 3 },
+      { "es": "La pantalla", "en": "The screen", "level": 1 }
+    ],
+    "explanation": {
+      "es": "El disco duro guarda de todo permanentemente; es el más lento de los tres y el más lejos de la CPU. La RAM y la caché guardan solo lo que se está usando.",
+      "en": "The hard disk stores everything permanently; it is the slowest of the three and the farthest from the CPU. The RAM and the cache hold only what is being used."
+    },
+    "retired": false
+  },
+  {
+    "topic": "datos-y-programas",
+    "slides": ["programa"],
+    "prompt": { "es": "Según la clase, ¿qué es un programa?", "en": "According to the class, what is a program?" },
+    "correct": [
+      {
+        "es": "Código escrito por un programador que se convierte en instrucciones que ejecuta el procesador",
+        "en": "Code written by a programmer that becomes instructions the processor runs"
+      }
+    ],
+    "incorrect": [
+      { "es": "Instrucciones que el procesador escribe para el programador", "en": "Instructions the processor writes for the programmer", "level": 5 },
+      { "es": "Un archivo de código que la CPU lee tal como está escrito", "en": "A code file the CPU reads just as it is written", "level": 5 },
+      { "es": "Datos guardados en el disco que la RAM ejecuta", "en": "Data stored on the disk that the RAM runs", "level": 5 },
+      { "es": "Una lista de datos: textos, imágenes y sonidos", "en": "A list of data: texts, pictures and sounds", "level": 3 },
+      { "es": "Un conjunto de piezas del computador", "en": "A set of computer parts", "level": 3 },
+      { "es": "Un canal de televisión", "en": "A television channel", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Un programa es código escrito por un programador que un compilador o un intérprete convierte en instrucciones de unos y ceros, y esas instrucciones las ejecuta el procesador. Word, un juego o Excel son programas.",
+      "en": "A program is code written by a programmer that a compiler or an interpreter turns into instructions of ones and zeros, and the processor runs those instructions. Word, a game or Excel are programs."
+    },
+    "retired": false
+  },
+  {
+    "topic": "datos-y-programas",
+    "slides": ["programa"],
+    "prompt": {
+      "es": "Según la clase, ¿qué convierte el código escrito por un programador en instrucciones para el procesador?",
+      "en": "According to the class, what turns the code written by a programmer into instructions for the processor?"
+    },
+    "correct": [{ "es": "Un compilador o un intérprete", "en": "A compiler or an interpreter" }],
+    "incorrect": [
+      { "es": "El sistema operativo", "en": "The operating system", "level": 5 },
+      { "es": "El propio procesador", "en": "The processor itself", "level": 5 },
+      { "es": "La memoria RAM", "en": "The RAM memory", "level": 5 },
+      { "es": "El disco duro", "en": "The hard disk", "level": 3 },
+      { "es": "La tarjeta de video", "en": "The video card", "level": 3 },
+      { "es": "El monitor", "en": "The monitor", "level": 1 }
+    ],
+    "explanation": {
+      "es": "El compilador o el intérprete convierte el código en instrucciones de unos y ceros; el procesador solo las ejecuta.",
+      "en": "The compiler or the interpreter turns the code into instructions of ones and zeros; the processor only runs them."
+    },
+    "retired": false
+  },
+  {
+    "topic": "datos-y-programas",
+    "slides": ["lenguajes"],
+    "prompt": {
+      "es": "Según la clase, ¿qué significa que un lenguaje de programación sea más abstracto?",
+      "en": "According to the class, what does it mean for a programming language to be more abstract?"
+    },
+    "correct": [
+      { "es": "Que esconde detalles: escribes menos detalle y es más fácil de entender", "en": "That it hides details: you write less detail and it is easier to understand" }
+    ],
+    "incorrect": [
+      { "es": "Que corre más rápido en la CPU", "en": "That it runs faster on the CPU", "level": 5 },
+      { "es": "Que la CPU lo entiende sin convertirlo", "en": "That the CPU understands it without converting it", "level": 5 },
+      { "es": "Que escribes más detalle para controlar el hardware", "en": "That you write more detail to control the hardware", "level": 5 },
+      { "es": "Que solo sirve para hacer juegos", "en": "That it is only good for making games", "level": 3 },
+      { "es": "Que no usa números", "en": "That it does not use numbers", "level": 3 },
+      { "es": "Que está escrito en otro idioma", "en": "That it is written in another human language", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Abstracto quiere decir que esconde detalles: cuanto más arriba en la pila, menos detalle escribes tú y más fácil es de entender. Abajo, por lo general, corre más rápido.",
+      "en": "Abstract means it hides details: the higher in the stack, the less detail you write and the easier it is to understand. Lower down, it usually runs faster."
+    },
+    "retired": false
+  },
+  {
+    "topic": "datos-y-programas",
+    "slides": ["lenguajes"],
+    "prompt": { "es": "Según la clase, ¿por qué los motores como Unreal están escritos en C++?", "en": "According to the class, why are engines like Unreal written in C++?" },
+    "correct": [{ "es": "Porque un juego necesita velocidad de procesamiento", "en": "Because a game needs processing speed" }],
+    "incorrect": [
+      { "es": "Porque C++ es el lenguaje más fácil de leer", "en": "Because C++ is the easiest language to read", "level": 5 },
+      { "es": "Porque la CPU entiende C++ directamente", "en": "Because the CPU understands C++ directly", "level": 5 },
+      { "es": "Porque los desarrolladores necesitan velocidad de desarrollo", "en": "Because developers need development speed", "level": 5 },
+      { "es": "Porque C++ no necesita compilarse", "en": "Because C++ does not need to be compiled", "level": 3 },
+      { "es": "Porque Wwise solo acepta C++", "en": "Because Wwise only accepts C++", "level": 3 },
+      { "es": "Porque C++ es gratis", "en": "Because C++ is free", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Los lenguajes más cercanos a la máquina, como C++, por lo general corren más rápido, y un juego necesita velocidad de procesamiento. El código que corre dentro de los motores, como los Blueprints, es de alto nivel porque ahí importa la velocidad de desarrollo.",
+      "en": "Languages closer to the machine, like C++, usually run faster, and a game needs processing speed. The code that runs inside the engines, like Blueprints, is high level because development speed matters there."
+    },
+    "retired": false
+  },
+  {
+    "topic": "datos-y-programas",
+    "slides": ["lenguajes"],
+    "prompt": {
+      "es": "Según la clase, ¿en qué nivel de abstracción está configurar Wwise o usar Blueprints de Unreal?",
+      "en": "According to the class, at which abstraction level is configuring Wwise or using Unreal Blueprints?"
+    },
+    "correct": [{ "es": "En el nivel más abstracto, cerca del humano", "en": "At the most abstract level, close to the human" }],
+    "incorrect": [
+      { "es": "En el nivel de C++ y Rust", "en": "At the level of C++ and Rust", "level": 5 },
+      { "es": "En el nivel del ensamblador", "en": "At the level of assembly", "level": 5 },
+      { "es": "En el nivel del código máquina, cerca de la CPU", "en": "At the level of machine code, close to the CPU", "level": 5 },
+      { "es": "Fuera de la pila: no son programación", "en": "Outside the stack: they are not programming", "level": 3 },
+      { "es": "En el nivel del sistema operativo", "en": "At the level of the operating system", "level": 3 },
+      { "es": "En el nivel del teclado", "en": "At the level of the keyboard", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Configurar Wwise y los Blueprints de Unreal puede considerarse trabajo de alto nivel de abstracción: se lee casi como inglés y la memoria se maneja sola. Escribas donde escribas, todo termina en unos y ceros.",
+      "en": "Configuring Wwise and Unreal Blueprints can be considered high-abstraction work: it reads almost like English and memory is handled for you. Wherever you write, everything ends up as ones and zeros."
+    },
+    "retired": false
+  }
+]
