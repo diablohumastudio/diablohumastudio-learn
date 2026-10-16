@@ -20,6 +20,7 @@ Todos en esta carpeta, `src/presentations/creacion_guiones_wwise-unreal/`. La cl
 - Clase 4 · Wwise por adentro: `guion_clase_4_wwise_por_adentro.md`. Por escribir.
 - Clase 5 · El editor Wwise: `guion_clase_5_editor.md`. Por escribir.
 - Clase 6 · Wwise Objects: `guion_clase_6_objects.md`. Por escribir.
+- Clase 7 · Work Units y control de versiones: `guion_clase_7_work_units_y_vcs.md`. Escrito junto con las diapositivas nuevas (`../wwise-unreal/work-units-y-vcs.tsx`, cinco diapositivas, registrada en `src/data/learn.ts`), a partir de `Clases/Clase07/Contenido.md` del material docente (verificado por el revisor de veracidad). Revisado por el verificador de pedagogía; pendiente de revisión del docente. Sus preguntas están en `questions/reviews/work_units_y_vcs_2026_oct_16.json` con su revisión, sin importar.
 
 Fuentes por clase: `../wwise-unreal/<slug>.dict.tsx` (objeto `es`) y `../wwise-unreal/<slug>.tsx`. La clase 1 ya tiene deck propio, `datos-y-programas`; la clase 2 sigue en `datos-programas-y-servidores`.
 
