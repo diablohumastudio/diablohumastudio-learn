@@ -101,6 +101,14 @@ export const LEARN_COURSES: LearnCourse[] = [
         slideLabels: () =>
           import('../presentations/wwise-unreal/wwise-objects.dict').then((deck) => labelsOf(deck.wwiseObjectsDict)),
       },
+      {
+        slug: 'work-units-y-vcs',
+        title: { es: 'Work Units y control de versiones', en: 'Work Units and version control' },
+        section: 'Intro',
+        component: dynamic(() => import('../presentations/wwise-unreal/work-units-y-vcs')),
+        slideLabels: () =>
+          import('../presentations/wwise-unreal/work-units-y-vcs.dict').then((deck) => labelsOf(deck.workUnitsDict)),
+      },
     ],
   },
 ];
