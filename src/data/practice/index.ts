@@ -3,8 +3,9 @@ import { LEARN_COURSES } from '../learn';
 import type { LearnCourse, PracticeScope } from '../learn';
 import type { PracticeQuestion } from './types';
 
-export type { PracticeAnswer, PracticeQuestion, ShuffledChoice } from './types';
+export type { DistractorLevel, PracticeAnswer, PracticeQuestion, ShuffledChoice } from './types';
 export {
+  DISTRACTOR_LEVELS,
   EXAM_QUESTIONS_COLLECTION,
   QUESTIONS_COLLECTION,
   MIN_CORRECT_ANSWERS,

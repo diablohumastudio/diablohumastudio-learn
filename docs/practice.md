@@ -67,13 +67,15 @@ id            permanent, never reused or renumbered (e.g. 'wu-wo-014')
 topic         class slug from src/data/learn.ts (optional)
 slides        [slide id, …] of that class (optional): keys of the deck dictionary's `labels`
 prompt        { es, en }
-correct       [{ id?, es, en }, …]   at least 1; one is shown per display
-incorrect     [{ id?, es, en }, …]   at least 3; three are shown per display
+correct       [{ id?, es, en }, …]          at least 1; one is shown per display
+incorrect     [{ id?, es, en, level }, …]   at least 3; three are shown per display
 explanation   { es, en }        optional, shown after answering
 retired       boolean           kept so old stats still resolve, never asked
 ```
 
 Rules of thumb:
+
+- `level` rates every wrong answer against the correct one: 5 almost correct, 3 plausible, 1 discardable (the scale, its rules and the review cycle are in [questions/README.md](../questions/README.md)). The editor and Import JSON require it on every wrong answer; a bank document without it is still read, so questions saved before levels existed keep working until they are rated. The hard practice mode will draw from it (`TODO.md`).
 
 - Ids are how stats are keyed. A new question gets the next number for its class automatically: `wu-wo-` for `wwise-unreal` / `wwise-objects`, from the initials of the course and class slugs; `q-` when it has no class. The first questions predate the class part (`wu-001`…) and keep their ids. The prefix is only a label: a question moved to another class keeps its id. Never reuse an id.
 - Do not delete questions: **retire** them. Deleting one leaves its stats showing as "Question no longer in the bank".
@@ -88,7 +90,7 @@ Rules of thumb:
 
 Open `/teacher/questions` with a teacher account (see setup step 6). The list shows every question; click one to edit it or use **New question**. The form enforces both languages, at least one correct and three wrong answers, and assigns the id on save.
 
-**Export JSON** downloads the practice bank (and, apart, the exam-only one) in the exact format Import reads, answer ids included, so a file edited outside the site, for instance to tag every question with its slides, goes back in with Import. **Import JSON** takes an array of questions in the model above, from a chosen `.json` file or pasted, and writes nothing by itself: **Review** opens a list of every question with what it would do (`src/data/practice/importReview.ts`). Green, *new*: its id is free. Red, *replaces with changes*: the id exists and the listed fields differ, which is also how you fix many questions at once. Red, *no id*: it gets the next free id of its class, shown in the list. Amber, *identical*: it is in the bank as it is and is not written. Every question has an **Edit** button that changes the import, not the bank, and Import asks for confirmation with the counts whenever something is not new. Answer ids are not compared; a replaced question whose file has no answer ids gets new ones, so do not replace a question an exam already used from a hand-written file. Example:
+**Export JSON** downloads the practice bank (and, apart, the exam-only one) in the exact format Import reads, answer ids included, so a file edited outside the site, for instance to tag every question with its slides, goes back in with Import. **Import JSON** takes an array of questions in the model above, from a chosen `.json` file or pasted, and writes nothing by itself: **Review** opens a list of every question with what it would do (`src/data/practice/importReview.ts`). Green, *new*: its id is free. Red, *replaces with changes*: the id exists and the listed fields differ, which is also how you fix many questions at once. Red, *no id*: it gets the next free id of its class, shown in the list. Amber, *identical*: it is in the bank as it is and is not written. Every question has an **Edit** button that changes the import, not the bank, and Import asks for confirmation with the counts whenever something is not new. A file with a wrong answer that has no `level` is refused before the review; a file that only changes levels counts as a change and is written. Answer ids are not compared; a replaced question whose file has no answer ids gets new ones, so do not replace a question an exam already used from a hand-written file. Example:
 
 ```json
 [
@@ -98,9 +100,9 @@ Open `/teacher/questions` with a teacher account (see setup step 6). The list sh
     "prompt": { "es": "¿…?", "en": "…?" },
     "correct": [{ "es": "Correcta", "en": "Correct" }],
     "incorrect": [
-      { "es": "Otra", "en": "Other" },
-      { "es": "Otra más", "en": "Another" },
-      { "es": "Y otra", "en": "And another" }
+      { "es": "Otra", "en": "Other", "level": 5 },
+      { "es": "Otra más", "en": "Another", "level": 3 },
+      { "es": "Y otra", "en": "And another", "level": 1 }
     ],
     "explanation": { "es": "Por qué.", "en": "Why." },
     "retired": false

@@ -134,6 +134,12 @@
   gap: 8px;
 }
 
+/* Beside the text pair, which takes the row: the select only needs its widest option. */
+.answerRow .level {
+  flex: none;
+  width: auto;
+}
+
 .remove {
   composes: btnGhost from '../learn/ui.module.css';
   padding: 10px 12px;

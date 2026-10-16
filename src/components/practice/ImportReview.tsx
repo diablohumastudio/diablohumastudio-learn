@@ -40,6 +40,7 @@ function fieldText(field: QuestionField, t: PracticeTexts): string {
     prompt: t.importFieldPrompt,
     correct: t.importFieldCorrect,
     incorrect: t.importFieldIncorrect,
+    levels: t.importFieldLevels,
     explanation: t.importFieldExplanation,
     retired: t.importFieldRetired,
   };

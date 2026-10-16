@@ -1,8 +1,14 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { LEARN_COURSES, TEACHER_PATH } from '../../data/learn';
-import { MIN_CORRECT_ANSWERS, MIN_INCORRECT_ANSWERS, nextQuestionId, questionTopicTitle } from '../../data/practice';
-import type { PracticeAnswer, PracticeQuestion } from '../../data/practice';
+import {
+  DISTRACTOR_LEVELS,
+  MIN_CORRECT_ANSWERS,
+  MIN_INCORRECT_ANSWERS,
+  nextQuestionId,
+  questionTopicTitle,
+} from '../../data/practice';
+import type { DistractorLevel, PracticeAnswer, PracticeQuestion } from '../../data/practice';
 import type { ImportedQuestion } from '../../data/practice/parse';
 import { LOCALES } from '../../i18n/locales';
 import { practiceDict } from '../../i18n/pages/practice';
@@ -67,7 +73,31 @@ function trimmed(text: Dictionary<string>): Dictionary<string> {
 
 /* The id survives an edit of the text: exam attempts already saved point at it. */
 function trimmedAnswer(answer: PracticeAnswer): PracticeAnswer {
-  return answer.id ? { ...trimmed(answer), id: answer.id } : trimmed(answer);
+  return {
+    ...trimmed(answer),
+    ...(answer.id ? { id: answer.id } : {}),
+    ...(answer.level ? { level: answer.level } : {}),
+  };
+}
+
+function withLevel(answer: PracticeAnswer, value: string): PracticeAnswer {
+  const unrated: PracticeAnswer = { ...answer };
+  delete unrated.level;
+  return value === '' ? unrated : { ...unrated, level: Number(value) as DistractorLevel };
+}
+
+/* The scale offers 1, 3 and 5; a 2 or 4 already in the bank stays selectable. */
+function levelOptions(current: DistractorLevel | undefined): DistractorLevel[] {
+  const options = [...DISTRACTOR_LEVELS];
+  if (current !== undefined && !options.includes(current)) options.push(current);
+  return options.sort((a, b) => a - b);
+}
+
+function levelText(level: DistractorLevel, t: Texts): string {
+  if (level === 1) return t.level1;
+  if (level === 3) return t.level3;
+  if (level === 5) return t.level5;
+  return String(level);
 }
 
 function isComplete(text: Dictionary<string>): boolean {
@@ -88,6 +118,7 @@ function validateDraft(draft: Draft, t: Texts): Validation {
   if (![...correct, ...incorrect].every(isComplete)) return { ok: false, message: t.validationAnswers };
   if (correct.length < MIN_CORRECT_ANSWERS) return { ok: false, message: t.validationCorrect };
   if (incorrect.length < MIN_INCORRECT_ANSWERS) return { ok: false, message: t.validationIncorrect };
+  if (incorrect.some((answer) => answer.level === undefined)) return { ok: false, message: t.validationLevels };
   if (!isBlank(explanation) && !isComplete(explanation)) return { ok: false, message: t.validationExplanation };
 
   return {
@@ -141,10 +172,12 @@ type AnswerListProps = {
   label: string;
   items: PracticeAnswer[];
   minimum: number;
+  /** Wrong answers are rated against the correct one; correct answers have no level. */
+  withLevels?: boolean;
   onChange: (items: PracticeAnswer[]) => void;
 };
 
-function AnswerList({ label, items, minimum, onChange }: AnswerListProps) {
+function AnswerList({ label, items, minimum, withLevels = false, onChange }: AnswerListProps) {
   const t = useT(practiceDict);
 
   function replaceAt(index: number, value: PracticeAnswer) {
@@ -161,6 +194,21 @@ function AnswerList({ label, items, minimum, onChange }: AnswerListProps) {
       {items.map((item, index) => (
         <div key={index} className={s.answerRow}>
           <TextPair value={item} onChange={(value) => replaceAt(index, value)} />
+          {withLevels && (
+            <select
+              className={`${s.select} ${s.level}`}
+              value={item.level ?? ''}
+              aria-label={t.levelLabel}
+              onChange={(event) => replaceAt(index, withLevel(item, event.target.value))}
+            >
+              <option value="">{t.levelUnset}</option>
+              {levelOptions(item.level).map((level) => (
+                <option key={level} value={level}>
+                  {levelText(level, t)}
+                </option>
+              ))}
+            </select>
+          )}
           <button
             type="button"
             className={s.remove}
@@ -304,6 +352,7 @@ function QuestionForm({ bank, editing, onDone, onEditedImport }: QuestionFormPro
           label={t.incorrectLabel}
           items={draft.incorrect}
           minimum={MIN_INCORRECT_ANSWERS}
+          withLevels
           onChange={(incorrect) => setDraft({ ...draft, incorrect })}
         />
 

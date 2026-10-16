@@ -11,7 +11,15 @@ import type { PracticeAnswer, PracticeQuestion } from './types';
     exists with the same content. `noId`: the file gave no id, so one is assigned. */
 export type ImportStatus = 'new' | 'changed' | 'identical' | 'noId';
 
-export type QuestionField = 'topic' | 'slides' | 'prompt' | 'correct' | 'incorrect' | 'explanation' | 'retired';
+export type QuestionField =
+  | 'topic'
+  | 'slides'
+  | 'prompt'
+  | 'correct'
+  | 'incorrect'
+  | 'levels'
+  | 'explanation'
+  | 'retired';
 
 export type ImportEntry = {
   status: ImportStatus;
@@ -35,6 +43,11 @@ function areSameAnswers(a: readonly PracticeAnswer[], b: readonly PracticeAnswer
   return a.length === b.length && a.every((answer, index) => isSameText(answer, b[index]));
 }
 
+/* Same texts, different ratings: the import still has something to write. */
+function areSameLevels(a: readonly PracticeAnswer[], b: readonly PracticeAnswer[]): boolean {
+  return a.length === b.length && a.every((answer, index) => answer.level === b[index].level);
+}
+
 function areSameSlides(a: readonly string[] | undefined, b: readonly string[] | undefined): boolean {
   const first = a ?? [];
   const second = b ?? [];
@@ -48,6 +61,7 @@ export function changedFieldsOf(imported: ImportedQuestion, existing: PracticeQu
   if (!isSameText(imported.prompt, existing.prompt)) fields.push('prompt');
   if (!areSameAnswers(imported.correct, existing.correct)) fields.push('correct');
   if (!areSameAnswers(imported.incorrect, existing.incorrect)) fields.push('incorrect');
+  else if (!areSameLevels(imported.incorrect, existing.incorrect)) fields.push('levels');
   if (!isSameText(imported.explanation, existing.explanation)) fields.push('explanation');
   if (imported.retired !== existing.retired) fields.push('retired');
   return fields;

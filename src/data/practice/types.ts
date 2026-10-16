@@ -9,9 +9,17 @@ export const MIN_INCORRECT_ANSWERS: number = 3;
 /** Every display shows one correct answer plus this many wrong ones. */
 export const SHOWN_INCORRECT_ANSWERS: number = 3;
 
+/** How close a wrong answer is to the correct one, judged against it (questions/README.md):
+    5 almost correct, 3 plausible, 1 discardable. The scale leaves 2 and 4 free for later. */
+export type DistractorLevel = 1 | 2 | 3 | 4 | 5;
+export const DISTRACTOR_LEVELS: readonly DistractorLevel[] = [1, 3, 5];
+export const MIN_DISTRACTOR_LEVEL: number = 1;
+export const MAX_DISTRACTOR_LEVEL: number = 5;
+
 /** One answer text. The id is what an exam attempt records as "the option the student picked":
-    opaque so it says nothing about being correct, assigned on save and never reused. */
-export type PracticeAnswer = Dictionary<string> & { id?: string };
+    opaque so it says nothing about being correct, assigned on save and never reused.
+    Only wrong answers carry a level. */
+export type PracticeAnswer = Dictionary<string> & { id?: string; level?: DistractorLevel };
 
 export type PracticeQuestion = {
   /** Stable and never reused: every student's stats are keyed by it (e.g. 'wu-wo-001'). */
@@ -24,7 +32,7 @@ export type PracticeQuestion = {
   prompt: Dictionary<string>;
   /** At least one; a random one is shown each time. */
   correct: PracticeAnswer[];
-  /** At least three; a random subset is shown each time. */
+  /** At least three, each with its level; a random subset is shown each time. */
   incorrect: PracticeAnswer[];
   explanation?: Dictionary<string>;
   /** Retired questions are kept so old stats still resolve, but are never asked. */
