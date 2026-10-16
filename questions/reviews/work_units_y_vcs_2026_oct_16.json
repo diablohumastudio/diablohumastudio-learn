@@ -1,0 +1,242 @@
+[
+  {
+    "topic": "work-units-y-vcs",
+    "slides": ["archivoWwu"],
+    "prompt": {
+      "es": "Según la clase, ¿qué es un Work Unit de Wwise?",
+      "en": "According to the class, what is a Wwise Work Unit?"
+    },
+    "correct": [
+      { "es": "Un archivo XML con extensión .wwu que guarda una parte del proyecto", "en": "An XML file with the .wwu extension that stores one part of the project" }
+    ],
+    "incorrect": [
+      { "es": "Un archivo binario con extensión .wwu que guarda los sonidos convertidos", "en": "A binary file with the .wwu extension that stores the converted sounds", "level": 5 },
+      { "es": "Una carpeta real del disco que agrupa los objetos de una categoría", "en": "A real folder on disk that groups the objects of one category", "level": 5 },
+      { "es": "Una carpeta que solo existe dentro del Project Explorer para ordenar objetos", "en": "A folder that only exists inside the Project Explorer to sort objects", "level": 5 },
+      { "es": "El archivo .wproj que lista las plataformas y los ajustes del proyecto", "en": "The .wproj file that lists the platforms and the project settings", "level": 5 },
+      { "es": "Un SoundBank generado para una plataforma", "en": "A SoundBank generated for one platform", "level": 3 },
+      { "es": "Una unidad de medida del volumen en Wwise", "en": "A unit of measurement for volume in Wwise", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Lo que ves en el Project Explorer es la suma de archivos XML llamados Work Units, con extensión .wwu. Cada uno guarda los objetos de una categoría que cuelgan de él. Las carpetas reales del disco son los Physical Folders y las carpetas que solo existen dentro del archivo son los Virtual Folders.",
+      "en": "What you see in the Project Explorer is the sum of XML files called Work Units, with the .wwu extension. Each one stores the objects of one category that hang from it. Real folders on disk are Physical Folders, and folders that only exist inside the file are Virtual Folders."
+    },
+    "retired": false
+  },
+  {
+    "topic": "work-units-y-vcs",
+    "slides": ["archivoWwu"],
+    "prompt": {
+      "es": "Según la clase, ¿qué pasa si borras o renombras un Default Work Unit?",
+      "en": "According to the class, what happens if you delete or rename a Default Work Unit?"
+    },
+    "correct": [
+      { "es": "Wwise lo recrea vacío y avisa al abrir el proyecto", "en": "Wwise recreates it empty and warns you when the project opens" }
+    ],
+    "incorrect": [
+      { "es": "Wwise lo recrea con los objetos que tenía, leyéndolos del .wproj", "en": "Wwise recreates it with the objects it had, reading them from the .wproj", "level": 5 },
+      { "es": "El proyecto no abre hasta que lo restaures desde Git", "en": "The project will not open until you restore it from Git", "level": 5 },
+      { "es": "Wwise mueve sus objetos al primer Work Unit que encuentre", "en": "Wwise moves its objects to the first Work Unit it finds", "level": 5 },
+      { "es": "Nada: es un Work Unit como cualquier otro y se puede borrar", "en": "Nothing: it is a Work Unit like any other and can be deleted", "level": 5 },
+      { "es": "Se borran también los audios de Originals que usaba", "en": "The Originals audio files it used are deleted too", "level": 3 },
+      { "es": "Se desinstala el plugin de Wwise de Unreal", "en": "The Wwise plugin is uninstalled from Unreal", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Los Default Work Units son archivos críticos: no se renombran ni se borran. Si faltan, Wwise los recrea vacíos y avisa al abrir el proyecto, así que los objetos que tenían se pierden si no los recuperas desde Git.",
+      "en": "Default Work Units are critical files: they are never renamed or deleted. If they are missing, Wwise recreates them empty and warns you when the project opens, so the objects they held are lost unless you recover them from Git."
+    },
+    "retired": false
+  },
+  {
+    "topic": "work-units-y-vcs",
+    "slides": ["wwise"],
+    "prompt": {
+      "es": "Según la clase, ¿por qué la carpeta .cache de un proyecto de Wwise no se versiona?",
+      "en": "According to the class, why is the .cache folder of a Wwise project not versioned?"
+    },
+    "correct": [
+      { "es": "Es derivada: contiene conversiones que Wwise regenera desde Originals y los Work Units", "en": "It is derived: it holds conversions that Wwise regenerates from Originals and the Work Units" }
+    ],
+    "incorrect": [
+      { "es": "Es personal: guarda el layout y las preferencias de cada usuario", "en": "It is personal: it stores the layout and preferences of each user", "level": 5 },
+      { "es": "Es fuente, pero pesa demasiado para Git sin LFS", "en": "It is source, but too heavy for Git without LFS", "level": 5 },
+      { "es": "Es derivada: contiene los SoundBanks que lee Unreal", "en": "It is derived: it holds the SoundBanks that Unreal reads", "level": 5 },
+      { "es": "Contiene las copias de respaldo que Wwise hace al migrar de versión", "en": "It holds the backup copies Wwise makes when migrating to a new version", "level": 5 },
+      { "es": "Contiene el código del plugin de Unreal", "en": "It holds the code of the Unreal plugin", "level": 3 },
+      { "es": "Git no permite carpetas cuyo nombre empieza con punto", "en": "Git does not allow folders whose name starts with a dot", "level": 1 }
+    ],
+    "explanation": {
+      "es": "La carpeta .cache guarda los .wem convertidos de cada plataforma y cachés de generación. Es derivada: con el proyecto y los audios de Originals, Wwise la vuelve a crear. Además, cada cambio de propiedad cambia el nombre de los archivos, así que llenaría el repositorio de archivos inútiles.",
+      "en": "The .cache folder holds the converted .wem files of each platform and generation caches. It is derived: with the project and the Originals audio, Wwise recreates it. Besides, every property change changes the file names, so it would fill the repository with useless files."
+    },
+    "retired": false
+  },
+  {
+    "topic": "work-units-y-vcs",
+    "slides": ["wwise"],
+    "prompt": {
+      "es": "Según la clase, ¿por qué los proyectos del curso suben GeneratedSoundBanks a Git aunque sea una carpeta derivada?",
+      "en": "According to the class, why do the course projects push GeneratedSoundBanks to Git even though it is a derived folder?"
+    },
+    "correct": [
+      { "es": "Porque Unreal lee esa carpeta y así el proyecto suena al clonarlo sin abrir Wwise", "en": "Because Unreal reads that folder, so the project plays sound when cloned without opening Wwise" }
+    ],
+    "incorrect": [
+      { "es": "Porque Wwise no puede regenerarlos sin la carpeta .cache", "en": "Because Wwise cannot regenerate them without the .cache folder", "level": 5 },
+      { "es": "Porque Git LFS los necesita para funcionar", "en": "Because Git LFS needs them in order to work", "level": 5 },
+      { "es": "Porque sin ellos el .wproj no abre", "en": "Because without them the .wproj will not open", "level": 5 },
+      { "es": "Porque son la fuente de los Work Units", "en": "Because they are the source of the Work Units", "level": 5 },
+      { "es": "Porque contienen las preferencias del usuario", "en": "Because they hold the user preferences", "level": 3 },
+      { "es": "Porque GitLab solo acepta archivos .bnk", "en": "Because GitLab only accepts .bnk files", "level": 1 }
+    ],
+    "explanation": {
+      "es": "GeneratedSoundBanks se regenera con Generate, así que es derivada, pero el proyecto de Unreal la lee tal cual. Si va a Git, quien clone el repositorio oye el juego sin abrir Wwise. El riesgo es subir bancos de generaciones distintas: se sube siempre la carpeta completa.",
+      "en": "GeneratedSoundBanks is regenerated with Generate, so it is derived, but the Unreal project reads it as is. If it goes to Git, whoever clones the repository hears the game without opening Wwise. The risk is pushing banks from different generations: always push the whole folder."
+    },
+    "retired": false
+  },
+  {
+    "topic": "work-units-y-vcs",
+    "slides": ["unreal"],
+    "prompt": {
+      "es": "Según la clase, ¿qué carpetas de un proyecto de Unreal regenera el editor y por eso van en el .gitignore?",
+      "en": "According to the class, which folders of an Unreal project does the editor regenerate, and therefore go in the .gitignore?"
+    },
+    "correct": [
+      { "es": "Binaries, Intermediate, Saved y DerivedDataCache", "en": "Binaries, Intermediate, Saved and DerivedDataCache" }
+    ],
+    "incorrect": [
+      { "es": "Binaries, Intermediate, Content y Config", "en": "Binaries, Intermediate, Content and Config", "level": 5 },
+      { "es": "Saved, DerivedDataCache, Source y Config", "en": "Saved, DerivedDataCache, Source and Config", "level": 5 },
+      { "es": "Binaries, Intermediate, Saved y Content", "en": "Binaries, Intermediate, Saved and Content", "level": 5 },
+      { "es": "Plugins, Content, Config y Saved", "en": "Plugins, Content, Config and Saved", "level": 5 },
+      { "es": "Originals, .cache y GeneratedSoundBanks", "en": "Originals, .cache and GeneratedSoundBanks", "level": 3 },
+      { "es": "Las carpetas con nombre en mayúsculas", "en": "The folders whose names start with a capital letter", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Binaries e Intermediate son el resultado de compilar, Saved guarda logs y configuración local, y DerivedDataCache guarda shaders y cachés. El editor los vuelve a crear. Content, Config y Source son la fuente del juego y sí van a Git.",
+      "en": "Binaries and Intermediate are the result of compiling, Saved holds logs and local configuration, and DerivedDataCache holds shaders and caches. The editor recreates them. Content, Config and Source are the source of the game and do go to Git."
+    },
+    "retired": false
+  },
+  {
+    "topic": "work-units-y-vcs",
+    "slides": ["unreal"],
+    "prompt": {
+      "es": "Según la clase, ¿por qué la carpeta Plugins/WwiseSoundEngine/ThirdParty queda fuera de Git?",
+      "en": "According to the class, why is the Plugins/WwiseSoundEngine/ThirdParty folder kept out of Git?"
+    },
+    "correct": [
+      { "es": "Es el SDK de Wwise: pesa gigabytes y el Audiokinetic Launcher lo reinstala al integrar", "en": "It is the Wwise SDK: it weighs gigabytes and the Audiokinetic Launcher reinstalls it when integrating" }
+    ],
+    "incorrect": [
+      { "es": "Es código del plugin que Unreal compila y vuelve a generar", "en": "It is plugin code that Unreal compiles and regenerates", "level": 5 },
+      { "es": "Contiene los SoundBanks, que ya están en el proyecto de Wwise", "en": "It holds the SoundBanks, which are already in the Wwise project", "level": 5 },
+      { "es": "Es una caché del editor, como DerivedDataCache", "en": "It is an editor cache, like DerivedDataCache", "level": 5 },
+      { "es": "Contiene las preferencias de cada usuario del plugin", "en": "It holds the preferences of each user of the plugin", "level": 5 },
+      { "es": "Contiene los audios originales en formato .wav", "en": "It holds the original audio files in .wav format", "level": 3 },
+      { "es": "Git no acepta carpetas con nombres en inglés", "en": "Git does not accept folders with English names", "level": 1 }
+    ],
+    "explanation": {
+      "es": "ThirdParty contiene el SDK de Wwise: librerías compiladas para cada plataforma, varios gigabytes. No es código que Unreal regenere ni una caché: lo vuelve a instalar el Audiokinetic Launcher con Integrate Wwise in Project. El código del plugin, en Source, sí va a Git.",
+      "en": "ThirdParty holds the Wwise SDK: compiled libraries for each platform, several gigabytes. It is neither code that Unreal regenerates nor a cache: the Audiokinetic Launcher reinstalls it with Integrate Wwise in Project. The plugin code, in Source, does go to Git."
+    },
+    "retired": false
+  },
+  {
+    "topic": "work-units-y-vcs",
+    "slides": ["binarios"],
+    "prompt": {
+      "es": "Según la clase, ¿qué hace Git LFS con un archivo .wav?",
+      "en": "According to the class, what does Git LFS do with a .wav file?"
+    },
+    "correct": [
+      { "es": "Deja un puntero de texto en el repositorio y guarda el archivo real en un almacén aparte", "en": "It leaves a text pointer in the repository and stores the real file in a separate store" }
+    ],
+    "incorrect": [
+      { "es": "Comprime el .wav para que Git pueda comparar sus líneas", "en": "It compresses the .wav so that Git can compare its lines", "level": 5 },
+      { "es": "Guarda solo la diferencia entre una versión del .wav y la siguiente", "en": "It stores only the difference between one version of the .wav and the next", "level": 5 },
+      { "es": "Permite que dos personas fusionen sus cambios en el mismo .wav", "en": "It lets two people merge their changes to the same .wav", "level": 5 },
+      { "es": "Convierte el .wav en texto para versionarlo como un .wwu", "en": "It converts the .wav into text to version it like a .wwu", "level": 5 },
+      { "es": "Lo convierte a .wem para que pese menos", "en": "It converts it to .wem so that it weighs less", "level": 3 },
+      { "es": "Lo sube a YouTube y guarda el enlace", "en": "It uploads it to YouTube and keeps the link", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Git LFS resuelve el peso: en el repositorio queda un puntero de texto de pocas líneas y el archivo real se guarda en un almacén aparte del servidor. No convierte ni compara el binario, y no permite fusionar cambios de dos personas sobre el mismo archivo: eso se resuelve repartiendo el trabajo.",
+      "en": "Git LFS solves the weight: a text pointer of a few lines stays in the repository and the real file is stored in a separate store on the server. It does not convert or compare the binary, and it does not let two people merge changes to the same file: that is solved by splitting the work."
+    },
+    "retired": false
+  },
+  {
+    "topic": "work-units-y-vcs",
+    "slides": ["nuevoWorkUnit"],
+    "prompt": {
+      "es": "Según la clase, importas un sonido en un Work Unit nuevo llamado WU_Ambiente y guardas el proyecto. ¿Qué ve Git en la carpeta Containers?",
+      "en": "According to the class, you import a sound into a new Work Unit called WU_Ambiente and save the project. What does Git see in the Containers folder?"
+    },
+    "correct": [
+      { "es": "Un archivo WU_Ambiente.wwu nuevo; Default Work Unit.wwu no cambia", "en": "A new WU_Ambiente.wwu file; Default Work Unit.wwu does not change" }
+    ],
+    "incorrect": [
+      { "es": "Un archivo WU_Ambiente.wwu nuevo y Default Work Unit.wwu modificado", "en": "A new WU_Ambiente.wwu file and Default Work Unit.wwu modified", "level": 5 },
+      { "es": "Solo Default Work Unit.wwu modificado, porque lista todos los Work Units", "en": "Only Default Work Unit.wwu modified, because it lists every Work Unit", "level": 5 },
+      { "es": "Ningún cambio hasta que generes los SoundBanks", "en": "No change until you generate the SoundBanks", "level": 5 },
+      { "es": "Un archivo WU_Ambiente.wwu nuevo con una copia del audio dentro", "en": "A new WU_Ambiente.wwu file with a copy of the audio inside", "level": 5 },
+      { "es": "Solo un .wem nuevo dentro de .cache", "en": "Only a new .wem inside .cache", "level": 3 },
+      { "es": "Un correo de aviso a los miembros del repositorio", "en": "A notification email to the members of the repository", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Cada objeto vive en un solo Work Unit. El sonido se escribe en WU_Ambiente.wwu, un archivo nuevo para Git, y Default Work Unit.wwu no se toca. El audio no va dentro del .wwu: solo la ruta al .wav, que se copia en Originals.",
+      "en": "Each object lives in one Work Unit only. The sound is written to WU_Ambiente.wwu, a new file for Git, and Default Work Unit.wwu is not touched. The audio does not go inside the .wwu: only the path to the .wav, which is copied into Originals."
+    },
+    "retired": false
+  },
+  {
+    "topic": "work-units-y-vcs",
+    "slides": ["equipo"],
+    "prompt": {
+      "es": "Según la clase, ¿cómo evita un equipo los conflictos de Git en los Work Units de Wwise?",
+      "en": "According to the class, how does a team avoid Git conflicts in Wwise Work Units?"
+    },
+    "correct": [
+      { "es": "Cada persona trabaja en Work Units distintos, con commits pequeños y guardando Wwise antes de cada commit", "en": "Each person works in different Work Units, with small commits and saving Wwise before each commit" }
+    ],
+    "incorrect": [
+      { "es": "Todas las personas trabajan en el Default Work Unit, que Git fusiona solo", "en": "Everyone works in the Default Work Unit, which Git merges on its own", "level": 5 },
+      { "es": "Cada persona tiene su propio proyecto de Wwise y al final se juntan", "en": "Each person has their own Wwise project and they are joined at the end", "level": 5 },
+      { "es": "Se usa el plug-in de Git que trae Wwise para hacer check-out de cada archivo", "en": "They use the Git plug-in that ships with Wwise to check out each file", "level": 5 },
+      { "es": "Se bloquea el .wproj con Git LFS mientras alguien edita", "en": "The .wproj is locked with Git LFS while someone edits", "level": 5 },
+      { "es": "Se versiona también la carpeta .cache para que todos tengan lo mismo", "en": "The .cache folder is versioned too so that everyone has the same", "level": 3 },
+      { "es": "Se trabaja sin Git y se envían los archivos por correo", "en": "They work without Git and send the files by email", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Hay un solo proyecto de Wwise por juego, partido en Work Units. Si cada persona toca archivos distintos, Git combina los commits sin preguntar; si dos editan el mismo .wwu a la vez, hay conflicto. Wwise trae plug-ins para Perforce y Subversion, no para Git, así que con Git se trabaja desde fuera.",
+      "en": "There is one Wwise project per game, split into Work Units. If each person touches different files, Git merges the commits without asking; if two edit the same .wwu at once, there is a conflict. Wwise ships plug-ins for Perforce and Subversion, not for Git, so with Git you work from outside."
+    },
+    "retired": false
+  },
+  {
+    "topic": "work-units-y-vcs",
+    "slides": ["solo"],
+    "prompt": {
+      "es": "Según la clase, ¿cómo conviene repartir los Work Units cuando trabajas solo y el proyecto crece?",
+      "en": "According to the class, how should you split the Work Units when you work alone and the project grows?"
+    },
+    "correct": [
+      { "es": "Un Work Unit por bloque del juego, con el mismo nombre en Containers y en Events", "en": "One Work Unit per block of the game, with the same name in Containers and in Events" }
+    ],
+    "incorrect": [
+      { "es": "Un Work Unit por tipo de objeto: uno para sonidos y otro para containers", "en": "One Work Unit per object type: one for sounds and another for containers", "level": 5 },
+      { "es": "Un Work Unit por cada sonido, para que los diffs sean mínimos", "en": "One Work Unit per sound, so that the diffs are minimal", "level": 5 },
+      { "es": "Todo en el Default Work Unit, porque dividir solo sirve en equipo", "en": "Everything in the Default Work Unit, because splitting only helps in a team", "level": 5 },
+      { "es": "Un Work Unit por bloque del juego en Containers, y todos los Events en el Default Work Unit", "en": "One Work Unit per block of the game in Containers, and every Event in the Default Work Unit", "level": 5 },
+      { "es": "Un proyecto de Wwise por cada nivel del juego", "en": "One Wwise project per level of the game", "level": 3 },
+      { "es": "Un Work Unit por cada día de trabajo", "en": "One Work Unit per day of work", "level": 1 }
+    ],
+    "explanation": {
+      "es": "Al principio el Default Work Unit basta. Cuando el proyecto crece, un Work Unit por bloque del juego (personaje, ambiente, interfaz, música) con el mismo nombre en Containers y en Events hace que cada bloque sean dos archivos y que cada commit cuente de qué trata.",
+      "en": "At first the Default Work Unit is enough. When the project grows, one Work Unit per block of the game (character, ambience, interface, music) with the same name in Containers and in Events makes each block two files and lets every commit tell what it is about."
+    },
+    "retired": false
+  }
+]
