@@ -54,6 +54,14 @@ export const LEARN_COURSES: LearnCourse[] = [
     title: 'Wwise + Unreal',
     classes: [
       {
+        slug: 'datos-y-programas',
+        title: { es: 'Datos y programas', en: 'Data and programs' },
+        section: 'Intro',
+        component: dynamic(() => import('../presentations/wwise-unreal/datos-y-programas')),
+        slideLabels: () =>
+          import('../presentations/wwise-unreal/datos-y-programas.dict').then((deck) => labelsOf(deck.datosYProgramasDict)),
+      },
+      {
         slug: 'datos-programas-y-servidores',
         title: { es: 'Datos, programas y servidores', en: 'Data, programs and servers' },
         section: 'Intro',
