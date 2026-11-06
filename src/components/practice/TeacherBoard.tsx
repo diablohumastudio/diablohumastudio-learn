@@ -1,20 +1,23 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { TEACHER_PATH } from '../../data/learn';
-import { questionTopicTitle } from '../../data/practice';
-import type { PracticeQuestion } from '../../data/practice';
+import { LEARN_COURSES, TEACHER_PATH } from '../../data/learn';
+import { dayKey, dayKeysBetween, monthKeyOf, monthKeysBetween, monthRange, questionTopicTitle } from '../../data/practice';
+import type { PracticeQuestion, ProgressScope } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
 import SignInRedirect from '../learn/SignInRedirect';
 import { dateText, percentText } from './format';
 import HomeworkGrid from './HomeworkGrid';
-import { fetchAllStudents, fetchStudentQuestions, isPermissionDenied } from './progress';
+import PeriodControls from './PeriodControls';
+import PeriodSummary from './PeriodSummary';
+import { byDisplayName, fetchAllStudents, fetchStudentQuestions, isPermissionDenied } from './progress';
 import type { QuestionStats, StudentStats } from './progress';
 import { useQuestionBank } from './questions';
 import s from './TeacherBoard.module.css';
 import ui from '../learn/ui.module.css';
 import { useAuthUser } from '../learn/useAuthUser';
+import { earliestDayKey, useStudentDays } from './useStudentDays';
 
 function byLastPlayedDesc(a: StudentStats, b: StudentStats): number {
   return (b.lastPlayedAt?.toMillis() ?? 0) - (a.lastPlayedAt?.toMillis() ?? 0);
@@ -112,6 +115,42 @@ function StudentDetail({ student, onBack }: { student: StudentStats; onBack: () 
   );
 }
 
+/** The homework of a course over a period: its controls, the summary and the day grid. */
+function CoursePeriod({ students }: { students: StudentStats[] }) {
+  const today = dayKey(new Date());
+  const [courseSlug, setCourseSlug] = useState(LEARN_COURSES[0].slug);
+  const [range, setRange] = useState(() => monthRange(monthKeyOf(today), today));
+  const daysByStudent = useStudentDays(students);
+  const days = dayKeysBetween(range.firstDay, range.lastDay);
+  const months = monthKeysBetween(monthKeyOf(earliestDayKey(daysByStudent) ?? today), monthKeyOf(today));
+  const studentsByName = [...students].sort(byDisplayName);
+  const scope: ProgressScope = { kind: 'daily', courseSlug };
+
+  return (
+    <>
+      <PeriodControls
+        courseSlug={courseSlug}
+        firstDay={range.firstDay}
+        lastDay={range.lastDay}
+        months={months}
+        today={today}
+        onCourseChange={setCourseSlug}
+        onRangeChange={(firstDay, lastDay) => setRange({ firstDay, lastDay })}
+      />
+      <PeriodSummary
+        key={courseSlug}
+        students={studentsByName}
+        daysByStudent={daysByStudent}
+        days={days}
+        scope={scope}
+        selectionKey={courseSlug}
+        fileName={`practica_${courseSlug}_${range.firstDay}_${range.lastDay}`}
+      />
+      <HomeworkGrid students={studentsByName} daysByStudent={daysByStudent} days={days} scope={scope} />
+    </>
+  );
+}
+
 function StudentsTable() {
   const t = useT(practiceDict);
   const locale = useLocale();
@@ -151,7 +190,7 @@ function StudentsTable() {
         <span className={ui.eyebrow}>{t.brand}</span>
         <h1 className={ui.title}>{t.teacherTitle}</h1>
       </div>
-      {students !== null && students.length > 0 && <HomeworkGrid students={students} />}
+      {students !== null && students.length > 0 && <CoursePeriod students={students} />}
       <div className={s.card}>
         {students === null ? (
           <p className={s.empty}>{t.loading}</p>

@@ -1,0 +1,19 @@
+.controls {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input {
+  composes: input from '../learn/ui.module.css';
+  font-size: 14px;
+  padding: 8px 10px;
+  color-scheme: dark;
+}

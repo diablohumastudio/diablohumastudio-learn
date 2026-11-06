@@ -41,6 +41,11 @@ export type StudentStats = {
   lastPlayedAt: Timestamp | null;
 };
 
+/** Alphabetical, the order of a class list; an account without a name sorts by its email. */
+export function byDisplayName(a: StudentStats, b: StudentStats): number {
+  return (a.displayName || a.email).localeCompare(b.displayName || b.email, undefined, { sensitivity: 'base' });
+}
+
 export type AnswerRecord = {
   uid: string;
   sessionId: string;

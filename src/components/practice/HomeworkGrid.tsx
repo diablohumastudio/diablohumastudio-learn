@@ -1,142 +1,91 @@
-import { useEffect, useState } from 'react';
-import { LEARN_COURSES } from '../../data/learn';
 import {
   DAILY_QUESTIONS_GOAL,
-  RECENT_DAYS_SHOWN,
+  DAY_SCORE_FULL,
+  DAY_SCORE_NONE,
   RUN_CORRECT_GOAL,
   RUN_LENGTH,
-  dayKey,
-  dayKeysBetween,
-  isDayDone,
-  isRoundDone,
-  recentDayKeys,
+  dailyDay,
+  dailyDayScore,
+  roundScore,
+  scopeDayScore,
   weekdayInitial,
 } from '../../data/practice';
-import type { DayProgress, Homework } from '../../data/practice';
+import type { DayProgress, ProgressScope } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import ui from '../learn/ui.module.css';
+import { scoreText } from './format';
 import s from './HomeworkGrid.module.css';
-import { fetchStudentDays } from './progress';
 import type { StudentStats } from './progress';
+import type { DaysByStudent } from './useStudentDays';
 
 const DAY_OF_MONTH_START: number = 8;
-
-type DaysByStudent = Record<string, DayProgress[]>;
 
 /** What one student did on one day: in the daily homework, or in one round of a specific one. */
 type GridCell = {
   key: string;
   /** Missing when the student answered nothing there. */
   progress: DayProgress | undefined;
-  isDone: boolean;
+  /** 1, ½ or 0: both goals met, one, none. */
+  score: number;
 };
 
 type HomeworkGridProps = {
   students: StudentStats[];
-  /** A specific homework: the grid then shows its days, a column per round, its answers and
-      its goals, with no controls. Without it, the daily homework of a course in a date range. */
-  homework?: Homework;
+  daysByStudent: DaysByStudent | null;
+  days: string[];
+  /** The daily homework of a course, or a specific homework with a column per round. */
+  scope: ProgressScope;
 };
 
 function cellClassName(cell: GridCell): string {
   if (!cell.progress) return s.cellEmpty;
-  return cell.isDone ? s.cellDone : s.cellStarted;
+  if (cell.score >= DAY_SCORE_FULL) return s.cellFull;
+  return cell.score > DAY_SCORE_NONE ? s.cellHalf : s.cellZero;
 }
 
 /** Homework of every student: a column per day (and round), a cell with answered · best run. */
-export default function HomeworkGrid({ students, homework }: HomeworkGridProps) {
+export default function HomeworkGrid({ students, daysByStudent, days, scope }: HomeworkGridProps) {
   const t = useT(practiceDict);
   const locale = useLocale();
-  const [courseSlug, setCourseSlug] = useState(LEARN_COURSES[0].slug);
-  const [firstDay, setFirstDay] = useState(() => recentDayKeys(RECENT_DAYS_SHOWN, new Date())[0]);
-  const [lastDay, setLastDay] = useState(() => dayKey(new Date()));
-  const [daysByStudent, setDaysByStudent] = useState<DaysByStudent | null>(null);
-  const days = homework ? dayKeysBetween(homework.firstDay, homework.lastDay) : dayKeysBetween(firstDay, lastDay);
-  const rounds = homework ? homework.rounds : [];
+  const rounds = scope.kind === 'homework' ? scope.homework.rounds : [];
   // A homework with a single round reads as it did before rounds existed: one column per day.
   const hasRounds = rounds.length > 1;
-
-  useEffect(() => {
-    let isCurrent = true;
-    Promise.all(students.map((student) => fetchStudentDays(student.uid)))
-      .then((loaded) => {
-        if (!isCurrent) return;
-        const byStudent: DaysByStudent = {};
-        students.forEach((student, index) => {
-          byStudent[student.uid] = loaded[index];
-        });
-        setDaysByStudent(byStudent);
-      })
-      .catch((error) => console.error('Could not load the homework', error));
-    return () => {
-      isCurrent = false;
-    };
-  }, [students]);
 
   /** The cells of one day: one per round of the homework, or the one of the daily homework. */
   function cellsOf(student: StudentStats, day: string): GridCell[] {
     const studentDays = daysByStudent?.[student.uid] ?? [];
-    if (!homework) {
-      const progress = studentDays.find((candidate) => candidate.day === day && candidate.courseSlug === courseSlug);
-      return [{ key: day, progress, isDone: progress !== undefined && isDayDone(progress) }];
+    if (scope.kind === 'daily') {
+      const progress = dailyDay(studentDays, scope.courseSlug, day);
+      return [{ key: day, progress, score: progress ? dailyDayScore(progress) : DAY_SCORE_NONE }];
     }
+    const { homework } = scope;
     return homework.rounds.map((round) => {
       const progress = studentDays.find(
         (candidate) => candidate.day === day && candidate.homeworkId === homework.id && candidate.roundId === round.id
       );
-      return { key: `${day}_${round.id}`, progress, isDone: progress !== undefined && isRoundDone(progress, round) };
+      return { key: `${day}_${round.id}`, progress, score: progress ? roundScore(progress, round) : DAY_SCORE_NONE };
     });
   }
 
-  /** A day of a specific homework is done when every round is. */
-  function daysDone(student: StudentStats): number {
-    return days.filter((day) => cellsOf(student, day).every((cell) => cell.isDone)).length;
+  function periodScore(student: StudentStats): number {
+    const studentDays = daysByStudent?.[student.uid] ?? [];
+    return days.reduce((sum, day) => sum + scopeDayScore(studentDays, scope, day), 0);
   }
+
+  const hint = (hasRounds ? t.homeworkRoundsGridHint : t.homeworkGridHint)
+    .replace('{count}', String(scope.kind === 'homework' ? rounds[0].goal : DAILY_QUESTIONS_GOAL))
+    .replace('{goal}', String(RUN_CORRECT_GOAL))
+    .replace('{length}', String(RUN_LENGTH));
 
   return (
     <section className={s.wrap}>
-      <div className={s.controls}>
-        <span className={ui.eyebrow}>{homework ? t.specificHomework : t.homeworkTitle}</span>
-        {!homework && (
-          <>
-            <label className={s.control}>
-              <span className={ui.label}>{t.colCourse}</span>
-              <select className={s.input} value={courseSlug} onChange={(event) => setCourseSlug(event.target.value)}>
-                {LEARN_COURSES.map((course) => (
-                  <option key={course.slug} value={course.slug}>
-                    {course.title}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className={s.control}>
-              <span className={ui.label}>{t.rangeFrom}</span>
-              <input
-                className={s.input}
-                type="date"
-                value={firstDay}
-                max={lastDay}
-                onChange={(event) => event.target.value && setFirstDay(event.target.value)}
-              />
-            </label>
-            <label className={s.control}>
-              <span className={ui.label}>{t.rangeTo}</span>
-              <input
-                className={s.input}
-                type="date"
-                value={lastDay}
-                min={firstDay}
-                onChange={(event) => event.target.value && setLastDay(event.target.value)}
-              />
-            </label>
-          </>
-        )}
-      </div>
-
+      <span className={ui.eyebrow}>{t.dayByDay}</span>
       <div className={s.card}>
         {daysByStudent === null ? (
           <p className={s.empty}>{t.loading}</p>
+        ) : days.length === 0 ? (
+          <p className={s.empty}>{t.noDaysInRange}</p>
         ) : (
           <div className={s.tableWrap}>
             <table className={s.table}>
@@ -144,7 +93,7 @@ export default function HomeworkGrid({ students, homework }: HomeworkGridProps) 
                 <tr>
                   <th rowSpan={hasRounds ? 2 : undefined}>{t.colStudent}</th>
                   <th rowSpan={hasRounds ? 2 : undefined} className={ui.num}>
-                    {t.colDaysDone}
+                    {scope.kind === 'daily' ? t.colDaysDone : t.colPoints}
                   </th>
                   {days.map((day) => (
                     <th key={day} colSpan={hasRounds ? rounds.length : undefined} className={s.dayHead} title={day}>
@@ -174,7 +123,7 @@ export default function HomeworkGrid({ students, homework }: HomeworkGridProps) 
                   <tr key={student.uid}>
                     <td>{student.displayName || student.email}</td>
                     <td className={ui.num}>
-                      {daysDone(student)} / {days.length}
+                      {scoreText(periodScore(student), locale)} / {days.length}
                     </td>
                     {days.map((day) =>
                       cellsOf(student, day).map((cell) => (
@@ -190,12 +139,7 @@ export default function HomeworkGrid({ students, homework }: HomeworkGridProps) 
           </div>
         )}
       </div>
-      <p className={ui.mono}>
-        {(hasRounds ? t.homeworkRoundsGridHint : t.homeworkGridHint)
-          .replace('{count}', String(homework ? rounds[0].goal : DAILY_QUESTIONS_GOAL))
-          .replace('{goal}', String(RUN_CORRECT_GOAL))
-          .replace('{length}', String(RUN_LENGTH))}
-      </p>
+      <p className={ui.mono}>{hint}</p>
     </section>
   );
 }

@@ -6,12 +6,13 @@ import {
   MAX_GRID_DAYS,
   dayKey,
   dayKeyAfter,
+  dayKeysBetween,
   dayText,
   isDayKey,
   isHomeworkOpen,
   newRoundId,
 } from '../../data/practice';
-import type { Homework, HomeworkSettings, PracticeQuestion } from '../../data/practice';
+import type { Homework, HomeworkSettings, PracticeQuestion, ProgressScope } from '../../data/practice';
 import type { Locale } from '../../i18n/locales';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
@@ -23,10 +24,13 @@ import { useTeacherStatus } from '../learn/useTeacherStatus';
 import HomeworkGrid from './HomeworkGrid';
 import s from './HomeworkManager.module.css';
 import { createHomework, deleteHomework, subscribeAllHomeworks, updateHomework } from './homeworks';
-import { fetchAllStudents } from './progress';
+import PeriodSummary from './PeriodSummary';
+import { byDisplayName, fetchAllStudents } from './progress';
 import type { StudentStats } from './progress';
 import QuestionPicker from './QuestionPicker';
 import { activeQuestions, useQuestionBank } from './questions';
+import { fileSlug } from './tableExport';
+import { useStudentDays } from './useStudentDays';
 
 const DEFAULT_HOMEWORK_DAYS: number = 4;
 
@@ -376,6 +380,34 @@ function HomeworkForm({ homework, onDone }: HomeworkFormProps) {
   );
 }
 
+type HomeworkProgressProps = {
+  students: StudentStats[];
+  homework: Homework;
+};
+
+/** What every student did in one homework: the summary to grade it and the grid of its days. */
+function HomeworkProgress({ students, homework }: HomeworkProgressProps) {
+  const daysByStudent = useStudentDays(students);
+  const scope: ProgressScope = { kind: 'homework', homework };
+  const days = dayKeysBetween(homework.firstDay, homework.lastDay);
+  const studentsByName = [...students].sort(byDisplayName);
+
+  return (
+    <>
+      <PeriodSummary
+        key={homework.id}
+        students={studentsByName}
+        daysByStudent={daysByStudent}
+        days={days}
+        scope={scope}
+        selectionKey={`hw-${homework.id}`}
+        fileName={`deber_${fileSlug(homework.title)}`}
+      />
+      <HomeworkGrid students={studentsByName} daysByStudent={daysByStudent} days={days} scope={scope} />
+    </>
+  );
+}
+
 function Homeworks() {
   const t = useT(practiceDict);
   const locale = useLocale();
@@ -432,7 +464,7 @@ function Homeworks() {
           <h1 className={ui.title}>{shownHomework ? shownHomework.title : t.newHomework}</h1>
         </div>
         {shownHomework && students && students.length > 0 && (
-          <HomeworkGrid students={students} homework={shownHomework} />
+          <HomeworkProgress students={students} homework={shownHomework} />
         )}
         <HomeworkForm
           key={shownHomework?.id ?? 'new'}

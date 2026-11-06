@@ -1,0 +1,119 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.button {
+  composes: btn from '../learn/ui.module.css';
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.status {
+  composes: mono from '../learn/ui.module.css';
+  color: var(--teal);
+}
+
+.statusFailed {
+  composes: status;
+  color: var(--red);
+}
+
+.selection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.linkButton {
+  composes: mono from '../learn/ui.module.css';
+  background: none;
+  border: 0;
+  padding: 4px 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.linkButton:hover {
+  color: var(--amber);
+}
+
+.card {
+  composes: card from '../learn/ui.module.css';
+  padding: 8px 0;
+}
+
+.tableWrap {
+  composes: tableWrap from '../learn/ui.module.css';
+}
+
+.table {
+  composes: table from '../learn/ui.module.css';
+}
+
+.rowUnchecked td {
+  color: var(--muted);
+}
+
+.check {
+  width: 1%;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--amber);
+  cursor: pointer;
+}
+
+.move {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.moveButton {
+  composes: btnGhost from '../learn/ui.module.css';
+  padding: 2px 6px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.name {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.rowUnchecked .name {
+  color: var(--muted);
+}
+
+.email {
+  composes: mono from '../learn/ui.module.css';
+  display: block;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.score {
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--teal);
+}
+
+.rowUnchecked .score {
+  color: var(--muted);
+}
+
+.empty {
+  composes: mono from '../learn/ui.module.css';
+  padding: 16px 24px;
+}

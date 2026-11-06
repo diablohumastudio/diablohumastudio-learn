@@ -4,26 +4,6 @@
   gap: 14px;
 }
 
-.controls {
-  display: flex;
-  align-items: flex-end;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.control {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.input {
-  composes: input from '../learn/ui.module.css';
-  font-size: 14px;
-  padding: 8px 10px;
-  color-scheme: dark;
-}
-
 .card {
   composes: card from '../learn/ui.module.css';
   padding: 8px 0;
@@ -59,12 +39,19 @@
   color: var(--muted);
 }
 
-.cellStarted {
+/* Practiced without reaching either goal: the numbers show, dimmer than a scored day. */
+.cellZero {
+  composes: cell;
+  color: var(--ink);
+  opacity: 0.55;
+}
+
+.cellHalf {
   composes: cell;
   color: var(--amber);
 }
 
-.cellDone {
+.cellFull {
   composes: cell;
   color: var(--teal);
 }
