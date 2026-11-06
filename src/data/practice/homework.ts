@@ -6,7 +6,9 @@
    questions, days and answers per day).
    A specific homework is made of rounds, each with its own questions and its own count, and
    the run is asked of every round: one good stretch of answers passes one round, never a
-   whole long homework. */
+   whole long homework.
+   To the teacher a day is worth one point with both goals met, half a point with one of them
+   and nothing with neither, however much was practiced; a period is graded by the sum. */
 
 export const DAILY_QUESTIONS_GOAL: number = 30;
 export const RUN_LENGTH: number = 10;
@@ -29,8 +31,16 @@ export const HOMEWORK_SHOWN_AFTER_DAYS: number = 7;
     already filled carry no round, and keep counting for it. */
 export const LEGACY_ROUND_ID: string = '';
 
+/** What a day is worth: both goals met, one of them, none. */
+export const DAY_SCORE_FULL: number = 1;
+export const DAY_SCORE_HALF: number = 0.5;
+export const DAY_SCORE_NONE: number = 0;
+
 const DAY_KEY_PART_WIDTH: number = 2;
 const DAY_KEY_PATTERN: RegExp = /^\d{4}-\d{2}-\d{2}$/;
+/** 'YYYY-MM': the start of a day key. */
+const MONTH_KEY_LENGTH: number = 7;
+const GOALS_PER_DAY: number = 2;
 const ROUND_ID_LENGTH: number = 6;
 
 /** One round of a specific homework: counted apart from the others, with its own best run. */
@@ -58,6 +68,21 @@ export type Homework = HomeworkSettings & { id: string };
 
 /** A round together with its homework: what the play screen is given. */
 export type RoundOfHomework = { homework: Homework; round: HomeworkRound };
+
+/** What a grid or a summary of the students looks at: the daily homework of one course, or
+    one specific homework with every round. */
+export type ProgressScope = { kind: 'daily'; courseSlug: string } | { kind: 'homework'; homework: Homework };
+
+/** One student over the days of a period, in one scope. */
+export type PeriodSummary = {
+  /** Sum of the day scores: the number the teacher grades. */
+  score: number;
+  fullDays: number;
+  /** Days worth something but not everything: half days, or days with only some rounds done. */
+  partialDays: number;
+  answered: number;
+  correct: number;
+};
 
 export type DayProgress = {
   /** Course of the daily homework; empty on the days of a specific homework. */
@@ -114,6 +139,41 @@ export function dayKeysBetween(firstDay: string, lastDay: string): string[] {
     cursor.setDate(cursor.getDate() + 1);
   }
   return keys;
+}
+
+export function monthKeyOf(day: string): string {
+  return day.slice(0, MONTH_KEY_LENGTH);
+}
+
+function dateOfMonthKey(month: string): Date {
+  const [year, monthNumber] = month.split('-').map(Number);
+  return new Date(year, monthNumber - 1, 1);
+}
+
+/** The days of a month cut at `today`: the days still to come count against nobody. A month
+    after today's gives a backwards range, which `dayKeysBetween` turns into no days. */
+export function monthRange(month: string, today: string): { firstDay: string; lastDay: string } {
+  const monthStart = dateOfMonthKey(month);
+  // Day 0 of the next month is the last day of this one.
+  const monthEnd = dayKey(new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0));
+  return { firstDay: dayKey(monthStart), lastDay: monthEnd < today ? monthEnd : today };
+}
+
+/** Every month from `firstMonth` to `lastMonth`, both included, oldest first. */
+export function monthKeysBetween(firstMonth: string, lastMonth: string): string[] {
+  const keys: string[] = [];
+  const cursor = dateOfMonthKey(firstMonth);
+  const end = dateOfMonthKey(lastMonth);
+  while (cursor <= end) {
+    keys.push(monthKeyOf(dayKey(cursor)));
+    cursor.setMonth(cursor.getMonth() + 1);
+  }
+  return keys;
+}
+
+/** 'October 2026': how the month selector names a month. */
+export function monthText(month: string, locale: string): string {
+  return dateOfMonthKey(month).toLocaleDateString(locale, { month: 'long', year: 'numeric' });
 }
 
 export function weekdayInitial(day: string, locale: string): string {
@@ -186,6 +246,71 @@ export function roundDay(
 /** A day of a homework is done when every one of its rounds is. */
 export function isHomeworkDayDone(homeworkDays: readonly DayProgress[], homework: Homework, day: string): boolean {
   return homework.rounds.every((round) => isRoundDone(roundDay(homeworkDays, homework, round, day), round));
+}
+
+/** Sessions add up: the goals are read from the day's totals, whenever they were reached. */
+function dayScore(progress: DayProgress, questionsGoal: number): number {
+  const goalsMet = Number(progress.answered >= questionsGoal) + Number(progress.bestRun >= RUN_CORRECT_GOAL);
+  if (goalsMet === GOALS_PER_DAY) return DAY_SCORE_FULL;
+  return goalsMet === 0 ? DAY_SCORE_NONE : DAY_SCORE_HALF;
+}
+
+/** A day of the daily homework: 1, ½ or 0. */
+export function dailyDayScore(progress: DayProgress): number {
+  return dayScore(progress, DAILY_QUESTIONS_GOAL);
+}
+
+/** One round on one day: 1, ½ or 0 against the round's own goal. */
+export function roundScore(progress: DayProgress, round: HomeworkRound): number {
+  return dayScore(progress, round.goal);
+}
+
+/** The day of the daily homework of one course, out of a student's days. */
+export function dailyDay(days: readonly DayProgress[], courseSlug: string, day: string): DayProgress | undefined {
+  return days.find((candidate) => candidate.day === day && candidate.courseSlug === courseSlug);
+}
+
+/** A day of a homework is the mean of its rounds: one point at most, however many rounds. */
+export function homeworkDayScore(homeworkDays: readonly DayProgress[], homework: Homework, day: string): number {
+  const total = homework.rounds.reduce(
+    (sum, round) => sum + roundScore(roundDay(homeworkDays, homework, round, day), round),
+    0
+  );
+  return total / homework.rounds.length;
+}
+
+/** The score of one day in a scope; a day without answers is worth nothing. */
+export function scopeDayScore(days: readonly DayProgress[], scope: ProgressScope, day: string): number {
+  if (scope.kind === 'daily') {
+    const progress = dailyDay(days, scope.courseSlug, day);
+    return progress ? dailyDayScore(progress) : DAY_SCORE_NONE;
+  }
+  return homeworkDayScore(days, scope.homework, day);
+}
+
+/** The answers of one day in a scope: the course's day, or the rounds of the homework. */
+function scopeDayProgress(days: readonly DayProgress[], scope: ProgressScope, day: string): DayProgress[] {
+  if (scope.kind === 'daily') {
+    const progress = dailyDay(days, scope.courseSlug, day);
+    return progress ? [progress] : [];
+  }
+  return scope.homework.rounds.map((round) => roundDay(days, scope.homework, round, day));
+}
+
+/** One student over `dayKeys`: the sum of the day scores and how the days split. */
+export function summarizePeriod(days: readonly DayProgress[], scope: ProgressScope, dayKeys: readonly string[]): PeriodSummary {
+  const summary: PeriodSummary = { score: 0, fullDays: 0, partialDays: 0, answered: 0, correct: 0 };
+  for (const day of dayKeys) {
+    const score = scopeDayScore(days, scope, day);
+    summary.score += score;
+    if (score >= DAY_SCORE_FULL) summary.fullDays += 1;
+    else if (score > DAY_SCORE_NONE) summary.partialDays += 1;
+    for (const progress of scopeDayProgress(days, scope, day)) {
+      summary.answered += progress.answered;
+      summary.correct += progress.correct;
+    }
+  }
+  return summary;
 }
 
 /** Day keys compare as text: 'YYYY-MM-DD' sorts like the dates. Answers only count on these days. */
