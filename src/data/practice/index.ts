@@ -18,6 +18,7 @@ export {
 
 export type {
   DayProgress,
+  DayRange,
   Homework,
   HomeworkRound,
   HomeworkSettings,

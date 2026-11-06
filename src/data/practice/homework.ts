@@ -84,6 +84,9 @@ export type PeriodSummary = {
   correct: number;
 };
 
+/** Two day keys, both included. */
+export type DayRange = { firstDay: string; lastDay: string };
+
 export type DayProgress = {
   /** Course of the daily homework; empty on the days of a specific homework. */
   courseSlug: string;
@@ -152,7 +155,7 @@ function dateOfMonthKey(month: string): Date {
 
 /** The days of a month cut at `today`: the days still to come count against nobody. A month
     after today's gives a backwards range, which `dayKeysBetween` turns into no days. */
-export function monthRange(month: string, today: string): { firstDay: string; lastDay: string } {
+export function monthRange(month: string, today: string): DayRange {
   const monthStart = dateOfMonthKey(month);
   // Day 0 of the next month is the last day of this one.
   const monthEnd = dayKey(new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0));

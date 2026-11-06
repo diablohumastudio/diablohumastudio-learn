@@ -1,15 +1,16 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { LEARN_COURSES, TEACHER_PATH } from '../../data/learn';
-import { dayKey, dayKeysBetween, monthKeyOf, monthKeysBetween, monthRange, questionTopicTitle } from '../../data/practice';
+import { dayKey, dayKeysBetween, monthKeyOf, monthKeysBetween, questionTopicTitle } from '../../data/practice';
 import type { PracticeQuestion, ProgressScope } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
 import SignInRedirect from '../learn/SignInRedirect';
-import { dateText, percentText } from './format';
+import { percentText } from './format';
 import HomeworkGrid from './HomeworkGrid';
-import PeriodControls from './PeriodControls';
+import PeriodControls, { periodRange } from './PeriodControls';
+import type { Period } from './PeriodControls';
 import PeriodSummary from './PeriodSummary';
 import { byDisplayName, fetchAllStudents, fetchStudentQuestions, isPermissionDenied } from './progress';
 import type { QuestionStats, StudentStats } from './progress';
@@ -18,10 +19,6 @@ import s from './TeacherBoard.module.css';
 import ui from '../learn/ui.module.css';
 import { useAuthUser } from '../learn/useAuthUser';
 import { earliestDayKey, useStudentDays } from './useStudentDays';
-
-function byLastPlayedDesc(a: StudentStats, b: StudentStats): number {
-  return (b.lastPlayedAt?.toMillis() ?? 0) - (a.lastPlayedAt?.toMillis() ?? 0);
-}
 
 function byAttemptsDesc(a: QuestionStats, b: QuestionStats): number {
   return b.attempts - a.attempts;
@@ -115,14 +112,21 @@ function StudentDetail({ student, onBack }: { student: StudentStats; onBack: () 
   );
 }
 
+type CoursePeriodProps = {
+  students: StudentStats[];
+  onSelectStudent: (student: StudentStats) => void;
+};
+
 /** The homework of a course over a period: its controls, the summary and the day grid. */
-function CoursePeriod({ students }: { students: StudentStats[] }) {
+function CoursePeriod({ students, onSelectStudent }: CoursePeriodProps) {
   const today = dayKey(new Date());
   const [courseSlug, setCourseSlug] = useState(LEARN_COURSES[0].slug);
-  const [range, setRange] = useState(() => monthRange(monthKeyOf(today), today));
+  const [period, setPeriod] = useState<Period>({ kind: 'month', month: monthKeyOf(today) });
   const daysByStudent = useStudentDays(students);
+  const firstDayEver = earliestDayKey(daysByStudent) ?? today;
+  const range = periodRange(period, firstDayEver, today);
   const days = dayKeysBetween(range.firstDay, range.lastDay);
-  const months = monthKeysBetween(monthKeyOf(earliestDayKey(daysByStudent) ?? today), monthKeyOf(today));
+  const months = monthKeysBetween(monthKeyOf(firstDayEver), monthKeyOf(today));
   const studentsByName = [...students].sort(byDisplayName);
   const scope: ProgressScope = { kind: 'daily', courseSlug };
 
@@ -130,12 +134,11 @@ function CoursePeriod({ students }: { students: StudentStats[] }) {
     <>
       <PeriodControls
         courseSlug={courseSlug}
-        firstDay={range.firstDay}
-        lastDay={range.lastDay}
+        period={period}
+        range={range}
         months={months}
-        today={today}
         onCourseChange={setCourseSlug}
-        onRangeChange={(firstDay, lastDay) => setRange({ firstDay, lastDay })}
+        onPeriodChange={setPeriod}
       />
       <PeriodSummary
         key={courseSlug}
@@ -145,6 +148,7 @@ function CoursePeriod({ students }: { students: StudentStats[] }) {
         scope={scope}
         selectionKey={courseSlug}
         fileName={`practica_${courseSlug}_${range.firstDay}_${range.lastDay}`}
+        onSelectStudent={onSelectStudent}
       />
       <HomeworkGrid students={studentsByName} daysByStudent={daysByStudent} days={days} scope={scope} />
     </>
@@ -153,14 +157,13 @@ function CoursePeriod({ students }: { students: StudentStats[] }) {
 
 function StudentsTable() {
   const t = useT(practiceDict);
-  const locale = useLocale();
   const [students, setStudents] = useState<StudentStats[] | null>(null);
   const [denied, setDenied] = useState(false);
   const [selected, setSelected] = useState<StudentStats | null>(null);
 
   useEffect(() => {
     fetchAllStudents()
-      .then((loaded) => setStudents([...loaded].sort(byLastPlayedDesc)))
+      .then(setStudents)
       .catch((error) => {
         if (isPermissionDenied(error)) {
           setDenied(true);
@@ -190,44 +193,17 @@ function StudentsTable() {
         <span className={ui.eyebrow}>{t.brand}</span>
         <h1 className={ui.title}>{t.teacherTitle}</h1>
       </div>
-      {students !== null && students.length > 0 && <CoursePeriod students={students} />}
-      <div className={s.card}>
-        {students === null ? (
+      {students === null ? (
+        <div className={s.card}>
           <p className={s.empty}>{t.loading}</p>
-        ) : students.length === 0 ? (
+        </div>
+      ) : students.length === 0 ? (
+        <div className={s.card}>
           <p className={s.empty}>{t.noStudents}</p>
-        ) : (
-          <div className={s.tableWrap}>
-            <table className={s.table}>
-              <thead>
-                <tr>
-                  <th>{t.colStudent}</th>
-                  <th className={ui.num}>{t.colSessions}</th>
-                  <th className={ui.num}>{t.colAnswered}</th>
-                  <th className={ui.num}>{t.colCorrect}</th>
-                  <th className={ui.num}>{t.colAccuracy}</th>
-                  <th>{t.colLastPlayed}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {students.map((student) => (
-                  <tr key={student.uid} className={s.row} onClick={() => setSelected(student)}>
-                    <td>
-                      <span className={s.name}>{student.displayName || student.email}</span>
-                      {student.displayName && <span className={s.email}>{student.email}</span>}
-                    </td>
-                    <td className={ui.num}>{student.sessionsPlayed}</td>
-                    <td className={ui.num}>{student.totalAnswered}</td>
-                    <td className={ui.num}>{student.totalCorrect}</td>
-                    <td className={ui.num}>{percentText(student.totalCorrect, student.totalAnswered)}</td>
-                    <td>{dateText(student.lastPlayedAt, locale, t.never)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <CoursePeriod students={students} onSelectStudent={setSelected} />
+      )}
     </div>
   );
 }

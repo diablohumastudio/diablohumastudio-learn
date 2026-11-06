@@ -23,26 +23,6 @@
   composes: table from '../learn/ui.module.css';
 }
 
-.row {
-  cursor: pointer;
-}
-
-.row:hover td {
-  background: var(--panel-2);
-}
-
-.name {
-  color: var(--ink);
-  font-weight: 600;
-}
-
-.email {
-  composes: mono from '../learn/ui.module.css';
-  display: block;
-  text-transform: none;
-  letter-spacing: 0.02em;
-}
-
 .back {
   composes: btnGhost from '../learn/ui.module.css';
   align-self: flex-start;

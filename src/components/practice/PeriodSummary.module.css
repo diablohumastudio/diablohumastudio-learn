@@ -87,9 +87,36 @@
   line-height: 1;
 }
 
+.group {
+  text-align: center;
+}
+
 .name {
   color: var(--ink);
   font-weight: 600;
+}
+
+.nameButton {
+  composes: name;
+  font: inherit;
+  font-weight: 600;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.nameButton:hover {
+  color: var(--amber);
+}
+
+.rowUnchecked .nameButton {
+  color: var(--muted);
+}
+
+.date {
+  white-space: nowrap;
 }
 
 .rowUnchecked .name {

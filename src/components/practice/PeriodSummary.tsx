@@ -4,7 +4,7 @@ import type { PeriodSummary as PeriodNumbers, ProgressScope } from '../../data/p
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import ui from '../learn/ui.module.css';
-import { scoreText } from './format';
+import { dateText, percentText, scoreText } from './format';
 import s from './PeriodSummary.module.css';
 import type { StudentStats } from './progress';
 import { movedOrder, orderedBy, readSummarySelection, saveSummarySelection } from './summarySelection';
@@ -16,6 +16,8 @@ import type { DaysByStudent } from './useStudentDays';
 const STATUS_SHOWN_MS: number = 2500;
 const UP: number = -1;
 const DOWN: number = 1;
+const PERIOD_COLUMNS: number = 6;
+const LIFETIME_COLUMNS: number = 5;
 
 type CopyStatus = 'idle' | 'copied' | 'failed';
 
@@ -35,6 +37,8 @@ type PeriodSummaryProps = {
   selectionKey: string;
   /** The exported file, without extension. */
   fileName: string;
+  /** Makes each name a button that opens the student's detail. */
+  onSelectStudent?: (student: StudentStats) => void;
 };
 
 function studentName(student: StudentStats): string {
@@ -49,6 +53,7 @@ export default function PeriodSummary({
   scope,
   selectionKey,
   fileName,
+  onSelectStudent,
 }: PeriodSummaryProps) {
   const t = useT(practiceDict);
   const locale = useLocale();
@@ -150,13 +155,28 @@ export default function PeriodSummary({
             <table className={s.table}>
               <thead>
                 <tr>
-                  <th className={s.check} />
-                  <th className={s.move} />
-                  <th>{t.colStudent}</th>
+                  <th rowSpan={2} className={s.check} />
+                  <th rowSpan={2} className={s.move} />
+                  <th rowSpan={2}>{t.colStudent}</th>
+                  <th colSpan={PERIOD_COLUMNS} className={s.group}>
+                    {t.groupPeriod}
+                  </th>
+                  <th colSpan={LIFETIME_COLUMNS} className={s.group}>
+                    {t.groupLifetime}
+                  </th>
+                </tr>
+                <tr>
                   <th className={ui.num}>{scoreHeader}</th>
                   <th className={ui.num}>{t.colFullDays}</th>
                   <th className={ui.num}>{t.colPartialDays}</th>
                   <th className={ui.num}>{t.colAnswered}</th>
+                  <th className={ui.num}>{t.colCorrect}</th>
+                  <th className={ui.num}>{t.colAccuracy}</th>
+                  <th className={ui.num}>{t.colSessions}</th>
+                  <th className={ui.num}>{t.colAnswered}</th>
+                  <th className={ui.num}>{t.colCorrect}</th>
+                  <th className={ui.num}>{t.colAccuracy}</th>
+                  <th>{t.colLastPlayed}</th>
                 </tr>
               </thead>
               <tbody>
@@ -191,7 +211,13 @@ export default function PeriodSummary({
                       </button>
                     </td>
                     <td>
-                      <span className={s.name}>{studentName(row.student)}</span>
+                      {onSelectStudent ? (
+                        <button type="button" className={s.nameButton} onClick={() => onSelectStudent(row.student)}>
+                          {studentName(row.student)}
+                        </button>
+                      ) : (
+                        <span className={s.name}>{studentName(row.student)}</span>
+                      )}
                       {row.student.displayName && <span className={s.email}>{row.student.email}</span>}
                     </td>
                     <td className={`${ui.num} ${s.score}`}>
@@ -200,6 +226,13 @@ export default function PeriodSummary({
                     <td className={ui.num}>{row.numbers.fullDays}</td>
                     <td className={ui.num}>{row.numbers.partialDays}</td>
                     <td className={ui.num}>{row.numbers.answered}</td>
+                    <td className={ui.num}>{row.numbers.correct}</td>
+                    <td className={ui.num}>{percentText(row.numbers.correct, row.numbers.answered)}</td>
+                    <td className={ui.num}>{row.student.sessionsPlayed}</td>
+                    <td className={ui.num}>{row.student.totalAnswered}</td>
+                    <td className={ui.num}>{row.student.totalCorrect}</td>
+                    <td className={ui.num}>{percentText(row.student.totalCorrect, row.student.totalAnswered)}</td>
+                    <td className={s.date}>{dateText(row.student.lastPlayedAt, locale, t.never)}</td>
                   </tr>
                 ))}
               </tbody>
