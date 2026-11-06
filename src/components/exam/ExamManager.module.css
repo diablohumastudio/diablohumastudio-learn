@@ -103,3 +103,7 @@
   composes: mono from '../learn/ui.module.css';
   padding: 16px 24px;
 }
+
+.date {
+  white-space: nowrap;
+}

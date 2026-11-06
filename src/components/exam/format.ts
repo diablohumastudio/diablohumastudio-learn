@@ -24,6 +24,18 @@ export function dateTimeText(ms: number | null, locale: Locale): string {
   return new Date(ms).toLocaleString(locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
+/** With the year: the exam list outlives a semester. */
+export function dateTimeYearText(ms: number | null, locale: Locale): string {
+  if (ms === null) return '–';
+  return new Date(ms).toLocaleString(locale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 export function examErrorText(error: unknown, t: ExamTexts): string {
   if (!(error instanceof ExamRequestError)) return t.errorGeneric;
   if (error.code === 'network') return t.errorNetwork;

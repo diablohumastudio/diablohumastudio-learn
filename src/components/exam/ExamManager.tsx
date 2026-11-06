@@ -26,7 +26,7 @@ import {
   subscribeGrades,
   updateDraft,
 } from './exams';
-import { dateTimeText, durationText, examErrorText } from './format';
+import { dateTimeText, dateTimeYearText, durationText, examErrorText } from './format';
 import type { ExamTexts } from './format';
 
 const DEFAULT_MAX_QUESTIONS: string = '10';
@@ -507,6 +507,7 @@ function Exams() {
                   <th className={ui.num}>{t.colQuestions}</th>
                   <th className={ui.num}>{t.colMinutes}</th>
                   <th>{t.colStatus}</th>
+                  <th>{t.colClosesAt}</th>
                 </tr>
               </thead>
               <tbody>
@@ -519,6 +520,8 @@ function Exams() {
                     <td>
                       <ExamStatusText exam={exam} />
                     </td>
+                    {/* The planned close while it runs; the real one once it is over, since closing early moves it. */}
+                    <td className={s.date}>{dateTimeYearText(exam.closesAtMs, locale)}</td>
                   </tr>
                 ))}
               </tbody>
