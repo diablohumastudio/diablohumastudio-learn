@@ -10,10 +10,12 @@ import s from './LearnPageLayout.module.css';
 type LearnPageLayoutProps = {
   /** Page-specific header controls, placed after the brand. */
   headerCenter?: ReactNode;
+  /** The whole window width instead of the reading column: the teacher's tables and forms. */
+  wide?: boolean;
   children: ReactNode;
 };
 
-export default function LearnPageLayout({ headerCenter, children }: LearnPageLayoutProps) {
+export default function LearnPageLayout({ headerCenter, wide = false, children }: LearnPageLayoutProps) {
   const t = useT(learnDict);
 
   return (
@@ -25,7 +27,7 @@ export default function LearnPageLayout({ headerCenter, children }: LearnPageLay
         <meta name="theme-color" content="#14161a" />
       </Head>
       <LearnHeader center={headerCenter} />
-      <main className={s.main}>{children}</main>
+      <main className={wide ? s.mainWide : s.main}>{children}</main>
     </div>
   );
 }

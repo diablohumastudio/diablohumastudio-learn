@@ -20,6 +20,6 @@ const StudentsPracticeInfoPage: NextPageWithLayout = () => {
   );
 };
 
-StudentsPracticeInfoPage.getLayout = (page: ReactElement) => <LearnPageLayout>{page}</LearnPageLayout>;
+StudentsPracticeInfoPage.getLayout = (page: ReactElement) => <LearnPageLayout wide>{page}</LearnPageLayout>;
 
 export default StudentsPracticeInfoPage;

@@ -20,6 +20,6 @@ const TeacherExamPage: NextPageWithLayout = () => {
   );
 };
 
-TeacherExamPage.getLayout = (page: ReactElement) => <LearnPageLayout>{page}</LearnPageLayout>;
+TeacherExamPage.getLayout = (page: ReactElement) => <LearnPageLayout wide>{page}</LearnPageLayout>;
 
 export default TeacherExamPage;

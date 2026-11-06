@@ -20,6 +20,6 @@ const QuestionsPage: NextPageWithLayout = () => {
   );
 };
 
-QuestionsPage.getLayout = (page: ReactElement) => <LearnPageLayout>{page}</LearnPageLayout>;
+QuestionsPage.getLayout = (page: ReactElement) => <LearnPageLayout wide>{page}</LearnPageLayout>;
 
 export default QuestionsPage;
