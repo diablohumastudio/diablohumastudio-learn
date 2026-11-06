@@ -125,9 +125,11 @@
 
 .email {
   composes: mono from '../learn/ui.module.css';
-  display: block;
+  margin-left: 8px;
+  font-size: 10px;
   text-transform: none;
   letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 .score {
