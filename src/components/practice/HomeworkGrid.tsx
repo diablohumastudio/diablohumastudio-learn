@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import {
   DAILY_QUESTIONS_GOAL,
   DAY_SCORE_FULL,
@@ -36,6 +37,8 @@ type HomeworkGridProps = {
   days: string[];
   /** The daily homework of a course, or a specific homework with a column per round. */
   scope: ProgressScope;
+  /** Shown in the heading row, after the eyebrow: the period selector of this section. */
+  controls?: ReactNode;
 };
 
 function cellClassName(cell: GridCell): string {
@@ -45,7 +48,7 @@ function cellClassName(cell: GridCell): string {
 }
 
 /** Homework of every student: a column per day (and round), a cell with answered · best run. */
-export default function HomeworkGrid({ students, daysByStudent, days, scope }: HomeworkGridProps) {
+export default function HomeworkGrid({ students, daysByStudent, days, scope, controls }: HomeworkGridProps) {
   const t = useT(practiceDict);
   const locale = useLocale();
   const rounds = scope.kind === 'homework' ? scope.homework.rounds : [];
@@ -80,7 +83,10 @@ export default function HomeworkGrid({ students, daysByStudent, days, scope }: H
 
   return (
     <section className={s.wrap}>
-      <span className={ui.eyebrow}>{t.dayByDay}</span>
+      <div className={s.header}>
+        <span className={ui.eyebrow}>{t.dayByDay}</span>
+        {controls}
+      </div>
       <div className={s.card}>
         {daysByStudent === null ? (
           <p className={s.empty}>{t.loading}</p>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { DAILY_QUESTIONS_GOAL, RUN_CORRECT_GOAL, RUN_LENGTH, summarizePeriod } from '../../data/practice';
 import type { PeriodSummary as PeriodNumbers, ProgressScope } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
@@ -39,6 +40,8 @@ type PeriodSummaryProps = {
   fileName: string;
   /** Makes each name a button that opens the student's detail. */
   onSelectStudent?: (student: StudentStats) => void;
+  /** Shown in the heading row, after the eyebrow: the period selector of this section. */
+  controls?: ReactNode;
 };
 
 function studentName(student: StudentStats): string {
@@ -59,6 +62,7 @@ export default function PeriodSummary({
   selectionKey,
   fileName,
   onSelectStudent,
+  controls,
 }: PeriodSummaryProps) {
   const t = useT(practiceDict);
   const locale = useLocale();
@@ -125,7 +129,10 @@ export default function PeriodSummary({
 
   return (
     <section className={s.wrap}>
-      <span className={ui.eyebrow}>{t.periodSummary}</span>
+      <div className={s.header}>
+        <span className={ui.eyebrow}>{t.periodSummary}</span>
+        {controls}
+      </div>
       <div className={s.actions}>
         <button type="button" className={s.button} disabled={!canExport} onClick={copy}>
           {t.copyTable}

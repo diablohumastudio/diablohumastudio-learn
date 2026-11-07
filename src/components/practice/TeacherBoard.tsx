@@ -9,7 +9,7 @@ import { isFirebaseConfigured } from '../../lib/firebase';
 import SignInRedirect from '../learn/SignInRedirect';
 import { percentText } from './format';
 import HomeworkGrid from './HomeworkGrid';
-import PeriodControls, { periodRange } from './PeriodControls';
+import { CourseSelect, PeriodSelect, periodRange } from './PeriodControls';
 import type { Period } from './PeriodControls';
 import PeriodSummary from './PeriodSummary';
 import { byDisplayName, fetchAllStudents, fetchStudentQuestions, isPermissionDenied } from './progress';
@@ -117,40 +117,44 @@ type CoursePeriodProps = {
   onSelectStudent: (student: StudentStats) => void;
 };
 
-/** The homework of a course over a period: its controls, the summary and the day grid. */
+/** The daily homework of a course: the summary and the day grid, each over a period of its own. */
 function CoursePeriod({ students, onSelectStudent }: CoursePeriodProps) {
   const today = dayKey(new Date());
+  const currentMonth: Period = { kind: 'month', month: monthKeyOf(today) };
   const [courseSlug, setCourseSlug] = useState(LEARN_COURSES[0].slug);
-  const [period, setPeriod] = useState<Period>({ kind: 'month', month: monthKeyOf(today) });
+  const [summaryPeriod, setSummaryPeriod] = useState<Period>(currentMonth);
+  const [gridPeriod, setGridPeriod] = useState<Period>(currentMonth);
   const daysByStudent = useStudentDays(students);
   const firstDayEver = earliestDayKey(daysByStudent) ?? today;
-  const range = periodRange(period, firstDayEver, today);
-  const days = dayKeysBetween(range.firstDay, range.lastDay);
+  const summaryRange = periodRange(summaryPeriod, firstDayEver, today);
+  const gridRange = periodRange(gridPeriod, firstDayEver, today);
   const months = monthKeysBetween(monthKeyOf(firstDayEver), monthKeyOf(today));
   const studentsByName = [...students].sort(byDisplayName);
   const scope: ProgressScope = { kind: 'daily', courseSlug };
 
   return (
     <>
-      <PeriodControls
-        courseSlug={courseSlug}
-        period={period}
-        range={range}
-        months={months}
-        onCourseChange={setCourseSlug}
-        onPeriodChange={setPeriod}
-      />
+      <CourseSelect courseSlug={courseSlug} onChange={setCourseSlug} />
       <PeriodSummary
         key={courseSlug}
         students={studentsByName}
         daysByStudent={daysByStudent}
-        days={days}
+        days={dayKeysBetween(summaryRange.firstDay, summaryRange.lastDay)}
         scope={scope}
         selectionKey={courseSlug}
-        fileName={`practica_${courseSlug}_${range.firstDay}_${range.lastDay}`}
+        fileName={`practica_${courseSlug}_${summaryRange.firstDay}_${summaryRange.lastDay}`}
         onSelectStudent={onSelectStudent}
+        controls={
+          <PeriodSelect period={summaryPeriod} range={summaryRange} months={months} onChange={setSummaryPeriod} />
+        }
       />
-      <HomeworkGrid students={studentsByName} daysByStudent={daysByStudent} days={days} scope={scope} />
+      <HomeworkGrid
+        students={studentsByName}
+        daysByStudent={daysByStudent}
+        days={dayKeysBetween(gridRange.firstDay, gridRange.lastDay)}
+        scope={scope}
+        controls={<PeriodSelect period={gridPeriod} range={gridRange} months={months} onChange={setGridPeriod} />}
+      />
     </>
   );
 }

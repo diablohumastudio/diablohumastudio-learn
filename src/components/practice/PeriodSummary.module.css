@@ -4,6 +4,16 @@
   gap: 14px;
 }
 
+/* The eyebrow and the section's own controls, on one row that scrolls rather than wraps. */
+.header {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: nowrap;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
 .actions {
   display: flex;
   align-items: center;
