@@ -6,6 +6,17 @@ export function percentText(correct: number, answered: number): string {
   return `${Math.round((correct / answered) * 100)}%`;
 }
 
+const FIRST_SURNAME_INDEX: number = 2;
+
+/** 'Brenda Celeste Salazar Daza' → 'Brenda Salazar': the first word and the third, where the
+    first surname sits after two given names; with three words the third is a surname either
+    way; with two, both; with one, that one. */
+export function shortName(fullName: string): string {
+  const words = fullName.trim().split(/\s+/).filter(Boolean);
+  if (words.length <= 2) return words.join(' ');
+  return `${words[0]} ${words[FIRST_SURNAME_INDEX]}`;
+}
+
 /** '24,5' in Spanish, '24.5' in English: a sum of whole and half days. */
 export function scoreText(score: number, locale: Locale): string {
   return score.toLocaleString(locale, { maximumFractionDigits: 2 });

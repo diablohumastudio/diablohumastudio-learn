@@ -14,7 +14,7 @@ import type { DayProgress, ProgressScope } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import ui from '../learn/ui.module.css';
-import { scoreText } from './format';
+import { scoreText, shortName } from './format';
 import s from './HomeworkGrid.module.css';
 import type { StudentStats } from './progress';
 import type { DaysByStudent } from './useStudentDays';
@@ -121,8 +121,10 @@ export default function HomeworkGrid({ students, daysByStudent, days, scope }: H
               <tbody>
                 {students.map((student) => (
                   <tr key={student.uid}>
-                    <td>{student.displayName || student.email}</td>
-                    <td className={ui.num}>
+                    <td className={s.nameCell} title={student.displayName || student.email}>
+                      {shortName(student.displayName) || student.email}
+                    </td>
+                    <td className={`${ui.num} ${s.total}`}>
                       {scoreText(periodScore(student), locale)} / {days.length}
                     </td>
                     {days.map((day) =>

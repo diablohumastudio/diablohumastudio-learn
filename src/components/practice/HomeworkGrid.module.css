@@ -13,8 +13,20 @@
   composes: tableWrap from '../learn/ui.module.css';
 }
 
+/* As wide as its days need, never narrower than the card: a short month must not squeeze the
+   names into two lines, and a long period scrolls sideways. */
 .table {
   composes: table from '../learn/ui.module.css';
+  width: max-content;
+  min-width: 100%;
+}
+
+.nameCell {
+  white-space: nowrap;
+}
+
+.total {
+  white-space: nowrap;
 }
 
 .dayHead {
