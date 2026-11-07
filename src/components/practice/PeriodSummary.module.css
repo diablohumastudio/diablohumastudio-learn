@@ -122,10 +122,6 @@
   line-height: 1;
 }
 
-.group {
-  text-align: center;
-}
-
 /* Gives way only after the email is gone, and never below six characters. */
 .name {
   flex: 0 1 auto;

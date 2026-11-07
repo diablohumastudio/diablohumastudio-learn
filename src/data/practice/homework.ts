@@ -82,6 +82,8 @@ export type PeriodSummary = {
   partialDays: number;
   answered: number;
   correct: number;
+  /** The last day of the period with an answer, or null when there was none. */
+  lastDay: string | null;
 };
 
 /** Two day keys, both included. */
@@ -302,7 +304,8 @@ function scopeDayProgress(days: readonly DayProgress[], scope: ProgressScope, da
 
 /** One student over `dayKeys`: the sum of the day scores and how the days split. */
 export function summarizePeriod(days: readonly DayProgress[], scope: ProgressScope, dayKeys: readonly string[]): PeriodSummary {
-  const summary: PeriodSummary = { score: 0, fullDays: 0, partialDays: 0, answered: 0, correct: 0 };
+  const summary: PeriodSummary = { score: 0, fullDays: 0, partialDays: 0, answered: 0, correct: 0, lastDay: null };
+  // Day keys come oldest first, so the last one with an answer is the latest.
   for (const day of dayKeys) {
     const score = scopeDayScore(days, scope, day);
     summary.score += score;
@@ -311,6 +314,7 @@ export function summarizePeriod(days: readonly DayProgress[], scope: ProgressSco
     for (const progress of scopeDayProgress(days, scope, day)) {
       summary.answered += progress.answered;
       summary.correct += progress.correct;
+      if (progress.answered > 0) summary.lastDay = day;
     }
   }
   return summary;

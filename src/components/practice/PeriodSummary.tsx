@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { DAILY_QUESTIONS_GOAL, RUN_CORRECT_GOAL, RUN_LENGTH, summarizePeriod } from '../../data/practice';
+import { DAILY_QUESTIONS_GOAL, RUN_CORRECT_GOAL, RUN_LENGTH, dayText, summarizePeriod } from '../../data/practice';
 import type { PeriodSummary as PeriodNumbers, ProgressScope } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import ui from '../learn/ui.module.css';
-import { dateText, percentText, scoreText } from './format';
+import { percentText, scoreText } from './format';
 import s from './PeriodSummary.module.css';
 import type { StudentStats } from './progress';
 import { movedOrder, orderedBy, readSummarySelection, saveSummarySelection } from './summarySelection';
@@ -18,8 +18,6 @@ import type { DaysByStudent } from './useStudentDays';
 const STATUS_SHOWN_MS: number = 2500;
 const UP: number = -1;
 const DOWN: number = 1;
-const PERIOD_COLUMNS: number = 6;
-const LIFETIME_COLUMNS: number = 5;
 
 type CopyStatus = 'idle' | 'copied' | 'failed';
 
@@ -167,32 +165,19 @@ export default function PeriodSummary({
         ) : (
           <div className={s.tableWrap}>
             <table className={s.table}>
+              {/* Every column is of the period: All makes it the whole history of the course. */}
               <thead>
                 <tr>
-                  <th rowSpan={2} className={s.check} />
-                  <th rowSpan={2} className={s.move} />
-                  <th rowSpan={2} className={s.studentCell}>
-                    {t.colStudent}
-                  </th>
-                  <th colSpan={PERIOD_COLUMNS} className={s.group}>
-                    {t.groupPeriod}
-                  </th>
-                  <th colSpan={LIFETIME_COLUMNS} className={s.group}>
-                    {t.groupLifetime}
-                  </th>
-                </tr>
-                <tr>
+                  <th className={s.check} />
+                  <th className={s.move} />
+                  <th className={s.studentCell}>{t.colStudent}</th>
                   <th className={ui.num}>{scoreHeader}</th>
                   <th className={ui.num}>{t.colFullDays}</th>
                   <th className={ui.num}>{t.colPartialDays}</th>
                   <th className={ui.num}>{t.colAnswered}</th>
                   <th className={ui.num}>{t.colCorrect}</th>
                   <th className={ui.num}>{t.colAccuracy}</th>
-                  <th className={ui.num}>{t.colSessions}</th>
-                  <th className={ui.num}>{t.colAnswered}</th>
-                  <th className={ui.num}>{t.colCorrect}</th>
-                  <th className={ui.num}>{t.colAccuracy}</th>
-                  <th>{t.colLastPlayed}</th>
+                  <th>{t.colLastDay}</th>
                 </tr>
               </thead>
               <tbody>
@@ -246,11 +231,7 @@ export default function PeriodSummary({
                     <td className={ui.num}>{row.numbers.answered}</td>
                     <td className={ui.num}>{row.numbers.correct}</td>
                     <td className={ui.num}>{percentText(row.numbers.correct, row.numbers.answered)}</td>
-                    <td className={ui.num}>{row.student.sessionsPlayed}</td>
-                    <td className={ui.num}>{row.student.totalAnswered}</td>
-                    <td className={ui.num}>{row.student.totalCorrect}</td>
-                    <td className={ui.num}>{percentText(row.student.totalCorrect, row.student.totalAnswered)}</td>
-                    <td className={s.date}>{dateText(row.student.lastPlayedAt, locale, t.never)}</td>
+                    <td className={s.date}>{row.numbers.lastDay ? dayText(row.numbers.lastDay, locale) : t.never}</td>
                   </tr>
                 ))}
               </tbody>
