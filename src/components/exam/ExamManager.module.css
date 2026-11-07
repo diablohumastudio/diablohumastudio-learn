@@ -76,6 +76,41 @@
   color: var(--amber);
 }
 
+/* The exam list: nothing wraps; Exam and Scope share the spare width and are cut short with an
+   ellipsis, never below eight characters, with the full text on hover. */
+.list {
+  composes: table from '../learn/ui.module.css';
+}
+
+.list th,
+.list td {
+  white-space: nowrap;
+}
+
+.truncated {
+  max-width: 0;
+  min-width: 8ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.titleCell {
+  composes: truncated;
+  width: 60%;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.list th.titleCell {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.scopeCell {
+  composes: truncated;
+  width: 40%;
+}
+
 .row {
   cursor: pointer;
 }

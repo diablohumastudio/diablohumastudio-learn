@@ -542,11 +542,11 @@ function Exams() {
           <p className={s.empty}>{t.noExams}</p>
         ) : (
           <div className={ui.tableWrap}>
-            <table className={ui.table}>
+            <table className={s.list}>
               <thead>
                 <tr>
-                  <th>{t.colTitle}</th>
-                  <th>{t.colScope}</th>
+                  <th className={s.titleCell}>{t.colTitle}</th>
+                  <th className={s.scopeCell}>{t.colScope}</th>
                   <th className={ui.num}>{t.colQuestions}</th>
                   <th className={ui.num}>{t.colMinutes}</th>
                   <th>{t.colStatus}</th>
@@ -556,8 +556,12 @@ function Exams() {
               <tbody>
                 {exams.map((exam) => (
                   <tr key={exam.id} className={s.row} onClick={() => void router.push(teacherExamPath(exam.id))}>
-                    <td className={s.name}>{exam.title}</td>
-                    <td>{scopeTitle(exam, t)}</td>
+                    <td className={s.titleCell} title={exam.title}>
+                      {exam.title}
+                    </td>
+                    <td className={s.scopeCell} title={scopeTitle(exam, t)}>
+                      {scopeTitle(exam, t)}
+                    </td>
                     <td className={ui.num}>{exam.maxQuestions}</td>
                     <td className={ui.num}>{exam.durationMinutes}</td>
                     <td>
