@@ -321,6 +321,14 @@ export function isHomeworkOpen(homework: Homework, today: string): boolean {
   return homework.firstDay <= today && today <= homework.lastDay;
 }
 
+/** Where a homework stands today: not started, being played, or over. */
+export type HomeworkState = 'upcoming' | 'open' | 'finished';
+
+export function homeworkState(homework: Homework, today: string): HomeworkState {
+  if (isHomeworkOpen(homework, today)) return 'open';
+  return today < homework.firstDay ? 'upcoming' : 'finished';
+}
+
 /** From its first day until a few days after the last one. */
 export function isHomeworkShown(homework: Homework, today: string): boolean {
   return homework.firstDay <= today && today <= dayKeyAfter(homework.lastDay, HOMEWORK_SHOWN_AFTER_DAYS);

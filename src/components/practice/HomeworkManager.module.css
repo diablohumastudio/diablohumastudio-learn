@@ -44,6 +44,26 @@
   gap: 22px;
 }
 
+/* A homework that is over: read-only and dimmed, only Delete still works. */
+.formFinished {
+  composes: form;
+  opacity: 0.6;
+}
+
+/* The fieldset only carries `disabled`: it lays out nothing, the form's gap keeps applying. */
+.fields {
+  display: contents;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.warning {
+  font-size: 14px;
+  color: var(--amber);
+}
+
 .select {
   composes: input from '../learn/ui.module.css';
   cursor: pointer;

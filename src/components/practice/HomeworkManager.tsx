@@ -8,11 +8,11 @@ import {
   dayKeyAfter,
   dayKeysBetween,
   dayText,
+  homeworkState,
   isDayKey,
-  isHomeworkOpen,
   newRoundId,
 } from '../../data/practice';
-import type { Homework, HomeworkSettings, PracticeQuestion, ProgressScope } from '../../data/practice';
+import type { Homework, HomeworkSettings, HomeworkState, PracticeQuestion, ProgressScope } from '../../data/practice';
 import type { Locale } from '../../i18n/locales';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
@@ -106,8 +106,9 @@ function daysText(homework: Homework, locale: Locale): string {
 }
 
 function statusText(homework: Homework, today: string, t: PracticeTexts): string {
-  if (isHomeworkOpen(homework, today)) return t.homeworkOpen;
-  return today < homework.firstDay ? t.homeworkUpcoming : t.homeworkFinished;
+  const state = homeworkState(homework, today);
+  if (state === 'open') return t.homeworkOpen;
+  return state === 'upcoming' ? t.homeworkUpcoming : t.homeworkFinished;
 }
 
 /** Two rounds may ask the same question: it is counted once. */
@@ -200,10 +201,12 @@ function RoundEditor({
 
 type HomeworkFormProps = {
   homework: Homework | null;
+  /** Null for a homework not saved yet. Over: nothing can change. Open: saving asks first. */
+  state: HomeworkState | null;
   onDone: () => void;
 };
 
-function HomeworkForm({ homework, onDone }: HomeworkFormProps) {
+function HomeworkForm({ homework, state, onDone }: HomeworkFormProps) {
   const t = useT(practiceDict);
   const bank = useQuestionBank();
   const [draft, setDraft] = useState<Draft>(() => draftOf(homework));
@@ -215,6 +218,9 @@ function HomeworkForm({ homework, onDone }: HomeworkFormProps) {
   const [message, setMessage] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [confirmingSave, setConfirmingSave] = useState(false);
+  const isFinished = state === 'finished';
+  const isOpen = state === 'open';
 
   async function run(action: () => Promise<void>, leaveAfter: boolean) {
     setBusy(true);
@@ -230,19 +236,26 @@ function HomeworkForm({ homework, onDone }: HomeworkFormProps) {
     } finally {
       setBusy(false);
       setConfirmingDelete(false);
+      setConfirmingSave(false);
     }
   }
 
+  function persist(settings: HomeworkSettings) {
+    void run(() => (homework ? updateHomework(homework.id, settings) : createHomework(settings)), !homework);
+  }
+
+  /** An open homework is being played: saving it changes the rules mid-way, so it asks first. */
   function save() {
     const validation = validateDraft(draft, t);
     if (validation.ok === false) {
       setMessage(validation.message);
       return;
     }
-    void run(
-      () => (homework ? updateHomework(homework.id, validation.settings) : createHomework(validation.settings)),
-      !homework
-    );
+    if (isOpen && !confirmingSave) {
+      setConfirmingSave(true);
+      return;
+    }
+    persist(validation.settings);
   }
 
   function replaceRound(changed: RoundDraft) {
@@ -269,89 +282,94 @@ function HomeworkForm({ homework, onDone }: HomeworkFormProps) {
 
   return (
     <form
-      className={s.form}
+      className={isFinished ? s.formFinished : s.form}
       onSubmit={(event) => {
         event.preventDefault();
         save();
       }}
     >
-      <label className={ui.field}>
-        <span className={ui.label}>{t.homeworkTitleLabel}</span>
-        <input
-          className={ui.input}
-          type="text"
-          value={draft.title}
-          onChange={(event) => setDraft({ ...draft, title: event.target.value })}
-        />
-      </label>
+      {isFinished && <p className={ui.mono}>{t.homeworkFinishedNotice}</p>}
+      {isOpen && <p className={s.warning}>{t.homeworkOpenNotice}</p>}
+      {/* A disabled fieldset disables every control inside, the question picker's included. */}
+      <fieldset className={s.fields} disabled={isFinished}>
+        <label className={ui.field}>
+          <span className={ui.label}>{t.homeworkTitleLabel}</span>
+          <input
+            className={ui.input}
+            type="text"
+            value={draft.title}
+            onChange={(event) => setDraft({ ...draft, title: event.target.value })}
+          />
+        </label>
 
-      <label className={ui.field}>
-        <span className={ui.label}>{t.colCourse}</span>
-        <select
-          className={s.select}
-          value={draft.courseSlug}
-          // The questions belong to a course: another course starts every round with none ticked.
-          onChange={(event) =>
-            setDraft({
-              ...draft,
-              courseSlug: event.target.value,
-              rounds: draft.rounds.map((round) => ({ ...round, questionIds: [] })),
-            })
-          }
-        >
-          {LEARN_COURSES.map((course) => (
-            <option key={course.slug} value={course.slug}>
-              {course.title}
-            </option>
-          ))}
-        </select>
-      </label>
+        <label className={ui.field}>
+          <span className={ui.label}>{t.colCourse}</span>
+          <select
+            className={s.select}
+            value={draft.courseSlug}
+            // The questions belong to a course: another course starts every round with none ticked.
+            onChange={(event) =>
+              setDraft({
+                ...draft,
+                courseSlug: event.target.value,
+                rounds: draft.rounds.map((round) => ({ ...round, questionIds: [] })),
+              })
+            }
+          >
+            {LEARN_COURSES.map((course) => (
+              <option key={course.slug} value={course.slug}>
+                {course.title}
+              </option>
+            ))}
+          </select>
+        </label>
 
-      <div className={ui.field}>
-        <span className={ui.label}>{t.colRounds}</span>
-        <div className={s.rounds}>
-          {draft.rounds.map((round, index) => (
-            <RoundEditor
-              key={round.id}
-              number={index + 1}
-              round={round}
-              courseSlug={draft.courseSlug}
-              questions={activeQuestions(bank)}
-              isOpen={round.id === openRoundId}
-              isOnlyRound={draft.rounds.length === 1}
-              onToggle={() => setOpenRoundId(round.id === openRoundId ? null : round.id)}
-              onChange={replaceRound}
-              onDuplicate={() => duplicateRound(index)}
-              onRemove={() => removeRound(round.id)}
-            />
-          ))}
+        <div className={ui.field}>
+          <span className={ui.label}>{t.colRounds}</span>
+          <div className={s.rounds}>
+            {draft.rounds.map((round, index) => (
+              <RoundEditor
+                key={round.id}
+                number={index + 1}
+                round={round}
+                courseSlug={draft.courseSlug}
+                questions={activeQuestions(bank)}
+                isOpen={round.id === openRoundId}
+                isOnlyRound={draft.rounds.length === 1}
+                onToggle={() => setOpenRoundId(round.id === openRoundId ? null : round.id)}
+                onChange={replaceRound}
+                onDuplicate={() => duplicateRound(index)}
+                onRemove={() => removeRound(round.id)}
+              />
+            ))}
+          </div>
+          <button type="button" className={s.add} onClick={addRound}>
+            + {t.addRound}
+          </button>
         </div>
-        <button type="button" className={s.add} onClick={addRound}>
-          + {t.addRound}
-        </button>
-      </div>
 
-      <div className={s.numbers}>
-        <label className={ui.field}>
-          <span className={ui.label}>{t.homeworkFirstDay}</span>
-          <input
-            className={s.dateInput}
-            type="date"
-            value={draft.firstDay}
-            onChange={(event) => setDraft({ ...draft, firstDay: event.target.value })}
-          />
-        </label>
-        <label className={ui.field}>
-          <span className={ui.label}>{t.homeworkLastDay}</span>
-          <input
-            className={s.dateInput}
-            type="date"
-            value={draft.lastDay}
-            min={draft.firstDay}
-            onChange={(event) => setDraft({ ...draft, lastDay: event.target.value })}
-          />
-        </label>
-      </div>
+        <div className={s.numbers}>
+          <label className={ui.field}>
+            <span className={ui.label}>{t.homeworkFirstDay}</span>
+            <input
+              className={s.dateInput}
+              type="date"
+              value={draft.firstDay}
+              onChange={(event) => setDraft({ ...draft, firstDay: event.target.value })}
+            />
+          </label>
+          <label className={ui.field}>
+            <span className={ui.label}>{t.homeworkLastDay}</span>
+            <input
+              className={s.dateInput}
+              type="date"
+              value={draft.lastDay}
+              min={draft.firstDay}
+              onChange={(event) => setDraft({ ...draft, lastDay: event.target.value })}
+            />
+          </label>
+        </div>
+      </fieldset>
 
       {message && <p className={ui.error}>{message}</p>}
       {notice && <p className={ui.notice}>{notice}</p>}
@@ -364,11 +382,21 @@ function HomeworkForm({ homework, onDone }: HomeworkFormProps) {
           onConfirm={() => void run(() => deleteHomework(homework.id), true)}
           onCancel={() => setConfirmingDelete(false)}
         />
+      ) : confirmingSave ? (
+        <ConfirmPanel
+          message={t.confirmSaveOpenHomework}
+          confirmLabel={t.save}
+          busy={busy}
+          onConfirm={save}
+          onCancel={() => setConfirmingSave(false)}
+        />
       ) : (
         <div className={s.actions}>
-          <button type="submit" className={s.primary} disabled={busy}>
-            {busy ? t.saving : t.save}
-          </button>
+          {!isFinished && (
+            <button type="submit" className={s.primary} disabled={busy}>
+              {busy ? t.saving : t.save}
+            </button>
+          )}
           {homework && (
             <button type="button" className={s.ghost} onClick={() => setConfirmingDelete(true)} disabled={busy}>
               {t.deleteHomework}
@@ -469,6 +497,7 @@ function Homeworks() {
         <HomeworkForm
           key={shownHomework?.id ?? 'new'}
           homework={shownHomework ?? null}
+          state={shownHomework ? homeworkState(shownHomework, today) : null}
           onDone={() => setScreen({ kind: 'list' })}
         />
       </div>
