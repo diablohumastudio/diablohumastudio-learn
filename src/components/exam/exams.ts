@@ -161,13 +161,14 @@ export function subscribeGrades(
   );
 }
 
-export async function fetchOwnAttempt(examId: string, uid: string): Promise<ExamAttempt | null> {
+/** One student's attempt: their own, or anybody's for a teacher (the rules decide). */
+export async function fetchAttempt(examId: string, uid: string): Promise<ExamAttempt | null> {
   const snapshot = await getDoc(doc(getFirestoreDb(), EXAMS_COLLECTION, examId, ATTEMPTS_SUBCOLLECTION, uid));
   return snapshot.exists() ? toAttempt(uid, snapshot.data()) : null;
 }
 
-/** Denied by the rules until the exam clock is over. */
-export async function fetchOwnGrade(examId: string, uid: string): Promise<ExamGrade | null> {
+/** One student's grade; a student is denied it until the exam clock is over, a teacher never. */
+export async function fetchGrade(examId: string, uid: string): Promise<ExamGrade | null> {
   const snapshot = await getDoc(doc(getFirestoreDb(), EXAMS_COLLECTION, examId, GRADES_SUBCOLLECTION, uid));
   return snapshot.exists() ? toGrade(uid, snapshot.data()) : null;
 }

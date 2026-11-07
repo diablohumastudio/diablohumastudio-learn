@@ -1,0 +1,119 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* The name on the left and the student switch on the right; on a phone, one under the other. */
+.heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+}
+
+.titles {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.control {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 100%;
+}
+
+.select {
+  composes: input from '../learn/ui.module.css';
+  font-size: calc(14px + var(--text-delta, 0px));
+  padding: 8px 10px;
+  cursor: pointer;
+  max-width: 100%;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.divider {
+  composes: sectionDivider from '../learn/ui.module.css';
+}
+
+.card {
+  composes: card from '../learn/ui.module.css';
+  padding: 8px 0;
+}
+
+.tableWrap {
+  composes: tableWrap from '../learn/ui.module.css';
+}
+
+.table {
+  composes: table from '../learn/ui.module.css';
+}
+
+.table th,
+.table td {
+  white-space: nowrap;
+}
+
+/* A homework row opens that homework's days under the table; the open one stays marked. */
+.row {
+  cursor: pointer;
+}
+
+.row:hover td,
+.rowOpen td {
+  background: var(--panel-2);
+}
+
+.rowOpen {
+  composes: row;
+}
+
+.name {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.link {
+  composes: name;
+  text-decoration: none;
+}
+
+.link:hover {
+  color: var(--amber);
+}
+
+.score {
+  font-weight: 600;
+  color: var(--teal);
+}
+
+.late {
+  color: var(--red);
+}
+
+.button {
+  composes: btn from '../learn/ui.module.css';
+  align-self: flex-start;
+  padding: 8px 12px;
+  font-size: calc(13px + var(--text-delta, 0px));
+}
+
+.listEmail {
+  composes: mono from '../learn/ui.module.css';
+  letter-spacing: 0.02em;
+}
+
+.empty {
+  composes: mono from '../learn/ui.module.css';
+  padding: 16px 24px;
+}

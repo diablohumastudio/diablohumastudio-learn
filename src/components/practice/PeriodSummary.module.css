@@ -136,22 +136,16 @@
   font-weight: 600;
 }
 
-.nameButton {
+.nameLink {
   composes: name;
-  font: inherit;
-  font-weight: 600;
-  background: none;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  text-align: left;
+  text-decoration: none;
 }
 
-.nameButton:hover {
+.nameLink:hover {
   color: var(--amber);
 }
 
-.rowUnchecked .nameButton {
+.rowUnchecked .nameLink {
   color: var(--muted);
 }
 

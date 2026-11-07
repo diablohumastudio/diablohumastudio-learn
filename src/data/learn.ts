@@ -10,6 +10,8 @@ export const STUDENTS_PRACTICE_INFO_PATH: string = `${TEACHER_PATH}/students-pra
 export const QUESTIONS_EDITOR_PATH: string = `${TEACHER_PATH}/questions`;
 export const TEACHER_EXAM_PATH: string = `${TEACHER_PATH}/exam`;
 export const TEACHER_HOMEWORKS_PATH: string = `${TEACHER_PATH}/homeworks`;
+/** The list of students to review; one student's page hangs under it by uid. */
+export const TEACHER_STUDENTS_PATH: string = `${TEACHER_PATH}/student`;
 /** In place of an id under the two paths above: the form of an exam or homework not saved yet. */
 export const NEW_ITEM_SEGMENT: string = 'new';
 export const TEACHER_EXAM_NEW_PATH: string = `${TEACHER_EXAM_PATH}/${NEW_ITEM_SEGMENT}`;
@@ -214,6 +216,11 @@ export function teacherExamPath(examId: string): string {
 /** The replay of one student's attempt, by the uid the attempt is stored under. */
 export function teacherAttemptPath(examId: string, uid: string): string {
   return `${teacherExamPath(examId)}/${uid}`;
+}
+
+/** Everything of one student on one page: daily homework, specific homeworks and exams. */
+export function teacherStudentPath(uid: string): string {
+  return `${TEACHER_STUDENTS_PATH}/${uid}`;
 }
 
 export function teacherHomeworkPath(homeworkId: string): string {

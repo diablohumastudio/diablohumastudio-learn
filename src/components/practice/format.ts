@@ -1,5 +1,10 @@
 import type { Timestamp } from 'firebase/firestore';
+import { dayText, homeworkState } from '../../data/practice';
+import type { Homework } from '../../data/practice';
 import type { Locale } from '../../i18n/locales';
+import type { practiceDict } from '../../i18n/pages/practice';
+
+export type PracticeTexts = Record<keyof typeof practiceDict.en, string>;
 
 export function percentText(correct: number, answered: number): string {
   if (answered === 0) return '–';
@@ -20,6 +25,17 @@ export function shortName(fullName: string): string {
 /** '24,5' in Spanish, '24.5' in English: a sum of whole and half days. */
 export function scoreText(score: number, locale: Locale): string {
   return score.toLocaleString(locale, { maximumFractionDigits: 2 });
+}
+
+/** 'Thu, Oct 1 – Mon, Oct 5': the days of a specific homework. */
+export function homeworkDaysText(homework: Homework, locale: Locale): string {
+  return `${dayText(homework.firstDay, locale)} – ${dayText(homework.lastDay, locale)}`;
+}
+
+export function homeworkStatusText(homework: Homework, today: string, t: PracticeTexts): string {
+  const state = homeworkState(homework, today);
+  if (state === 'open') return t.homeworkOpen;
+  return state === 'upcoming' ? t.homeworkUpcoming : t.homeworkFinished;
 }
 
 export function dateText(timestamp: Timestamp | null, locale: Locale, fallback: string): string {

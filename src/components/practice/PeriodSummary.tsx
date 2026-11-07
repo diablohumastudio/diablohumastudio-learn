@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { DAILY_QUESTIONS_GOAL, RUN_CORRECT_GOAL, RUN_LENGTH, summarizePeriod } from '../../data/practice';
@@ -38,8 +39,8 @@ type PeriodSummaryProps = {
   selectionKey: string;
   /** The exported file, without extension. */
   fileName: string;
-  /** Makes each name a button that opens the student's detail. */
-  onSelectStudent?: (student: StudentStats) => void;
+  /** Makes each name a link, to the student's own page. */
+  studentHref?: (student: StudentStats) => string;
   /** Shown in the heading row, after the eyebrow: the period selector of this section. */
   controls?: ReactNode;
 };
@@ -61,7 +62,7 @@ export default function PeriodSummary({
   scope,
   selectionKey,
   fileName,
-  onSelectStudent,
+  studentHref,
   controls,
 }: PeriodSummaryProps) {
   const t = useT(practiceDict);
@@ -227,10 +228,10 @@ export default function PeriodSummary({
                     </td>
                     <td className={s.studentCell} title={studentTitle(row.student)}>
                       <span className={s.student}>
-                        {onSelectStudent ? (
-                          <button type="button" className={s.nameButton} onClick={() => onSelectStudent(row.student)}>
+                        {studentHref ? (
+                          <Link href={studentHref(row.student)} className={s.nameLink}>
                             {studentName(row.student)}
-                          </button>
+                          </Link>
                         ) : (
                           <span className={s.name}>{studentName(row.student)}</span>
                         )}

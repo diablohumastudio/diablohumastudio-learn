@@ -16,13 +16,11 @@ import {
   dayKey,
   dayKeyAfter,
   dayKeysBetween,
-  dayText,
   homeworkState,
   isDayKey,
   newRoundId,
 } from '../../data/practice';
 import type { Homework, HomeworkSettings, HomeworkState, PracticeQuestion, ProgressScope } from '../../data/practice';
-import type { Locale } from '../../i18n/locales';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
@@ -32,6 +30,8 @@ import ui from '../learn/ui.module.css';
 import { useTeacherStatus } from '../learn/useTeacherStatus';
 import HomeworkGrid from './HomeworkGrid';
 import s from './HomeworkManager.module.css';
+import { homeworkDaysText, homeworkStatusText } from './format';
+import type { PracticeTexts } from './format';
 import { createHomework, deleteHomework, subscribeAllHomeworks, updateHomework } from './homeworks';
 import PeriodSummary from './PeriodSummary';
 import { byDisplayName, fetchAllStudents } from './progress';
@@ -42,8 +42,6 @@ import { fileSlug } from './tableExport';
 import { useStudentDays } from './useStudentDays';
 
 const DEFAULT_HOMEWORK_DAYS: number = 4;
-
-type PracticeTexts = Record<keyof typeof practiceDict.en, string>;
 
 /** A round in the form: its answers per day stay text until they are validated. */
 type RoundDraft = {
@@ -108,16 +106,6 @@ function validateDraft(draft: Draft, t: PracticeTexts): DraftValidation {
     ok: true,
     settings: { title, courseSlug: draft.courseSlug, rounds, firstDay: draft.firstDay, lastDay: draft.lastDay },
   };
-}
-
-function daysText(homework: Homework, locale: Locale): string {
-  return `${dayText(homework.firstDay, locale)} – ${dayText(homework.lastDay, locale)}`;
-}
-
-function statusText(homework: Homework, today: string, t: PracticeTexts): string {
-  const state = homeworkState(homework, today);
-  if (state === 'open') return t.homeworkOpen;
-  return state === 'upcoming' ? t.homeworkUpcoming : t.homeworkFinished;
 }
 
 /** Two rounds may ask the same question: it is counted once. */
@@ -523,7 +511,7 @@ function Homeworks() {
         <div className={s.heading}>
           <span className={ui.eyebrow}>
             {shownHomework
-              ? `${daysText(shownHomework, locale)} · ${statusText(shownHomework, today, t)}`
+              ? `${homeworkDaysText(shownHomework, locale)} · ${homeworkStatusText(shownHomework, today, t)}`
               : t.homeworksTitle}
           </span>
           <h1 className={ui.title}>{shownHomework ? shownHomework.title : t.newHomework}</h1>
@@ -590,8 +578,8 @@ function Homeworks() {
               <tbody>
                 {homeworks.map((homework) => {
                   const courseTitle = findCourse(homework.courseSlug)?.title ?? homework.courseSlug;
-                  const days = daysText(homework, locale);
-                  const status = statusText(homework, today, t);
+                  const days = homeworkDaysText(homework, locale);
+                  const status = homeworkStatusText(homework, today, t);
                   return (
                     <tr
                       key={homework.id}

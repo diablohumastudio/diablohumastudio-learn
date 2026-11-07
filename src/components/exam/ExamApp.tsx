@@ -15,7 +15,7 @@ import { useAuthUser } from '../learn/useAuthUser';
 import AttemptReplay from './AttemptReplay';
 import s from './ExamApp.module.css';
 import ExamTaker from './ExamTaker';
-import { fetchOwnAttempt, fetchOwnGrade, startExam, submitExam, subscribeExam } from './exams';
+import { fetchAttempt, fetchGrade, startExam, submitExam, subscribeExam } from './exams';
 import { clearStoredExam, readStoredExam, writeStoredExam } from './examStorage';
 import { durationText, examErrorText } from './format';
 
@@ -64,7 +64,7 @@ function ExamRoom({ user, course, examId }: { user: User; course: LearnCourse; e
 
   const refreshAttempt = useCallback(async () => {
     try {
-      setAttempt(await fetchOwnAttempt(examId, uid));
+      setAttempt(await fetchAttempt(examId, uid));
     } catch (error) {
       console.error('Could not load the attempt', error);
       setAttempt(null);
@@ -138,7 +138,7 @@ function ExamRoom({ user, course, examId }: { user: User; course: LearnCourse; e
     let retryTimer: number | undefined;
     let cancelled = false;
     function load() {
-      fetchOwnGrade(examId, uid)
+      fetchGrade(examId, uid)
         .then((loaded) => {
           if (cancelled) return;
           if (loaded) setGrade(loaded);

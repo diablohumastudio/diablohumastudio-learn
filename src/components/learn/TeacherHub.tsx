@@ -5,6 +5,7 @@ import {
   STUDENTS_PRACTICE_INFO_PATH,
   TEACHER_EXAM_PATH,
   TEACHER_HOMEWORKS_PATH,
+  TEACHER_STUDENTS_PATH,
 } from '../../data/learn';
 import { learnDict } from '../../i18n/learn';
 import { useT } from '../../i18n/useT';
@@ -55,6 +56,10 @@ export default function TeacherHub() {
       <nav className={s.list}>
         <Link href={STUDENTS_PRACTICE_INFO_PATH} className={s.item}>
           {t.studentsPracticeInfo}
+          <span className={s.itemArrow}>→</span>
+        </Link>
+        <Link href={TEACHER_STUDENTS_PATH} className={s.item}>
+          {t.studentReview}
           <span className={s.itemArrow}>→</span>
         </Link>
         <Link href={QUESTIONS_EDITOR_PATH} className={s.item}>

@@ -15,13 +15,6 @@
   padding: 8px 0;
 }
 
-.back {
-  composes: btnGhost from '../learn/ui.module.css';
-  align-self: flex-start;
-  padding: 8px 12px;
-  font-size: calc(13px + var(--text-delta, 0px));
-}
-
 .empty {
   composes: mono from '../learn/ui.module.css';
   padding: 16px 24px;
