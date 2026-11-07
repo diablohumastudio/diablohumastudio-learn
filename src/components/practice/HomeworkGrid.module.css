@@ -4,6 +4,39 @@
   gap: 14px;
 }
 
+.header {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.windowControl {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.windowSelect {
+  composes: input from '../learn/ui.module.css';
+  font-size: calc(14px + var(--text-delta, 0px));
+  padding: 8px 10px;
+  color-scheme: dark;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pageButton {
+  composes: btnGhost from '../learn/ui.module.css';
+  padding: 6px 10px;
+  font-size: calc(12px + var(--text-delta, 0px));
+  line-height: 1;
+}
+
 .card {
   composes: card from '../learn/ui.module.css';
   padding: 8px 0;
@@ -21,12 +54,38 @@
   min-width: 100%;
 }
 
-.nameCell {
+/* The two left columns stay put while the days scroll. The first has a fixed width so the
+   second knows where to stick; both paint the card's background over the cells passing under. */
+.stickyColumn {
+  position: sticky;
+  z-index: 1;
+  background: var(--panel);
   white-space: nowrap;
 }
 
+.nameHead {
+  composes: stickyColumn;
+  left: 0;
+  width: 180px;
+  min-width: 180px;
+  max-width: 180px;
+  box-sizing: border-box;
+}
+
+.nameCell {
+  composes: nameHead;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.totalHead {
+  composes: stickyColumn;
+  left: 180px;
+  box-shadow: 1px 0 0 var(--line);
+}
+
 .total {
-  white-space: nowrap;
+  composes: totalHead;
 }
 
 .dayHead {
