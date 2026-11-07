@@ -10,12 +10,17 @@ export const STUDENTS_PRACTICE_INFO_PATH: string = `${TEACHER_PATH}/students-pra
 export const QUESTIONS_EDITOR_PATH: string = `${TEACHER_PATH}/questions`;
 export const TEACHER_EXAM_PATH: string = `${TEACHER_PATH}/exam`;
 export const TEACHER_HOMEWORKS_PATH: string = `${TEACHER_PATH}/homeworks`;
+/** One deliverable of the teacher's by id; there is no list here: they are listed with the
+    homeworks or the exams, by role (docs/deliverables.md). */
+export const TEACHER_DELIVERABLE_PATH: string = `${TEACHER_PATH}/deliverable`;
 /** The list of students to review; one student's page hangs under it by uid. */
 export const TEACHER_STUDENTS_PATH: string = `${TEACHER_PATH}/student`;
 /** In place of an id under the two paths above: the form of an exam or homework not saved yet. */
 export const NEW_ITEM_SEGMENT: string = 'new';
 export const TEACHER_EXAM_NEW_PATH: string = `${TEACHER_EXAM_PATH}/${NEW_ITEM_SEGMENT}`;
 export const TEACHER_HOMEWORK_NEW_PATH: string = `${TEACHER_HOMEWORKS_PATH}/${NEW_ITEM_SEGMENT}`;
+/** The query parameter that tells a new deliverable's form which role it is for. */
+export const DELIVERABLE_ROLE_PARAM: string = 'role';
 export const SIGN_IN_PATH: string = '/sign-in';
 const COURSE_PATH_PREFIX: string = '/course';
 
@@ -229,6 +234,26 @@ export function teacherHomeworkPath(homeworkId: string): string {
 
 export function examPath(course: LearnCourse, examId: string): string {
   return `${courseExamsPath(course)}/${examId}`;
+}
+
+/** The page a student hands a deliverable in on; its course is in the URL, like an exam's. */
+export function deliverablePath(course: LearnCourse, deliverableId: string): string {
+  return `${coursePath(course)}/deliverable/${deliverableId}`;
+}
+
+/** The teacher's page of one deliverable: its draft form, or the live view once it is opened. */
+export function teacherDeliverablePath(deliverableId: string): string {
+  return `${TEACHER_DELIVERABLE_PATH}/${deliverableId}`;
+}
+
+/** The form of a deliverable not saved yet, for the list (homeworks or exams) it was asked from. */
+export function teacherDeliverableNewPath(role: string): string {
+  return `${TEACHER_DELIVERABLE_PATH}/${NEW_ITEM_SEGMENT}?${DELIVERABLE_ROLE_PARAM}=${role}`;
+}
+
+/** One student's submission, by the uid it is stored under. */
+export function teacherSubmissionPath(deliverableId: string, uid: string): string {
+  return `${teacherDeliverablePath(deliverableId)}/${uid}`;
 }
 
 export function neighborClass(
