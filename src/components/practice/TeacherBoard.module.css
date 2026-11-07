@@ -15,27 +15,11 @@
   padding: 8px 0;
 }
 
-.tableWrap {
-  composes: tableWrap from '../learn/ui.module.css';
-}
-
-.table {
-  composes: table from '../learn/ui.module.css';
-}
-
 .back {
   composes: btnGhost from '../learn/ui.module.css';
   align-self: flex-start;
   padding: 8px 12px;
   font-size: calc(13px + var(--text-delta, 0px));
-}
-
-.right {
-  color: var(--teal);
-}
-
-.wrong {
-  color: var(--red);
 }
 
 .empty {

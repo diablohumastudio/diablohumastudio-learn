@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { LEARN_COURSES, TEACHER_PATH } from '../../data/learn';
-import { dayKey, dayKeysBetween, monthKeyOf, monthKeysBetween, questionTopicTitle } from '../../data/practice';
-import type { PracticeQuestion, ProgressScope } from '../../data/practice';
+import { dayKey, dayKeysBetween, monthKeyOf, monthKeysBetween } from '../../data/practice';
+import type { ProgressScope } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
-import { useLocale, useT } from '../../i18n/useT';
+import { useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
 import SignInRedirect from '../learn/SignInRedirect';
 import { percentText } from './format';
@@ -14,27 +14,15 @@ import type { Period } from './PeriodControls';
 import PeriodSummary from './PeriodSummary';
 import { byDisplayName, fetchAllStudents, fetchStudentQuestions, isPermissionDenied } from './progress';
 import type { QuestionStats, StudentStats } from './progress';
-import { useQuestionBank } from './questions';
+import QuestionStatsTable, { byAttemptsDesc } from './QuestionStatsTable';
 import s from './TeacherBoard.module.css';
 import ui from '../learn/ui.module.css';
 import { useAuthUser } from '../learn/useAuthUser';
 import { earliestDayKey, useStudentDays } from './useStudentDays';
 
-function byAttemptsDesc(a: QuestionStats, b: QuestionStats): number {
-  return b.attempts - a.attempts;
-}
-
-function questionsById(bank: ReturnType<typeof useQuestionBank>): Map<string, PracticeQuestion> {
-  if (bank.status !== 'ready') return new Map();
-  return new Map(bank.questions.map((question) => [question.id, question]));
-}
-
 function StudentDetail({ student, onBack }: { student: StudentStats; onBack: () => void }) {
   const t = useT(practiceDict);
-  const locale = useLocale();
-  const bank = useQuestionBank();
   const [questions, setQuestions] = useState<QuestionStats[] | null>(null);
-  const bankById = questionsById(bank);
 
   useEffect(() => {
     fetchStudentQuestions(student.uid)
@@ -69,45 +57,7 @@ function StudentDetail({ student, onBack }: { student: StudentStats; onBack: () 
           <span className={ui.statLabel}>{t.statAccuracy}</span>
         </div>
       </div>
-      <div className={s.card}>
-        {questions === null || bank.status === 'loading' ? (
-          <p className={s.empty}>{t.loading}</p>
-        ) : questions.length === 0 ? (
-          <p className={s.empty}>{t.noAnswersYet}</p>
-        ) : (
-          <div className={s.tableWrap}>
-            <table className={s.table}>
-              <thead>
-                <tr>
-                  <th>{t.colQuestion}</th>
-                  <th>{t.colTopic}</th>
-                  <th className={ui.num}>{t.colAttempts}</th>
-                  <th className={ui.num}>{t.colCorrect}</th>
-                  <th className={ui.num}>{t.colAccuracy}</th>
-                  <th>{t.colLastResult}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {questions.map((stats) => {
-                  const question = bankById.get(stats.questionId);
-                  return (
-                    <tr key={stats.questionId}>
-                      <td>{question ? question.prompt[locale] : `${t.unknownQuestion} (${stats.questionId})`}</td>
-                      <td>{question ? questionTopicTitle(question, locale) ?? '' : ''}</td>
-                      <td className={ui.num}>{stats.attempts}</td>
-                      <td className={ui.num}>{stats.correct}</td>
-                      <td className={ui.num}>{percentText(stats.correct, stats.attempts)}</td>
-                      <td className={stats.lastCorrect ? s.right : s.wrong}>
-                        {stats.lastCorrect ? t.resultRight : t.resultWrong}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      <QuestionStatsTable stats={questions} />
     </div>
   );
 }
