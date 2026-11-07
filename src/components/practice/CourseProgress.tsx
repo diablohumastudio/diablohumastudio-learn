@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useState } from 'react';
-import { courseExamsPath, practicePlayPath } from '../../data/learn';
+import { courseExamsPath, courseHistoryPath, practicePlayPath } from '../../data/learn';
 import type { LearnCourse } from '../../data/learn';
 import {
   DAILY_QUESTIONS_GOAL,
@@ -174,6 +174,11 @@ export default function CourseProgress({ course }: { course: LearnCourse }) {
         <Link href={courseExamsPath(course)} className={s.exams}>
           {learnT.exams}
         </Link>
+        {progress && (
+          <Link href={courseHistoryPath(course)} className={s.exams}>
+            {t.historyTitle}
+          </Link>
+        )}
       </div>
     </section>
   );

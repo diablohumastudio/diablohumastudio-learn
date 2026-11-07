@@ -44,6 +44,10 @@ const en = {
   monthLabel: 'Month',
   monthGradeHint:
     'A day is worth 1 with {count} answered and {goal} of {length} in a row, ½ with one of the two and 0 with neither. The month counts up to today.',
+  historyPageTitle: 'History and statistics – DiabloHumaStudio',
+  historyTitle: 'History and statistics',
+  monthlyTable: 'Daily homework by month',
+  byQuestion: 'By question',
   homeworkRun: 'Last 10',
   homeworkBestRun: 'Best 10',
   bestToday: 'best today',
@@ -270,6 +274,10 @@ const es: Record<keyof typeof en, string> = {
   monthLabel: 'Mes',
   monthGradeHint:
     'Un día vale 1 con {count} respondidas y {goal} de {length} seguidas, ½ con una de las dos y 0 con ninguna. El mes se cuenta hasta hoy.',
+  historyPageTitle: 'Historial y estadísticas – DiabloHumaStudio',
+  historyTitle: 'Historial y estadísticas',
+  monthlyTable: 'Deber diario por mes',
+  byQuestion: 'Por pregunta',
   homeworkRun: 'Últimas 10',
   homeworkBestRun: 'Mejores 10',
   bestToday: 'mejor de hoy',

@@ -62,6 +62,7 @@ function toCourseProgress(
     answersByClass,
     homeworks: records.homeworks,
     homeworkDays: records.days.filter((day) => day.homeworkId !== undefined),
+    questionStats: records.questionStats,
   };
 }
 

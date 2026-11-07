@@ -132,6 +132,11 @@ export function courseExamsPath(course: LearnCourse): string {
   return `${coursePath(course)}/exams`;
 }
 
+/** The signed-in student's own history in a course: grade by month, day by day and by question. */
+export function courseHistoryPath(course: LearnCourse): string {
+  return `${coursePath(course)}/history`;
+}
+
 export function classPath(course: LearnCourse, learnClass: LearnClass): string {
   return `${coursePath(course)}/class/${learnClass.slug}`;
 }

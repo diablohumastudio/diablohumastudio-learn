@@ -18,6 +18,13 @@ type CourseSelectProps = {
   onChange: (courseSlug: string) => void;
 };
 
+type MonthSelectProps = {
+  month: string;
+  /** Months offered, oldest first. */
+  months: string[];
+  onChange: (month: string) => void;
+};
+
 type PeriodSelectProps = {
   period: Period;
   /** The days the period stands for today. */
@@ -59,6 +66,27 @@ export function CourseSelect({ courseSlug, onChange }: CourseSelectProps) {
           </select>
         </label>
       </div>
+    </div>
+  );
+}
+
+/** One month, in a section's heading row: the student's own history offers no other period. */
+export function MonthSelect({ month, months, onChange }: MonthSelectProps) {
+  const t = useT(practiceDict);
+  const locale = useLocale();
+
+  return (
+    <div className={s.controls}>
+      <label className={s.control}>
+        <span className={ui.label}>{t.monthLabel}</span>
+        <select className={s.input} value={month} onChange={(event) => onChange(event.target.value)}>
+          {months.map((candidate) => (
+            <option key={candidate} value={candidate}>
+              {monthText(candidate, locale)}
+            </option>
+          ))}
+        </select>
+      </label>
     </div>
   );
 }

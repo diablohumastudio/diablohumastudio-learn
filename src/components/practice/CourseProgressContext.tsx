@@ -3,6 +3,7 @@ import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { LearnCourse } from '../../data/learn';
 import type { DayProgress, Homework } from '../../data/practice';
+import type { QuestionStats } from './progress';
 
 export type ClassAnswers = {
   /** Every answer the student gave to the questions of the class, and how many were right. */
@@ -20,6 +21,8 @@ export type CourseProgressData = {
   homeworks: Homework[];
   /** The student's days of every specific homework: each card picks its own by `homeworkId`. */
   homeworkDays: DayProgress[];
+  /** The student's attempts per question, every course included; the history page filters them. */
+  questionStats: QuestionStats[];
 };
 
 // Firebase is browser-only and heavy: the loader renders nothing and fills the context, so

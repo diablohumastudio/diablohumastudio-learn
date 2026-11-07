@@ -17,6 +17,7 @@ Teaching platform of DiabloHumaStudio, served at `learn.diablohumastudio.com`: c
 | `/course/<course>` | class menu of a course, homework cards |
 | `/course/<course>/class/<class>` | slide deck (`?s=<n>` slide, `&p=<n>` step) |
 | `/course/<course>/exams`, `/course/<course>/exams/<id>` | exam list of a course, exam room |
+| `/course/<course>/history` | the signed-in student's own history in the course: grade by month, day by day, by question |
 | `/practice/play?course=<slug>[&class=<slug>]` | timed practice |
 | `/sign-in`, `/teacher/*` | account, teacher tools |
 | `/teacher/exam`, `/teacher/exam/<id>`, `/teacher/exam/<id>/<uid>` | exam list; one exam by id (`new` for a draft not saved yet); the replay of one student's attempt |
