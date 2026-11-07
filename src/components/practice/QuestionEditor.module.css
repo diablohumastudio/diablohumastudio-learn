@@ -140,6 +140,22 @@
   width: auto;
 }
 
+/* On a phone the row breaks: the two texts above, at full width; the level and the × below. */
+@media (max-width: 560px) {
+  .answerRow {
+    flex-wrap: wrap;
+  }
+
+  .pair {
+    flex-basis: 100%;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .answerRow .level {
+    flex: 1;
+  }
+}
+
 .remove {
   composes: btnGhost from '../learn/ui.module.css';
   padding: 10px 12px;
