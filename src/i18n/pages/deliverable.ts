@@ -48,7 +48,6 @@ const en = {
 
   titleLabel: 'Title',
   courseLabel: 'Course',
-  roleLabel: 'Listed with',
   kindLabel: 'What the student hands in',
   guideUrlLabel: 'Guide: link to the PDF (optional)',
   instructionsLabel: 'Instructions shown above the form (optional)',
@@ -184,7 +183,6 @@ const es: Record<keyof typeof en, string> = {
 
   titleLabel: 'Título',
   courseLabel: 'Curso',
-  roleLabel: 'Se lista con',
   kindLabel: 'Qué entrega el estudiante',
   guideUrlLabel: 'Guía: enlace al PDF (opcional)',
   instructionsLabel: 'Instrucciones que se muestran sobre el formulario (opcional)',

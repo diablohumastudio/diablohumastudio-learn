@@ -5,7 +5,6 @@ import {
   DEFAULT_DURATION_MINUTES,
   DEFAULT_MAX_SCORE,
   DELIVERABLE_KINDS,
-  DELIVERABLE_ROLES,
   isDeliverableRole,
   isDeliverableRunning,
   isHttpUrl,
@@ -235,7 +234,8 @@ function QuestionEditor({ number, question, isOnlyQuestion, onChange, onRemove }
 
 type DraftFormProps = {
   deliverable: Deliverable | null;
-  /** For a deliverable not saved yet: the list its New button was pressed in. */
+  /** The list the deliverable belongs to: the one its New button was pressed in. It is not a
+      field of the form, so a homework never turns into an exam. */
   role: DeliverableRole;
   onDeleted: () => void;
   onCreated: (deliverableId: string) => void;
@@ -325,20 +325,6 @@ function DraftForm({ deliverable, role, onDeleted, onCreated }: DraftFormProps) 
             {LEARN_COURSES.map((course) => (
               <option key={course.slug} value={course.slug}>
                 {course.title}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className={ui.field}>
-          <span className={ui.label}>{t.roleLabel}</span>
-          <select
-            className={s.select}
-            value={draft.role}
-            onChange={(event) => setDraft({ ...draft, role: isDeliverableRole(event.target.value) ? event.target.value : 'homework' })}
-          >
-            {DELIVERABLE_ROLES.map((option) => (
-              <option key={option} value={option}>
-                {roleText(option, t)}
               </option>
             ))}
           </select>
