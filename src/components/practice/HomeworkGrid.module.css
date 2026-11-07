@@ -28,6 +28,8 @@
 .table {
   composes: table from '../learn/ui.module.css';
   width: max-content;
+  /* The pinned Student column; the Total column sticks right after it. */
+  --name-column: 180px;
 }
 
 /* The two left columns stay put while the days scroll. The first has a fixed width so the
@@ -42,9 +44,9 @@
 .nameHead {
   composes: stickyColumn;
   left: 0;
-  width: 180px;
-  min-width: 180px;
-  max-width: 180px;
+  width: var(--name-column);
+  min-width: var(--name-column);
+  max-width: var(--name-column);
   box-sizing: border-box;
 }
 
@@ -56,7 +58,7 @@
 
 .totalHead {
   composes: stickyColumn;
-  left: 180px;
+  left: var(--name-column);
   box-shadow: 1px 0 0 var(--line);
 }
 
@@ -112,4 +114,43 @@
 .empty {
   composes: mono from '../learn/ui.module.css';
   padding: 16px 24px;
+}
+
+/* On a phone the two pinned columns give up room so a few days still show beside them: a
+   narrower name, the Total heading on two lines like the day headings, tighter days and
+   smaller text. */
+@media (max-width: 560px) {
+  .table {
+    --name-column: 120px;
+  }
+
+  .table .nameHead,
+  .table .totalHead,
+  .table .dayHead,
+  .table .cell {
+    padding: 8px 6px;
+  }
+
+  .table .nameCell {
+    font-size: calc(12px + var(--text-delta, 0px));
+  }
+
+  .table .totalHead {
+    white-space: normal;
+  }
+
+  .table .total {
+    white-space: nowrap;
+    font-size: calc(12px + var(--text-delta, 0px));
+  }
+
+  .table .dayHead,
+  .table .cell {
+    width: 44px;
+    min-width: 44px;
+  }
+
+  .table .cell {
+    font-size: calc(11px + var(--text-delta, 0px));
+  }
 }
