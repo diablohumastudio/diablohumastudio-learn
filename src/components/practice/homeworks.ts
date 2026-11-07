@@ -86,8 +86,13 @@ export async function fetchHomework(homeworkId: string): Promise<Homework | null
   return snapshot.exists() ? toHomework(snapshot.id, snapshot.data()) : null;
 }
 
-export async function createHomework(settings: HomeworkSettings): Promise<void> {
-  await addDoc(collection(getFirestoreDb(), HOMEWORKS_COLLECTION), { ...settings, createdAt: serverTimestamp() });
+/** Returns the new homework's id: the teacher is taken to its own page. */
+export async function createHomework(settings: HomeworkSettings): Promise<string> {
+  const created = await addDoc(collection(getFirestoreDb(), HOMEWORKS_COLLECTION), {
+    ...settings,
+    createdAt: serverTimestamp(),
+  });
+  return created.id;
 }
 
 export async function updateHomework(homeworkId: string, settings: HomeworkSettings): Promise<void> {

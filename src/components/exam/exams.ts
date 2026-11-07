@@ -119,12 +119,14 @@ export function subscribeExam(
   );
 }
 
-export async function createDraft(settings: ExamSettings): Promise<void> {
-  await addDoc(collection(getFirestoreDb(), EXAMS_COLLECTION), {
+/** Returns the new exam's id: the teacher is taken to its own page. */
+export async function createDraft(settings: ExamSettings): Promise<string> {
+  const created = await addDoc(collection(getFirestoreDb(), EXAMS_COLLECTION), {
     ...settings,
     status: 'draft',
     createdAt: serverTimestamp(),
   });
+  return created.id;
 }
 
 export async function updateDraft(examId: string, settings: ExamSettings): Promise<void> {

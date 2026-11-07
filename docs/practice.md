@@ -8,7 +8,7 @@
 |---|---|---|
 | Question model | `src/data/practice/types.ts`, `src/data/practice/index.ts` | Types, choice drawing, id numbering, class titles and `questionsInScope()` from the Learn registry |
 | Homework model | `src/data/practice/homework.ts` | The goals (`DAILY_QUESTIONS_GOAL`, `RUN_LENGTH`, `RUN_CORRECT_GOAL`), day keys, the run and `isDayDone()`; the `Homework` type of a specific homework, its rounds (`HomeworkRound`, `isRoundDone()`, `isHomeworkDayDone()`) and `isHomeworkOpen()` |
-| Specific homeworks | `src/components/practice/homeworks.ts`, `HomeworkManager.tsx`, `CourseHomeworks.tsx` | Firestore reads/writes of `homeworks/{id}`, the teacher page at `/teacher/homeworks` and the cards on the course page |
+| Specific homeworks | `src/components/practice/homeworks.ts`, `HomeworkManager.tsx`, `CourseHomeworks.tsx` | Firestore reads/writes of `homeworks/{id}`, the teacher pages at `/teacher/homeworks` (list) and `/teacher/homeworks/<id>` (one homework; `new` for one not saved yet) and the cards on the course page |
 | Question selection | `src/data/practice/selection.ts`, `src/components/practice/QuestionPicker.tsx` | Which questions an exam draws from: a list of ids, ticked one by one or all at once after filtering by class or slide (`docs/exam.md`) |
 | Slides of a class | `src/data/learn.ts` (`slideLabels`, `classSlides`), `src/components/learn/useClassSlides.ts` | Slide ids and titles from the deck dictionaries, loaded only by the teacher tools |
 | Question bank | `src/components/practice/questions.ts` | Firestore reads/writes of `questions/{id}`, validation, `useQuestionBank()` |
@@ -22,7 +22,7 @@
 | Teacher hub | `src/components/learn/TeacherHub.tsx` | `/teacher`: links to the board and the editor, teachers only |
 | Account | `src/components/learn/useAuthUser.ts`, `useTeacherStatus.ts`, `AccountMenu.tsx`, `SignIn.tsx`, `SignInGate.tsx`, `SignInRedirect.tsx` | Shared by the whole platform (see `docs/learn-courses-and-slides.md`) |
 | Layout | `src/components/learn/LearnPageLayout.tsx` | Learn theme and fonts plus the section header |
-| Routes | `src/pages/practice/play.tsx`, `teacher/index.tsx`, `teacher/students-practice-info.tsx`, `teacher/questions.tsx`, `teacher/homeworks.tsx` | All load their app with `next/dynamic` and `ssr: false` |
+| Routes | `src/pages/practice/play.tsx`, `teacher/index.tsx`, `teacher/students-practice-info.tsx`, `teacher/questions.tsx`, `teacher/homeworks/index.tsx`, `teacher/homeworks/[homeworkId].tsx` (the same page: `HomeworkManager` reads the id, or `new`, from the route) | All load their app with `next/dynamic` and `ssr: false` |
 | Rules | `firebase/firestore.rules` | Source of truth for the Firestore security rules |
 | Texts | `src/i18n/pages/practice.ts` | UI strings in both languages |
 
@@ -51,7 +51,7 @@ Days use the student's local date, read when the practice session starts: a sess
 
 ## Specific homeworks
 
-Besides the daily homework, a teacher can set a **specific homework**: questions to practice on given days, for instance to let students recover a grade. It is created at `/teacher/homeworks` with a title, a course, a first and a last day, and one or more **rounds**. Each round has its own questions (the same picker the exams use, without the exam-only bank) and its own **answers per day** (`goal`, 50 by default).
+Besides the daily homework, a teacher can set a **specific homework**: questions to practice on given days, for instance to let students recover a grade. It is created at `/teacher/homeworks/new`, and each one then lives at `/teacher/homeworks/<id>`, with a title, a course, a first and a last day, and one or more **rounds**. Each round has its own questions (the same picker the exams use, without the exam-only bank) and its own **answers per day** (`goal`, 50 by default).
 
 - **Rounds are what keeps a long homework honest.** The best run is asked once per round. A homework of 200 answers in a single round is passed with ten careful answers and 190 random ones; five rounds of 40 ask for the run five times, which is what five separate homeworks of 40 would. In the form, **Duplicate** copies a round with its questions, **Add round** starts an empty one, and a homework keeps at least one. A homework with a single round looks to students the way every homework did before rounds existed.
 - **It is counted apart, round by round.** Playing a round (`/practice/play?course=<slug>&homework=<id>&round=<roundId>`) asks only its questions and fills that round's own day (`students/{uid}/days/hw-{id}-{roundId}_{day}`). Those answers do **not** count for the daily homework nor for another round, and normal practice does not count for the specific one, so a student who owes both does both. Lifetime counters, per-question stats and sessions are still updated: they describe the student, not a homework. Each round is a session of its own, so its run starts empty.

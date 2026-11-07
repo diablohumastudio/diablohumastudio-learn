@@ -1,6 +1,15 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { LEARN_COURSES, TEACHER_PATH, findCourse } from '../../data/learn';
+import {
+  LEARN_COURSES,
+  NEW_ITEM_SEGMENT,
+  TEACHER_HOMEWORKS_PATH,
+  TEACHER_HOMEWORK_NEW_PATH,
+  TEACHER_PATH,
+  findCourse,
+  teacherHomeworkPath,
+} from '../../data/learn';
 import {
   DEFAULT_HOMEWORK_DAILY_GOAL,
   MAX_GRID_DAYS,
@@ -203,10 +212,13 @@ type HomeworkFormProps = {
   homework: Homework | null;
   /** Null for a homework not saved yet. Over: nothing can change. Open: saving asks first. */
   state: HomeworkState | null;
-  onDone: () => void;
+  /** After the homework is deleted: back to the list. */
+  onDeleted: () => void;
+  /** After a new homework is saved: to its own page. */
+  onCreated: (homeworkId: string) => void;
 };
 
-function HomeworkForm({ homework, state, onDone }: HomeworkFormProps) {
+function HomeworkForm({ homework, state, onDeleted, onCreated }: HomeworkFormProps) {
   const t = useT(practiceDict);
   const bank = useQuestionBank();
   const [draft, setDraft] = useState<Draft>(() => draftOf(homework));
@@ -222,13 +234,14 @@ function HomeworkForm({ homework, state, onDone }: HomeworkFormProps) {
   const isFinished = state === 'finished';
   const isOpen = state === 'open';
 
-  async function run(action: () => Promise<void>, leaveAfter: boolean) {
+  /** `after` leaves this screen with the action's result; without it the screen stays and says saved. */
+  async function run<T>(action: () => Promise<T>, after: ((result: T) => void) | null) {
     setBusy(true);
     setMessage(null);
     setNotice(null);
     try {
-      await action();
-      if (leaveAfter) onDone();
+      const result = await action();
+      if (after) after(result);
       else setNotice(t.savedNotice);
     } catch (error) {
       console.error('Homework action failed', error);
@@ -241,7 +254,8 @@ function HomeworkForm({ homework, state, onDone }: HomeworkFormProps) {
   }
 
   function persist(settings: HomeworkSettings) {
-    void run(() => (homework ? updateHomework(homework.id, settings) : createHomework(settings)), !homework);
+    if (homework) void run(() => updateHomework(homework.id, settings), null);
+    else void run(() => createHomework(settings), onCreated);
   }
 
   /** An open homework is being played: saving it changes the rules mid-way, so it asks first. */
@@ -379,7 +393,7 @@ function HomeworkForm({ homework, state, onDone }: HomeworkFormProps) {
           message={t.confirmDeleteHomework}
           confirmLabel={t.deleteHomework}
           busy={busy}
-          onConfirm={() => void run(() => deleteHomework(homework.id), true)}
+          onConfirm={() => void run(() => deleteHomework(homework.id), onDeleted)}
           onCancel={() => setConfirmingDelete(false)}
         />
       ) : confirmingSave ? (
@@ -436,13 +450,20 @@ function HomeworkProgress({ students, homework }: HomeworkProgressProps) {
   );
 }
 
+/** The route decides the screen: the list, the form of a new homework, or one homework by its id. */
+function screenOf(homeworkIdParam: string | string[] | undefined): Screen {
+  if (typeof homeworkIdParam !== 'string') return { kind: 'list' };
+  return homeworkIdParam === NEW_ITEM_SEGMENT ? { kind: 'new' } : { kind: 'homework', homeworkId: homeworkIdParam };
+}
+
 function Homeworks() {
   const t = useT(practiceDict);
   const locale = useLocale();
+  const router = useRouter();
   const [homeworks, setHomeworks] = useState<Homework[] | null>(null);
   const [students, setStudents] = useState<StudentStats[] | null>(null);
   const [failed, setFailed] = useState(false);
-  const [screen, setScreen] = useState<Screen>({ kind: 'list' });
+  const screen = screenOf(router.query.homeworkId);
   const today = dayKey(new Date());
   const shownHomework =
     screen.kind === 'homework' ? homeworks?.find((homework) => homework.id === screen.homeworkId) : undefined;
@@ -469,7 +490,8 @@ function Homeworks() {
       </div>
     );
   }
-  if (!homeworks) {
+  // The route's id arrives with the router; until then nothing says which screen this is.
+  if (!router.isReady || !homeworks) {
     return (
       <div className={ui.centered}>
         <span className={ui.mono}>{t.loading}</span>
@@ -477,10 +499,25 @@ function Homeworks() {
     );
   }
 
+  function goToList(): void {
+    void router.push(TEACHER_HOMEWORKS_PATH);
+  }
+
+  if (screen.kind === 'homework' && !shownHomework) {
+    return (
+      <div className={s.wrap}>
+        <button type="button" className={s.back} onClick={goToList}>
+          ← {t.backToHomeworks}
+        </button>
+        <p className={ui.error}>{t.homeworkNotFound}</p>
+      </div>
+    );
+  }
+
   if (screen.kind === 'new' || shownHomework) {
     return (
       <div className={s.wrap}>
-        <button type="button" className={s.back} onClick={() => setScreen({ kind: 'list' })}>
+        <button type="button" className={s.back} onClick={goToList}>
           ← {t.backToHomeworks}
         </button>
         <div className={s.heading}>
@@ -495,10 +532,11 @@ function Homeworks() {
           <HomeworkProgress students={students} homework={shownHomework} />
         )}
         <HomeworkForm
-          key={shownHomework?.id ?? 'new'}
+          key={shownHomework?.id ?? NEW_ITEM_SEGMENT}
           homework={shownHomework ?? null}
           state={shownHomework ? homeworkState(shownHomework, today) : null}
-          onDone={() => setScreen({ kind: 'list' })}
+          onDeleted={goToList}
+          onCreated={(homeworkId) => void router.replace(teacherHomeworkPath(homeworkId))}
         />
       </div>
     );
@@ -514,7 +552,7 @@ function Homeworks() {
         <h1 className={ui.title}>{t.homeworksTitle}</h1>
       </div>
       <div className={s.actions}>
-        <button type="button" className={s.primary} onClick={() => setScreen({ kind: 'new' })}>
+        <button type="button" className={s.primary} onClick={() => void router.push(TEACHER_HOMEWORK_NEW_PATH)}>
           + {t.newHomework}
         </button>
       </div>
@@ -540,7 +578,7 @@ function Homeworks() {
                   <tr
                     key={homework.id}
                     className={s.row}
-                    onClick={() => setScreen({ kind: 'homework', homeworkId: homework.id })}
+                    onClick={() => void router.push(teacherHomeworkPath(homework.id))}
                   >
                     <td className={s.name}>{homework.title}</td>
                     <td>{findCourse(homework.courseSlug)?.title ?? homework.courseSlug}</td>

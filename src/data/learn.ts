@@ -10,6 +10,10 @@ export const STUDENTS_PRACTICE_INFO_PATH: string = `${TEACHER_PATH}/students-pra
 export const QUESTIONS_EDITOR_PATH: string = `${TEACHER_PATH}/questions`;
 export const TEACHER_EXAM_PATH: string = `${TEACHER_PATH}/exam`;
 export const TEACHER_HOMEWORKS_PATH: string = `${TEACHER_PATH}/homeworks`;
+/** In place of an id under the two paths above: the form of an exam or homework not saved yet. */
+export const NEW_ITEM_SEGMENT: string = 'new';
+export const TEACHER_EXAM_NEW_PATH: string = `${TEACHER_EXAM_PATH}/${NEW_ITEM_SEGMENT}`;
+export const TEACHER_HOMEWORK_NEW_PATH: string = `${TEACHER_HOMEWORKS_PATH}/${NEW_ITEM_SEGMENT}`;
 export const SIGN_IN_PATH: string = '/sign-in';
 const COURSE_PATH_PREFIX: string = '/course';
 
@@ -197,6 +201,15 @@ export function homeworkPlayPath(courseSlug: string, homeworkId: string, roundId
 }
 
 /** The page a student takes an exam on: the link the teacher shares. */
+/** The teacher's page of one exam: its draft form, or the live view once it is opened. */
+export function teacherExamPath(examId: string): string {
+  return `${TEACHER_EXAM_PATH}/${examId}`;
+}
+
+export function teacherHomeworkPath(homeworkId: string): string {
+  return `${TEACHER_HOMEWORKS_PATH}/${homeworkId}`;
+}
+
 export function examPath(course: LearnCourse, examId: string): string {
   return `${courseExamsPath(course)}/${examId}`;
 }

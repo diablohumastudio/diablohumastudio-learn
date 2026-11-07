@@ -22,6 +22,7 @@ const en = {
   backToExams: 'Exams of the course',
 
   examNotFound: 'This exam does not exist or has not been opened yet.',
+  teacherExamNotFound: 'This exam does not exist.',
   examClosed: 'This exam is closed.',
   answersNotReceived: 'This exam is closed and your answers were never received from this device.',
   startLede:
@@ -131,6 +132,7 @@ const es: Record<keyof typeof en, string> = {
   backToExams: 'Exámenes del curso',
 
   examNotFound: 'Este examen no existe o todavía no se ha abierto.',
+  teacherExamNotFound: 'Este examen no existe.',
   examClosed: 'Este examen está cerrado.',
   answersNotReceived: 'Este examen está cerrado y tus respuestas nunca llegaron desde este dispositivo.',
   startLede:

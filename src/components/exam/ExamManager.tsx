@@ -1,8 +1,18 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { isExamRunning, questionsPerStudent } from '../../data/exam/types';
 import type { Exam, ExamAttempt, ExamGrade, ExamSettings } from '../../data/exam/types';
-import { LEARN_COURSES, TEACHER_PATH, examPath, findCourse } from '../../data/learn';
+import {
+  LEARN_COURSES,
+  NEW_ITEM_SEGMENT,
+  TEACHER_EXAM_NEW_PATH,
+  TEACHER_EXAM_PATH,
+  TEACHER_PATH,
+  examPath,
+  findCourse,
+  teacherExamPath,
+} from '../../data/learn';
 import { questionsWithIds } from '../../data/practice';
 import { examDict } from '../../i18n/pages/exam';
 import { useLocale, useT } from '../../i18n/useT';
@@ -104,10 +114,13 @@ function useIsRunning(exam: Exam): boolean {
 
 type DraftFormProps = {
   exam: Exam | null;
-  onDone: () => void;
+  /** After the draft is deleted: back to the list. */
+  onDeleted: () => void;
+  /** After a new draft is saved: to its own page. */
+  onCreated: (examId: string) => void;
 };
 
-function DraftForm({ exam, onDone }: DraftFormProps) {
+function DraftForm({ exam, onDeleted, onCreated }: DraftFormProps) {
   const t = useT(examDict);
   const bank = useQuestionBank();
   const examOnlyBank = useExamOnlyBank();
@@ -121,13 +134,14 @@ function DraftForm({ exam, onDone }: DraftFormProps) {
   const pickedQuestions = questionsWithIds(pickableQuestions, draft.questionIds);
   const inScopeCount = pickedQuestions.length;
 
-  async function run(action: () => Promise<unknown>, leaveAfter: boolean) {
+  /** `after` leaves this screen with the action's result; without it the screen stays and says saved. */
+  async function run<T>(action: () => Promise<T>, after: ((result: T) => void) | null) {
     setBusy(true);
     setMessage(null);
     setNotice(null);
     try {
-      await action();
-      if (leaveAfter) onDone();
+      const result = await action();
+      if (after) after(result);
       else setNotice(t.savedNotice);
     } catch (error) {
       console.error('Exam action failed', error);
@@ -144,7 +158,8 @@ function DraftForm({ exam, onDone }: DraftFormProps) {
       setMessage(validation.message);
       return;
     }
-    void run(() => (exam ? updateDraft(exam.id, validation.settings) : createDraft(validation.settings)), !exam);
+    if (exam) void run(() => updateDraft(exam.id, validation.settings), null);
+    else void run(() => createDraft(validation.settings), onCreated);
   }
 
   /* Saves first, so the exam that opens is the one on screen. It stays on this screen: the
@@ -159,7 +174,7 @@ function DraftForm({ exam, onDone }: DraftFormProps) {
     void run(async () => {
       await updateDraft(draftExam.id, validation.settings);
       await openExam(draftExam.id);
-    }, false);
+    }, null);
   }
 
   // The draft lives in this component's state, so closing the preview returns to it as it was.
@@ -248,7 +263,7 @@ function DraftForm({ exam, onDone }: DraftFormProps) {
           message={t.confirmDelete}
           confirmLabel={t.confirmDeleteButton}
           busy={busy}
-          onConfirm={() => void run(() => deleteDraft(exam.id), true)}
+          onConfirm={() => void run(() => deleteDraft(exam.id), onDeleted)}
           onCancel={() => setConfirming(null)}
         />
       )}
@@ -429,13 +444,24 @@ function OpenedExam({ exam }: { exam: Exam }) {
   );
 }
 
+/** The route decides the screen: the list, the form of a new draft, or one exam by its id. */
+function screenOf(examIdParam: string | string[] | undefined): Screen {
+  if (typeof examIdParam !== 'string') return { kind: 'list' };
+  return examIdParam === NEW_ITEM_SEGMENT ? { kind: 'new' } : { kind: 'exam', examId: examIdParam };
+}
+
 function Exams() {
   const t = useT(examDict);
   const locale = useLocale();
+  const router = useRouter();
   const [exams, setExams] = useState<Exam[] | null>(null);
   const [failed, setFailed] = useState(false);
-  const [screen, setScreen] = useState<Screen>({ kind: 'list' });
+  const screen = screenOf(router.query.examId);
   const shownExam = screen.kind === 'exam' ? exams?.find((exam) => exam.id === screen.examId) : undefined;
+
+  function goToList(): void {
+    void router.push(TEACHER_EXAM_PATH);
+  }
 
   useEffect(
     () =>
@@ -453,7 +479,8 @@ function Exams() {
       </div>
     );
   }
-  if (!exams) {
+  // The route's id arrives with the router; until then nothing says which screen this is.
+  if (!router.isReady || !exams) {
     return (
       <div className={ui.centered}>
         <span className={ui.mono}>{t.loading}</span>
@@ -461,10 +488,21 @@ function Exams() {
     );
   }
 
+  if (screen.kind === 'exam' && !shownExam) {
+    return (
+      <div className={s.wrap}>
+        <button type="button" className={s.back} onClick={goToList}>
+          ← {t.backToExams}
+        </button>
+        <p className={ui.error}>{t.teacherExamNotFound}</p>
+      </div>
+    );
+  }
+
   if (screen.kind === 'new' || shownExam) {
     return (
       <div className={s.wrap}>
-        <button type="button" className={s.back} onClick={() => setScreen({ kind: 'list' })}>
+        <button type="button" className={s.back} onClick={goToList}>
           ← {t.backToExams}
         </button>
         <div className={s.heading}>
@@ -474,7 +512,12 @@ function Exams() {
         {shownExam && shownExam.status === 'opened' ? (
           <OpenedExam exam={shownExam} />
         ) : (
-          <DraftForm key={shownExam?.id ?? 'new'} exam={shownExam ?? null} onDone={() => setScreen({ kind: 'list' })} />
+          <DraftForm
+            key={shownExam?.id ?? NEW_ITEM_SEGMENT}
+            exam={shownExam ?? null}
+            onDeleted={goToList}
+            onCreated={(examId) => void router.replace(teacherExamPath(examId))}
+          />
         )}
       </div>
     );
@@ -490,7 +533,7 @@ function Exams() {
         <h1 className={ui.title}>{t.managerTitle}</h1>
       </div>
       <div className={s.actions}>
-        <button type="button" className={s.primary} onClick={() => setScreen({ kind: 'new' })}>
+        <button type="button" className={s.primary} onClick={() => void router.push(TEACHER_EXAM_NEW_PATH)}>
           + {t.newExam}
         </button>
       </div>
@@ -512,7 +555,7 @@ function Exams() {
               </thead>
               <tbody>
                 {exams.map((exam) => (
-                  <tr key={exam.id} className={s.row} onClick={() => setScreen({ kind: 'exam', examId: exam.id })}>
+                  <tr key={exam.id} className={s.row} onClick={() => void router.push(teacherExamPath(exam.id))}>
                     <td className={s.name}>{exam.title}</td>
                     <td>{scopeTitle(exam, t)}</td>
                     <td className={ui.num}>{exam.maxQuestions}</td>
