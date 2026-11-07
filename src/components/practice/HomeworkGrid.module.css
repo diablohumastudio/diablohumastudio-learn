@@ -4,39 +4,6 @@
   gap: 14px;
 }
 
-.header {
-  display: flex;
-  align-items: flex-end;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.windowControl {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.windowSelect {
-  composes: input from '../learn/ui.module.css';
-  font-size: calc(14px + var(--text-delta, 0px));
-  padding: 8px 10px;
-  color-scheme: dark;
-}
-
-.pager {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.pageButton {
-  composes: btnGhost from '../learn/ui.module.css';
-  padding: 6px 10px;
-  font-size: calc(12px + var(--text-delta, 0px));
-  line-height: 1;
-}
-
 .card {
   composes: card from '../learn/ui.module.css';
   padding: 8px 0;
@@ -46,12 +13,11 @@
   composes: tableWrap from '../learn/ui.module.css';
 }
 
-/* As wide as its days need, never narrower than the card: a short month must not squeeze the
-   names into two lines, and a long period scrolls sideways. */
+/* As wide as its days need and no wider: every day column has the same width, a short period
+   leaves the card half empty and a long one scrolls sideways under the pinned columns. */
 .table {
   composes: table from '../learn/ui.module.css';
   width: max-content;
-  min-width: 100%;
 }
 
 /* The two left columns stay put while the days scroll. The first has a fixed width so the
@@ -90,6 +56,9 @@
 
 .dayHead {
   text-align: center;
+  width: 56px;
+  min-width: 56px;
+  box-sizing: border-box;
 }
 
 .dayNumber {
@@ -99,6 +68,9 @@
 
 .cell {
   text-align: center;
+  width: 56px;
+  min-width: 56px;
+  box-sizing: border-box;
   white-space: nowrap;
   font-family: var(--font-mono, Menlo, Consolas, monospace);
   font-size: calc(12px + var(--text-delta, 0px));
