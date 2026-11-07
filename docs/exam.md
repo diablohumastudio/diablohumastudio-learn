@@ -1,6 +1,6 @@
 # Exams: Timed Tests, Server Grading and Setup
 
-`/course/<course>/exams/<id>` is where students take a real, timed test and `/course/<course>/exams` lists the opened exams of a course; `/teacher/exam` lists them for the teacher and `/teacher/exam/<id>` is where one is created (`/teacher/exam/new`), opened and reviewed. Like the rest of the platform it is unlisted. **An exam always belongs to one course** (the whole course or one class of it), like practice: the list is reached from the Exams button of the course page's homework card, there is no global list (`/exam` redirects to `/courses`), and the exam room's back links go to the exam's course. It reuses the practice question bank (`docs/practice.md`), but unlike practice **the browser is never trusted**: opening, drawing questions, receiving answers and grading all run on the server (Next API routes on Vercel using the Firebase admin SDK).
+`/course/<course>/exams/<id>` is where students take a real, timed test and `/course/<course>/exams` lists the opened exams of a course; `/teacher/exam` lists them for the teacher, `/teacher/exam/<id>` is where one is created (`/teacher/exam/new`), opened and reviewed, and `/teacher/exam/<id>/<uid>` replays one student's attempt. Like the rest of the platform it is unlisted. **An exam always belongs to one course** (the whole course or one class of it), like practice: the list is reached from the Exams button of the course page's homework card, there is no global list (`/exam` redirects to `/courses`), and the exam room's back links go to the exam's course. It reuses the practice question bank (`docs/practice.md`), but unlike practice **the browser is never trusted**: opening, drawing questions, receiving answers and grading all run on the server (Next API routes on Vercel using the Firebase admin SDK).
 
 ## What the teacher and the student see
 
@@ -26,7 +26,7 @@
 | Student | `src/components/exam/ExamList.tsx`, `ExamApp.tsx`, `ExamTaker.tsx` | List, exam room (start, resume, submit and retry, result), the one-page taker |
 | Teacher | `src/components/exam/ExamManager.tsx` | Drafts, open, close early, live attempts, replay |
 | Shared | `AttemptReplay.tsx`, `ConfirmPanel.tsx`, `format.ts` | Replay of an attempt, inline confirmation, countdown and error texts |
-| Routes | `src/pages/course/[curso]/exams/index.tsx`, `course/[curso]/exams/[examId].tsx`, `teacher/exam/index.tsx`, `teacher/exam/[examId].tsx` (the same page: `ExamManager` reads the id, or `new`, from the route) | `next/dynamic` + `ssr: false` like practice; the exam room shows "not found" when the exam does not belong to the course in the URL |
+| Routes | `src/pages/course/[curso]/exams/index.tsx`, `course/[curso]/exams/[examId].tsx`, `teacher/exam/index.tsx`, `teacher/exam/[examId]/index.tsx`, `teacher/exam/[examId]/[uid].tsx` (the same page: `ExamManager` reads the exam id, or `new`, and the attempt's uid from the route) | `next/dynamic` + `ssr: false` like practice; the exam room shows "not found" when the exam does not belong to the course in the URL |
 | Rules | `firebase/firestore.rules` | What browsers may read; they write drafts only |
 | Texts | `src/i18n/pages/exam.ts` | UI strings in both languages |
 

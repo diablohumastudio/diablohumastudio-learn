@@ -23,6 +23,7 @@ const en = {
 
   examNotFound: 'This exam does not exist or has not been opened yet.',
   teacherExamNotFound: 'This exam does not exist.',
+  attemptNotFound: 'This student has no attempt in this exam.',
   examClosed: 'This exam is closed.',
   answersNotReceived: 'This exam is closed and your answers were never received from this device.',
   startLede:
@@ -133,6 +134,7 @@ const es: Record<keyof typeof en, string> = {
 
   examNotFound: 'Este examen no existe o todavía no se ha abierto.',
   teacherExamNotFound: 'Este examen no existe.',
+  attemptNotFound: 'Este estudiante no tiene ningún intento en este examen.',
   examClosed: 'Este examen está cerrado.',
   answersNotReceived: 'Este examen está cerrado y tus respuestas nunca llegaron desde este dispositivo.',
   startLede:

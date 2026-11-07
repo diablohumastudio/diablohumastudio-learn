@@ -19,7 +19,7 @@ Teaching platform of DiabloHumaStudio, served at `learn.diablohumastudio.com`: c
 | `/course/<course>/exams`, `/course/<course>/exams/<id>` | exam list of a course, exam room |
 | `/practice/play?course=<slug>[&class=<slug>]` | timed practice |
 | `/sign-in`, `/teacher/*` | account, teacher tools |
-| `/teacher/exam`, `/teacher/exam/<id>` | exam list; one exam by id (`new` for a draft not saved yet) |
+| `/teacher/exam`, `/teacher/exam/<id>`, `/teacher/exam/<id>/<uid>` | exam list; one exam by id (`new` for a draft not saved yet); the replay of one student's attempt |
 | `/teacher/homeworks`, `/teacher/homeworks/<id>` | homework list; one homework by id (`new` for one not saved yet) |
 
 Every route is built from the constants and helpers in `src/data/learn.ts` (`COURSES_PATH`, `coursePath`, `classPath`, `examPath`…). Never write a route literal in a component.

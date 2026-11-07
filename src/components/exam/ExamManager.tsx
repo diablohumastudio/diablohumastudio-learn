@@ -11,6 +11,7 @@ import {
   TEACHER_PATH,
   examPath,
   findCourse,
+  teacherAttemptPath,
   teacherExamPath,
 } from '../../data/learn';
 import { questionsWithIds } from '../../data/practice';
@@ -297,14 +298,22 @@ function DraftForm({ exam, onDeleted, onCreated }: DraftFormProps) {
   );
 }
 
-function OpenedExam({ exam }: { exam: Exam }) {
+type OpenedExamProps = {
+  exam: Exam;
+  /** The student whose attempt the route asks to replay, or null for the attempts table. */
+  replayUid: string | null;
+  onOpenReplay: (uid: string) => void;
+  onCloseReplay: () => void;
+};
+
+function OpenedExam({ exam, replayUid, onOpenReplay, onCloseReplay }: OpenedExamProps) {
   const t = useT(examDict);
   const locale = useLocale();
   const course = findCourse(exam.courseSlug ?? undefined);
   const running = useIsRunning(exam);
   const [attempts, setAttempts] = useState<ExamAttempt[]>([]);
+  const [attemptsLoaded, setAttemptsLoaded] = useState(false);
   const [grades, setGrades] = useState<ExamGrade[]>([]);
-  const [replayUid, setReplayUid] = useState<string | null>(null);
   const [confirmingClose, setConfirmingClose] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -312,7 +321,14 @@ function OpenedExam({ exam }: { exam: Exam }) {
   const replayGrade = grades.find((grade) => grade.uid === replayUid);
 
   useEffect(() => {
-    const stopAttempts = subscribeAttempts(exam.id, setAttempts, (error) => console.error('Could not load the attempts', error));
+    const stopAttempts = subscribeAttempts(
+      exam.id,
+      (loaded) => {
+        setAttempts(loaded);
+        setAttemptsLoaded(true);
+      },
+      (error) => console.error('Could not load the attempts', error)
+    );
     const stopGrades = subscribeGrades(exam.id, setGrades, (error) => console.error('Could not load the grades', error));
     return () => {
       stopAttempts();
@@ -334,10 +350,22 @@ function OpenedExam({ exam }: { exam: Exam }) {
     }
   }
 
+  // A uid in the route that no attempt matches: the student never started, or the id is wrong.
+  if (replayUid && attemptsLoaded && !replayAttempt) {
+    return (
+      <>
+        <button type="button" className={s.back} onClick={onCloseReplay}>
+          ← {t.backToAttempts}
+        </button>
+        <p className={ui.error}>{t.attemptNotFound}</p>
+      </>
+    );
+  }
+
   if (replayAttempt) {
     return (
       <>
-        <button type="button" className={s.back} onClick={() => setReplayUid(null)}>
+        <button type="button" className={s.back} onClick={onCloseReplay}>
           ← {t.backToAttempts}
         </button>
         <div className={s.summary}>
@@ -422,7 +450,7 @@ function OpenedExam({ exam }: { exam: Exam }) {
                 {attempts.map((attempt) => {
                   const grade = grades.find((candidate) => candidate.uid === attempt.uid);
                   return (
-                    <tr key={attempt.uid} className={s.row} onClick={() => setReplayUid(attempt.uid)}>
+                    <tr key={attempt.uid} className={s.row} onClick={() => onOpenReplay(attempt.uid)}>
                       <td>
                         <span className={s.name}>{attempt.displayName || attempt.email}</span>
                         <span className={s.email}>{attempt.email}</span>
@@ -458,6 +486,7 @@ function Exams() {
   const [failed, setFailed] = useState(false);
   const screen = screenOf(router.query.examId);
   const shownExam = screen.kind === 'exam' ? exams?.find((exam) => exam.id === screen.examId) : undefined;
+  const replayUid = typeof router.query.uid === 'string' ? router.query.uid : null;
 
   function goToList(): void {
     void router.push(TEACHER_EXAM_PATH);
@@ -510,7 +539,12 @@ function Exams() {
           <h1 className={ui.title}>{shownExam ? shownExam.title : t.newExam}</h1>
         </div>
         {shownExam && shownExam.status === 'opened' ? (
-          <OpenedExam exam={shownExam} />
+          <OpenedExam
+            exam={shownExam}
+            replayUid={replayUid}
+            onOpenReplay={(uid) => void router.push(teacherAttemptPath(shownExam.id, uid))}
+            onCloseReplay={() => void router.push(teacherExamPath(shownExam.id))}
+          />
         ) : (
           <DraftForm
             key={shownExam?.id ?? NEW_ITEM_SEGMENT}

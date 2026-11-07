@@ -206,6 +206,11 @@ export function teacherExamPath(examId: string): string {
   return `${TEACHER_EXAM_PATH}/${examId}`;
 }
 
+/** The replay of one student's attempt, by the uid the attempt is stored under. */
+export function teacherAttemptPath(examId: string, uid: string): string {
+  return `${teacherExamPath(examId)}/${uid}`;
+}
+
 export function teacherHomeworkPath(homeworkId: string): string {
   return `${TEACHER_HOMEWORKS_PATH}/${homeworkId}`;
 }
