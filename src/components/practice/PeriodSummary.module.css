@@ -4,14 +4,16 @@
   gap: 14px;
 }
 
-/* The eyebrow and the section's own controls, on one row that scrolls rather than wraps. */
+.divider {
+  composes: sectionDivider from '../learn/ui.module.css';
+}
+
+/* The eyebrow above the section's own controls. */
 .header {
   display: flex;
-  align-items: flex-end;
-  flex-wrap: nowrap;
-  gap: 16px;
-  overflow-x: auto;
-  padding-bottom: 2px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
 }
 
 .actions {

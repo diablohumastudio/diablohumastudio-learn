@@ -225,6 +225,13 @@
   }
 }
 
+/* A thin line that opens a section of a page, 20px short of the edges on both sides. */
+.sectionDivider {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 0 20px;
+}
+
 .centered {
   display: flex;
   flex-direction: column;

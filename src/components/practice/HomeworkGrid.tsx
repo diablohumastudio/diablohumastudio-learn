@@ -83,6 +83,7 @@ export default function HomeworkGrid({ students, daysByStudent, days, scope, con
 
   return (
     <section className={s.wrap}>
+      <hr className={s.divider} />
       <div className={s.header}>
         <span className={ui.eyebrow}>{t.dayByDay}</span>
         {controls}

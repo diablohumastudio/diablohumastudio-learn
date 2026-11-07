@@ -129,6 +129,7 @@ export default function PeriodSummary({
 
   return (
     <section className={s.wrap}>
+      <hr className={s.divider} />
       <div className={s.header}>
         <span className={ui.eyebrow}>{t.periodSummary}</span>
         {controls}
