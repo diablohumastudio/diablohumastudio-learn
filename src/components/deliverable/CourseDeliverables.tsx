@@ -10,7 +10,7 @@ import { isFirebaseConfigured } from '../../lib/firebase';
 import { dateTimeText, durationText } from '../exam/format';
 import { useAuthUser } from '../learn/useAuthUser';
 import s from './CourseDeliverables.module.css';
-import { fetchReview, fetchSubmission, subscribeOpenedDeliverables } from './deliverables';
+import { fetchReview, fetchSubmission, subscribeStudentDeliverables } from './deliverables';
 import { roleText } from './format';
 import { useNowMs } from './useNowMs';
 
@@ -91,17 +91,17 @@ function SignedInDeliverables({ course, uid }: { course: LearnCourse; uid: strin
 
   useEffect(
     () =>
-      subscribeOpenedDeliverables(setDeliverables, (error) =>
+      subscribeStudentDeliverables(course.slug, uid, setDeliverables, (error) =>
         // The rules refuse `deliverables` until firebase/firestore.rules is republished: no cards, nothing else.
         console.warn('Could not load the deliverables', error)
       ),
-    []
+    [course.slug, uid]
   );
 
   return (
     <>
       {deliverables
-        .filter((deliverable) => deliverable.courseSlug === course.slug && isDeliverableShown(deliverable, nowMs))
+        .filter((deliverable) => isDeliverableShown(deliverable, nowMs))
         .map((deliverable) => (
           <DeliverableCard key={deliverable.id} course={course} deliverable={deliverable} uid={uid} nowMs={nowMs} />
         ))}

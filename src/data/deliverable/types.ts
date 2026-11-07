@@ -70,11 +70,15 @@ export type DeliverableSettings = {
   durationMinutes: number;
   /** Homework role: the close Open will fix, chosen in the form; null until chosen. */
   deadlineMs: number | null;
+  /** The accounts it is for; empty for everybody enrolled in the course. */
+  assignedUids: string[];
 };
 
 export type Deliverable = DeliverableSettings & {
   id: string;
   status: DeliverableStatus;
+  /** Stored beside `assignedUids` so a student's query can ask for it by equality. */
+  forEveryone: boolean;
   createdAtMs: number | null;
   openedAtMs: number | null;
   /** Fixed when the teacher opens the deliverable; Close now moves it to that moment. */
@@ -208,6 +212,11 @@ export function isValidSubmissionUrl(kind: DeliverableKind, value: string): bool
   if (kind === 'repo') return isRepoUrl(value);
   if (kind === 'docLink') return isHttpUrl(value);
   return value === '';
+}
+
+/** Whether a deliverable is for this account: for everybody, or listed. */
+export function isDeliverableFor(deliverable: Deliverable, uid: string): boolean {
+  return deliverable.forEveryone || deliverable.assignedUids.includes(uid);
 }
 
 export function hasContent(submission: Submission): boolean {

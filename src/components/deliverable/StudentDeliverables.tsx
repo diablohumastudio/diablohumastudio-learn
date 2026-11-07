@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { isSavedLate, lateBySeconds } from '../../data/deliverable/types';
+import { isDeliverableFor, isSavedLate, lateBySeconds } from '../../data/deliverable/types';
 import type { Deliverable, DeliverableRole, Review, Submission } from '../../data/deliverable/types';
 import { deliverablePath, findCourse, teacherDeliverablePath, teacherSubmissionPath } from '../../data/learn';
 import type { LearnCourse } from '../../data/learn';
@@ -9,7 +9,7 @@ import { useLocale, useT } from '../../i18n/useT';
 import { dateTimeYearText, durationText } from '../exam/format';
 import ui from '../learn/ui.module.css';
 import s from './StudentDeliverables.module.css';
-import { fetchReview, fetchSubmission, subscribeAllDeliverables, subscribeOpenedDeliverables } from './deliverables';
+import { fetchReview, fetchSubmission, subscribeAllDeliverables, subscribeStudentDeliverables } from './deliverables';
 
 /** What one student did in one deliverable: nothing saved, a submission, and its review once it exists. */
 type DeliverableResult = {
@@ -38,18 +38,23 @@ export default function StudentDeliverables({ uid, role, course, viewer }: Stude
         (deliverable) =>
           deliverable.status === 'opened' &&
           deliverable.role === role &&
+          isDeliverableFor(deliverable, uid) &&
           (course === undefined || deliverable.courseSlug === course.slug)
       ),
-    [deliverables, role, course]
+    [deliverables, role, course, uid]
   );
 
   useEffect(() => {
     const onError = (error: unknown) => console.error('Could not load the deliverables', error);
-    // A student may only list the opened ones; a teacher's list includes drafts, which hold nothing.
-    return viewer === 'teacher'
-      ? subscribeAllDeliverables(setDeliverables, onError)
-      : subscribeOpenedDeliverables(setDeliverables, onError);
-  }, [viewer]);
+    // A teacher's list includes drafts, which hold nothing; a student may only list what is for them
+    // in one course, which the history page always names.
+    if (viewer === 'teacher') return subscribeAllDeliverables(setDeliverables, onError);
+    if (course === undefined) {
+      setDeliverables([]);
+      return undefined;
+    }
+    return subscribeStudentDeliverables(course.slug, uid, setDeliverables, onError);
+  }, [viewer, course, uid]);
 
   useEffect(() => {
     if (deliverables === null) return undefined;

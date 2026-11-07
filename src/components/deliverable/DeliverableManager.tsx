@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { memberName } from '../../data/course/types';
+import type { CourseMember } from '../../data/course/types';
 import {
   DEFAULT_DURATION_MINUTES,
   DEFAULT_MAX_SCORE,
@@ -34,6 +36,7 @@ import {
 import { deliverableDict } from '../../i18n/pages/deliverable';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import { useCourseMembers } from '../course/useCourseMembers';
 import ConfirmPanel from '../exam/ConfirmPanel';
 import { dateTimeText, dateTimeYearText, dayMonthText, durationText } from '../exam/format';
 import SignInRedirect from '../learn/SignInRedirect';
@@ -81,6 +84,9 @@ type Draft = {
   durationMinutes: string;
   /** `datetime-local` value; empty until the teacher picks one. */
   deadline: string;
+  /** For everybody enrolled in the course; otherwise `assignedUids` says who. */
+  everyone: boolean;
+  assignedUids: string[];
 };
 
 type DraftValidation = { ok: true; settings: DeliverableSettings } | { ok: false; message: string };
@@ -104,6 +110,8 @@ function draftOf(deliverable: Deliverable | null, role: DeliverableRole): Draft 
       maxScore: String(DEFAULT_MAX_SCORE),
       durationMinutes: String(DEFAULT_DURATION_MINUTES),
       deadline: '',
+      everyone: true,
+      assignedUids: [],
     };
   }
   return {
@@ -124,6 +132,8 @@ function draftOf(deliverable: Deliverable | null, role: DeliverableRole): Draft 
     maxScore: String(deliverable.maxScore),
     durationMinutes: String(deliverable.durationMinutes),
     deadline: deliverable.deadlineMs === null ? '' : toDateTimeLocal(deliverable.deadlineMs),
+    everyone: deliverable.assignedUids.length === 0,
+    assignedUids: deliverable.assignedUids,
   };
 }
 
@@ -159,6 +169,7 @@ function validateDraft(draft: Draft, forOpen: boolean, t: DeliverableTexts): Dra
   if (guideUrl !== '' && !isHttpUrl(guideUrl)) return { ok: false, message: t.validationGuideUrl };
   const questions = validateQuestions(draft, t);
   if (!Array.isArray(questions)) return questions;
+  if (!draft.everyone && draft.assignedUids.length === 0) return { ok: false, message: t.validationStudents };
   if (!(maxScore > 0)) return { ok: false, message: t.validationMaxScore };
   if (draft.role === 'exam' && !isPositiveInteger(durationMinutes)) return { ok: false, message: t.validationDuration };
   if (draft.role === 'homework' && forOpen && (deadlineMs === null || deadlineMs <= Date.now())) {
@@ -177,6 +188,7 @@ function validateDraft(draft: Draft, forOpen: boolean, t: DeliverableTexts): Dra
       maxScore,
       durationMinutes: isPositiveInteger(durationMinutes) ? durationMinutes : DEFAULT_DURATION_MINUTES,
       deadlineMs,
+      assignedUids: draft.everyone ? [] : draft.assignedUids,
     },
   };
 }
@@ -228,6 +240,66 @@ function QuestionEditor({ number, question, isOnlyQuestion, onChange, onRemove }
           onChange={(event) => onChange({ ...question, maxChars: event.target.value })}
         />
       </label>
+    </div>
+  );
+}
+
+type StudentPickerProps = {
+  courseSlug: string;
+  everyone: boolean;
+  assignedUids: string[];
+  onChange: (everyone: boolean, assignedUids: string[]) => void;
+};
+
+/** Everybody enrolled, or a tick per enrolled student, found by name or email. */
+function StudentPicker({ courseSlug, everyone, assignedUids, onChange }: StudentPickerProps) {
+  const t = useT(deliverableDict);
+  const members = useCourseMembers(courseSlug);
+  const [search, setSearch] = useState('');
+  const needle = search.trim().toLowerCase();
+  const shown = (members ?? []).filter(
+    (member) => needle === '' || memberName(member).toLowerCase().includes(needle) || member.email.toLowerCase().includes(needle)
+  );
+
+  function toggle(uid: string): void {
+    onChange(false, assignedUids.includes(uid) ? assignedUids.filter((other) => other !== uid) : [...assignedUids, uid]);
+  }
+
+  return (
+    <div className={ui.field}>
+      <span className={ui.label}>{t.studentsLabel}</span>
+      <label className={s.check}>
+        <input type="checkbox" checked={everyone} onChange={(event) => onChange(event.target.checked, assignedUids)} />
+        {t.everyoneLabel}
+      </label>
+      {!everyone && (
+        <>
+          <input
+            className={ui.input}
+            type="search"
+            placeholder={t.searchStudents}
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+          {members === null ? (
+            <span className={ui.mono}>{t.loading}</span>
+          ) : members.length === 0 ? (
+            <span className={ui.mono}>{t.noMembers}</span>
+          ) : (
+            <ul className={s.studentList}>
+              {shown.map((member) => (
+                <li key={member.uid}>
+                  <label className={s.studentItem}>
+                    <input type="checkbox" checked={assignedUids.includes(member.uid)} onChange={() => toggle(member.uid)} />
+                    {memberName(member)} <span className={s.studentEmail}>{member.email}</span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          )}
+          <span className={ui.mono}>{t.assignedCount.replace('{count}', String(assignedUids.length))}</span>
+        </>
+      )}
     </div>
   );
 }
@@ -320,7 +392,7 @@ function DraftForm({ deliverable, role, onDeleted, onCreated }: DraftFormProps) 
           <select
             className={s.select}
             value={draft.courseSlug}
-            onChange={(event) => setDraft({ ...draft, courseSlug: event.target.value })}
+            onChange={(event) => setDraft({ ...draft, courseSlug: event.target.value, everyone: true, assignedUids: [] })}
           >
             {LEARN_COURSES.map((course) => (
               <option key={course.slug} value={course.slug}>
@@ -344,6 +416,15 @@ function DraftForm({ deliverable, role, onDeleted, onCreated }: DraftFormProps) 
           </select>
         </label>
       </div>
+
+      <StudentPicker
+        // The members belong to the course: another course starts the list over.
+        key={draft.courseSlug}
+        courseSlug={draft.courseSlug}
+        everyone={draft.everyone}
+        assignedUids={draft.assignedUids}
+        onChange={(everyone, assignedUids) => setDraft({ ...draft, everyone, assignedUids })}
+      />
 
       <label className={ui.field}>
         <span className={ui.label}>{t.guideUrlLabel}</span>
@@ -630,12 +711,39 @@ type OpenedDeliverableProps = {
   onCloseSubmission: () => void;
 };
 
+/** One line of the submissions table: a student the deliverable is for, with their submission if any. */
+type RosterRow = {
+  uid: string;
+  name: string;
+  email: string;
+  submission: Submission | null;
+};
+
+/** The students the deliverable is for (every member, or the listed ones) plus anybody else who
+    saved, each with their submission or none, by name. */
+function rosterOf(deliverable: Deliverable, members: readonly CourseMember[] | null, submissions: readonly Submission[]): RosterRow[] {
+  const rows: Map<string, RosterRow> = new Map();
+  const memberList = members ?? [];
+  const forUids = deliverable.forEveryone ? memberList.map((member) => member.uid) : deliverable.assignedUids;
+  for (const uid of forUids) {
+    const member = memberList.find((candidate) => candidate.uid === uid);
+    rows.set(uid, { uid, name: member ? memberName(member) : uid, email: member?.email ?? '', submission: null });
+  }
+  for (const submission of submissions) {
+    const row = rows.get(submission.uid);
+    const name = submission.displayName || submission.email || row?.name || submission.uid;
+    rows.set(submission.uid, { uid: submission.uid, name, email: submission.email || row?.email || '', submission });
+  }
+  return Array.from(rows.values()).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+}
+
 function OpenedDeliverable({ deliverable, reviewUid, onOpenSubmission, onCloseSubmission }: OpenedDeliverableProps) {
   const t = useT(deliverableDict);
   const locale = useLocale();
   const nowMs = useNowMs(STATUS_TICK_MS);
   const course = findCourse(deliverable.courseSlug);
   const running = isDeliverableRunning(deliverable, nowMs);
+  const members = useCourseMembers(deliverable.courseSlug);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [submissionsLoaded, setSubmissionsLoaded] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -645,6 +753,7 @@ function OpenedDeliverable({ deliverable, reviewUid, onOpenSubmission, onCloseSu
   const [message, setMessage] = useState<string | null>(null);
   const reviewedSubmission = submissions.find((submission) => submission.uid === reviewUid);
   const reviewOf = (uid: string) => reviews.find((review) => review.uid === uid);
+  const roster = useMemo(() => rosterOf(deliverable, members, submissions), [deliverable, members, submissions]);
 
   // Close now and a saved change move the close: the field follows it.
   useEffect(() => {
@@ -773,8 +882,8 @@ function OpenedDeliverable({ deliverable, reviewUid, onOpenSubmission, onCloseSu
       )}
 
       <div className={s.card}>
-        {submissions.length === 0 ? (
-          <p className={s.empty}>{t.noSubmissions}</p>
+        {roster.length === 0 ? (
+          <p className={s.empty}>{members === null ? t.loading : t.noSubmissions}</p>
         ) : (
           <div className={ui.tableWrap}>
             <table className={s.list}>
@@ -788,28 +897,41 @@ function OpenedDeliverable({ deliverable, reviewUid, onOpenSubmission, onCloseSu
                 </tr>
               </thead>
               <tbody>
-                {submissions.map((submission) => {
-                  const review = reviewOf(submission.uid);
-                  const late = isSavedLate(submission, deliverable);
+                {roster.map((row) => {
+                  const { submission } = row;
+                  const review = reviewOf(row.uid);
+                  const late = submission ? isSavedLate(submission, deliverable) : false;
                   return (
-                    <tr key={submission.uid} className={s.row} onClick={() => onOpenSubmission(submission.uid)}>
-                      <td className={s.studentCell} title={submission.email}>
-                        <span className={s.name}>{submission.displayName || submission.email}</span>
-                        <span className={s.email}>{submission.email}</span>
+                    <tr
+                      key={row.uid}
+                      className={submission ? s.row : undefined}
+                      onClick={submission ? () => onOpenSubmission(row.uid) : undefined}
+                    >
+                      <td className={s.studentCell} title={row.email}>
+                        <span className={s.name}>{row.name}</span>
+                        <span className={s.email}>{row.email}</span>
                       </td>
-                      <td className={s.dateCell} title={dateTimeYearText(submission.savedAtMs, locale)}>
-                        <span className={s.dateLong}>{dateTimeYearText(submission.savedAtMs, locale)}</span>
-                        <span className={s.dateShort}>{dayMonthText(submission.savedAtMs, locale)}</span>
-                      </td>
+                      {submission ? (
+                        <td className={s.dateCell} title={dateTimeYearText(submission.savedAtMs, locale)}>
+                          <span className={s.dateLong}>{dateTimeYearText(submission.savedAtMs, locale)}</span>
+                          <span className={s.dateShort}>{dayMonthText(submission.savedAtMs, locale)}</span>
+                        </td>
+                      ) : (
+                        <td className={`${s.dateCell} ${ui.mono}`}>{t.notSaved}</td>
+                      )}
                       <td className={late ? `${ui.num} ${s.countCell} ${s.late}` : `${ui.num} ${s.countCell}`}>
-                        {late ? durationText(lateBySeconds(submission, deliverable)) : '–'}
+                        {late && submission ? durationText(lateBySeconds(submission, deliverable)) : '–'}
                       </td>
                       <td className={`${ui.num} ${s.countCell}`}>
                         {review && review.score !== null ? `${review.score} / ${review.maxScore}` : '–'}
                       </td>
                       {deliverable.kind === 'text' && (
                         <td className={s.countCell}>
-                          {hasSuspiciousSignals(submission.typing) ? <span className={s.flag}>{t.signalsFlag}</span> : '–'}
+                          {submission && hasSuspiciousSignals(submission.typing) ? (
+                            <span className={s.flag}>{t.signalsFlag}</span>
+                          ) : (
+                            '–'
+                          )}
                         </td>
                       )}
                     </tr>
