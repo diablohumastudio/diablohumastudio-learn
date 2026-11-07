@@ -1,6 +1,7 @@
 rules_version = '2';
 
-// Practice data (see docs/practice.md), exams (docs/exam.md) and deliverables (docs/deliverables.md).
+// Practice data (see docs/practice.md), exams (docs/exam.md), deliverables (docs/deliverables.md)
+// and course membership (docs/courses.md).
 // Paste into Firebase console → Firestore → Rules.
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -15,6 +16,13 @@ service cloud.firestore {
     function isTeacher() {
       return isSignedIn()
         && exists(/databases/$(database)/documents/teachers/$(request.auth.uid));
+    }
+
+    // Enrolled in a course (docs/courses.md): a teacher wrote courses/{course}/members/{uid}.
+    // Signing in creates an account, not a membership.
+    function isMember(courseSlug) {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/courses/$(courseSlug)/members/$(request.auth.uid));
     }
 
     // True from the moment a teacher opens an exam until its clock ends. The exam API writes
@@ -55,17 +63,38 @@ service cloud.firestore {
       allow read, write: if isTeacher();
     }
 
+    // Courses (docs/courses.md). The course document itself never exists: only its members and
+    // the requests for access hang under it.
+    match /courses/{courseSlug} {
+      // Enrolled students. A teacher enrolls; a student reads only their own membership.
+      match /members/{uid} {
+        allow read: if isOwner(uid) || isTeacher();
+        allow write: if isTeacher();
+      }
+
+      // A student asking for access: created by the student, closed by a teacher (accepting
+      // enrolls and deletes it; rejecting deletes it, so the student may ask again).
+      match /requests/{uid} {
+        allow read: if isOwner(uid) || isTeacher();
+        allow create: if isOwner(uid);
+        allow update: if false;
+        allow delete: if isTeacher();
+      }
+    }
+
     // Specific homeworks (docs/practice.md): which questions, which days, how many answers a day.
-    // Every signed-in student reads them; the answers are counted in each student's own subtree.
+    // The students enrolled in the course read them (their queries filter by course, which is
+    // what lets the rule be checked); the answers are counted in each student's own subtree.
     match /homeworks/{homeworkId} {
-      allow read: if isSignedIn();
+      allow read: if isTeacher() || isMember(resource.data.courseSlug);
       allow write: if isTeacher();
     }
 
     // Exams. Browsers only ever write drafts; opening, starting, submitting and grading go
     // through the API routes (src/pages/api/exam), which use the admin SDK and skip these rules.
     match /exams/{examId} {
-      allow read: if isTeacher() || (isSignedIn() && resource.data.status == 'opened');
+      // A student's list query filters by course and status, so both can be checked here.
+      allow read: if isTeacher() || (isMember(resource.data.courseSlug) && resource.data.status == 'opened');
       allow create: if isTeacher() && request.resource.data.status == 'draft';
       allow update: if isTeacher() && resource.data.status == 'draft' && request.resource.data.status == 'draft';
       allow delete: if isTeacher() && resource.data.status == 'draft';
@@ -89,14 +118,22 @@ service cloud.firestore {
     }
 
     // Deliverables (docs/deliverables.md): homeworks and exams handed in as text written on the
-    // platform or as a link. Teachers manage them from the browser; students read the opened
-    // ones and write their own submission, which the server stamps.
-    function deliverableOpened(deliverableId) {
-      return get(/databases/$(database)/documents/deliverables/$(deliverableId)).data.status == 'opened';
+    // platform or as a link. Teachers manage them from the browser; the students it is for read
+    // it once opened and write their own submission, which the server stamps.
+    // For everybody enrolled in its course, or for the accounts listed in `assignedUids`.
+    function deliverableIsFor(data) {
+      return isMember(data.courseSlug) && (data.forEveryone == true || request.auth.uid in data.assignedUids);
+    }
+
+    function canSubmit(deliverableId) {
+      return get(/databases/$(database)/documents/deliverables/$(deliverableId)).data.status == 'opened'
+        && deliverableIsFor(get(/databases/$(database)/documents/deliverables/$(deliverableId)).data);
     }
 
     match /deliverables/{deliverableId} {
-      allow read: if isTeacher() || (isSignedIn() && resource.data.status == 'opened');
+      // A student's list queries filter by course, status and either forEveryone or their own
+      // uid in assignedUids, so the rule can be checked against them.
+      allow read: if isTeacher() || (resource.data.status == 'opened' && deliverableIsFor(resource.data));
       allow write: if isTeacher();
 
       // What the student handed in. `savedAt` must be the server's clock, so a save after the
@@ -104,11 +141,11 @@ service cloud.firestore {
       match /submissions/{uid} {
         allow read: if isOwner(uid) || isTeacher();
         allow create: if isOwner(uid)
-          && deliverableOpened(deliverableId)
+          && canSubmit(deliverableId)
           && request.resource.data.savedAt == request.time
           && request.resource.data.firstSavedAt == request.time;
         allow update: if isOwner(uid)
-          && deliverableOpened(deliverableId)
+          && canSubmit(deliverableId)
           && request.resource.data.savedAt == request.time
           && request.resource.data.firstSavedAt == resource.data.firstSavedAt;
         allow delete: if false;
