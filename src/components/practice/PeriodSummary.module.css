@@ -60,6 +60,26 @@
   composes: table from '../learn/ui.module.css';
 }
 
+/* Headings and numbers never break: the student column is the only one that gives way. */
+.table th,
+.table td {
+  white-space: nowrap;
+}
+
+/* Takes the width the other columns leave, and may shrink below its text: the name and the
+   email inside are cut short instead of wrapping. */
+.studentCell {
+  width: 100%;
+  max-width: 0;
+}
+
+.student {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
 .rowUnchecked td {
   color: var(--muted);
 }
@@ -91,7 +111,12 @@
   text-align: center;
 }
 
+/* Gives way only after the email is gone, and never below six characters. */
 .name {
+  flex: 0 1 auto;
+  min-width: 6ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--ink);
   font-weight: 600;
 }
@@ -123,13 +148,17 @@
   color: var(--muted);
 }
 
+/* Fills what is left and is the first to be cut short: the big shrink factor makes it give
+   up its width before the name loses any. */
 .email {
   composes: mono from '../learn/ui.module.css';
-  margin-left: 8px;
+  flex: 1 1000 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: calc(10px + var(--text-delta, 0px));
   text-transform: none;
   letter-spacing: 0.02em;
-  white-space: nowrap;
 }
 
 .score {

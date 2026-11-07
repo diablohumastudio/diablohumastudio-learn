@@ -45,6 +45,11 @@ function studentName(student: StudentStats): string {
   return student.displayName || student.email;
 }
 
+/** The hover text of a student cell: what the cell may have cut short. */
+function studentTitle(student: StudentStats): string {
+  return student.displayName ? `${student.displayName} · ${student.email}` : student.email;
+}
+
 /** One row per student: what the period adds up to and whether it is exported. */
 export default function PeriodSummary({
   students,
@@ -157,7 +162,9 @@ export default function PeriodSummary({
                 <tr>
                   <th rowSpan={2} className={s.check} />
                   <th rowSpan={2} className={s.move} />
-                  <th rowSpan={2}>{t.colStudent}</th>
+                  <th rowSpan={2} className={s.studentCell}>
+                    {t.colStudent}
+                  </th>
                   <th colSpan={PERIOD_COLUMNS} className={s.group}>
                     {t.groupPeriod}
                   </th>
@@ -210,15 +217,17 @@ export default function PeriodSummary({
                         ↓
                       </button>
                     </td>
-                    <td>
-                      {onSelectStudent ? (
-                        <button type="button" className={s.nameButton} onClick={() => onSelectStudent(row.student)}>
-                          {studentName(row.student)}
-                        </button>
-                      ) : (
-                        <span className={s.name}>{studentName(row.student)}</span>
-                      )}
-                      {row.student.displayName && <span className={s.email}>{row.student.email}</span>}
+                    <td className={s.studentCell} title={studentTitle(row.student)}>
+                      <span className={s.student}>
+                        {onSelectStudent ? (
+                          <button type="button" className={s.nameButton} onClick={() => onSelectStudent(row.student)}>
+                            {studentName(row.student)}
+                          </button>
+                        ) : (
+                          <span className={s.name}>{studentName(row.student)}</span>
+                        )}
+                        {row.student.displayName && <span className={s.email}>{row.student.email}</span>}
+                      </span>
                     </td>
                     <td className={`${ui.num} ${s.score}`}>
                       {scoreText(row.numbers.score, locale)} / {days.length}
