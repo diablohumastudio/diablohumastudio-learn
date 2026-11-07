@@ -1,14 +1,31 @@
 import Link from 'next/link';
+import { useState } from 'react';
 import { courseExamsPath, practicePlayPath } from '../../data/learn';
 import type { LearnCourse } from '../../data/learn';
-import { dayKey, emptyDay, isDayDone, weekDayKeys, weekdayInitial } from '../../data/practice';
-import type { DayProgress } from '../../data/practice';
+import {
+  DAILY_QUESTIONS_GOAL,
+  RUN_CORRECT_GOAL,
+  RUN_LENGTH,
+  dayKey,
+  dayKeysBetween,
+  emptyDay,
+  isDayDone,
+  monthKeyOf,
+  monthKeysBetween,
+  monthRange,
+  monthText,
+  summarizePeriod,
+  weekDayKeys,
+  weekdayInitial,
+} from '../../data/practice';
+import type { DayProgress, ProgressScope } from '../../data/practice';
 import { learnDict } from '../../i18n/learn';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import s from './CourseProgress.module.css';
 import { useCourseProgress } from './CourseProgressContext';
 import type { CourseProgressData } from './CourseProgressContext';
+import { scoreText } from './format';
 import HomeworkMeter from './HomeworkMeter';
 
 function dayOf(progress: CourseProgressData, courseSlug: string, day: string): DayProgress {
@@ -67,6 +84,66 @@ function WeekSection({ progress, course, today }: WeekSectionProps) {
   );
 }
 
+/** The months the student practiced this course in, oldest first; today's month always. */
+function monthsOf(progress: CourseProgressData, today: string): string[] {
+  const firstDay = progress.days.reduce((earliest, day) => (day.day && day.day < earliest ? day.day : earliest), today);
+  return monthKeysBetween(monthKeyOf(firstDay), monthKeyOf(today));
+}
+
+/** One month as the teacher grades it: the sum of its days, 1, ½ or 0 each, up to today. */
+function MonthSection({ progress, course, today }: WeekSectionProps) {
+  const t = useT(practiceDict);
+  const locale = useLocale();
+  const [month, setMonth] = useState(monthKeyOf(today));
+  const months = monthsOf(progress, today);
+  const range = monthRange(month, today);
+  const days = dayKeysBetween(range.firstDay, range.lastDay);
+  const scope: ProgressScope = { kind: 'daily', courseSlug: course.slug };
+  const summary = summarizePeriod(progress.days, scope, days);
+
+  return (
+    <div className={s.monthSection}>
+      <div className={s.monthHeader}>
+        <span className={s.sectionLabel}>{t.monthGrade}</span>
+        <select
+          className={s.monthSelect}
+          value={month}
+          aria-label={t.monthLabel}
+          onChange={(event) => setMonth(event.target.value)}
+        >
+          {months.map((candidate) => (
+            <option key={candidate} value={candidate}>
+              {monthText(candidate, locale)}
+            </option>
+          ))}
+        </select>
+      </div>
+      <dl className={s.weekNumbers}>
+        <div className={s.weekNumber}>
+          <dt className={s.weekNumberLabel}>{t.weekDaysDone}</dt>
+          <dd className={s.weekNumberValue}>
+            {scoreText(summary.score, locale)} / {days.length}
+          </dd>
+        </div>
+        <div className={s.weekNumber}>
+          <dt className={s.weekNumberLabel}>{t.colFullDays}</dt>
+          <dd className={s.weekNumberValue}>{summary.fullDays}</dd>
+        </div>
+        <div className={s.weekNumber}>
+          <dt className={s.weekNumberLabel}>{t.colPartialDays}</dt>
+          <dd className={s.weekNumberValue}>{summary.partialDays}</dd>
+        </div>
+      </dl>
+      <p className={s.monthHint}>
+        {t.monthGradeHint
+          .replace('{count}', String(DAILY_QUESTIONS_GOAL))
+          .replace('{goal}', String(RUN_CORRECT_GOAL))
+          .replace('{length}', String(RUN_LENGTH))}
+      </p>
+    </div>
+  );
+}
+
 /** Homework of the signed-in student in one course; guests only get the buttons. */
 export default function CourseProgress({ course }: { course: LearnCourse }) {
   const t = useT(practiceDict);
@@ -86,6 +163,7 @@ export default function CourseProgress({ course }: { course: LearnCourse }) {
           </div>
 
           <WeekSection progress={progress} course={course} today={today} />
+          <MonthSection progress={progress} course={course} today={today} />
         </>
       )}
 
