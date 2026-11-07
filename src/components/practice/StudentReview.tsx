@@ -72,14 +72,16 @@ function StudentList({ students }: { students: StudentStats[] }) {
   );
 }
 
-/** The per-question table, loaded only when asked for: it is one read per question answered. */
+/** The per-question table, loaded the first time it is asked for: it is one read per question
+    answered. Hiding it keeps what was loaded, so showing it again reads nothing. */
 function QuestionsSection({ uid }: { uid: string }) {
   const t = useT(practiceDict);
-  // Undefined until the teacher asks; null while loading.
-  const [stats, setStats] = useState<QuestionStats[] | null | undefined>(undefined);
+  const [isShown, setIsShown] = useState(false);
+  const [stats, setStats] = useState<QuestionStats[] | null>(null);
 
-  function load(): void {
-    setStats(null);
+  function show(): void {
+    setIsShown(true);
+    if (stats !== null) return;
     fetchStudentQuestions(uid)
       .then((loaded) => setStats([...loaded].sort(byAttemptsDesc)))
       .catch((error) => console.error('Could not load the student questions', error));
@@ -89,13 +91,10 @@ function QuestionsSection({ uid }: { uid: string }) {
     <section className={s.section}>
       <hr className={s.divider} />
       <span className={ui.eyebrow}>{t.byQuestion}</span>
-      {stats === undefined ? (
-        <button type="button" className={s.button} onClick={load}>
-          {t.showQuestions}
-        </button>
-      ) : (
-        <QuestionStatsTable stats={stats} />
-      )}
+      {isShown && <QuestionStatsTable stats={stats} />}
+      <button type="button" className={s.button} onClick={isShown ? () => setIsShown(false) : show}>
+        {isShown ? t.hideQuestions : t.showQuestions}
+      </button>
     </section>
   );
 }
