@@ -21,8 +21,14 @@
   composes: btnPrimary from '../learn/ui.module.css';
 }
 
-.ghost {
-  composes: btnGhost from '../learn/ui.module.css';
+/* Delete: a plain button rather than a ghost one, so it never reads as switched off; red on hover. */
+.delete {
+  composes: btn from '../learn/ui.module.css';
+}
+
+.delete:hover:enabled {
+  color: var(--red);
+  border-color: var(--red);
 }
 
 .back {

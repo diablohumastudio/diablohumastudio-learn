@@ -412,7 +412,7 @@ function HomeworkForm({ homework, state, onDeleted, onCreated }: HomeworkFormPro
             </button>
           )}
           {homework && (
-            <button type="button" className={s.ghost} onClick={() => setConfirmingDelete(true)} disabled={busy}>
+            <button type="button" className={s.delete} onClick={() => setConfirmingDelete(true)} disabled={busy}>
               {t.deleteHomework}
             </button>
           )}
