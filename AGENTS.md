@@ -1,6 +1,6 @@
 # diablohumastudio-learn — Project Instructions
 
-Teaching platform of DiabloHumaStudio, served at `learn.diablohumastudio.com`: class presentations, daily practice, specific homeworks, server-graded exams and deliverables (homeworks and exams handed in as text or links). Next.js 14 (Pages Router) + TypeScript, plain CSS (CSS Modules), Firebase (Firestore + Auth) for data. The marketing site is a separate repo (`diablohumastudio-site-nextjs`); it only redirects its old `/learn/...` links here.
+Teaching platform of DiabloHumaStudio, served at `learn.diablohumastudio.com`: class presentations, daily practice, specific homeworks, server-graded exams and deliverables (homeworks and exams handed in as text or links), for the students enrolled in each course. Next.js 14 (Pages Router) + TypeScript, plain CSS (CSS Modules), Firebase (Firestore + Auth) for data. The marketing site is a separate repo (`diablohumastudio-site-nextjs`); it only redirects its old `/learn/...` links here.
 
 ## Commands
 
@@ -14,7 +14,7 @@ Teaching platform of DiabloHumaStudio, served at `learn.diablohumastudio.com`: c
 |---|---|
 | `/` | redirects to `/courses` |
 | `/courses` | course menu |
-| `/course/<course>` | class menu of a course, homework cards |
+| `/course/<course>` | class menu of a course; for an enrolled student the homework and deliverable cards, for one who is not the card to request access |
 | `/course/<course>/class/<class>` | slide deck (`?s=<n>` slide, `&p=<n>` step) |
 | `/course/<course>/exams`, `/course/<course>/exams/<id>` | exam list of a course, exam room |
 | `/course/<course>/history` | the signed-in student's own history in the course, in five sections: daily practice, multiple option exams, multiple option specific homeworks, deliverable exams, deliverable homeworks |
@@ -24,7 +24,8 @@ Teaching platform of DiabloHumaStudio, served at `learn.diablohumastudio.com`: c
 | `/teacher/exam`, `/teacher/exam/<id>`, `/teacher/exam/<id>/<uid>` | exam list (multiple option and deliverable exams, each with its New button); one exam by id (`new` for a draft not saved yet); the replay of one student's attempt |
 | `/teacher/homeworks`, `/teacher/homeworks/<id>` | homework list (multiple option and deliverable homeworks, each with its New button); one homework by id (`new` for one not saved yet) |
 | `/teacher/deliverable/<id>`, `/teacher/deliverable/<id>/<uid>` | one deliverable by id (`new?role=homework` or `new?role=exam` for one not saved yet; no list here); one student's submission with its review |
-| `/teacher/student`, `/teacher/student/<uid>` | list of students to review; one student's page, the same five sections as the student's history |
+| `/teacher/student`, `/teacher/student/<uid>` | list of students to review (the enrolled ones); one student's page, the same five sections as the student's history |
+| `/teacher/enrollment` | who is enrolled in each course, who is asking for access; enroll, remove, enroll all registered accounts |
 
 Every route is built from the constants and helpers in `src/data/learn.ts` (`COURSES_PATH`, `coursePath`, `classPath`, `examPath`…). Never write a route literal in a component.
 
@@ -61,4 +62,5 @@ Every route is built from the constants and helpers in `src/data/learn.ts` (`COU
 - [docs/practice.md](docs/practice.md) — practice, daily and specific homeworks, the question bank and the teacher tools; Firebase setup.
 - [docs/exam.md](docs/exam.md) — timed, server-graded exams at `/course/<course>/exams/<id>`: API routes, data model, rules and setup. Read before touching exams, the question bank's answer ids or `firebase/firestore.rules`. Key rule: the correct option never reaches a student's browser; opening, drawing, receiving answers and grading stay on the server.
 - [docs/deliverables.md](docs/deliverables.md) — deliverables: homeworks and exams handed in as text written on the platform (no pasting, typing signals recorded) or as a link to a repository or a document; roles, kinds, data model, rules, the export and import scripts for grading on demand. Read before touching the homework or exam lists, the student history, the review page or `firebase/firestore.rules`.
+- [docs/courses.md](docs/courses.md) — course membership: enrollment, access requests, the Enrollment page, what the membership gates and why every student query names its course. Read before adding anything a student reads per course or touching `firebase/firestore.rules`.
 - [docs/i18n-handoff.md](docs/i18n-handoff.md) — the i18n decisions (written when the platform was `/learn` of the marketing site).

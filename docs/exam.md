@@ -87,7 +87,7 @@ Questions written for exams live in a second bank, `examQuestions/{id}`, with th
 
 The attempt stores the **texts** next to the ids, so a replay stays exact after the bank is edited. Option ids come from the bank (`id` on every entry of `correct[]` / `incorrect[]`): opaque, assigned by the editor on save or by `open`, kept when the text is edited. A JSON import that leaves them out gets new ones.
 
-Rules in short: teachers read everything except `private`; a student reads opened exams, their own attempt and, **once `closesAt` has passed**, their own grade, which is how the result releases itself without any scheduler. Browsers can only create, edit and delete drafts.
+Rules in short: teachers read everything except `private`; a student enrolled in the course ([courses.md](courses.md)) reads its opened exams (the list query filters by course and status so the rule can be checked), their own attempt and, **once `closesAt` has passed**, their own grade, which is how the result releases itself without any scheduler. Browsers can only create, edit and delete drafts.
 
 ## Practice is paused during an exam (on purpose)
 
