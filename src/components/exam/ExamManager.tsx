@@ -439,10 +439,11 @@ function OpenedExam({ exam, replayUid, onOpenReplay, onCloseReplay }: OpenedExam
           <div className={ui.tableWrap}>
             <table className={ui.table}>
               <thead>
+                {/* Score right after the student: on a phone it shows without scrolling sideways. */}
                 <tr>
                   <th>{t.colStudent}</th>
-                  <th>{t.colAttempt}</th>
                   <th className={`${ui.num} ${s.score}`}>{t.colScore}</th>
+                  <th>{t.colAttempt}</th>
                   <th className={ui.num}>{t.colLate}</th>
                 </tr>
               </thead>
@@ -455,8 +456,8 @@ function OpenedExam({ exam, replayUid, onOpenReplay, onCloseReplay }: OpenedExam
                         <span className={s.name}>{attempt.displayName || attempt.email}</span>
                         <span className={s.email}>{attempt.email}</span>
                       </td>
-                      <td>{attempt.status === 'submitted' ? t.attemptSubmitted : t.attemptStarted}</td>
                       <td className={`${ui.num} ${s.score}`}>{grade ? `${grade.score} / ${grade.total}` : '–'}</td>
+                      <td>{attempt.status === 'submitted' ? t.attemptSubmitted : t.attemptStarted}</td>
                       <td className={attempt.late ? `${ui.num} ${s.late}` : ui.num}>
                         {attempt.late ? durationText(attempt.lateBySeconds) : '–'}
                       </td>
