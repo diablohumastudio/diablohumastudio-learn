@@ -4,6 +4,7 @@ import { COURSES_PATH, classPath, groupClassesBySection } from '../../data/learn
 import type { LearnCourse } from '../../data/learn';
 import { learnDict } from '../../i18n/learn';
 import { useLocale, useT } from '../../i18n/useT';
+import CourseDeliverables from '../deliverable/CourseDeliverables';
 import ClassPracticeLink from '../practice/ClassPracticeLink';
 import CourseHomeworks from '../practice/CourseHomeworks';
 import CourseProgress from '../practice/CourseProgress';
@@ -41,6 +42,7 @@ export default function ClassList({ course }: { course: LearnCourse }) {
         </div>
         <CourseProgress course={course} />
         <CourseHomeworks course={course} />
+        <CourseDeliverables course={course} />
         {groupClassesBySection(course).map((group) => (
           <div key={group.classes[0].slug} className={s.group}>
             {group.section && <span className={s.groupLabel}>{group.section}</span>}
