@@ -18,6 +18,7 @@ import { questionsWithIds } from '../../data/practice';
 import { examDict } from '../../i18n/pages/exam';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import DeliverableSection from '../deliverable/DeliverableSection';
 import SignInRedirect from '../learn/SignInRedirect';
 import ui from '../learn/ui.module.css';
 import { useTeacherStatus } from '../learn/useTeacherStatus';
@@ -567,7 +568,8 @@ function Exams() {
         <span className={ui.eyebrow}>{t.brand}</span>
         <h1 className={ui.title}>{t.managerTitle}</h1>
       </div>
-      <div className={s.actions}>
+      <div className={ui.sectionHead}>
+        <h2 className={ui.sectionTitle}>{t.multipleOptionExamsSection}</h2>
         <button type="button" className={s.primary} onClick={() => void router.push(TEACHER_EXAM_NEW_PATH)}>
           + {t.newExam}
         </button>
@@ -624,6 +626,7 @@ function Exams() {
           </div>
         )}
       </div>
+      <DeliverableSection role="exam" />
     </div>
   );
 }

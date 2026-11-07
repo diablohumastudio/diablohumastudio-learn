@@ -1,0 +1,95 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.head {
+  composes: sectionHead from '../learn/ui.module.css';
+}
+
+.title {
+  composes: sectionTitle from '../learn/ui.module.css';
+}
+
+.primary {
+  composes: btnPrimary from '../learn/ui.module.css';
+}
+
+.card {
+  composes: card from '../learn/ui.module.css';
+  padding: 8px 0;
+}
+
+/* One line per deliverable, every column cut short with an ellipsis and giving way in proportion. */
+.list {
+  composes: listTable from '../learn/ui.module.css';
+}
+
+.titleCell {
+  width: 32%;
+  min-width: 12ch;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.list th.titleCell {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.courseCell {
+  width: 16%;
+  min-width: 8ch;
+}
+
+.kindCell {
+  width: 20%;
+  min-width: 8ch;
+}
+
+.statusCell {
+  width: 14%;
+  min-width: 6ch;
+}
+
+.dateCell {
+  width: 18%;
+  min-width: 6ch;
+}
+
+.dateShort {
+  display: none;
+}
+
+@media (max-width: 560px) {
+  .dateLong {
+    display: none;
+  }
+
+  .dateShort {
+    display: inline;
+  }
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row:hover td {
+  background: var(--panel-2);
+}
+
+.running {
+  color: var(--teal);
+}
+
+.empty {
+  composes: mono from '../learn/ui.module.css';
+  padding: 16px 24px;
+}
+
+.error {
+  composes: error from '../learn/ui.module.css';
+  padding: 16px 24px;
+}

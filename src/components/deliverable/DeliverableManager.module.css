@@ -1,0 +1,257 @@
+/* The deliverable pages have no dynamic columns: on a wide window they stop growing at a reading
+   width and sit centred, like the exam pages. */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.primary {
+  composes: btnPrimary from '../learn/ui.module.css';
+}
+
+.secondary {
+  composes: btn from '../learn/ui.module.css';
+}
+
+.ghost {
+  composes: btnGhost from '../learn/ui.module.css';
+}
+
+/* Delete: a plain button rather than a ghost one, so it never reads as switched off; red on hover. */
+.delete {
+  composes: btn from '../learn/ui.module.css';
+}
+
+.delete:hover:enabled {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.back {
+  composes: btnGhost from '../learn/ui.module.css';
+  align-self: flex-start;
+  padding: 8px 12px;
+  font-size: calc(13px + var(--text-delta, 0px));
+}
+
+.card {
+  composes: card from '../learn/ui.module.css';
+  padding: 8px 0;
+}
+
+.form {
+  composes: card from '../learn/ui.module.css';
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.select {
+  composes: input from '../learn/ui.module.css';
+  cursor: pointer;
+}
+
+.textarea {
+  composes: input from '../learn/ui.module.css';
+  min-height: 90px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+/* The native pickers follow the page's color scheme, which is dark here. */
+.dateInput {
+  composes: input from '../learn/ui.module.css';
+  color-scheme: dark;
+}
+
+.numbers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.questions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* One question of a text deliverable: its text and its character limit, and a button to drop it. */
+.question {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.questionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.questionName {
+  composes: mono from '../learn/ui.module.css';
+  color: var(--amber);
+}
+
+.remove {
+  composes: btnGhost from '../learn/ui.module.css';
+  flex: none;
+  padding: 6px 12px;
+  font-size: calc(16px + var(--text-delta, 0px));
+  line-height: 1;
+}
+
+.remove:hover:enabled {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.maxCharsField {
+  composes: field from '../learn/ui.module.css';
+  max-width: 260px;
+}
+
+.add {
+  composes: btnGhost from '../learn/ui.module.css';
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 8px 12px;
+  font-size: calc(13px + var(--text-delta, 0px));
+}
+
+.summary {
+  composes: card from '../learn/ui.module.css';
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.running {
+  composes: mono from '../learn/ui.module.css';
+  color: var(--teal);
+}
+
+.link {
+  color: var(--amber);
+}
+
+/* The close of an opened deliverable: a date-time field and its Save button on one line. */
+.closeForm {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.list {
+  composes: listTable from '../learn/ui.module.css';
+}
+
+.studentCell {
+  width: 36%;
+  min-width: 12ch;
+}
+
+.dateCell {
+  width: 20%;
+  min-width: 6ch;
+}
+
+.countCell {
+  width: 12%;
+  min-width: 5ch;
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row:hover td {
+  background: var(--panel-2);
+}
+
+.name {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.email {
+  composes: mono from '../learn/ui.module.css';
+  display: block;
+  letter-spacing: 0.02em;
+}
+
+.late {
+  color: var(--red);
+}
+
+.flag {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.empty {
+  composes: mono from '../learn/ui.module.css';
+  padding: 16px 24px;
+}
+
+/* One answer as the student wrote it: line breaks kept, long words broken. */
+.answerCard {
+  composes: card from '../learn/ui.module.css';
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.answers {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.questionText {
+  font-family: var(--font-disp, 'Arial Narrow', sans-serif);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.answerText {
+  font-size: calc(15px + var(--text-delta, 0px));
+  line-height: 1.5;
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.noAnswer {
+  composes: mono from '../learn/ui.module.css';
+}
+
+.scoreField {
+  composes: field from '../learn/ui.module.css';
+  max-width: 200px;
+}

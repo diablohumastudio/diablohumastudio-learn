@@ -15,6 +15,7 @@ const en = {
   errorServerNotConfigured: 'The exam server is not configured: set FIREBASE_SERVICE_ACCOUNT (see docs/exam.md).',
 
   examsTitle: 'Exams',
+  multipleOptionExamsSection: 'Multiple option exams',
   noExams: 'There are no exams yet.',
   stateRunning: 'Running',
   stateFinished: 'Finished',
@@ -126,6 +127,7 @@ const es: Record<keyof typeof en, string> = {
     'El servidor de exámenes no está configurado: define FIREBASE_SERVICE_ACCOUNT (ver docs/exam.md).',
 
   examsTitle: 'Exámenes',
+  multipleOptionExamsSection: 'Exámenes de opción múltiple',
   noExams: 'Todavía no hay exámenes.',
   stateRunning: 'En curso',
   stateFinished: 'Terminado',

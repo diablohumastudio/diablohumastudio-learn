@@ -24,6 +24,7 @@ import type { Homework, HomeworkSettings, HomeworkState, PracticeQuestion, Progr
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import DeliverableSection from '../deliverable/DeliverableSection';
 import ConfirmPanel from '../exam/ConfirmPanel';
 import SignInRedirect from '../learn/SignInRedirect';
 import ui from '../learn/ui.module.css';
@@ -539,7 +540,8 @@ function Homeworks() {
         <span className={ui.eyebrow}>{t.brand}</span>
         <h1 className={ui.title}>{t.homeworksTitle}</h1>
       </div>
-      <div className={s.actions}>
+      <div className={ui.sectionHead}>
+        <h2 className={ui.sectionTitle}>{t.multipleOptionHomeworksSection}</h2>
         <button type="button" className={s.primary} onClick={() => void router.push(TEACHER_HOMEWORK_NEW_PATH)}>
           + {t.newHomework}
         </button>
@@ -609,6 +611,7 @@ function Homeworks() {
           </div>
         )}
       </div>
+      <DeliverableSection role="homework" />
     </div>
   );
 }
