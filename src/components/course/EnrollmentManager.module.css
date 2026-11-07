@@ -1,0 +1,110 @@
+/* No dynamic columns: on a wide window the page stops at a reading width and sits centred. */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sectionHead {
+  composes: sectionHead from '../learn/ui.module.css';
+}
+
+.sectionTitle {
+  composes: sectionTitle from '../learn/ui.module.css';
+}
+
+.card {
+  composes: card from '../learn/ui.module.css';
+  padding: 8px 0;
+}
+
+.table {
+  composes: table from '../learn/ui.module.css';
+}
+
+.table th,
+.table td {
+  white-space: nowrap;
+}
+
+.name {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.email {
+  composes: mono from '../learn/ui.module.css';
+  display: block;
+  letter-spacing: 0.02em;
+}
+
+.rowActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.primary {
+  composes: btnPrimary from '../learn/ui.module.css';
+}
+
+.small {
+  composes: btn from '../learn/ui.module.css';
+  padding: 8px 12px;
+  font-size: calc(13px + var(--text-delta, 0px));
+}
+
+.smallPrimary {
+  composes: btnPrimary from '../learn/ui.module.css';
+  padding: 8px 12px;
+  font-size: calc(13px + var(--text-delta, 0px));
+}
+
+/* Remove and reject: plain buttons that turn red on hover, never read as switched off. */
+.danger {
+  composes: small;
+}
+
+.danger:hover:enabled {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+/* The account picker and its button on one line; on a phone, one under the other. */
+.addRow {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pickerField {
+  composes: field from '../learn/ui.module.css';
+  flex: 1;
+  min-width: 240px;
+}
+
+.select {
+  composes: input from '../learn/ui.module.css';
+  cursor: pointer;
+}
+
+.empty {
+  composes: mono from '../learn/ui.module.css';
+  padding: 16px 24px;
+}

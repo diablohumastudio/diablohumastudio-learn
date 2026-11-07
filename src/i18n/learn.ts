@@ -47,6 +47,7 @@ const en = {
   studentReview: 'Student review',
   practiceQuestions: 'Practice questions',
   specificHomeworks: 'Specific homeworks',
+  enrollment: 'Enrollment',
   notAuthorized: 'This account is not registered as a teacher.',
   notConfigured: 'Firebase is not configured: set the NEXT_PUBLIC_FIREBASE_* variables (see docs/practice.md).',
 
@@ -122,6 +123,7 @@ const es: Record<keyof typeof en, string> = {
   studentReview: 'Revisión por estudiante',
   practiceQuestions: 'Preguntas de práctica',
   specificHomeworks: 'Deberes específicos',
+  enrollment: 'Inscripciones',
   notAuthorized: 'Esta cuenta no está registrada como docente.',
   notConfigured: 'Firebase no está configurado: define las variables NEXT_PUBLIC_FIREBASE_* (ver docs/practice.md).',
 

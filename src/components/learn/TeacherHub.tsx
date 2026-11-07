@@ -3,6 +3,7 @@ import {
   COURSES_PATH,
   QUESTIONS_EDITOR_PATH,
   STUDENTS_PRACTICE_INFO_PATH,
+  TEACHER_ENROLLMENT_PATH,
   TEACHER_EXAM_PATH,
   TEACHER_HOMEWORKS_PATH,
   TEACHER_STUDENTS_PATH,
@@ -72,6 +73,10 @@ export default function TeacherHub() {
         </Link>
         <Link href={TEACHER_EXAM_PATH} className={s.item}>
           {t.exams}
+          <span className={s.itemArrow}>→</span>
+        </Link>
+        <Link href={TEACHER_ENROLLMENT_PATH} className={s.item}>
+          {t.enrollment}
           <span className={s.itemArrow}>→</span>
         </Link>
       </nav>

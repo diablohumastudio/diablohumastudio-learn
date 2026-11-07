@@ -15,6 +15,8 @@ export const TEACHER_HOMEWORKS_PATH: string = `${TEACHER_PATH}/homeworks`;
 export const TEACHER_DELIVERABLE_PATH: string = `${TEACHER_PATH}/deliverable`;
 /** The list of students to review; one student's page hangs under it by uid. */
 export const TEACHER_STUDENTS_PATH: string = `${TEACHER_PATH}/student`;
+/** Who is enrolled in each course and who is asking for access (docs/courses.md). */
+export const TEACHER_ENROLLMENT_PATH: string = `${TEACHER_PATH}/enrollment`;
 /** In place of an id under the two paths above: the form of an exam or homework not saved yet. */
 export const NEW_ITEM_SEGMENT: string = 'new';
 export const TEACHER_EXAM_NEW_PATH: string = `${TEACHER_EXAM_PATH}/${NEW_ITEM_SEGMENT}`;
