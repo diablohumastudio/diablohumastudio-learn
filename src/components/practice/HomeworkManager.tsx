@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   LEARN_COURSES,
   NEW_ITEM_SEGMENT,
@@ -24,6 +24,7 @@ import type { Homework, HomeworkSettings, HomeworkState, PracticeQuestion, Progr
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import { memberUids, useCourseMembers } from '../course/useCourseMembers';
 import DeliverableSection from '../deliverable/DeliverableSection';
 import ConfirmPanel from '../exam/ConfirmPanel';
 import SignInRedirect from '../learn/SignInRedirect';
@@ -418,10 +419,17 @@ type HomeworkProgressProps = {
 
 /** What every student did in one homework: the summary to grade it and the grid of its days. */
 function HomeworkProgress({ students, homework }: HomeworkProgressProps) {
-  const daysByStudent = useStudentDays(students);
+  const members = useCourseMembers(homework.courseSlug);
+  // One array per membership list, or the days would be fetched again on every render.
+  const enrolledStudents = useMemo(() => {
+    if (members === null) return [];
+    const enrolled = memberUids(members);
+    return students.filter((student) => enrolled.has(student.uid));
+  }, [members, students]);
+  const daysByStudent = useStudentDays(enrolledStudents);
   const scope: ProgressScope = { kind: 'homework', homework };
   const days = dayKeysBetween(homework.firstDay, homework.lastDay);
-  const studentsByName = [...students].sort(byDisplayName);
+  const studentsByName = [...enrolledStudents].sort(byDisplayName);
 
   return (
     <>

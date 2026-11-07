@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import type { Exam, ExamAttempt, ExamGrade } from '../../data/exam/types';
 import {
+  LEARN_COURSES,
   TEACHER_PATH,
   TEACHER_STUDENTS_PATH,
   findCourse,
@@ -12,11 +13,13 @@ import {
 import { dayKey, dayKeysBetween, summarizePeriod } from '../../data/practice';
 import type { Homework } from '../../data/practice';
 import type { DeliverableRole } from '../../data/deliverable/types';
+import { courseDict } from '../../i18n/pages/course';
 import { deliverableDict } from '../../i18n/pages/deliverable';
 import { examDict } from '../../i18n/pages/exam';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import { fetchMembers } from '../course/members';
 import StudentDeliverables from '../deliverable/StudentDeliverables';
 import { roleSectionText } from '../deliverable/format';
 import { fetchAttempt, fetchGrade, subscribeAllExams } from '../exam/exams';
@@ -46,8 +49,22 @@ function studentName(student: StudentStats): string {
   return student.displayName || student.email;
 }
 
+/** Every account enrolled in at least one course: the ones there is anything to review for. */
+async function fetchEnrolledUids(): Promise<Set<string>> {
+  const membersByCourse = await Promise.all(
+    LEARN_COURSES.map((course) =>
+      fetchMembers(course.slug).catch((error) => {
+        console.warn('Could not load the members', error);
+        return [];
+      })
+    )
+  );
+  return new Set(membersByCourse.flat().map((member) => member.uid));
+}
+
 function StudentList({ students }: { students: StudentStats[] }) {
   const t = useT(practiceDict);
+  const courseT = useT(courseDict);
 
   return (
     <div className={s.wrap}>
@@ -59,6 +76,7 @@ function StudentList({ students }: { students: StudentStats[] }) {
         <h1 className={ui.title}>{t.studentReviewTitle}</h1>
       </div>
       <p className={ui.lede}>{t.pickStudent}</p>
+      <p className={ui.mono}>{courseT.onlyEnrolledHint}</p>
       {students.length === 0 ? (
         <p className={ui.mono}>{t.noStudents}</p>
       ) : (
@@ -355,8 +373,10 @@ function Review() {
   const student = students?.find((candidate) => candidate.uid === uid);
 
   useEffect(() => {
-    fetchAllStudents()
-      .then((loaded) => setStudents([...loaded].sort(byDisplayName)))
+    Promise.all([fetchAllStudents(), fetchEnrolledUids()])
+      .then(([loaded, enrolled]) =>
+        setStudents(loaded.filter((student) => enrolled.has(student.uid)).sort(byDisplayName))
+      )
       .catch((error) => {
         console.error('Could not load the students', error);
         setFailed(true);

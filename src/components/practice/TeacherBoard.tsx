@@ -5,7 +5,9 @@ import { dayKey, dayKeysBetween, monthKeyOf, monthKeysBetween } from '../../data
 import type { ProgressScope } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useT } from '../../i18n/useT';
+import { courseDict } from '../../i18n/pages/course';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import { memberUids, useCourseMembers } from '../course/useCourseMembers';
 import SignInRedirect from '../learn/SignInRedirect';
 import HomeworkGrid from './HomeworkGrid';
 import { CourseSelect, PeriodSelect, periodRange } from './PeriodControls';
@@ -28,26 +30,41 @@ type CoursePeriodProps = {
   selectionScope?: string;
   /** Makes each name of the summary a link to the student's own page. */
   studentHref?: (student: StudentStats) => string;
+  /** Keeps only the students enrolled in the chosen course (the board); a student's own page
+      shows that student whatever the course. */
+  membersOnly?: boolean;
 };
 
 /** The daily homework of a course for these students: the summary and the day grid, each over a
     period of its own. The board passes everybody; a student's review page passes that one. */
-export function CoursePeriod({ students, daysByStudent, selectionScope = '', studentHref }: CoursePeriodProps) {
+export function CoursePeriod({
+  students,
+  daysByStudent,
+  selectionScope = '',
+  studentHref,
+  membersOnly = false,
+}: CoursePeriodProps) {
+  const courseT = useT(courseDict);
   const today = dayKey(new Date());
   const currentMonth: Period = { kind: 'month', month: monthKeyOf(today) };
   const [courseSlug, setCourseSlug] = useState(LEARN_COURSES[0].slug);
+  const members = useCourseMembers(courseSlug);
+  const enrolled = memberUids(members);
+  // Until the members arrive nobody is shown, rather than everybody for a moment.
+  const shownStudents = membersOnly ? (members === null ? [] : students.filter((student) => enrolled.has(student.uid))) : students;
   const [summaryPeriod, setSummaryPeriod] = useState<Period>(currentMonth);
   const [gridPeriod, setGridPeriod] = useState<Period>(currentMonth);
   const firstDayEver = earliestDayKey(daysByStudent) ?? today;
   const summaryRange = periodRange(summaryPeriod, firstDayEver, today);
   const gridRange = periodRange(gridPeriod, firstDayEver, today);
   const months = monthKeysBetween(monthKeyOf(firstDayEver), monthKeyOf(today));
-  const studentsByName = [...students].sort(byDisplayName);
+  const studentsByName = [...shownStudents].sort(byDisplayName);
   const scope: ProgressScope = { kind: 'daily', courseSlug };
 
   return (
     <>
       <CourseSelect courseSlug={courseSlug} onChange={setCourseSlug} />
+      {membersOnly && <p className={ui.mono}>{courseT.onlyEnrolledHint}</p>}
       <PeriodSummary
         key={courseSlug}
         students={studentsByName}
@@ -120,6 +137,7 @@ function StudentsTable() {
           students={students}
           daysByStudent={daysByStudent}
           studentHref={(student) => teacherStudentPath(student.uid)}
+          membersOnly
         />
       )}
     </div>
