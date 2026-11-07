@@ -135,6 +135,12 @@
   letter-spacing: 0.02em;
 }
 
+/* Never narrower than "100 / 100": a score stays on one line however big the exam. */
+.score {
+  white-space: nowrap;
+  min-width: 9ch;
+}
+
 .late {
   color: var(--red);
 }
