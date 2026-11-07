@@ -39,6 +39,8 @@ type HomeworkGridProps = {
   scope: ProgressScope;
   /** Shown in the heading row, after the eyebrow: the period selector of this section. */
   controls?: ReactNode;
+  /** Replaces the section's title, "Day by day": a page with several grids names each one. */
+  eyebrow?: string;
 };
 
 function cellClassName(cell: GridCell): string {
@@ -48,7 +50,7 @@ function cellClassName(cell: GridCell): string {
 }
 
 /** Homework of every student: a column per day (and round), a cell with answered · best run. */
-export default function HomeworkGrid({ students, daysByStudent, days, scope, controls }: HomeworkGridProps) {
+export default function HomeworkGrid({ students, daysByStudent, days, scope, controls, eyebrow }: HomeworkGridProps) {
   const t = useT(practiceDict);
   const locale = useLocale();
   const rounds = scope.kind === 'homework' ? scope.homework.rounds : [];
@@ -85,7 +87,7 @@ export default function HomeworkGrid({ students, daysByStudent, days, scope, con
     <section className={s.wrap}>
       <hr className={s.divider} />
       <div className={s.header}>
-        <span className={ui.eyebrow}>{t.dayByDay}</span>
+        <span className={ui.eyebrow}>{eyebrow ?? t.dayByDay}</span>
         {controls}
       </div>
       <div className={s.card}>

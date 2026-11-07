@@ -176,6 +176,7 @@ function HomeworksSection({ student, daysByStudent }: HomeworksSectionProps) {
           daysByStudent={daysByStudent}
           days={dayKeysBetween(openHomework.firstDay, openHomework.lastDay)}
           scope={{ kind: 'homework', homework: openHomework }}
+          eyebrow={`${t.dayByDay} · ${openHomework.title}`}
         />
       )}
       <p className={ui.mono}>{t.reviewHomeworkHint}</p>
