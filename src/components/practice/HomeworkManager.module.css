@@ -166,17 +166,50 @@
   color-scheme: dark;
 }
 
+/* The homework list: one line per homework, every column cut short with an ellipsis and giving
+   way in proportion, Title the widest and the last to drop below a readable length. */
+.list {
+  composes: listTable from '../learn/ui.module.css';
+}
+
+.titleCell {
+  width: 28%;
+  min-width: 14ch;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.list th.titleCell {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.courseCell {
+  width: 16%;
+  min-width: 8ch;
+}
+
+.daysCell {
+  width: 18%;
+  min-width: 8ch;
+}
+
+.countCell {
+  width: 8%;
+  min-width: 5ch;
+}
+
+.statusCell {
+  width: 14%;
+  min-width: 6ch;
+}
+
 .row {
   cursor: pointer;
 }
 
 .row:hover td {
   background: var(--panel-2);
-}
-
-.name {
-  color: var(--ink);
-  font-weight: 600;
 }
 
 .empty {

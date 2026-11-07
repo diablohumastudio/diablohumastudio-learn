@@ -561,34 +561,61 @@ function Homeworks() {
           <p className={s.empty}>{t.noHomeworks}</p>
         ) : (
           <div className={ui.tableWrap}>
-            <table className={ui.table}>
+            <table className={s.list}>
               <thead>
                 <tr>
-                  <th>{t.colTitle}</th>
-                  <th>{t.colCourse}</th>
-                  <th>{t.colDays}</th>
-                  <th className={ui.num}>{t.colRounds}</th>
-                  <th className={ui.num}>{t.colQuestions}</th>
-                  <th className={ui.num}>{t.colDailyGoal}</th>
-                  <th>{t.colStatus}</th>
+                  <th className={s.titleCell} title={t.colTitle}>
+                    {t.colTitle}
+                  </th>
+                  <th className={s.courseCell} title={t.colCourse}>
+                    {t.colCourse}
+                  </th>
+                  <th className={s.daysCell} title={t.colDays}>
+                    {t.colDays}
+                  </th>
+                  <th className={`${ui.num} ${s.countCell}`} title={t.colRounds}>
+                    {t.colRounds}
+                  </th>
+                  <th className={`${ui.num} ${s.countCell}`} title={t.colQuestions}>
+                    {t.colQuestions}
+                  </th>
+                  <th className={`${ui.num} ${s.countCell}`} title={t.colDailyGoal}>
+                    {t.colDailyGoal}
+                  </th>
+                  <th className={s.statusCell} title={t.colStatus}>
+                    {t.colStatus}
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {homeworks.map((homework) => (
-                  <tr
-                    key={homework.id}
-                    className={s.row}
-                    onClick={() => void router.push(teacherHomeworkPath(homework.id))}
-                  >
-                    <td className={s.name}>{homework.title}</td>
-                    <td>{findCourse(homework.courseSlug)?.title ?? homework.courseSlug}</td>
-                    <td>{daysText(homework, locale)}</td>
-                    <td className={ui.num}>{homework.rounds.length}</td>
-                    <td className={ui.num}>{questionCount(homework)}</td>
-                    <td className={ui.num}>{answersPerDay(homework)}</td>
-                    <td>{statusText(homework, today, t)}</td>
-                  </tr>
-                ))}
+                {homeworks.map((homework) => {
+                  const courseTitle = findCourse(homework.courseSlug)?.title ?? homework.courseSlug;
+                  const days = daysText(homework, locale);
+                  const status = statusText(homework, today, t);
+                  return (
+                    <tr
+                      key={homework.id}
+                      className={s.row}
+                      onClick={() => void router.push(teacherHomeworkPath(homework.id))}
+                    >
+                      <td className={s.titleCell} title={homework.title}>
+                        {homework.title}
+                      </td>
+                      <td className={s.courseCell} title={courseTitle}>
+                        {courseTitle}
+                      </td>
+                      <td className={s.daysCell} title={days}>
+                        {days}
+                      </td>
+                      <td className={`${ui.num} ${s.countCell}`}>{homework.rounds.length}</td>
+                      <td className={`${ui.num} ${s.countCell}`}>{questionCount(homework)}</td>
+                      <td className={`${ui.num} ${s.countCell}`}>{answersPerDay(homework)}</td>
+                      <td className={s.statusCell} title={status}>
+                        {status}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
