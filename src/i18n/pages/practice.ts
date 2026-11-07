@@ -132,6 +132,7 @@ const en = {
   pickStudent: 'Pick the student you are reviewing with: the page shows their numbers and nobody else\'s.',
   studentNotFound: 'This student does not exist.',
   showQuestions: 'Show questions',
+  hideQuestions: 'Hide questions',
   reviewHomeworkHint: 'Click a homework to see its days.',
   reviewExamHint: 'An exam with an attempt links to its replay.',
 
@@ -367,6 +368,7 @@ const es: Record<keyof typeof en, string> = {
   pickStudent: 'Elige al estudiante con el que revisas: la página muestra sus números y los de nadie más.',
   studentNotFound: 'Este estudiante no existe.',
   showQuestions: 'Ver preguntas',
+  hideQuestions: 'Ocultar preguntas',
   reviewHomeworkHint: 'Pulsa un deber para ver sus días.',
   reviewExamHint: 'Un examen con intento lleva a su repetición.',
 

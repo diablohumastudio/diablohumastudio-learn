@@ -155,10 +155,12 @@ type CourseQuestionsProps = {
   questionStats: QuestionStats[];
 };
 
-/** The student's attempts on the questions of this course only, most attempted first. */
+/** The student's attempts on the questions of this course only, most attempted first; the
+    table is long, so it opens on request and folds back. */
 function CourseQuestions({ course, questionStats }: CourseQuestionsProps) {
   const t = useT(practiceDict);
   const bank = useQuestionBank();
+  const [isShown, setIsShown] = useState(false);
   let stats: QuestionStats[] | null = null;
   if (bank.status === 'ready') {
     const courseQuestionIds = new Set(questionsInScope(bank.questions, { courseSlug: course.slug }).map((q) => q.id));
@@ -169,7 +171,10 @@ function CourseQuestions({ course, questionStats }: CourseQuestionsProps) {
     <section className={s.section}>
       <hr className={s.divider} />
       <span className={ui.eyebrow}>{t.byQuestion}</span>
-      <QuestionStatsTable stats={stats} />
+      {isShown && <QuestionStatsTable stats={stats} />}
+      <button type="button" className={s.button} onClick={() => setIsShown(!isShown)}>
+        {isShown ? t.hideQuestions : t.showQuestions}
+      </button>
     </section>
   );
 }

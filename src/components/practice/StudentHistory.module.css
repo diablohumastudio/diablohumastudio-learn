@@ -48,6 +48,13 @@
   color: var(--teal);
 }
 
+.button {
+  composes: btn from '../learn/ui.module.css';
+  align-self: flex-start;
+  padding: 8px 12px;
+  font-size: calc(13px + var(--text-delta, 0px));
+}
+
 .empty {
   composes: mono from '../learn/ui.module.css';
   padding: 16px 24px;
