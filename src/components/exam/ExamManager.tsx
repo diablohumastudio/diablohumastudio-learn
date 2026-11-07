@@ -37,7 +37,7 @@ import {
   subscribeGrades,
   updateDraft,
 } from './exams';
-import { dateTimeText, dateTimeYearText, durationText, examErrorText } from './format';
+import { dateTimeText, dateTimeYearText, dayMonthText, durationText, examErrorText } from './format';
 import type { ExamTexts } from './format';
 
 const DEFAULT_MAX_QUESTIONS: string = '10';
@@ -579,12 +579,24 @@ function Exams() {
             <table className={s.list}>
               <thead>
                 <tr>
-                  <th className={s.titleCell}>{t.colTitle}</th>
-                  <th className={s.scopeCell}>{t.colScope}</th>
-                  <th className={ui.num}>{t.colQuestions}</th>
-                  <th className={ui.num}>{t.colMinutes}</th>
-                  <th>{t.colStatus}</th>
-                  <th>{t.colClosesAt}</th>
+                  <th className={s.titleCell} title={t.colTitle}>
+                    {t.colTitle}
+                  </th>
+                  <th className={s.scopeCell} title={t.colScope}>
+                    {t.colScope}
+                  </th>
+                  <th className={`${ui.num} ${s.countCell}`} title={t.colQuestions}>
+                    {t.colQuestions}
+                  </th>
+                  <th className={`${ui.num} ${s.countCell}`} title={t.colMinutes}>
+                    {t.colMinutes}
+                  </th>
+                  <th className={s.statusCell} title={t.colStatus}>
+                    {t.colStatus}
+                  </th>
+                  <th className={s.dateCell} title={t.colClosesAt}>
+                    {t.colClosesAt}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -596,13 +608,14 @@ function Exams() {
                     <td className={s.scopeCell} title={scopeTitle(exam, t)}>
                       {scopeTitle(exam, t)}
                     </td>
-                    <td className={ui.num}>{exam.maxQuestions}</td>
-                    <td className={ui.num}>{exam.durationMinutes}</td>
-                    <td>
-                      <ExamStatusText exam={exam} />
-                    </td>
+                    <td className={`${ui.num} ${s.countCell}`}>{exam.maxQuestions}</td>
+                    <td className={`${ui.num} ${s.countCell}`}>{exam.durationMinutes}</td>
+                    <ExamStatusCell exam={exam} />
                     {/* The planned close while it runs; the real one once it is over, since closing early moves it. */}
-                    <td className={s.date}>{dateTimeYearText(exam.closesAtMs, locale)}</td>
+                    <td className={s.dateCell} title={dateTimeYearText(exam.closesAtMs, locale)}>
+                      <span className={s.dateLong}>{dateTimeYearText(exam.closesAtMs, locale)}</span>
+                      <span className={s.dateShort}>{dayMonthText(exam.closesAtMs, locale)}</span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -614,11 +627,17 @@ function Exams() {
   );
 }
 
-function ExamStatusText({ exam }: { exam: Exam }) {
+/** The Status cell of the exam list; its text doubles as the title, since the cell may cut it short. */
+function ExamStatusCell({ exam }: { exam: Exam }) {
   const t = useT(examDict);
   const running = useIsRunning(exam);
-  if (exam.status === 'draft') return <>{t.statusDraft}</>;
-  return running ? <span className={s.running}>{t.stateRunning}</span> : <>{t.stateFinished}</>;
+  const isRunning = exam.status !== 'draft' && running;
+  const text = exam.status === 'draft' ? t.statusDraft : isRunning ? t.stateRunning : t.stateFinished;
+  return (
+    <td className={s.statusCell} title={text}>
+      {isRunning ? <span className={s.running}>{text}</span> : text}
+    </td>
+  );
 }
 
 export default function ExamManager() {

@@ -36,6 +36,12 @@ export function dateTimeYearText(ms: number | null, locale: Locale): string {
   });
 }
 
+/** '5 Oct': the exam list on a phone, where the full date does not fit. */
+export function dayMonthText(ms: number | null, locale: Locale): string {
+  if (ms === null) return '–';
+  return new Date(ms).toLocaleString(locale, { day: 'numeric', month: 'short' });
+}
+
 export function examErrorText(error: unknown, t: ExamTexts): string {
   if (!(error instanceof ExamRequestError)) return t.errorGeneric;
   if (error.code === 'network') return t.errorNetwork;

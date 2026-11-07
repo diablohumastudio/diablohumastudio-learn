@@ -195,6 +195,36 @@
   overflow-x: auto;
 }
 
+/* A list whose rows never wrap: every column is cut short with an ellipsis and gives way in
+   proportion to its width, down to the min-width each cell class sets; the full text goes in
+   `title`. On a phone the text and the padding shrink so the whole row still fits. */
+.listTable {
+  composes: table;
+}
+
+.listTable th,
+.listTable td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 0;
+}
+
+@media (max-width: 560px) {
+  .listTable {
+    font-size: calc(12px + var(--text-delta, 0px));
+  }
+
+  .listTable th,
+  .listTable td {
+    padding: 8px 6px;
+  }
+
+  .listTable th {
+    font-size: calc(10px + var(--text-delta, 0px));
+  }
+}
+
 .centered {
   display: flex;
   flex-direction: column;

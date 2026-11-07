@@ -81,27 +81,15 @@
   color: var(--amber);
 }
 
-/* The exam list: nothing wraps; Exam and Scope share the spare width and are cut short with an
-   ellipsis, never below eight characters, with the full text on hover. */
+/* The exam list: one line per exam, every column cut short with an ellipsis and giving way in
+   proportion, Exam the widest and the last to drop below a readable length. */
 .list {
-  composes: table from '../learn/ui.module.css';
-}
-
-.list th,
-.list td {
-  white-space: nowrap;
-}
-
-.truncated {
-  max-width: 0;
-  min-width: 8ch;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  composes: listTable from '../learn/ui.module.css';
 }
 
 .titleCell {
-  composes: truncated;
-  width: 60%;
+  width: 34%;
+  min-width: 12ch;
   color: var(--ink);
   font-weight: 600;
 }
@@ -112,8 +100,38 @@
 }
 
 .scopeCell {
-  composes: truncated;
-  width: 40%;
+  width: 22%;
+  min-width: 8ch;
+}
+
+.countCell {
+  width: 10%;
+  min-width: 5ch;
+}
+
+.statusCell {
+  width: 12%;
+  min-width: 6ch;
+}
+
+.dateCell {
+  width: 12%;
+  min-width: 6ch;
+}
+
+/* The full date on a wide window, "5 Oct" on a phone; the full one is the cell's title. */
+.dateShort {
+  display: none;
+}
+
+@media (max-width: 560px) {
+  .dateLong {
+    display: none;
+  }
+
+  .dateShort {
+    display: inline;
+  }
 }
 
 .row {
@@ -148,8 +166,4 @@
 .empty {
   composes: mono from '../learn/ui.module.css';
   padding: 16px 24px;
-}
-
-.date {
-  white-space: nowrap;
 }
