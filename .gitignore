@@ -38,3 +38,6 @@ exam-only-questions*.json
 
 # Question bank exports made by questions/scripts: they hold the correct answers.
 questions/exports/
+
+# Deliverable exports made by deliverables/scripts: they hold student work and names.
+deliverables/exports/
