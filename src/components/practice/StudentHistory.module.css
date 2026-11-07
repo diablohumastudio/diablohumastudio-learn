@@ -16,6 +16,10 @@
   gap: 14px;
 }
 
+.sectionTitle {
+  composes: sectionTitle from '../learn/ui.module.css';
+}
+
 .divider {
   composes: sectionDivider from '../learn/ui.module.css';
 }

@@ -1,0 +1,41 @@
+.card {
+  composes: card from '../learn/ui.module.css';
+  padding: 8px 0;
+}
+
+.tableWrap {
+  composes: tableWrap from '../learn/ui.module.css';
+}
+
+.table {
+  composes: table from '../learn/ui.module.css';
+}
+
+.table th,
+.table td {
+  white-space: nowrap;
+}
+
+.link {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link:hover {
+  color: var(--amber);
+}
+
+.score {
+  font-weight: 600;
+  color: var(--teal);
+}
+
+.late {
+  color: var(--red);
+}
+
+.empty {
+  composes: mono from '../learn/ui.module.css';
+  padding: 16px 24px;
+}

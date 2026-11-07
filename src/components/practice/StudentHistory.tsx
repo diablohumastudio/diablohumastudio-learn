@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import type { User } from 'firebase/auth';
 import { coursePath } from '../../data/learn';
 import type { LearnCourse } from '../../data/learn';
@@ -16,16 +17,20 @@ import {
   questionsInScope,
   summarizePeriod,
 } from '../../data/practice';
-import type { ProgressScope } from '../../data/practice';
+import type { Homework, ProgressScope } from '../../data/practice';
+import { deliverableDict } from '../../i18n/pages/deliverable';
+import { examDict } from '../../i18n/pages/exam';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import StudentDeliverables from '../deliverable/StudentDeliverables';
+import StudentExams from '../exam/StudentExams';
 import SignInRedirect from '../learn/SignInRedirect';
 import ui from '../learn/ui.module.css';
 import { useAuthUser } from '../learn/useAuthUser';
 import { CourseProgressProvider, useCourseProgress } from './CourseProgressContext';
 import type { CourseProgressData } from './CourseProgressContext';
-import { percentText, scoreText } from './format';
+import { homeworkDaysText, homeworkStatusText, percentText, scoreText } from './format';
 import HomeworkGrid from './HomeworkGrid';
 import { MonthSelect } from './PeriodControls';
 import { subscribeStudent } from './progress';
@@ -179,8 +184,66 @@ function CourseQuestions({ course, questionStats }: CourseQuestionsProps) {
   );
 }
 
+/** Every specific homework of the course with the student's points and its state. */
+function HomeworksTable({ progress }: { progress: CourseProgressData }) {
+  const t = useT(practiceDict);
+  const locale = useLocale();
+  const today = dayKey(new Date());
+  const homeworks: Homework[] = progress.homeworks;
+
+  return (
+    <div className={s.card}>
+      {homeworks.length === 0 ? (
+        <p className={s.empty}>{t.noHomeworks}</p>
+      ) : (
+        <div className={s.tableWrap}>
+          <table className={s.table}>
+            <thead>
+              <tr>
+                <th>{t.colTitle}</th>
+                <th>{t.colDays}</th>
+                <th className={ui.num}>{t.colPoints}</th>
+                <th>{t.colStatus}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {homeworks.map((homework) => {
+                const days = dayKeysBetween(homework.firstDay, homework.lastDay);
+                const summary = summarizePeriod(progress.homeworkDays, { kind: 'homework', homework }, days);
+                return (
+                  <tr key={homework.id}>
+                    <td className={s.month}>{homework.title}</td>
+                    <td>{homeworkDaysText(homework, locale)}</td>
+                    <td className={`${ui.num} ${s.score}`}>
+                      {scoreText(summary.score, locale)} / {days.length}
+                    </td>
+                    <td>{homeworkStatusText(homework, today, t)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** One of the page's big sections, after the daily practice: a title over its table. */
+function TitledSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className={s.section}>
+      <hr className={s.divider} />
+      <h2 className={s.sectionTitle}>{title}</h2>
+      {children}
+    </section>
+  );
+}
+
 function HistoryPage({ course, user }: HistoryPageProps) {
   const t = useT(practiceDict);
+  const examT = useT(examDict);
+  const deliverableT = useT(deliverableDict);
   const progress = useCourseProgress();
   const today = dayKey(new Date());
   const [student, setStudent] = useState<StudentStats | null>(null);
@@ -205,6 +268,7 @@ function HistoryPage({ course, user }: HistoryPageProps) {
         </div>
       ) : (
         <>
+          <h2 className={s.sectionTitle}>{t.dailyPracticeSection}</h2>
           <LifetimeStats student={student} />
           <MonthsTable progress={progress} scope={scope} months={monthsOf(progress, today)} today={today} />
           <HomeworkGrid
@@ -215,6 +279,18 @@ function HistoryPage({ course, user }: HistoryPageProps) {
             controls={<MonthSelect month={gridMonth} months={monthsOf(progress, today)} onChange={setGridMonth} />}
           />
           <CourseQuestions course={course} questionStats={progress.questionStats} />
+          <TitledSection title={examT.multipleOptionExamsSection}>
+            <StudentExams course={course} uid={user.uid} />
+          </TitledSection>
+          <TitledSection title={t.multipleOptionHomeworksSection}>
+            <HomeworksTable progress={progress} />
+          </TitledSection>
+          <TitledSection title={deliverableT.examsSection}>
+            <StudentDeliverables uid={user.uid} role="exam" course={course} viewer="student" />
+          </TitledSection>
+          <TitledSection title={deliverableT.homeworksSection}>
+            <StudentDeliverables uid={user.uid} role="homework" course={course} viewer="student" />
+          </TitledSection>
         </>
       )}
     </div>

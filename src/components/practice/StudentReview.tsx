@@ -11,10 +11,14 @@ import {
 } from '../../data/learn';
 import { dayKey, dayKeysBetween, summarizePeriod } from '../../data/practice';
 import type { Homework } from '../../data/practice';
+import type { DeliverableRole } from '../../data/deliverable/types';
+import { deliverableDict } from '../../i18n/pages/deliverable';
 import { examDict } from '../../i18n/pages/exam';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import StudentDeliverables from '../deliverable/StudentDeliverables';
+import { roleSectionText } from '../deliverable/format';
 import { fetchAttempt, fetchGrade, subscribeAllExams } from '../exam/exams';
 import { dateTimeYearText, durationText } from '../exam/format';
 import menu from '../learn/LearnMenu.module.css';
@@ -126,7 +130,7 @@ function HomeworksSection({ student, daysByStudent }: HomeworksSectionProps) {
   return (
     <section className={s.section}>
       <hr className={s.divider} />
-      <span className={ui.eyebrow}>{t.homeworksTitle}</span>
+      <h2 className={s.sectionTitle}>{t.multipleOptionHomeworksSection}</h2>
       <div className={s.card}>
         {homeworks === null ? (
           <p className={s.empty}>{t.loading}</p>
@@ -225,7 +229,7 @@ function ExamsSection({ uid }: { uid: string }) {
   return (
     <section className={s.section}>
       <hr className={s.divider} />
-      <span className={ui.eyebrow}>{t.examsTitle}</span>
+      <h2 className={s.sectionTitle}>{t.multipleOptionExamsSection}</h2>
       <div className={s.card}>
         {exams === null ? (
           <p className={s.empty}>{t.loading}</p>
@@ -278,13 +282,26 @@ function ExamsSection({ uid }: { uid: string }) {
   );
 }
 
+/** The deliverables of one role with this student's saved state and score. */
+function DeliverablesSection({ uid, role }: { uid: string; role: DeliverableRole }) {
+  const t = useT(deliverableDict);
+  return (
+    <section className={s.section}>
+      <hr className={s.divider} />
+      <h2 className={s.sectionTitle}>{roleSectionText(role, t)}</h2>
+      <StudentDeliverables uid={uid} role={role} viewer="teacher" />
+    </section>
+  );
+}
+
 type StudentPageProps = {
   student: StudentStats;
   /** Everybody, alphabetical, for the switch in the heading. */
   students: StudentStats[];
 };
 
-/** One student's page: daily homework, questions on demand, specific homeworks and exams. */
+/** One student's page: daily practice (homework and questions on demand), multiple option exams
+    and homeworks, and the deliverables of each role. */
 function StudentPage({ student, students }: StudentPageProps) {
   const t = useT(practiceDict);
   const router = useRouter();
@@ -317,10 +334,13 @@ function StudentPage({ student, students }: StudentPageProps) {
           </select>
         </label>
       </div>
+      <h2 className={s.sectionTitle}>{t.dailyPracticeSection}</h2>
       <CoursePeriod students={studentList} daysByStudent={daysByStudent} selectionScope={`student-${student.uid}-`} />
       <QuestionsSection uid={student.uid} />
-      <HomeworksSection student={student} daysByStudent={daysByStudent} />
       <ExamsSection uid={student.uid} />
+      <HomeworksSection student={student} daysByStudent={daysByStudent} />
+      <DeliverablesSection uid={student.uid} role="exam" />
+      <DeliverablesSection uid={student.uid} role="homework" />
     </div>
   );
 }
