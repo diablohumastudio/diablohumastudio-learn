@@ -57,56 +57,60 @@ export default function PeriodControls({
   }
 
   return (
-    <div className={s.controls}>
+    <div className={s.wrap}>
       <span className={ui.eyebrow}>{t.homeworkTitle}</span>
-      <label className={s.control}>
-        <span className={ui.label}>{t.colCourse}</span>
-        <select className={s.input} value={courseSlug} onChange={(event) => onCourseChange(event.target.value)}>
-          {LEARN_COURSES.map((course) => (
-            <option key={course.slug} value={course.slug}>
-              {course.title}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className={s.control}>
-        <span className={ui.label}>{t.periodLabel}</span>
-        <select className={s.input} value={optionOf(period)} onChange={(event) => selectPeriod(event.target.value)}>
-          {months.map((month) => (
-            <option key={month} value={`${MONTH_OPTION_PREFIX}${month}`}>
-              {monthText(month, locale)}
-            </option>
-          ))}
-          <option value={ALL_OPTION}>{t.periodAll}</option>
-          <option value={CUSTOM_OPTION}>{t.periodCustom}</option>
-        </select>
-      </label>
-      {period.kind === 'custom' && (
-        <>
-          <label className={s.control}>
-            <span className={ui.label}>{t.rangeFrom}</span>
-            <input
-              className={s.input}
-              type="date"
-              value={period.firstDay}
-              max={period.lastDay}
-              onChange={(event) =>
-                event.target.value && onPeriodChange({ ...period, firstDay: event.target.value })
-              }
-            />
-          </label>
-          <label className={s.control}>
-            <span className={ui.label}>{t.rangeTo}</span>
-            <input
-              className={s.input}
-              type="date"
-              value={period.lastDay}
-              min={period.firstDay}
-              onChange={(event) => event.target.value && onPeriodChange({ ...period, lastDay: event.target.value })}
-            />
-          </label>
-        </>
-      )}
+      <div className={s.controls}>
+        <label className={s.control}>
+          <span className={ui.label}>{t.colCourse}</span>
+          <select className={s.input} value={courseSlug} onChange={(event) => onCourseChange(event.target.value)}>
+            {LEARN_COURSES.map((course) => (
+              <option key={course.slug} value={course.slug}>
+                {course.title}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={s.control}>
+          <span className={ui.label}>{t.periodLabel}</span>
+          <select className={s.input} value={optionOf(period)} onChange={(event) => selectPeriod(event.target.value)}>
+            {months.map((month) => (
+              <option key={month} value={`${MONTH_OPTION_PREFIX}${month}`}>
+                {monthText(month, locale)}
+              </option>
+            ))}
+            <option value={ALL_OPTION}>{t.periodAll}</option>
+            <option value={CUSTOM_OPTION}>{t.periodCustom}</option>
+          </select>
+        </label>
+        {period.kind === 'custom' && (
+          <>
+            <label className={s.control}>
+              <span className={ui.label}>{t.rangeFrom}</span>
+              <input
+                className={s.input}
+                type="date"
+                value={period.firstDay}
+                max={period.lastDay}
+                onChange={(event) =>
+                  event.target.value && onPeriodChange({ ...period, firstDay: event.target.value })
+                }
+              />
+            </label>
+            <label className={s.control}>
+              <span className={ui.label}>{t.rangeTo}</span>
+              <input
+                className={s.input}
+                type="date"
+                value={period.lastDay}
+                min={period.firstDay}
+                onChange={(event) =>
+                  event.target.value && onPeriodChange({ ...period, lastDay: event.target.value })
+                }
+              />
+            </label>
+          </>
+        )}
+      </div>
     </div>
   );
 }

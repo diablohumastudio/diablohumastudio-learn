@@ -1,11 +1,21 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* One row always: on a narrow window it scrolls sideways rather than breaking into two. */
 .controls {
   display: flex;
   align-items: flex-end;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 2px;
 }
 
 .control {
+  flex: none;
   display: flex;
   flex-direction: column;
   gap: 6px;
