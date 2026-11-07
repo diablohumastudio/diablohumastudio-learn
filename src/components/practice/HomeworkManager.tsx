@@ -296,7 +296,7 @@ function HomeworkForm({ homework, state, onDeleted, onCreated }: HomeworkFormPro
 
   return (
     <form
-      className={isFinished ? s.formFinished : s.form}
+      className={s.form}
       onSubmit={(event) => {
         event.preventDefault();
         save();
@@ -305,7 +305,7 @@ function HomeworkForm({ homework, state, onDeleted, onCreated }: HomeworkFormPro
       {isFinished && <p className={ui.mono}>{t.homeworkFinishedNotice}</p>}
       {isOpen && <p className={s.warning}>{t.homeworkOpenNotice}</p>}
       {/* A disabled fieldset disables every control inside, the question picker's included. */}
-      <fieldset className={s.fields} disabled={isFinished}>
+      <fieldset className={isFinished ? s.fieldsFinished : s.fields} disabled={isFinished}>
         <label className={ui.field}>
           <span className={ui.label}>{t.homeworkTitleLabel}</span>
           <input
