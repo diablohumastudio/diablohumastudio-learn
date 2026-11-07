@@ -23,7 +23,7 @@
 
 .input {
   composes: input from '../learn/ui.module.css';
-  font-size: 14px;
+  font-size: calc(14px + var(--text-delta, 0px));
   padding: 8px 10px;
   color-scheme: dark;
 }

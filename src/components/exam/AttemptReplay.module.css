@@ -35,7 +35,7 @@
 }
 
 .prompt {
-  font-size: 17px;
+  font-size: calc(17px + var(--text-delta, 0px));
   font-weight: 600;
   line-height: 1.4;
   color: var(--ink);
@@ -53,7 +53,7 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  font-size: 15px;
+  font-size: calc(15px + var(--text-delta, 0px));
   line-height: 1.4;
   background: var(--bg);
   border: 1px solid var(--line);
@@ -81,5 +81,5 @@
   composes: mono from '../learn/ui.module.css';
   color: var(--ink);
   text-transform: uppercase;
-  font-size: 10px;
+  font-size: calc(10px + var(--text-delta, 0px));
 }

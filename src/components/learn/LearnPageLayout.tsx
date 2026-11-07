@@ -1,7 +1,8 @@
 import Head from 'next/head';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { learnDict } from '../../i18n/learn';
 import { useT } from '../../i18n/useT';
+import { useTextDelta } from '../practice/practiceSettings';
 import { LEARN_FONT_VARS } from './fonts';
 import LearnHeader from './LearnHeader';
 import s from './LearnPageLayout.module.css';
@@ -17,9 +18,12 @@ type LearnPageLayoutProps = {
 
 export default function LearnPageLayout({ headerCenter, wide = false, children }: LearnPageLayoutProps) {
   const t = useT(learnDict);
+  const textDelta = useTextDelta();
+  // The text sizes of the page add this to their base (`--text-delta` in the CSS modules).
+  const textStyle = { '--text-delta': `${textDelta}px` } as CSSProperties;
 
   return (
-    <div className={`${s.shell} ${LEARN_FONT_VARS}`}>
+    <div className={`${s.shell} ${LEARN_FONT_VARS}`} style={textStyle}>
       <Head>
         <title>{t.pageTitle}</title>
         {/* Unlisted section: reachable only by direct link. */}

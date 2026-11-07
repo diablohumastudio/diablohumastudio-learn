@@ -3,19 +3,33 @@ import { learnDict } from '../../i18n/learn';
 import { useT } from '../../i18n/useT';
 import LanguageSwitch from '../LanguageSwitch';
 import {
+  DEFAULT_TEXT_DELTA,
   MAX_QUESTION_SECONDS,
+  MAX_TEXT_DELTA,
   MIN_QUESTION_SECONDS,
+  MIN_TEXT_DELTA,
   clampQuestionSeconds,
   saveQuestionSeconds,
+  saveTextDelta,
   useQuestionSeconds,
+  useTextDelta,
 } from '../practice/practiceSettings';
 import s from './ConfigDialog.module.css';
 import ui from './ui.module.css';
+
+const TEXT_DELTA_STEP: number = 1;
+
+/** '+2', '−3' or the word for the default. */
+function textDeltaText(delta: number, defaultText: string): string {
+  if (delta === DEFAULT_TEXT_DELTA) return defaultText;
+  return delta > 0 ? `+${delta}` : `−${Math.abs(delta)}`;
+}
 
 export default function ConfigDialog({ onClose }: { onClose: () => void }) {
   const t = useT(learnDict);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const questionSeconds = useQuestionSeconds();
+  const textDelta = useTextDelta();
   // Text while typing: clamping each keystroke would turn the "1" of "15" into the minimum.
   const [secondsText, setSecondsText] = useState(String(questionSeconds));
 
@@ -64,6 +78,31 @@ export default function ConfigDialog({ onClose }: { onClose: () => void }) {
           </span>
         </span>
       </label>
+
+      <div className={s.setting}>
+        <span className={ui.label}>{t.textSizeLabel}</span>
+        <span className={s.stepper}>
+          <button
+            type="button"
+            className={s.stepButton}
+            aria-label={t.textSmaller}
+            disabled={textDelta <= MIN_TEXT_DELTA}
+            onClick={() => saveTextDelta(textDelta - TEXT_DELTA_STEP)}
+          >
+            −
+          </button>
+          <span className={s.stepValue}>{textDeltaText(textDelta, t.textSizeDefault)}</span>
+          <button
+            type="button"
+            className={s.stepButton}
+            aria-label={t.textLarger}
+            disabled={textDelta >= MAX_TEXT_DELTA}
+            onClick={() => saveTextDelta(textDelta + TEXT_DELTA_STEP)}
+          >
+            +
+          </button>
+        </span>
+      </div>
 
       <form method="dialog" className={s.actions}>
         <button type="submit" className={ui.btnPrimary}>

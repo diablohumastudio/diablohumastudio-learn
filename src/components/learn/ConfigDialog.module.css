@@ -55,6 +55,25 @@
   font-variant-numeric: tabular-nums;
 }
 
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stepButton {
+  composes: btn from './ui.module.css';
+  padding: 6px 12px;
+  line-height: 1;
+}
+
+.stepValue {
+  composes: mono from './ui.module.css';
+  min-width: 56px;
+  text-align: center;
+  color: var(--ink);
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;

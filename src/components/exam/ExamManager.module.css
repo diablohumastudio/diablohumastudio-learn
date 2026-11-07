@@ -34,7 +34,7 @@
   composes: btnGhost from '../learn/ui.module.css';
   align-self: flex-start;
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: calc(13px + var(--text-delta, 0px));
 }
 
 .card {

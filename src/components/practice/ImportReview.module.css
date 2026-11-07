@@ -14,7 +14,7 @@
   composes: btnGhost from '../learn/ui.module.css';
   align-self: flex-start;
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: calc(13px + var(--text-delta, 0px));
 }
 
 .entries {
@@ -57,7 +57,7 @@
 }
 
 .status {
-  font-size: 13px;
+  font-size: calc(13px + var(--text-delta, 0px));
   font-weight: 600;
   color: var(--status);
 }
@@ -77,7 +77,7 @@
 .prompt {
   flex: 1;
   min-width: 0;
-  font-size: 14px;
+  font-size: calc(14px + var(--text-delta, 0px));
   color: var(--ink);
 }
 
@@ -85,7 +85,7 @@
   composes: btnGhost from '../learn/ui.module.css';
   flex: none;
   padding: 6px 12px;
-  font-size: 13px;
+  font-size: calc(13px + var(--text-delta, 0px));
 }
 
 .actions {

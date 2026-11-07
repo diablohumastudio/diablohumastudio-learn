@@ -44,7 +44,7 @@
   gap: 10px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--line);
-  font-size: 14px;
+  font-size: calc(14px + var(--text-delta, 0px));
   color: var(--ink);
   cursor: pointer;
 }
@@ -76,7 +76,7 @@
   display: flex;
   align-items: baseline;
   gap: 10px;
-  font-size: 14px;
+  font-size: calc(14px + var(--text-delta, 0px));
   line-height: 1.4;
   color: var(--ink);
   cursor: pointer;

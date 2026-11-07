@@ -42,7 +42,7 @@
   text-align: center;
   white-space: nowrap;
   font-family: var(--font-mono, Menlo, Consolas, monospace);
-  font-size: 12px;
+  font-size: calc(12px + var(--text-delta, 0px));
   font-variant-numeric: tabular-nums;
 }
 

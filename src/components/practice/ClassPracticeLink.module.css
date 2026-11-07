@@ -18,13 +18,13 @@
   text-align: right;
   white-space: nowrap;
   font-family: var(--font-mono, Menlo, Consolas, monospace);
-  font-size: 12px;
+  font-size: calc(12px + var(--text-delta, 0px));
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
 .label {
-  font-size: 14px;
+  font-size: calc(14px + var(--text-delta, 0px));
   transition: color 0.15s;
 }
 

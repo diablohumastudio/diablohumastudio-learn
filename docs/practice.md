@@ -16,7 +16,7 @@
 | Firebase init | `src/lib/firebase.ts` | Lazy client init from `NEXT_PUBLIC_FIREBASE_*`; `isFirebaseConfigured()` |
 | Student app | `src/components/practice/PracticeApp.tsx` → `Player`, `HomeworkMeter`, `PlayScopeSelect` | Endless timed play (`/practice/play`) with the day's homework under the card |
 | Course page | `src/components/practice/CourseProgressContext.tsx`, `CourseProgressLoader.tsx`, `CourseProgress.tsx`, `ClassPracticeLink.tsx` | Homework card and per-class answer counts on `/course/<course>`; the loader is the only part that downloads Firebase |
-| Settings | `src/components/practice/practiceSettings.ts`, `src/components/learn/ConfigDialog.tsx` | Time per question, per device in `localStorage` |
+| Settings | `src/components/practice/practiceSettings.ts`, `src/components/learn/ConfigDialog.tsx` | Time per question and text size, per device in `localStorage`; the layout sets `--text-delta` from the text size and every text size in the CSS modules is `calc(<base>px + var(--text-delta, 0px))`, headings excepted |
 | Persistence | `src/components/practice/progress.ts` | All Firestore reads and writes of student progress |
 | Teacher board | `src/components/practice/TeacherBoard.tsx`, `PeriodControls.tsx`, `PeriodSummary.tsx`, `HomeworkGrid.tsx`, `useStudentDays.ts`, `summarySelection.ts`, `tableExport.ts` | Course, month and range; the period summary with its export; the day grid; every student's numbers and per-question table at `/teacher/students-practice-info` |
 | Teacher hub | `src/components/learn/TeacherHub.tsx` | `/teacher`: links to the board and the editor, teachers only |

@@ -22,7 +22,7 @@
 
 .timer {
   font-family: var(--font-mono, Menlo, Consolas, monospace);
-  font-size: 15px;
+  font-size: calc(15px + var(--text-delta, 0px));
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
@@ -66,7 +66,7 @@
 .stop {
   composes: btnGhost from '../learn/ui.module.css';
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: calc(13px + var(--text-delta, 0px));
   text-decoration: none;
 }
 
@@ -114,7 +114,7 @@
 
 .choice {
   font: inherit;
-  font-size: 16px;
+  font-size: calc(16px + var(--text-delta, 0px));
   line-height: 1.4;
   text-align: left;
   color: var(--ink);
@@ -188,7 +188,7 @@
 }
 
 .explanation {
-  font-size: 15px;
+  font-size: calc(15px + var(--text-delta, 0px));
   line-height: 1.55;
   color: var(--muted);
 }
@@ -241,6 +241,6 @@
 }
 
 .dayNotice {
-  font-size: 14px;
+  font-size: calc(14px + var(--text-delta, 0px));
   color: var(--amber);
 }

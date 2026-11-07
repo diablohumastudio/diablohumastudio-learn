@@ -33,7 +33,7 @@
 
 .mono {
   font-family: var(--font-mono, Menlo, Consolas, monospace);
-  font-size: 12px;
+  font-size: calc(12px + var(--text-delta, 0px));
   letter-spacing: 0.06em;
   color: var(--muted);
 }
@@ -51,7 +51,7 @@
 .btn {
   font: inherit;
   font-weight: 600;
-  font-size: 14px;
+  font-size: calc(14px + var(--text-delta, 0px));
   line-height: 1;
   color: var(--ink);
   background: var(--panel-2);
@@ -110,7 +110,7 @@
 
 .input {
   font: inherit;
-  font-size: 15px;
+  font-size: calc(15px + var(--text-delta, 0px));
   color: var(--ink);
   background: var(--bg);
   border: 1px solid var(--line);
@@ -165,7 +165,7 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: calc(14px + var(--text-delta, 0px));
 }
 
 .table th,
@@ -178,7 +178,7 @@
 
 .table th {
   font-family: var(--font-mono, Menlo, Consolas, monospace);
-  font-size: 12px;
+  font-size: calc(12px + var(--text-delta, 0px));
   letter-spacing: 0.06em;
   color: var(--muted);
   text-transform: uppercase;

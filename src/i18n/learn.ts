@@ -33,6 +33,10 @@ const en = {
   closeConfig: 'Done',
   questionTimeLabel: 'Practice: time per question',
   secondsUnit: 'seconds',
+  textSizeLabel: 'Text size',
+  textSizeDefault: 'normal',
+  textSmaller: 'Smaller text',
+  textLarger: 'Larger text',
   signIn: 'Sign in',
   signOut: 'Sign out',
 
@@ -103,6 +107,10 @@ const es: Record<keyof typeof en, string> = {
   closeConfig: 'Listo',
   questionTimeLabel: 'Práctica: tiempo por pregunta',
   secondsUnit: 'segundos',
+  textSizeLabel: 'Tamaño de letra',
+  textSizeDefault: 'normal',
+  textSmaller: 'Letra más pequeña',
+  textLarger: 'Letra más grande',
   signIn: 'Iniciar sesión',
   signOut: 'Cerrar sesión',
 

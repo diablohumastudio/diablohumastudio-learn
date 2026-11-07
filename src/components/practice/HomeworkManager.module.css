@@ -29,7 +29,7 @@
   composes: btnGhost from '../learn/ui.module.css';
   align-self: flex-start;
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: calc(13px + var(--text-delta, 0px));
 }
 
 .card {
@@ -60,7 +60,7 @@
 }
 
 .warning {
-  font-size: 14px;
+  font-size: calc(14px + var(--text-delta, 0px));
   color: var(--amber);
 }
 
@@ -116,21 +116,21 @@
 
 .roundName {
   font-weight: 600;
-  font-size: 15px;
+  font-size: calc(15px + var(--text-delta, 0px));
 }
 
 .duplicate {
   composes: btnGhost from '../learn/ui.module.css';
   flex: none;
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: calc(13px + var(--text-delta, 0px));
 }
 
 .remove {
   composes: btnGhost from '../learn/ui.module.css';
   flex: none;
   padding: 6px 12px;
-  font-size: 16px;
+  font-size: calc(16px + var(--text-delta, 0px));
   line-height: 1;
 }
 
@@ -149,7 +149,7 @@
   align-self: flex-start;
   margin-top: 4px;
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: calc(13px + var(--text-delta, 0px));
 }
 
 .numbers {
