@@ -77,10 +77,13 @@
 }
 
 /* Takes the width the other columns leave, and may shrink below its text: the name and the
-   email inside are cut short instead of wrapping. */
+   email inside are cut short instead of wrapping. Never below 96px, and whatever is cut stays
+   inside the cell instead of running over the next column. */
 .studentCell {
   width: 100%;
   max-width: 0;
+  min-width: 96px;
+  overflow: hidden;
 }
 
 .student {
