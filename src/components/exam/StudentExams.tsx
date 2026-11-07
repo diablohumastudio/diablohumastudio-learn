@@ -22,11 +22,11 @@ export default function StudentExams({ course, uid }: { course: LearnCourse; uid
   const locale = useLocale();
   const [exams, setExams] = useState<Exam[] | null>(null);
   const [results, setResults] = useState<Record<string, ExamResult> | null>(null);
-  const courseExams = useMemo(() => (exams ?? []).filter((exam) => exam.courseSlug === course.slug), [exams, course.slug]);
+  const courseExams = useMemo(() => exams ?? [], [exams]);
 
   useEffect(
-    () => subscribeOpenedExams(setExams, (error) => console.error('Could not load the exams', error)),
-    []
+    () => subscribeOpenedExams(course.slug, setExams, (error) => console.error('Could not load the exams', error)),
+    [course.slug]
   );
 
   useEffect(() => {

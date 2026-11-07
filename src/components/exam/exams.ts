@@ -98,10 +98,19 @@ export function subscribeAllExams(onExams: (exams: Exam[]) => void, onError: (er
   );
 }
 
-/** The rules only let a student list opened exams, so the query has to ask for exactly those. */
-export function subscribeOpenedExams(onExams: (exams: Exam[]) => void, onError: (error: unknown) => void): Unsubscribe {
+/** The rules only let a student list the opened exams of a course they are enrolled in, so the
+    query has to ask for exactly those. */
+export function subscribeOpenedExams(
+  courseSlug: string,
+  onExams: (exams: Exam[]) => void,
+  onError: (error: unknown) => void
+): Unsubscribe {
   return onSnapshot(
-    query(collection(getFirestoreDb(), EXAMS_COLLECTION), where('status', '==', 'opened')),
+    query(
+      collection(getFirestoreDb(), EXAMS_COLLECTION),
+      where('status', '==', 'opened'),
+      where('courseSlug', '==', courseSlug)
+    ),
     (snapshot) => onExams(snapshot.docs.map((examDoc) => toExam(examDoc.id, examDoc.data())).sort(newestFirst)),
     onError
   );

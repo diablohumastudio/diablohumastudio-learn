@@ -3,7 +3,7 @@ import type { LearnCourse } from '../../data/learn';
 import { questionsInScope } from '../../data/practice';
 import type { DayProgress, Homework, PracticeQuestion } from '../../data/practice';
 import { isFirebaseConfigured } from '../../lib/firebase';
-import { useAuthUser } from '../learn/useAuthUser';
+import { useMembership } from '../course/useMembership';
 import type { ClassAnswers, CourseProgressData } from './CourseProgressContext';
 import { fetchCourseHomeworks } from './homeworks';
 import { fetchStudentDays, fetchStudentQuestions } from './progress';
@@ -90,14 +90,17 @@ function SignedInLoader({ uid, course, onLoaded }: CourseProgressLoaderProps & {
   return null;
 }
 
-/** Renders nothing: it reports the signed-in student's progress in a course to the context. */
+/** Renders nothing: it reports the signed-in student's progress in a course to the context.
+    An account that is not enrolled gets none, like a guest: the course page then shows the
+    access card instead of the homework (docs/courses.md). */
 export default function CourseProgressLoader({ course, onLoaded }: CourseProgressLoaderProps) {
-  const auth = useAuthUser();
+  const membership = useMembership(course.slug);
+  const isMember = membership.status === 'member';
 
   useEffect(() => {
-    if (auth.status === 'signedOut') onLoaded(null);
-  }, [auth.status, onLoaded]);
+    if (!isMember) onLoaded(null);
+  }, [isMember, onLoaded]);
 
-  if (!isFirebaseConfigured() || auth.status !== 'signedIn') return null;
-  return <SignedInLoader uid={auth.user.uid} course={course} onLoaded={onLoaded} />;
+  if (!isFirebaseConfigured() || !isMember || !membership.user) return null;
+  return <SignedInLoader uid={membership.user.uid} course={course} onLoaded={onLoaded} />;
 }

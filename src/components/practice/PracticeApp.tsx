@@ -17,6 +17,8 @@ import type { Homework, RoundOfHomework } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import NotEnrolledNotice from '../course/NotEnrolledNotice';
+import { useMembership } from '../course/useMembership';
 import SignInRedirect from '../learn/SignInRedirect';
 import ui from '../learn/ui.module.css';
 import { useAuthUser } from '../learn/useAuthUser';
@@ -177,6 +179,7 @@ export default function PracticeApp() {
   const roundId = querySlug(router.query.round);
   const course = findCourse(scope.courseSlug);
   const isCourseMissing = router.isReady && !course;
+  const membership = useMembership(course?.slug ?? '');
 
   // Practice never mixes courses: a link without a known course goes back to the course menu.
   useEffect(() => {
@@ -201,6 +204,15 @@ export default function PracticeApp() {
   if (auth.status === 'signedOut') {
     return <SignInRedirect />;
   }
+  // Practice is for the students enrolled in the course (docs/courses.md).
+  if (membership.status === 'loading') {
+    return (
+      <div className={ui.centered}>
+        <span className={ui.mono}>{t.loading}</span>
+      </div>
+    );
+  }
+  if (membership.status !== 'member') return <NotEnrolledNotice course={course} />;
 
   if (homeworkId) {
     return (

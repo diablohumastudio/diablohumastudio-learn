@@ -1,0 +1,16 @@
+.card {
+  composes: card from '../practice/CourseProgress.module.css';
+}
+
+.title {
+  composes: title from '../practice/CourseProgress.module.css';
+}
+
+.lede {
+  composes: lede from '../learn/ui.module.css';
+}
+
+.button {
+  composes: btnPrimary from '../learn/ui.module.css';
+  align-self: flex-start;
+}

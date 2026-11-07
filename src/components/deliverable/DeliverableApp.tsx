@@ -16,6 +16,8 @@ import type { LearnCourse } from '../../data/learn';
 import { deliverableDict } from '../../i18n/pages/deliverable';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import NotEnrolledNotice from '../course/NotEnrolledNotice';
+import { useMembership } from '../course/useMembership';
 import { countdownText, dateTimeText, durationText } from '../exam/format';
 import SignInRedirect from '../learn/SignInRedirect';
 import ui from '../learn/ui.module.css';
@@ -380,6 +382,7 @@ export default function DeliverableApp() {
   const auth = useAuthUser();
   const course = findCourse(querySlug(router.query.curso));
   const deliverableId = querySlug(router.query.deliverableId);
+  const membership = useMembership(course?.slug ?? '');
 
   if (!isFirebaseConfigured()) {
     return (
@@ -403,6 +406,14 @@ export default function DeliverableApp() {
       </div>
     );
   }
+  if (membership.status === 'loading') {
+    return (
+      <div className={ui.centered}>
+        <span className={ui.mono}>{t.loading}</span>
+      </div>
+    );
+  }
+  if (membership.status !== 'member') return <NotEnrolledNotice course={course} />;
   return (
     <DeliverableRoom key={`${deliverableId}:${auth.user.uid}`} user={auth.user} course={course} deliverableId={deliverableId} />
   );

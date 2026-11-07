@@ -9,6 +9,8 @@ import type { LearnCourse } from '../../data/learn';
 import { examDict } from '../../i18n/pages/exam';
 import { useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import NotEnrolledNotice from '../course/NotEnrolledNotice';
+import { useMembership } from '../course/useMembership';
 import SignInRedirect from '../learn/SignInRedirect';
 import ui from '../learn/ui.module.css';
 import { useAuthUser } from '../learn/useAuthUser';
@@ -271,6 +273,7 @@ export default function ExamApp() {
   const auth = useAuthUser();
   const course = findCourse(querySlug(router.query.curso));
   const examId = querySlug(router.query.examId);
+  const membership = useMembership(course?.slug ?? '');
 
   if (!isFirebaseConfigured()) {
     return (
@@ -294,5 +297,13 @@ export default function ExamApp() {
       </div>
     );
   }
+  if (membership.status === 'loading') {
+    return (
+      <div className={ui.centered}>
+        <span className={ui.mono}>{t.loading}</span>
+      </div>
+    );
+  }
+  if (membership.status !== 'member') return <NotEnrolledNotice course={course} />;
   return <ExamRoom key={`${examId}:${auth.user.uid}`} user={auth.user} course={course} examId={examId} />;
 }

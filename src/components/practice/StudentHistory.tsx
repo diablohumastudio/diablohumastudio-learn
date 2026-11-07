@@ -23,6 +23,8 @@ import { examDict } from '../../i18n/pages/exam';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import NotEnrolledNotice from '../course/NotEnrolledNotice';
+import { useMembership } from '../course/useMembership';
 import StudentDeliverables from '../deliverable/StudentDeliverables';
 import StudentExams from '../exam/StudentExams';
 import SignInRedirect from '../learn/SignInRedirect';
@@ -301,6 +303,7 @@ function HistoryPage({ course, user }: HistoryPageProps) {
 export default function StudentHistory({ course }: { course: LearnCourse }) {
   const t = useT(practiceDict);
   const auth = useAuthUser();
+  const membership = useMembership(course.slug);
 
   if (!isFirebaseConfigured()) {
     return (
@@ -317,6 +320,14 @@ export default function StudentHistory({ course }: { course: LearnCourse }) {
     );
   }
   if (auth.status === 'signedOut') return <SignInRedirect />;
+  if (membership.status === 'loading') {
+    return (
+      <div className={ui.centered}>
+        <span className={ui.mono}>{t.loading}</span>
+      </div>
+    );
+  }
+  if (membership.status !== 'member') return <NotEnrolledNotice course={course} />;
   return (
     <CourseProgressProvider course={course}>
       <HistoryPage course={course} user={auth.user} />

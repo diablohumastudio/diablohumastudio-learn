@@ -10,7 +10,9 @@ import { deliverableDict } from '../../i18n/pages/deliverable';
 import { examDict } from '../../i18n/pages/exam';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
-import { subscribeOpenedDeliverables } from '../deliverable/deliverables';
+import NotEnrolledNotice from '../course/NotEnrolledNotice';
+import { useMembership } from '../course/useMembership';
+import { subscribeStudentDeliverables } from '../deliverable/deliverables';
 import menu from '../learn/LearnMenu.module.css';
 import SignInRedirect from '../learn/SignInRedirect';
 import ui from '../learn/ui.module.css';
@@ -19,22 +21,20 @@ import s from './ExamList.module.css';
 import { subscribeOpenedExams } from './exams';
 import { dateTimeText } from './format';
 
-/** The opened deliverable exams of the course, listed after the multiple option ones. */
-function OpenedDeliverableExams({ course }: { course: LearnCourse }) {
+/** The opened deliverable exams of the course that are for this student, after the multiple option ones. */
+function OpenedDeliverableExams({ course, uid }: { course: LearnCourse; uid: string }) {
   const t = useT(deliverableDict);
   const locale = useLocale();
   const [deliverables, setDeliverables] = useState<Deliverable[]>([]);
-  const courseDeliverables = deliverables.filter(
-    (deliverable) => deliverable.courseSlug === course.slug && deliverable.role === 'exam'
-  );
+  const courseDeliverables = deliverables.filter((deliverable) => deliverable.role === 'exam');
 
   useEffect(
     () =>
-      subscribeOpenedDeliverables(setDeliverables, (error) =>
+      subscribeStudentDeliverables(course.slug, uid, setDeliverables, (error) =>
         // Refused until firebase/firestore.rules names the collection: then there is simply nothing to list.
         console.warn('Could not load the deliverables', error)
       ),
-    []
+    [course.slug, uid]
   );
 
   if (courseDeliverables.length === 0) return null;
@@ -61,7 +61,7 @@ function OpenedDeliverableExams({ course }: { course: LearnCourse }) {
   );
 }
 
-function OpenedExams({ course }: { course: LearnCourse }) {
+function OpenedExams({ course, uid }: { course: LearnCourse; uid: string }) {
   const t = useT(examDict);
   const locale = useLocale();
   const [exams, setExams] = useState<Exam[] | null>(null);
@@ -69,11 +69,11 @@ function OpenedExams({ course }: { course: LearnCourse }) {
 
   useEffect(
     () =>
-      subscribeOpenedExams(setExams, (error) => {
+      subscribeOpenedExams(course.slug, setExams, (error) => {
         console.error('Could not load the exams', error);
         setFailed(true);
       }),
-    []
+    [course.slug]
   );
 
   if (failed) {
@@ -90,7 +90,7 @@ function OpenedExams({ course }: { course: LearnCourse }) {
       </div>
     );
   }
-  const courseExams = exams.filter((exam) => exam.courseSlug === course.slug);
+  const courseExams = exams;
 
   return (
     <div className={menu.wrap}>
@@ -120,7 +120,7 @@ function OpenedExams({ course }: { course: LearnCourse }) {
           })}
         </nav>
       )}
-      <OpenedDeliverableExams course={course} />
+      <OpenedDeliverableExams course={course} uid={uid} />
     </div>
   );
 }
@@ -128,6 +128,7 @@ function OpenedExams({ course }: { course: LearnCourse }) {
 export default function ExamList({ course }: { course: LearnCourse }) {
   const t = useT(examDict);
   const auth = useAuthUser();
+  const membership = useMembership(course.slug);
 
   if (!isFirebaseConfigured()) {
     return (
@@ -144,5 +145,13 @@ export default function ExamList({ course }: { course: LearnCourse }) {
     );
   }
   if (auth.status === 'signedOut') return <SignInRedirect />;
-  return <OpenedExams course={course} />;
+  if (membership.status === 'loading') {
+    return (
+      <div className={ui.centered}>
+        <span className={ui.mono}>{t.loading}</span>
+      </div>
+    );
+  }
+  if (membership.status !== 'member') return <NotEnrolledNotice course={course} />;
+  return <OpenedExams course={course} uid={auth.user.uid} />;
 }
