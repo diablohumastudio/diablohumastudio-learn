@@ -19,6 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const { maxScoreOf, questionsOf } = require('./scoring');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const projectRequire = require('module').createRequire(path.join(repoRoot, 'package.json'));
@@ -73,15 +74,15 @@ function deliverableMarkdown(deliverable) {
   const lines = [`# ${deliverable.title}`, ''];
   lines.push(`- Id: ${deliverableId}`);
   lines.push(`- Curso: ${deliverable.courseSlug}`);
-  lines.push(`- Rol: ${deliverable.role} · Tipo: ${deliverable.kind} · Nota máxima: ${deliverable.maxScore}`);
+  lines.push(`- Rol: ${deliverable.role} · Tipo: ${deliverable.kind} · Nota máxima: ${maxScoreOf(deliverable)}`);
   lines.push(`- Abierta: ${iso(deliverable.openedAt) || '-'} · Cierre: ${iso(deliverable.closesAt) || '-'}`);
   if (deliverable.guideUrl) lines.push(`- Guía: ${deliverable.guideUrl}`);
   if (deliverable.instructions) lines.push('', '## Instrucciones', '', deliverable.instructions);
   if (Array.isArray(deliverable.questions) && deliverable.questions.length > 0) {
     lines.push('', '## Preguntas', '');
-    deliverable.questions.forEach((question, index) => {
-      const limit = question.maxChars ? ` (máx. ${question.maxChars} caracteres)` : '';
-      lines.push(`${index + 1}. ${question.text}${limit}`);
+    questionsOf(deliverable).forEach((question, index) => {
+      const limit = question.maxChars ? ` · máx. ${question.maxChars} caracteres` : '';
+      lines.push(`${index + 1}. ${question.text} (${question.points} pts${limit})`);
     });
   }
   return lines.join('\n') + '\n';
@@ -109,7 +110,7 @@ function submissionMarkdown(deliverable, submission) {
   const lines = [`# ${name}`, ''];
   lines.push(`- Correo: ${submission.email || '-'} · uid: ${submission.uid}`);
   lines.push(`- Guardado: ${iso(submission.savedAt) || '-'}${late ? ` · TARDÍO (${elapsed((savedAtMs - closesAtMs) / 1000)} después del cierre)` : ''}`);
-  const questions = Array.isArray(deliverable.questions) ? deliverable.questions : [];
+  const questions = questionsOf(deliverable);
   if (deliverable.kind === 'text') {
     questions.forEach((question, index) => {
       const answer = (submission.answers || {})[question.id] || '';

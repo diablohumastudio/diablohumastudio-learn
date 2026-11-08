@@ -242,7 +242,7 @@ function SubmissionEditor({ deliverable, user, course, remote, review, nowMs }: 
               return (
                 <li key={question.id} className={s.questionCard}>
                   <span className={s.number}>
-                    {index + 1} / {deliverable.questions.length}
+                    {index + 1} / {deliverable.questions.length} · {t.questionPoints.replace('{points}', String(question.points))}
                   </span>
                   <p className={s.prompt}>{question.text}</p>
                   <textarea

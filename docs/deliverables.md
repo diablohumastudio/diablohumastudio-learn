@@ -9,7 +9,7 @@ A **deliverable** is a homework or an exam the student hands in as something oth
 
 ## What the teacher and the student see
 
-1. The teacher presses **New deliverable homework** or **New deliverable exam** in the matching list. The role is the list's and is not a field of the form; it asks for the title, the course and the kind, the **students** it is for (everyone enrolled in the course, the default, or a tick per enrolled student, found by name or email; see [courses.md](courses.md)), an optional link to the guide (a PDF in Drive), optional instructions shown above the form, the questions (text kind), the maximum score and, for an exam, the minutes it stays open; for a homework, the date and time it closes. **Save draft** keeps it unseen by students.
+1. The teacher presses **New deliverable homework** or **New deliverable exam** in the matching list. The role is the list's and is not a field of the form; it asks for the title, the course and the kind, the **students** it is for (everyone enrolled in the course, the default, or a tick per enrolled student, found by name or email; see [courses.md](courses.md)), an optional link to the guide (a PDF in Drive), optional instructions shown above the form, the questions (text kind), each with its **points** (1 by default, halves allowed; the total they add up to is shown under them and is the deliverable's maximum), the maximum score for the link kinds, which have nothing to add up, and, for an exam, the minutes it stays open; for a homework, the date and time it closes. **Save draft** keeps it unseen by students.
 2. **Open** publishes it to the students it is for. An exam closes `durationMinutes` after that moment; a homework closes at the chosen date and time. While it is open the teacher can **change the close**, **close now**, and still change who it is for (to add someone late, for instance).
 3. The student finds a card on the course page (and, for the exam role, a row in the course's exams list) and opens `/course/<course>/deliverable/<id>`: the title, the instructions, a button to the guide, the time left and the form. Text answers are kept in the browser and **saved by themselves every minute** while they change, and with the **Save** button; a link is saved when it is valid. The page says when the last save happened and warns before leaving with unsaved changes.
 4. At the close the fields lock. Whatever was saved last is the submission. A save that reaches the server after the close and its one-minute grace (`SAVE_GRACE_MS`, the same as the exams' `SUBMIT_GRACE_MS`) is accepted and shown as **late** by that many seconds, to the student and to the teacher, exactly like an exam submission.
@@ -53,7 +53,9 @@ Routes come from `src/data/learn.ts`: `deliverablePath(course, id)`, `teacherDel
 ```
 deliverables/{id}
   title, courseSlug, role 'homework' | 'exam', kind 'text' | 'repo' | 'docLink'
-  guideUrl, instructions, questions[{ id, text, maxChars | null }], maxScore
+  guideUrl, instructions, questions[{ id, text, maxChars | null, points }], maxScore
+    (text: the sum of the points, recomputed on every save and when read; a question saved
+    before points existed counts 1, or an even share of maxScore when none of them has points)
   assignedUids[], forEveryone   who it is for: every member of the course when the list is empty;
                                 forEveryone is stored beside the list so a query can ask for it
   durationMinutes            exam role: Open sets closesAt this far ahead

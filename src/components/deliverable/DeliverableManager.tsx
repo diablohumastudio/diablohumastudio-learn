@@ -7,6 +7,7 @@ import type { CourseMember } from '../../data/course/types';
 import {
   DEFAULT_DURATION_MINUTES,
   DEFAULT_MAX_SCORE,
+  DEFAULT_QUESTION_POINTS,
   DELIVERABLE_KINDS,
   isDeliverableRole,
   isDeliverableRunning,
@@ -14,6 +15,7 @@ import {
   isSavedLate,
   lateBySeconds,
   newQuestionId,
+  questionsTotal,
 } from '../../data/deliverable/types';
 import type {
   Deliverable,
@@ -71,6 +73,7 @@ type QuestionDraft = {
   id: string;
   text: string;
   maxChars: string;
+  points: string;
 };
 
 /** The form's values: numbers stay text until they are validated. */
@@ -96,7 +99,7 @@ type DraftValidation = { ok: true; settings: DeliverableSettings } | { ok: false
 type Screen = { kind: 'new'; role: DeliverableRole } | { kind: 'deliverable'; deliverableId: string };
 
 function newQuestionDraft(): QuestionDraft {
-  return { id: newQuestionId(), text: '', maxChars: '' };
+  return { id: newQuestionId(), text: '', maxChars: '', points: String(DEFAULT_QUESTION_POINTS) };
 }
 
 function draftOf(deliverable: Deliverable | null, role: DeliverableRole): Draft {
@@ -129,6 +132,7 @@ function draftOf(deliverable: Deliverable | null, role: DeliverableRole): Draft 
             id: question.id,
             text: question.text,
             maxChars: question.maxChars === null ? '' : String(question.maxChars),
+            points: String(question.points),
           }))
         : [newQuestionDraft()],
     maxScore: String(deliverable.maxScore),
@@ -143,6 +147,17 @@ function isPositiveInteger(value: number): boolean {
   return Number.isInteger(value) && value > 0;
 }
 
+function isPositiveNumber(value: string): boolean {
+  return value.trim() !== '' && Number(value) > 0;
+}
+
+/** The points of the draft's questions, as the form shows them while they are typed. */
+function draftTotal(draft: Draft): number {
+  return questionsTotal(
+    draft.questions.map((question) => ({ id: question.id, text: question.text, maxChars: null, points: Number(question.points) || 0 }))
+  );
+}
+
 function validateQuestions(draft: Draft, t: DeliverableTexts): DraftValidation | DeliverableSettings['questions'] {
   if (draft.kind !== 'text') return [];
   if (draft.questions.length === 0) return { ok: false, message: t.validationQuestions };
@@ -152,10 +167,14 @@ function validateQuestions(draft: Draft, t: DeliverableTexts): DraftValidation |
   if (draft.questions.some((question) => question.maxChars !== '' && !isPositiveInteger(Number(question.maxChars)))) {
     return { ok: false, message: t.validationMaxChars };
   }
+  if (draft.questions.some((question) => !isPositiveNumber(question.points))) {
+    return { ok: false, message: t.validationPoints };
+  }
   return draft.questions.map((question) => ({
     id: question.id,
     text: question.text.trim(),
     maxChars: question.maxChars === '' ? null : Number(question.maxChars),
+    points: Number(question.points),
   }));
 }
 
@@ -163,7 +182,6 @@ function validateQuestions(draft: Draft, t: DeliverableTexts): DraftValidation |
 function validateDraft(draft: Draft, forOpen: boolean, t: DeliverableTexts): DraftValidation {
   const title = draft.title.trim();
   const guideUrl = draft.guideUrl.trim();
-  const maxScore = Number(draft.maxScore);
   const durationMinutes = Number(draft.durationMinutes);
   const deadlineMs = fromDateTimeLocal(draft.deadline);
   if (title === '') return { ok: false, message: t.validationTitle };
@@ -172,6 +190,8 @@ function validateDraft(draft: Draft, forOpen: boolean, t: DeliverableTexts): Dra
   const questions = validateQuestions(draft, t);
   if (!Array.isArray(questions)) return questions;
   if (!draft.everyone && draft.assignedUids.length === 0) return { ok: false, message: t.validationStudents };
+  // A text deliverable is worth what its questions add up to; a link has nothing to add.
+  const maxScore = draft.kind === 'text' ? questionsTotal(questions) : Number(draft.maxScore);
   if (!(maxScore > 0)) return { ok: false, message: t.validationMaxScore };
   if (draft.role === 'exam' && !isPositiveInteger(durationMinutes)) return { ok: false, message: t.validationDuration };
   if (draft.role === 'homework' && forOpen && (deadlineMs === null || deadlineMs <= Date.now())) {
@@ -232,16 +252,29 @@ function QuestionEditor({ number, question, isOnlyQuestion, onChange, onRemove }
           onChange={(event) => onChange({ ...question, text: event.target.value })}
         />
       </label>
-      <label className={s.maxCharsField}>
-        <span className={ui.label}>{t.maxCharsLabel}</span>
-        <input
-          className={ui.input}
-          type="number"
-          min={1}
-          value={question.maxChars}
-          onChange={(event) => onChange({ ...question, maxChars: event.target.value })}
-        />
-      </label>
+      <div className={s.numbers}>
+        <label className={s.pointsField}>
+          <span className={ui.label}>{t.pointsLabel}</span>
+          <input
+            className={ui.input}
+            type="number"
+            min={SCORE_STEP}
+            step={SCORE_STEP}
+            value={question.points}
+            onChange={(event) => onChange({ ...question, points: event.target.value })}
+          />
+        </label>
+        <label className={s.maxCharsField}>
+          <span className={ui.label}>{t.maxCharsLabel}</span>
+          <input
+            className={ui.input}
+            type="number"
+            min={1}
+            value={question.maxChars}
+            onChange={(event) => onChange({ ...question, maxChars: event.target.value })}
+          />
+        </label>
+      </div>
     </div>
   );
 }
@@ -403,28 +436,33 @@ function DraftForm({ deliverable, role, onDeleted, onCreated }: DraftFormProps) 
               />
             ))}
           </div>
-          <button
-            type="button"
-            className={s.add}
-            onClick={() => setDraft({ ...draft, questions: [...draft.questions, newQuestionDraft()] })}
-          >
-            + {t.addQuestion}
-          </button>
+          <div className={s.questionsFoot}>
+            <button
+              type="button"
+              className={s.add}
+              onClick={() => setDraft({ ...draft, questions: [...draft.questions, newQuestionDraft()] })}
+            >
+              + {t.addQuestion}
+            </button>
+            <span className={s.total}>{t.totalPoints.replace('{total}', String(draftTotal(draft)))}</span>
+          </div>
         </div>
       )}
 
       <div className={s.numbers}>
-        <label className={ui.field}>
-          <span className={ui.label}>{t.maxScoreLabel}</span>
-          <input
-            className={ui.input}
-            type="number"
-            min={1}
-            step={SCORE_STEP}
-            value={draft.maxScore}
-            onChange={(event) => setDraft({ ...draft, maxScore: event.target.value })}
-          />
-        </label>
+        {draft.kind !== 'text' && (
+          <label className={ui.field}>
+            <span className={ui.label}>{t.maxScoreLabel}</span>
+            <input
+              className={ui.input}
+              type="number"
+              min={1}
+              step={SCORE_STEP}
+              value={draft.maxScore}
+              onChange={(event) => setDraft({ ...draft, maxScore: event.target.value })}
+            />
+          </label>
+        )}
         {draft.role === 'exam' ? (
           <label className={ui.field}>
             <span className={ui.label}>{t.durationLabel}</span>

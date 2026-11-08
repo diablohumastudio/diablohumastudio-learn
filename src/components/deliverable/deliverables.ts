@@ -17,12 +17,15 @@ import { assignmentOf, storedAssignment } from '../../data/course/assignment';
 import {
   DEFAULT_DURATION_MINUTES,
   DEFAULT_MAX_SCORE,
+  DEFAULT_QUESTION_POINTS,
   DELIVERABLES_COLLECTION,
   REVIEWS_SUBCOLLECTION,
   SUBMISSIONS_SUBCOLLECTION,
   emptyTypingSignals,
   isDeliverableKind,
   isDeliverableRole,
+  questionsTotal,
+  roundScore,
 } from '../../data/deliverable/types';
 import type {
   Deliverable,
@@ -47,29 +50,41 @@ function millisOf(value: unknown): number | null {
   return value && typeof (value as Timestamp).toMillis === 'function' ? (value as Timestamp).toMillis() : null;
 }
 
-function toQuestions(value: unknown): DeliverableQuestion[] {
+function isPoints(value: unknown): value is number {
+  return typeof value === 'number' && value > 0;
+}
+
+/** Questions saved before they had points share the deliverable's maximum evenly, so an old
+    review still reads against the same total. */
+function toQuestions(value: unknown, storedMaxScore: number): DeliverableQuestion[] {
   const stored: unknown[] = Array.isArray(value) ? value : [];
-  return stored
+  const valid = stored
     .filter((question): question is DocumentData => typeof question === 'object' && question !== null)
-    .filter((question) => typeof question.id === 'string' && typeof question.text === 'string')
-    .map((question) => ({
-      id: question.id,
-      text: question.text,
-      maxChars: typeof question.maxChars === 'number' && question.maxChars > 0 ? question.maxChars : null,
-    }));
+    .filter((question) => typeof question.id === 'string' && typeof question.text === 'string');
+  const hasPoints = valid.some((question) => isPoints(question.points));
+  const legacyPoints = valid.length > 0 ? roundScore(storedMaxScore / valid.length) : DEFAULT_QUESTION_POINTS;
+  return valid.map((question) => ({
+    id: question.id,
+    text: question.text,
+    maxChars: typeof question.maxChars === 'number' && question.maxChars > 0 ? question.maxChars : null,
+    points: isPoints(question.points) ? question.points : hasPoints ? DEFAULT_QUESTION_POINTS : legacyPoints,
+  }));
 }
 
 function toDeliverable(id: string, data: DocumentData): Deliverable {
+  const kind = isDeliverableKind(data.kind) ? data.kind : 'text';
+  const storedMaxScore = Number(data.maxScore) || DEFAULT_MAX_SCORE;
+  const questions = toQuestions(data.questions, storedMaxScore);
   return {
     id,
     title: data.title ?? '',
     courseSlug: data.courseSlug ?? '',
     role: isDeliverableRole(data.role) ? data.role : 'homework',
-    kind: isDeliverableKind(data.kind) ? data.kind : 'text',
+    kind,
     guideUrl: typeof data.guideUrl === 'string' ? data.guideUrl : '',
     instructions: typeof data.instructions === 'string' ? data.instructions : '',
-    questions: toQuestions(data.questions),
-    maxScore: Number(data.maxScore) || DEFAULT_MAX_SCORE,
+    questions,
+    maxScore: kind === 'text' && questions.length > 0 ? questionsTotal(questions) : storedMaxScore,
     durationMinutes: Number(data.durationMinutes) || DEFAULT_DURATION_MINUTES,
     deadlineMs: millisOf(data.deadline),
     ...assignmentOf(data),

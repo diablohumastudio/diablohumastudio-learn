@@ -28,8 +28,12 @@ export const AUTOSAVE_MS: number = 60_000;
 export const SAVE_RETRY_MS: number = 5000;
 /** A closed deliverable stays on the course page this long, so students see how it ended. */
 export const SHOWN_AFTER_CLOSE_MS: number = 7 * 24 * 60 * 60 * 1000;
+/** The maximum of a link deliverable, which has no questions to add up. */
 export const DEFAULT_MAX_SCORE: number = 10;
+export const DEFAULT_QUESTION_POINTS: number = 1;
 export const DEFAULT_DURATION_MINUTES: number = 90;
+/** Scores and points keep at most two decimals: half points are the usual case. */
+const SCORE_DECIMALS: number = 100;
 
 /* Typing signals. Pasting and dropping are refused by the page, which is friction and not
    security: what tells a copied text apart is the record of how it was typed. */
@@ -52,6 +56,8 @@ export type DeliverableQuestion = {
   text: string;
   /** The answer is cut here; null for no limit. */
   maxChars: number | null;
+  /** What a full answer is worth; the questions add up to the deliverable's maximum. */
+  points: number;
 };
 
 /** What a teacher sets. */
@@ -66,6 +72,7 @@ export type DeliverableSettings = {
   instructions: string;
   /** Only for `kind === 'text'`; empty otherwise. */
   questions: DeliverableQuestion[];
+  /** For text, the sum of the questions' points; for a link, what the form says. */
   maxScore: number;
   /** Exam role: Open fixes the close this many minutes ahead. */
   durationMinutes: number;
@@ -149,6 +156,16 @@ export function emptyTypingSignals(): TypingSignals {
     activeSeconds: 0,
     maxCharsPerMinute: 0,
   };
+}
+
+/** Two decimals at most, so sums of halves do not show floating-point noise. */
+export function roundScore(value: number): number {
+  return Math.round(value * SCORE_DECIMALS) / SCORE_DECIMALS;
+}
+
+/** What the questions add up to: the maximum of a text deliverable. */
+export function questionsTotal(questions: readonly DeliverableQuestion[]): number {
+  return roundScore(questions.reduce((sum, question) => sum + question.points, 0));
 }
 
 export function newQuestionId(): string {

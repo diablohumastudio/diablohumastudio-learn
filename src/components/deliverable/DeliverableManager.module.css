@@ -133,12 +133,32 @@
   max-width: 260px;
 }
 
+.pointsField {
+  composes: field from '../learn/ui.module.css';
+  max-width: 140px;
+}
+
+/* Under the questions: the button for one more and what they add up to. */
+.questionsFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
 .add {
   composes: btnGhost from '../learn/ui.module.css';
   align-self: flex-start;
   margin-top: 4px;
   padding: 8px 12px;
   font-size: calc(13px + var(--text-delta, 0px));
+}
+
+.total {
+  composes: mono from '../learn/ui.module.css';
+  color: var(--amber);
+  font-weight: 700;
 }
 
 .summary {
