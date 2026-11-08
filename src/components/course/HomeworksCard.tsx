@@ -32,6 +32,8 @@ export default function HomeworksCard({ course, uid, deliverables, nowMs }: Home
   return (
     <EntriesCard
       title={t.homeworks}
+      summary={entries && entries.length > 0 ? t.openCount.replace('{count}', String(entries.length)) : undefined}
+      defaultOpen={false}
       sectionLabel={t.openHomeworks}
       emptyText={t.noOpenHomeworks}
       entries={entries}

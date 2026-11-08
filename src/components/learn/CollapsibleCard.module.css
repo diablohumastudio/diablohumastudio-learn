@@ -1,0 +1,47 @@
+.card {
+  composes: card from './ui.module.css';
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+/* The whole title row is the button: closed, the card is this row alone. */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 20px 24px;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.header:hover .title {
+  color: #f7b45a;
+}
+
+.title {
+  composes: eyebrow from './ui.module.css';
+}
+
+.summary {
+  composes: mono from './ui.module.css';
+}
+
+.chevron {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: calc(14px + var(--text-delta, 0px));
+  line-height: 1;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 24px 20px;
+}

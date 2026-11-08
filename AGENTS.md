@@ -14,7 +14,7 @@ Teaching platform of DiabloHumaStudio, served at `learn.diablohumastudio.com`: c
 |---|---|
 | `/` | redirects to `/courses` |
 | `/courses` | course menu |
-| `/course/<course>` | class menu of a course; for an enrolled student the daily homework card and the Homeworks and Exams cards with what is open right now, for one who is not the card to request access |
+| `/course/<course>` | class menu of a course; four cards closed to their title: Daily practice, Homeworks and Exams (what is open right now) and Class presentations with the class rows; for a student who is not enrolled, the card to request access |
 | `/course/<course>/class/<class>` | slide deck (`?s=<n>` slide, `&p=<n>` step) |
 | `/course/<course>/exams`, `/course/<course>/exams/<id>` | exam list of a course, exam room |
 | `/course/<course>/homeworks` | every homework of the signed-in student in the course, specific and deliverable: the open ones, then the finished ones |

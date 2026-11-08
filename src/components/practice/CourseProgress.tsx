@@ -22,6 +22,7 @@ import type { DayProgress, ProgressScope } from '../../data/practice';
 import { learnDict } from '../../i18n/learn';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
+import CollapsibleCard from '../learn/CollapsibleCard';
 import s from './CourseProgress.module.css';
 import { useCourseProgress } from './CourseProgressContext';
 import type { CourseProgressData } from './CourseProgressContext';
@@ -144,7 +145,7 @@ function MonthSection({ progress, course, today }: WeekSectionProps) {
   );
 }
 
-/** Homework of the signed-in student in one course; guests only get the buttons. */
+/** The daily practice of the signed-in student in one course; guests only get the buttons. */
 export default function CourseProgress({ course }: { course: LearnCourse }) {
   const t = useT(practiceDict);
   const learnT = useT(learnDict);
@@ -152,9 +153,7 @@ export default function CourseProgress({ course }: { course: LearnCourse }) {
   const today = dayKey(new Date());
 
   return (
-    <section className={s.card}>
-      <span className={s.title}>{t.homeworkTitle}</span>
-
+    <CollapsibleCard title={t.dailyPracticeSection}>
       {progress && (
         <>
           <div className={s.section}>
@@ -177,6 +176,6 @@ export default function CourseProgress({ course }: { course: LearnCourse }) {
           </Link>
         )}
       </div>
-    </section>
+    </CollapsibleCard>
   );
 }

@@ -1,12 +1,4 @@
-/* Same family as the daily homework card: the frame, title and section label are composed from it. */
-.card {
-  composes: card from '../practice/CourseProgress.module.css';
-}
-
-.title {
-  composes: title from '../practice/CourseProgress.module.css';
-}
-
+/* Same family as the daily practice card: the section label and the actions are composed from it. */
 .section {
   composes: section from '../practice/CourseProgress.module.css';
 }

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { learnDict } from '../../i18n/learn';
 import { useT } from '../../i18n/useT';
+import CollapsibleCard from '../learn/CollapsibleCard';
 import s from './EntriesCard.module.css';
 
 export type CardEntry = {
@@ -11,6 +12,10 @@ export type CardEntry = {
 
 type EntriesCardProps = {
   title: string;
+  /** Beside the title while the card is closed, such as how many entries are open. */
+  summary?: string;
+  /** The course page's cards start closed; the homeworks page's start open. */
+  defaultOpen?: boolean;
   /** Over the entries, when the card lists one state of several ("Open homeworks"). */
   sectionLabel?: string;
   emptyText: string;
@@ -23,12 +28,20 @@ type EntriesCardProps = {
 
 /** A card of the course page or the homeworks page: its entries one under the other, split by
     lines, and the way to everything when the card shows only what is open. */
-export default function EntriesCard({ title, sectionLabel, emptyText, entries, allHref, allText }: EntriesCardProps) {
+export default function EntriesCard({
+  title,
+  summary,
+  defaultOpen = true,
+  sectionLabel,
+  emptyText,
+  entries,
+  allHref,
+  allText,
+}: EntriesCardProps) {
   const t = useT(learnDict);
 
   return (
-    <section className={s.card}>
-      <span className={s.title}>{title}</span>
+    <CollapsibleCard title={title} summary={summary} defaultOpen={defaultOpen}>
       <div className={s.section}>
         {sectionLabel && <span className={s.sectionLabel}>{sectionLabel}</span>}
         {entries === null ? (
@@ -52,6 +65,6 @@ export default function EntriesCard({ title, sectionLabel, emptyText, entries, a
           </Link>
         </div>
       )}
-    </section>
+    </CollapsibleCard>
   );
 }

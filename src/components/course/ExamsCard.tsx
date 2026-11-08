@@ -39,6 +39,8 @@ export default function ExamsCard({ course, uid, deliverables, nowMs }: ExamsCar
   return (
     <EntriesCard
       title={t.exams}
+      summary={entries && entries.length > 0 ? t.openCount.replace('{count}', String(entries.length)) : undefined}
+      defaultOpen={false}
       sectionLabel={t.openExams}
       emptyText={t.noOpenExams}
       entries={entries}

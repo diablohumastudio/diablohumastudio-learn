@@ -36,6 +36,8 @@ const en = {
   showAllExams: 'Show all exams',
   multipleOptionExam: 'Multiple option exam',
   openExam: 'Open exam',
+  openCount: '{count} open',
+  classPresentations: 'Class presentations',
   teacherArea: 'Teacher',
   loading: 'Loading…',
 
@@ -124,6 +126,8 @@ const es: Record<keyof typeof en, string> = {
   showAllExams: 'Ver todos los exámenes',
   multipleOptionExam: 'Examen de opción múltiple',
   openExam: 'Abrir examen',
+  openCount: '{count} abiertos',
+  classPresentations: 'Presentaciones de las clases',
   teacherArea: 'Docente',
   loading: 'Cargando…',
 
