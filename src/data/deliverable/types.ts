@@ -136,11 +136,20 @@ export type Submission = {
   savedAtMs: number | null;
 };
 
+/** Question id → the score of that answer; null while the teacher has not scored it. */
+export type QuestionScores = Record<string, number | null>;
+/** Question id → a remark on that answer; absent or empty for none. */
+export type QuestionComments = Record<string, string>;
+
 export type Review = {
   uid: string;
+  /** For text, the sum of the question scores given; for a link, the one score. Null until scored. */
   score: number | null;
   maxScore: number;
+  /** On the whole submission. */
   comment: string;
+  scores: QuestionScores;
+  comments: QuestionComments;
   reviewedAtMs: number | null;
   reviewedBy: string;
 };
@@ -166,6 +175,23 @@ export function roundScore(value: number): number {
 /** What the questions add up to: the maximum of a text deliverable. */
 export function questionsTotal(questions: readonly DeliverableQuestion[]): number {
   return roundScore(questions.reduce((sum, question) => sum + question.points, 0));
+}
+
+/** The sum of the scores given so far, or null while none has been. */
+export function scoresTotal(scores: QuestionScores): number | null {
+  const given = Object.values(scores).filter((score): score is number => score !== null);
+  return given.length === 0 ? null : roundScore(given.reduce((sum, score) => sum + score, 0));
+}
+
+/** Whether the review says anything the student should see. */
+export function hasReviewContent(review: Review | null): review is Review {
+  if (review === null) return false;
+  return (
+    review.score !== null ||
+    review.comment !== '' ||
+    Object.values(review.scores).some((score) => score !== null) ||
+    Object.values(review.comments).some((comment) => comment !== '')
+  );
 }
 
 export function newQuestionId(): string {

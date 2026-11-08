@@ -7,6 +7,7 @@ import {
   AUTOSAVE_MS,
   SAVE_GRACE_MS,
   SAVE_RETRY_MS,
+  hasReviewContent,
   isDeliverableOver,
   isValidSubmissionUrl,
 } from '../../data/deliverable/types';
@@ -194,7 +195,7 @@ function SubmissionEditor({ deliverable, user, course, remote, review, nowMs }: 
 
   const status = statusLine();
   const remainingMs = closesAtMs - nowMs;
-  const hasReview = review !== null && (review.score !== null || review.comment !== '');
+  const hasReview = hasReviewContent(review);
 
   return (
     <div className={s.wrap}>
@@ -239,6 +240,8 @@ function SubmissionEditor({ deliverable, user, course, remote, review, nowMs }: 
           <ol className={s.list}>
             {deliverable.questions.map((question, index) => {
               const answer = answers[question.id] ?? '';
+              const questionScore = review?.scores[question.id] ?? null;
+              const questionComment = review?.comments[question.id] ?? '';
               return (
                 <li key={question.id} className={s.questionCard}>
                   <span className={s.number}>
@@ -260,6 +263,16 @@ function SubmissionEditor({ deliverable, user, course, remote, review, nowMs }: 
                     <span className={s.counter}>
                       {t.charCount.replace('{count}', String(answer.length)).replace('{max}', String(question.maxChars))}
                     </span>
+                  )}
+                  {(questionScore !== null || questionComment !== '') && (
+                    <div className={s.questionReview}>
+                      {questionScore !== null && (
+                        <span className={s.questionScore}>
+                          {t.scoreLabel}: {questionScore} / {question.points}
+                        </span>
+                      )}
+                      {questionComment !== '' && <p className={s.questionComment}>{questionComment}</p>}
+                    </div>
                   )}
                 </li>
               );

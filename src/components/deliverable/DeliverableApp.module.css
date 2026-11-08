@@ -182,3 +182,22 @@
   color: var(--ink);
   white-space: pre-wrap;
 }
+
+/* Under an answer once reviewed: its score out of the question's points and the teacher's remark. */
+.questionReview {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.questionScore {
+  composes: mono from '../learn/ui.module.css';
+  color: var(--amber);
+  font-weight: 700;
+}
+
+.questionComment {
+  composes: comment;
+}

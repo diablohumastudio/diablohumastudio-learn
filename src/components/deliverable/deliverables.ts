@@ -31,6 +31,8 @@ import type {
   Deliverable,
   DeliverableQuestion,
   DeliverableSettings,
+  QuestionComments,
+  QuestionScores,
   Review,
   Submission,
   SubmissionAnswers,
@@ -151,12 +153,32 @@ function toSubmission(uid: string, data: DocumentData): Submission {
   };
 }
 
+function toQuestionScores(value: unknown): QuestionScores {
+  if (typeof value !== 'object' || value === null) return {};
+  const scores: QuestionScores = {};
+  for (const [questionId, score] of Object.entries(value)) {
+    if (typeof score === 'number' || score === null) scores[questionId] = score;
+  }
+  return scores;
+}
+
+function toQuestionComments(value: unknown): QuestionComments {
+  if (typeof value !== 'object' || value === null) return {};
+  const comments: QuestionComments = {};
+  for (const [questionId, comment] of Object.entries(value)) {
+    if (typeof comment === 'string' && comment !== '') comments[questionId] = comment;
+  }
+  return comments;
+}
+
 function toReview(uid: string, data: DocumentData): Review {
   return {
     uid,
     score: typeof data.score === 'number' ? data.score : null,
     maxScore: Number(data.maxScore) || DEFAULT_MAX_SCORE,
     comment: typeof data.comment === 'string' ? data.comment : '',
+    scores: toQuestionScores(data.scores),
+    comments: toQuestionComments(data.comments),
     reviewedAtMs: millisOf(data.reviewedAt),
     reviewedBy: typeof data.reviewedBy === 'string' ? data.reviewedBy : '',
   };
@@ -352,6 +374,8 @@ export type ReviewPayload = {
   score: number | null;
   maxScore: number;
   comment: string;
+  scores: QuestionScores;
+  comments: QuestionComments;
   reviewedBy: string;
 };
 

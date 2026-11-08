@@ -12,8 +12,9 @@
      entrega.md             título, tipo, cierre, guía, instrucciones y preguntas
      <estudiante>.md        un archivo por estudiante: respuestas o enlace, hora de guardado, retraso
                             y señales de escritura (solo las de texto)
-     reviews.json           plantilla con un objeto por estudiante para rellenar nota y comentario,
-                            que lee import-reviews.js
+     reviews.json           plantilla con un objeto por estudiante que lee import-reviews.js: en las
+                            entregas de texto, una lista `answers` con nota y comentario por pregunta
+                            (la total se suma); en las de enlace, `score` y `comment`
    Con --clone, en las entregas de tipo repo clona cada enlace (sin descargar LFS) en repos/<estudiante>/
    y guarda commits.md con el historial y los diffs de los archivos de texto por commit. */
 const fs = require('fs');
@@ -123,6 +124,31 @@ function submissionMarkdown(deliverable, submission) {
   return lines.join('\n') + '\n';
 }
 
+/* Un objeto de reviews.json por estudiante, con lo ya revisado si lo hay. En las entregas de texto
+   trae una respuesta por pregunta para poner nota y comentario a cada una; la nota total la suma
+   import-reviews.js. */
+function reviewTemplate(deliverable, submission, review) {
+  const entry = {
+    uid: submission.uid,
+    displayName: submission.displayName || '',
+    email: submission.email || '',
+    score: typeof review.score === 'number' ? review.score : null,
+    comment: review.comment || '',
+  };
+  if (deliverable.kind === 'text') {
+    const scores = review.scores || {};
+    const comments = review.comments || {};
+    entry.answers = questionsOf(deliverable).map((question) => ({
+      questionId: question.id,
+      question: question.text,
+      points: question.points,
+      score: typeof scores[question.id] === 'number' ? scores[question.id] : null,
+      comment: comments[question.id] || '',
+    }));
+  }
+  return entry;
+}
+
 function cloneRepo(url, targetDir) {
   const parsed = new URL(url);
   const segments = parsed.pathname.split('/').filter(Boolean);
@@ -174,14 +200,7 @@ function commitsMarkdown(repoDir, repoUrl, branch) {
     while (usedNames.has(fileName)) fileName += '_';
     usedNames.add(fileName);
     fs.writeFileSync(path.join(outDir, `${fileName}.md`), submissionMarkdown(deliverable, submission));
-    const review = reviews.get(doc.id) || {};
-    template.push({
-      uid: submission.uid,
-      displayName: submission.displayName || '',
-      email: submission.email || '',
-      score: typeof review.score === 'number' ? review.score : null,
-      comment: review.comment || '',
-    });
+    template.push(reviewTemplate(deliverable, submission, reviews.get(doc.id) || {}));
     if (clone && deliverable.kind === 'repo' && submission.url) {
       const repoDir = path.join(outDir, 'repos', fileName);
       try {

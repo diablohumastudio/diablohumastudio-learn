@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
 import { assignedAccounts } from '../../data/course/assignment';
 import { memberName } from '../../data/course/types';
 import type { CourseMember } from '../../data/course/types';
@@ -16,12 +17,16 @@ import {
   lateBySeconds,
   newQuestionId,
   questionsTotal,
+  scoresTotal,
 } from '../../data/deliverable/types';
 import type {
   Deliverable,
   DeliverableKind,
+  DeliverableQuestion,
   DeliverableRole,
   DeliverableSettings,
+  QuestionComments,
+  QuestionScores,
   Review,
   Submission,
 } from '../../data/deliverable/types';
@@ -529,25 +534,145 @@ function DraftForm({ deliverable, role, onDeleted, onCreated }: DraftFormProps) 
   );
 }
 
-type ReviewFormProps = {
-  deliverable: Deliverable;
-  uid: string;
-  review: Review | null;
+/** The review as typed: numbers stay text until they are validated. */
+type ReviewDraft = {
+  /** The one score of a link deliverable. */
+  score: string;
+  /** On the whole submission. */
+  comment: string;
+  /** Question id → score as typed, '' for none yet. */
+  scores: Record<string, string>;
+  comments: Record<string, string>;
 };
 
-function ReviewForm({ deliverable, uid, review }: ReviewFormProps) {
+function reviewDraftOf(deliverable: Deliverable, review: Review | null): ReviewDraft {
+  const scores: Record<string, string> = {};
+  const comments: Record<string, string> = {};
+  for (const question of deliverable.questions) {
+    const score = review?.scores[question.id];
+    scores[question.id] = score === null || score === undefined ? '' : String(score);
+    comments[question.id] = review?.comments[question.id] ?? '';
+  }
+  // A review saved before scores were per question, on a single question: its total is that score.
+  const [onlyQuestion] = deliverable.questions;
+  if (review !== null && review.score !== null && deliverable.questions.length === 1 && scores[onlyQuestion.id] === '') {
+    scores[onlyQuestion.id] = String(review.score);
+  }
+  return {
+    score: review === null || review.score === null ? '' : String(review.score),
+    comment: review?.comment ?? '',
+    scores,
+    comments,
+  };
+}
+
+/** Empty is "not scored"; anything else is a number, NaN included, for the range check to catch. */
+function scoreOf(value: string): number | null {
+  return value.trim() === '' ? null : Number(value);
+}
+
+function isScoreInRange(score: number | null, max: number): boolean {
+  return score === null || (!Number.isNaN(score) && score >= 0 && score <= max);
+}
+
+type AnswerReviewProps = {
+  question: DeliverableQuestion;
+  number: number;
+  count: number;
+  answer: string;
+  score: string;
+  comment: string;
+  onChange: (score: string, comment: string) => void;
+};
+
+/** One answer as saved, with its score out of the question's points and a remark on it. */
+function AnswerReview({ question, number, count, answer, score, comment, onChange }: AnswerReviewProps) {
+  const t = useT(deliverableDict);
+  return (
+    <div className={s.answerCard}>
+      <span className={s.questionName}>
+        {number} / {count} · {t.questionPoints.replace('{points}', String(question.points))}
+      </span>
+      <p className={s.questionText}>{question.text}</p>
+      {answer.trim() === '' ? <span className={s.noAnswer}>{t.noAnswer}</span> : <p className={s.answerText}>{answer}</p>}
+      <div className={s.reviewRow}>
+        <label className={s.scoreField}>
+          <span className={ui.label}>
+            {t.scoreLabel} / {question.points}
+          </span>
+          <input
+            className={ui.input}
+            type="number"
+            min={0}
+            max={question.points}
+            step={SCORE_STEP}
+            value={score}
+            onChange={(event) => onChange(event.target.value, comment)}
+          />
+        </label>
+        <label className={s.questionCommentField}>
+          <span className={ui.label}>{t.questionCommentLabel}</span>
+          <input className={ui.input} type="text" value={comment} onChange={(event) => onChange(score, event.target.value)} />
+        </label>
+      </div>
+    </div>
+  );
+}
+
+type ReviewFormProps = {
+  deliverable: Deliverable;
+  submission: Submission;
+  review: Review | null;
+  /** Shown between the answers and the total: the typing signals. */
+  children?: ReactNode;
+};
+
+/** The teacher's review. For text, a score and a remark under each answer and the total they add
+    up to; for a link, one score. A general comment in both cases. */
+function ReviewForm({ deliverable, submission, review, children }: ReviewFormProps) {
   const t = useT(deliverableDict);
   const locale = useLocale();
   const auth = useAuthUser();
-  const [score, setScore] = useState<string>(() => (review?.score === null || review === null ? '' : String(review.score)));
-  const [comment, setComment] = useState<string>(() => review?.comment ?? '');
+  const isText = deliverable.kind === 'text';
+  const [draft, setDraft] = useState<ReviewDraft>(() => reviewDraftOf(deliverable, review));
+  const [touched, setTouched] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const questionScores: QuestionScores = {};
+  for (const question of deliverable.questions) questionScores[question.id] = scoreOf(draft.scores[question.id] ?? '');
+  const total = isText ? scoresTotal(questionScores) : scoreOf(draft.score);
+  const totalText = total === null || Number.isNaN(total) ? '–' : String(total);
+
+  // A review that arrives after the form did fills it in, unless the teacher already typed.
+  useEffect(() => {
+    if (review !== null && !touched) setDraft(reviewDraftOf(deliverable, review));
+  }, [deliverable, review, touched]);
+
+  function change(changes: Partial<ReviewDraft>): void {
+    setTouched(true);
+    setDraft((current) => ({ ...current, ...changes }));
+  }
+
+  function changeAnswer(questionId: string, score: string, comment: string): void {
+    change({ scores: { ...draft.scores, [questionId]: score }, comments: { ...draft.comments, [questionId]: comment } });
+  }
+
+  function questionComments(): QuestionComments {
+    const comments: QuestionComments = {};
+    for (const question of deliverable.questions) {
+      const comment = (draft.comments[question.id] ?? '').trim();
+      if (comment !== '') comments[question.id] = comment;
+    }
+    return comments;
+  }
 
   async function save() {
-    const scoreNumber = score.trim() === '' ? null : Number(score);
-    if (scoreNumber !== null && (Number.isNaN(scoreNumber) || scoreNumber < 0 || scoreNumber > deliverable.maxScore)) {
+    if (isText && deliverable.questions.some((question) => !isScoreInRange(questionScores[question.id], question.points))) {
+      setMessage(t.validationQuestionScore);
+      return;
+    }
+    if (!isText && !isScoreInRange(total, deliverable.maxScore)) {
       setMessage(t.validationScore);
       return;
     }
@@ -555,10 +680,12 @@ function ReviewForm({ deliverable, uid, review }: ReviewFormProps) {
     setMessage(null);
     setNotice(null);
     try {
-      await saveReview(deliverable.id, uid, {
-        score: scoreNumber,
+      await saveReview(deliverable.id, submission.uid, {
+        score: total,
         maxScore: deliverable.maxScore,
-        comment: comment.trim(),
+        comment: draft.comment.trim(),
+        scores: isText ? questionScores : {},
+        comments: isText ? questionComments() : {},
         reviewedBy: auth.status === 'signedIn' ? auth.user.uid : '',
       });
       setNotice(t.savedNotice);
@@ -572,40 +699,65 @@ function ReviewForm({ deliverable, uid, review }: ReviewFormProps) {
 
   return (
     <form
-      className={s.form}
+      className={s.reviewStack}
       onSubmit={(event) => {
         event.preventDefault();
         void save();
       }}
     >
-      <span className={ui.eyebrow}>
-        {t.reviewTitle}
-        {review?.reviewedAtMs ? ` · ${t.reviewedAt} ${dateTimeYearText(review.reviewedAtMs, locale)}` : ''}
-      </span>
-      <label className={s.scoreField}>
-        <span className={ui.label}>
-          {t.scoreLabel} / {deliverable.maxScore}
+      {isText && (
+        <div className={s.answers}>
+          {deliverable.questions.map((question, index) => (
+            <AnswerReview
+              key={question.id}
+              question={question}
+              number={index + 1}
+              count={deliverable.questions.length}
+              answer={submission.answers[question.id] ?? ''}
+              score={draft.scores[question.id] ?? ''}
+              comment={draft.comments[question.id] ?? ''}
+              onChange={(score, comment) => changeAnswer(question.id, score, comment)}
+            />
+          ))}
+        </div>
+      )}
+      {children}
+      <div className={s.form}>
+        <span className={ui.eyebrow}>
+          {t.reviewTitle}
+          {review?.reviewedAtMs ? ` · ${t.reviewedAt} ${dateTimeYearText(review.reviewedAtMs, locale)}` : ''}
         </span>
-        <input
-          className={ui.input}
-          type="number"
-          min={0}
-          max={deliverable.maxScore}
-          step={SCORE_STEP}
-          value={score}
-          onChange={(event) => setScore(event.target.value)}
-        />
-      </label>
-      <label className={ui.field}>
-        <span className={ui.label}>{t.commentLabel}</span>
-        <textarea className={s.textarea} value={comment} onChange={(event) => setComment(event.target.value)} />
-      </label>
-      {message && <p className={ui.error}>{message}</p>}
-      {notice && <p className={ui.notice}>{notice}</p>}
-      <div className={s.actions}>
-        <button type="submit" className={s.primary} disabled={busy}>
-          {busy ? t.saving : t.saveReview}
-        </button>
+        {isText ? (
+          <span className={s.reviewTotal}>
+            {t.totalScore}: {totalText} / {deliverable.maxScore}
+          </span>
+        ) : (
+          <label className={s.scoreField}>
+            <span className={ui.label}>
+              {t.scoreLabel} / {deliverable.maxScore}
+            </span>
+            <input
+              className={ui.input}
+              type="number"
+              min={0}
+              max={deliverable.maxScore}
+              step={SCORE_STEP}
+              value={draft.score}
+              onChange={(event) => change({ score: event.target.value })}
+            />
+          </label>
+        )}
+        <label className={ui.field}>
+          <span className={ui.label}>{isText ? t.generalCommentLabel : t.commentLabel}</span>
+          <textarea className={s.textarea} value={draft.comment} onChange={(event) => change({ comment: event.target.value })} />
+        </label>
+        {message && <p className={ui.error}>{message}</p>}
+        {notice && <p className={ui.notice}>{notice}</p>}
+        <div className={s.actions}>
+          <button type="submit" className={s.primary} disabled={busy}>
+            {busy ? t.saving : t.saveReview}
+          </button>
+        </div>
       </div>
     </form>
   );
@@ -642,26 +794,7 @@ function SubmissionReview({ deliverable, submission, review, onBack }: Submissio
         )}
       </div>
 
-      {deliverable.kind === 'text' ? (
-        <div className={s.answers}>
-          {deliverable.questions.map((question, index) => {
-            const answer = submission.answers[question.id] ?? '';
-            return (
-              <div key={question.id} className={s.answerCard}>
-                <span className={s.questionName}>
-                  {index + 1} / {deliverable.questions.length}
-                </span>
-                <p className={s.questionText}>{question.text}</p>
-                {answer.trim() === '' ? (
-                  <span className={s.noAnswer}>{t.noAnswer}</span>
-                ) : (
-                  <p className={s.answerText}>{answer}</p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      ) : (
+      {deliverable.kind !== 'text' && (
         <div className={s.answerCard}>
           <span className={ui.eyebrow}>{kindText(deliverable.kind, t)}</span>
           {submission.url === '' ? (
@@ -674,11 +807,11 @@ function SubmissionReview({ deliverable, submission, review, onBack }: Submissio
         </div>
       )}
 
-      {deliverable.kind === 'text' && (
-        <TypingSignalsView signals={submission.typing} questions={deliverable.questions} charsWritten={charsWritten} />
-      )}
-
-      <ReviewForm key={submission.uid} deliverable={deliverable} uid={submission.uid} review={review} />
+      <ReviewForm key={submission.uid} deliverable={deliverable} submission={submission} review={review}>
+        {deliverable.kind === 'text' && (
+          <TypingSignalsView signals={submission.typing} questions={deliverable.questions} charsWritten={charsWritten} />
+        )}
+      </ReviewForm>
     </>
   );
 }

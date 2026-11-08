@@ -275,3 +275,32 @@
   composes: field from '../learn/ui.module.css';
   max-width: 200px;
 }
+
+/* The review of a text deliverable: the answer cards, the signals and the closing card. */
+.reviewStack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Under an answer: its score out of the question's points and a remark on it. */
+.reviewRow {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+}
+
+.questionCommentField {
+  composes: field from '../learn/ui.module.css';
+  flex: 1;
+  min-width: 220px;
+}
+
+.reviewTotal {
+  font-family: var(--font-disp, 'Arial Narrow', sans-serif);
+  font-weight: 800;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--amber);
+}
