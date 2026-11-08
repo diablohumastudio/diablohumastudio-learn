@@ -6,7 +6,7 @@ import type { LearnCourse } from '../../data/learn';
 import { examDict } from '../../i18n/pages/exam';
 import { useLocale, useT } from '../../i18n/useT';
 import ui from '../learn/ui.module.css';
-import { fetchAttempt, fetchGrade, subscribeOpenedExams } from './exams';
+import { fetchAttempt, fetchGrade, subscribeStudentExams } from './exams';
 import { dateTimeYearText, durationText } from './format';
 import s from './StudentExams.module.css';
 
@@ -25,8 +25,8 @@ export default function StudentExams({ course, uid }: { course: LearnCourse; uid
   const courseExams = useMemo(() => exams ?? [], [exams]);
 
   useEffect(
-    () => subscribeOpenedExams(course.slug, setExams, (error) => console.error('Could not load the exams', error)),
-    [course.slug]
+    () => subscribeStudentExams(course.slug, uid, setExams, (error) => console.error('Could not load the exams', error)),
+    [course.slug, uid]
   );
 
   useEffect(() => {

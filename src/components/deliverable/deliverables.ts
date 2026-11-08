@@ -13,6 +13,7 @@ import {
   where,
 } from 'firebase/firestore';
 import type { DocumentData, Unsubscribe } from 'firebase/firestore';
+import { assignmentOf, storedAssignment } from '../../data/course/assignment';
 import {
   DEFAULT_DURATION_MINUTES,
   DEFAULT_MAX_SCORE,
@@ -35,6 +36,7 @@ import type {
   TypingSignals,
 } from '../../data/deliverable/types';
 import { getFirestoreDb } from '../../lib/firebase';
+import { subscribeAssignedTo } from '../course/assignedQuery';
 
 /* Firestore layout (rules in firebase/firestore.rules, model in docs/deliverables.md):
    deliverables/{id}                   settings, status, openedAt, closesAt; teachers write it all
@@ -70,8 +72,7 @@ function toDeliverable(id: string, data: DocumentData): Deliverable {
     maxScore: Number(data.maxScore) || DEFAULT_MAX_SCORE,
     durationMinutes: Number(data.durationMinutes) || DEFAULT_DURATION_MINUTES,
     deadlineMs: millisOf(data.deadline),
-    assignedUids: Array.isArray(data.assignedUids) ? data.assignedUids.filter((uid: unknown) => typeof uid === 'string') : [],
-    forEveryone: data.forEveryone === true || !Array.isArray(data.assignedUids) || data.assignedUids.length === 0,
+    ...assignmentOf(data),
     status: data.status === 'opened' ? 'opened' : 'draft',
     createdAtMs: millisOf(data.createdAt),
     openedAtMs: millisOf(data.openedAt),
@@ -175,8 +176,7 @@ function toStoredSettings(settings: DeliverableSettings): DocumentData {
     maxScore: settings.maxScore,
     durationMinutes: settings.durationMinutes,
     deadline: settings.deadlineMs === null ? null : Timestamp.fromMillis(settings.deadlineMs),
-    assignedUids: [...settings.assignedUids],
-    forEveryone: settings.assignedUids.length === 0,
+    ...storedAssignment(settings.assignedUids),
   };
 }
 
@@ -193,9 +193,9 @@ export function subscribeAllDeliverables(
   );
 }
 
-/** The opened deliverables of a course that are for this student. The rules only let a student
-    read what is for them, and a query has to prove it, so two queries run, one for the deliverables
-    for everybody and one for those listing the student, and their results are merged. */
+/** The opened deliverables of a course that are for this student: the rules only let a student
+    read what is for them, so the query names the course and the status and splits in two
+    (`subscribeAssignedTo`). */
 export function subscribeStudentDeliverables(
   courseSlug: string,
   uid: string,
@@ -207,28 +207,7 @@ export function subscribeStudentDeliverables(
     where('status', '==', 'opened'),
     where('courseSlug', '==', courseSlug)
   );
-  const byQuery: Map<string, Deliverable[]> = new Map();
-  function publish(): void {
-    const byId: Map<string, Deliverable> = new Map();
-    byQuery.forEach((deliverables) => {
-      for (const deliverable of deliverables) byId.set(deliverable.id, deliverable);
-    });
-    onDeliverables(Array.from(byId.values()).sort(newestFirst));
-  }
-  const stops = [
-    query(opened, where('forEveryone', '==', true)),
-    query(opened, where('assignedUids', 'array-contains', uid)),
-  ].map((partialQuery, index) =>
-    onSnapshot(
-      partialQuery,
-      (snapshot) => {
-        byQuery.set(String(index), snapshot.docs.map((item) => toDeliverable(item.id, item.data())));
-        publish();
-      },
-      onError
-    )
-  );
-  return () => stops.forEach((stop) => stop());
+  return subscribeAssignedTo(opened, uid, toDeliverable, (deliverables) => onDeliverables(deliverables.sort(newestFirst)), onError);
 }
 
 export function subscribeDeliverable(

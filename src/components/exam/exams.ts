@@ -11,6 +11,7 @@ import {
   where,
 } from 'firebase/firestore';
 import type { DocumentData, Timestamp, Unsubscribe } from 'firebase/firestore';
+import { assignmentOf, storedAssignment } from '../../data/course/assignment';
 import { ATTEMPTS_SUBCOLLECTION, EXAMS_COLLECTION, GRADES_SUBCOLLECTION } from '../../data/exam/types';
 import type {
   Exam,
@@ -23,6 +24,7 @@ import type {
 } from '../../data/exam/types';
 import { parseQuestionIds } from '../../data/practice/selection';
 import { getFirebaseAuth, getFirestoreDb } from '../../lib/firebase';
+import { subscribeAssignedTo } from '../course/assignedQuery';
 
 /* Firestore layout (rules in firebase/firestore.rules, model in docs/exam.md):
    exams/{examId}                  settings, status, openedAt, closesAt; browsers write drafts only
@@ -53,6 +55,7 @@ function toExam(id: string, data: DocumentData): Exam {
     questionIds: parseQuestionIds(data.questionIds),
     maxQuestions: Number(data.maxQuestions) || 0,
     durationMinutes: Number(data.durationMinutes) || 0,
+    ...assignmentOf(data),
     status: data.status === 'opened' ? 'opened' : 'draft',
     createdAtMs: millisOf(data.createdAt),
     openedAtMs: millisOf(data.openedAt),
@@ -98,22 +101,26 @@ export function subscribeAllExams(onExams: (exams: Exam[]) => void, onError: (er
   );
 }
 
-/** The rules only let a student list the opened exams of a course they are enrolled in, so the
-    query has to ask for exactly those. */
-export function subscribeOpenedExams(
+/** The opened exams of a course that are for this student: the rules only let a student read
+    what is for them, so the query names the course and the status and splits in two
+    (`subscribeAssignedTo`). */
+export function subscribeStudentExams(
   courseSlug: string,
+  uid: string,
   onExams: (exams: Exam[]) => void,
   onError: (error: unknown) => void
 ): Unsubscribe {
-  return onSnapshot(
-    query(
-      collection(getFirestoreDb(), EXAMS_COLLECTION),
-      where('status', '==', 'opened'),
-      where('courseSlug', '==', courseSlug)
-    ),
-    (snapshot) => onExams(snapshot.docs.map((examDoc) => toExam(examDoc.id, examDoc.data())).sort(newestFirst)),
-    onError
+  const opened = query(
+    collection(getFirestoreDb(), EXAMS_COLLECTION),
+    where('status', '==', 'opened'),
+    where('courseSlug', '==', courseSlug)
   );
+  return subscribeAssignedTo(opened, uid, toExam, (exams) => onExams(exams.sort(newestFirst)), onError);
+}
+
+/** Firestore refuses `undefined`; the form always sends every field. */
+function toStoredSettings(settings: ExamSettings): DocumentData {
+  return { ...settings, ...storedAssignment(settings.assignedUids) };
 }
 
 export function subscribeExam(
@@ -131,7 +138,7 @@ export function subscribeExam(
 /** Returns the new exam's id: the teacher is taken to its own page. */
 export async function createDraft(settings: ExamSettings): Promise<string> {
   const created = await addDoc(collection(getFirestoreDb(), EXAMS_COLLECTION), {
-    ...settings,
+    ...toStoredSettings(settings),
     status: 'draft',
     createdAt: serverTimestamp(),
   });
@@ -139,7 +146,7 @@ export async function createDraft(settings: ExamSettings): Promise<string> {
 }
 
 export async function updateDraft(examId: string, settings: ExamSettings): Promise<void> {
-  await updateDoc(doc(getFirestoreDb(), EXAMS_COLLECTION, examId), { ...settings });
+  await updateDoc(doc(getFirestoreDb(), EXAMS_COLLECTION, examId), toStoredSettings(settings));
 }
 
 export async function deleteDraft(examId: string): Promise<void> {

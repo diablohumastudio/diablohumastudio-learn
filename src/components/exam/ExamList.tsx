@@ -18,7 +18,7 @@ import SignInRedirect from '../learn/SignInRedirect';
 import ui from '../learn/ui.module.css';
 import { useAuthUser } from '../learn/useAuthUser';
 import s from './ExamList.module.css';
-import { subscribeOpenedExams } from './exams';
+import { subscribeStudentExams } from './exams';
 import { dateTimeText } from './format';
 
 /** The opened deliverable exams of the course that are for this student, after the multiple option ones. */
@@ -69,11 +69,11 @@ function OpenedExams({ course, uid }: { course: LearnCourse; uid: string }) {
 
   useEffect(
     () =>
-      subscribeOpenedExams(course.slug, setExams, (error) => {
+      subscribeStudentExams(course.slug, uid, setExams, (error) => {
         console.error('Could not load the exams', error);
         setFailed(true);
       }),
-    [course.slug]
+    [course.slug, uid]
   );
 
   if (failed) {

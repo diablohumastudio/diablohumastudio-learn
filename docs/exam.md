@@ -56,6 +56,8 @@ Each selection is written to `localStorage` (`exam:<examId>:<uid>`). Submit mark
 ```
 exams/{examId}
   title, courseSlug, questionIds[], maxQuestions, durationMinutes
+  assignedUids[], forEveryone   who it is for (courses.md): every member of the course when the list
+                                is empty; forEveryone is stored beside the list so a query can ask for it
   status            'draft' | 'opened'   ("finished" is just closesAt in the past)
   createdAt, openedAt, closesAt, paperSize
 
@@ -87,7 +89,7 @@ Questions written for exams live in a second bank, `examQuestions/{id}`, with th
 
 The attempt stores the **texts** next to the ids, so a replay stays exact after the bank is edited. Option ids come from the bank (`id` on every entry of `correct[]` / `incorrect[]`): opaque, assigned by the editor on save or by `open`, kept when the text is edited. A JSON import that leaves them out gets new ones.
 
-Rules in short: teachers read everything except `private`; a student enrolled in the course ([courses.md](courses.md)) reads its opened exams (the list query filters by course and status so the rule can be checked), their own attempt and, **once `closesAt` has passed**, their own grade, which is how the result releases itself without any scheduler. Browsers can only create, edit and delete drafts.
+Rules in short: teachers read everything except `private`; a student enrolled in the course ([courses.md](courses.md)) reads the opened exams that are for them (`subscribeStudentExams` filters by course and status and splits in two over `forEveryone` and `assignedUids`, so the rule can be checked), their own attempt and, **once `closesAt` has passed**, their own grade, which is how the result releases itself without any scheduler. Browsers can only create, edit and delete drafts. The rules do not cover the API routes, so `start` checks by itself that the caller is a member of the exam's course and among the students it is for (`requireExaminee`; teachers may start any exam, to try it) and answers `notEnrolled` otherwise.
 
 ## Practice is paused during an exam (on purpose)
 

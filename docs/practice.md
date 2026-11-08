@@ -149,6 +149,9 @@ students/{uid}/days/hw-{homeworkId}-{roundId}_{YYYY-MM-DD}
 
 homeworks/{homeworkId}
   title, courseSlug, rounds[{ id, questionIds[], goal }], firstDay, lastDay, createdAt
+  assignedUids[], forEveryone                              who it is for (courses.md): every member of the
+                                                           course when the list is empty; forEveryone is
+                                                           stored beside the list so a query can ask for it
                                                            saved before rounds existed: questionIds[] and dailyGoal
                                                            instead of rounds, read as one round without id
 

@@ -1,9 +1,10 @@
 import { Timestamp } from 'firebase-admin/firestore';
 import { drawQuestions } from '../../../data/exam/paper';
 import type { StartExamResponse } from '../../../data/exam/types';
-import { ExamApiError, attemptRef, examApiRoute, examRef, paperRef } from '../../../lib/examApi';
+import { ExamApiError, attemptRef, examApiRoute, examRef, paperRef, requireExaminee } from '../../../lib/examApi';
 
-/** Safe to call again: a student who already started gets the same frozen draw back. */
+/** Safe to call again: a student who already started gets the same frozen draw back. Only the
+    students the exam is for may start it; the rules cannot check that for the API. */
 export default examApiRoute(async (context): Promise<StartExamResponse> => {
   const { db, examId, caller } = context;
 
@@ -15,6 +16,7 @@ export default examApiRoute(async (context): Promise<StartExamResponse> => {
     if (examDoc.get('status') !== 'opened' || !(closesAt instanceof Timestamp) || closesAt.toMillis() <= now.toMillis()) {
       throw new ExamApiError('notRunning');
     }
+    await requireExaminee(context, examDoc, transaction);
     const times = { closesAtMs: closesAt.toMillis(), serverNowMs: now.toMillis() };
 
     const attemptDoc = await transaction.get(attemptRef(db, examId, caller.uid));

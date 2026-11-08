@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { assignedAccounts } from '../../data/course/assignment';
+import { memberName } from '../../data/course/types';
 import { isExamRunning, questionsPerStudent } from '../../data/exam/types';
 import type { Exam, ExamAttempt, ExamGrade, ExamSettings } from '../../data/exam/types';
 import {
@@ -18,6 +20,8 @@ import { questionsWithIds } from '../../data/practice';
 import { examDict } from '../../i18n/pages/exam';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import StudentPicker from '../course/StudentPicker';
+import { useCourseMembers } from '../course/useCourseMembers';
 import DeliverableSection from '../deliverable/DeliverableSection';
 import SignInRedirect from '../learn/SignInRedirect';
 import ui from '../learn/ui.module.css';
@@ -52,6 +56,9 @@ type Draft = {
   questionIds: string[];
   maxQuestions: string;
   durationMinutes: string;
+  /** For everybody enrolled in the course; otherwise `assignedUids` says who. */
+  everyone: boolean;
+  assignedUids: string[];
 };
 
 type DraftValidation = { ok: true; settings: ExamSettings } | { ok: false; message: string };
@@ -72,6 +79,8 @@ function draftOf(exam: Exam | null): Draft {
       questionIds: [],
       maxQuestions: DEFAULT_MAX_QUESTIONS,
       durationMinutes: DEFAULT_DURATION_MINUTES,
+      everyone: true,
+      assignedUids: [],
     };
   }
   return {
@@ -80,6 +89,8 @@ function draftOf(exam: Exam | null): Draft {
     questionIds: exam.questionIds,
     maxQuestions: String(exam.maxQuestions),
     durationMinutes: String(exam.durationMinutes),
+    everyone: exam.assignedUids.length === 0,
+    assignedUids: exam.assignedUids,
   };
 }
 
@@ -92,6 +103,7 @@ function validateDraft(draft: Draft, t: ExamTexts): DraftValidation {
   if (!Number.isInteger(maxQuestions) || maxQuestions < 1 || !Number.isInteger(durationMinutes) || durationMinutes < 1) {
     return { ok: false, message: t.validationNumbers };
   }
+  if (!draft.everyone && draft.assignedUids.length === 0) return { ok: false, message: t.validationStudents };
   return {
     ok: true,
     settings: {
@@ -100,6 +112,7 @@ function validateDraft(draft: Draft, t: ExamTexts): DraftValidation {
       questionIds: draft.questionIds,
       maxQuestions,
       durationMinutes,
+      assignedUids: draft.everyone ? [] : draft.assignedUids,
     },
   };
 }
@@ -215,7 +228,14 @@ function DraftForm({ exam, onDeleted, onCreated }: DraftFormProps) {
         <QuestionPicker
           courseSlug={draft.courseSlug}
           questionIds={draft.questionIds}
-          onChange={(courseSlug, questionIds) => setDraft({ ...draft, courseSlug, questionIds })}
+          // The students belong to the course: another course starts with everybody again.
+          onChange={(courseSlug, questionIds) =>
+            setDraft(
+              courseSlug === draft.courseSlug
+                ? { ...draft, questionIds }
+                : { ...draft, courseSlug, questionIds, everyone: true, assignedUids: [] }
+            )
+          }
           questions={pickableQuestions}
         />
         {bank.status === 'ready' && inScopeCount < Number(draft.maxQuestions) && (
@@ -224,6 +244,14 @@ function DraftForm({ exam, onDeleted, onCreated }: DraftFormProps) {
           </span>
         )}
       </div>
+
+      <StudentPicker
+        key={draft.courseSlug}
+        courseSlug={draft.courseSlug}
+        everyone={draft.everyone}
+        assignedUids={draft.assignedUids}
+        onChange={(everyone, assignedUids) => setDraft({ ...draft, everyone, assignedUids })}
+      />
 
       <div className={s.numbers}>
         <label className={ui.field}>
@@ -312,6 +340,7 @@ function OpenedExam({ exam, replayUid, onOpenReplay, onCloseReplay }: OpenedExam
   const locale = useLocale();
   const course = findCourse(exam.courseSlug ?? undefined);
   const running = useIsRunning(exam);
+  const members = useCourseMembers(exam.courseSlug ?? '');
   const [attempts, setAttempts] = useState<ExamAttempt[]>([]);
   const [attemptsLoaded, setAttemptsLoaded] = useState(false);
   const [grades, setGrades] = useState<ExamGrade[]>([]);
@@ -320,6 +349,10 @@ function OpenedExam({ exam, replayUid, onOpenReplay, onCloseReplay }: OpenedExam
   const [message, setMessage] = useState<string | null>(null);
   const replayAttempt = attempts.find((attempt) => attempt.uid === replayUid);
   const replayGrade = grades.find((grade) => grade.uid === replayUid);
+  // The students the exam is for who have not started: listed after the attempts.
+  const notStarted = assignedAccounts(exam, members ?? []).filter(
+    (account) => !attempts.some((attempt) => attempt.uid === account.uid)
+  );
 
   useEffect(() => {
     const stopAttempts = subscribeAttempts(
@@ -434,7 +467,7 @@ function OpenedExam({ exam, replayUid, onOpenReplay, onCloseReplay }: OpenedExam
         ))}
 
       <div className={s.card}>
-        {attempts.length === 0 ? (
+        {attempts.length === 0 && notStarted.length === 0 ? (
           <p className={s.empty}>{t.noAttempts}</p>
         ) : (
           <div className={ui.tableWrap}>
@@ -465,6 +498,17 @@ function OpenedExam({ exam, replayUid, onOpenReplay, onCloseReplay }: OpenedExam
                     </tr>
                   );
                 })}
+                {notStarted.map((account) => (
+                  <tr key={account.uid}>
+                    <td>
+                      <span className={s.name}>{memberName(account)}</span>
+                      <span className={s.email}>{account.email}</span>
+                    </td>
+                    <td className={`${ui.num} ${s.score}`}>–</td>
+                    <td className={ui.mono}>{t.attemptNotStarted}</td>
+                    <td className={ui.num}>–</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

@@ -22,8 +22,10 @@ Teachers are members of every course: `useMembership` says so without reading an
 | Teacher | `EnrollmentManager.tsx`, `src/pages/teacher/enrollment.tsx` | The Enrollment page |
 | Gates | `CourseProgressLoader.tsx`, `PracticeApp.tsx`, `ExamList.tsx`, `ExamApp.tsx`, `DeliverableApp.tsx`, `StudentHistory.tsx` | Each checks the membership before loading or showing anything |
 | Teacher lists | `TeacherBoard.tsx` (`CoursePeriod` with `membersOnly`), `StudentReview.tsx`, `HomeworkManager.tsx` | The board and a homework's progress count the enrolled students of the course; the review lists the accounts enrolled in at least one course |
-| Rules | `firebase/firestore.rules` | `isMember()`, the `courses` block, and the reads of homeworks, exams and deliverables |
-| Texts | `src/i18n/pages/course.ts` | UI strings in both languages |
+| Assignment | `src/data/course/assignment.ts`, `src/components/course/assignedQuery.ts`, `StudentPicker.tsx` | Who a homework, an exam or a deliverable is for (below): the two stored fields and their helpers, the two-query read a student's list needs, and the teacher's picker |
+| Rules | `firebase/firestore.rules` | `isMember()`, `isAssignedTo()`, the `courses` block, and the reads of homeworks, exams and deliverables |
+| Migration | `firebase/scripts/add-assignment-fields.js` | One-off: gives the documents saved before the assignment fields existed their `forEveryone` and `assignedUids` |
+| Texts | `src/i18n/pages/course.ts` | UI strings in both languages, the picker's included |
 
 The course page keeps Firebase out of the guest's download, as before: `ClassList` renders `CourseProgress` (buttons for everybody, progress for members) and loads `CourseAccess` with `next/dynamic` and `ssr: false`, like the progress loader.
 
@@ -39,9 +41,19 @@ courses/{courseSlug}/requests/{uid}
 
 The course document itself never exists: Firestore keeps subcollections without a parent, and the courses are the entries of `LEARN_COURSES` in `src/data/learn.ts`.
 
-Rules in short: `isMember(courseSlug)` is `exists(courses/<course>/members/<uid>)`. A student reads only their own member and request documents and creates their own request; teachers read and write both. `homeworks` are read by the members of their course; `exams` by the members of their course once opened; `deliverables` by the members of their course once opened and when the deliverable is for them (see [deliverables.md](deliverables.md)); a submission can only be created or updated by someone the deliverable is for. The question bank stays readable by every signed-in account (its questions are not tied to one course); practice is gated in the page.
+Rules in short: `isMember(courseSlug)` is `exists(courses/<course>/members/<uid>)`. A student reads only their own member and request documents and creates their own request; teachers read and write both. `homeworks`, `exams` (once opened) and `deliverables` (once opened) are read by the students they are for, `isAssignedTo(resource.data)`: a member of the course who is among the assigned (below); a submission can only be created or updated by someone the deliverable is for ([deliverables.md](deliverables.md)). The question bank stays readable by every signed-in account (its questions are not tied to one course); practice is gated in the page.
 
-**Queries must say the course.** A rule that reads `resource.data.courseSlug` can only be checked against a list query that filters `courseSlug` by equality, so the student's queries do: `fetchCourseHomeworks(courseSlug)`, `subscribeOpenedExams(courseSlug)` (also `status == 'opened'`) and the two queries of `subscribeStudentDeliverables`. A query without the course is refused by the rules even for an enrolled student.
+## Who a homework, an exam or a deliverable is for
+
+Each of the three is for **everybody enrolled in its course** by default, or for the students the teacher ticks in the form (`StudentPicker`: a tick for everybody, or a searchable list of the enrolled; changing the course starts over with everybody). It is stored as two fields, `assignedUids` (empty for everybody) and `forEveryone` (true exactly when that list is empty), because a student's list query has to ask for one or the other by equality for the rules to check it. `src/data/course/assignment.ts` holds the `Assignment` type and the helpers that read, store and test it (`assignmentOf`, `storedAssignment`, `isAssignedTo`, `assignedAccounts`); `isHomeworkFor`, `isExamFor` and `isDeliverableFor` are the same test with the right name.
+
+What the assignment changes:
+
+- The student's lists and cards show only what is for them; the homework play screen, the exam room and the deliverable page refuse the rest (the rules refuse the read, which the pages show as "does not exist"). For exams, the `start` API route checks it too, since the rules do not cover the API (`requireExaminee` in `src/lib/examApi.ts`; teachers may start any exam).
+- The teacher's opened exam lists the assigned students who have not started as "Not started", the opened deliverable lists them as "Nothing saved", and a homework's progress counts the assigned students instead of every member.
+- A document saved before the two fields existed is **for everybody**: the rules read `forEveryone` with `true` as the default, and the browser treats a missing list as empty. But a student's list query asks for `forEveryone == true`, which a missing field does not match, so those documents need the fields written once: `node firebase/scripts/add-assignment-fields.js --dry-run` lists them, and without `--dry-run` writes `forEveryone: true, assignedUids: []` on every homework, exam and deliverable that lacks them. Run it once after publishing the rules that name `isAssignedTo`.
+
+**Queries must say the course and the assignment.** A rule that reads `resource.data.courseSlug` can only be checked against a list query that filters `courseSlug` by equality, and one that reads `forEveryone` or `assignedUids` against a query that filters one of them, so every student query names its course and splits in two, `forEveryone == true` and `assignedUids array-contains uid`, merged by `subscribeAssignedTo` or `fetchAssignedTo` (`src/components/course/assignedQuery.ts`): `fetchStudentHomeworks(courseSlug, uid)`, `subscribeStudentExams(courseSlug, uid)` (also `status == 'opened'`) and `subscribeStudentDeliverables(courseSlug, uid)`. A query without the course or without the split is refused by the rules even for an enrolled student. If Firestore ever asks for a composite index for one of these queries, the error in the console carries the link to create it.
 
 ## Setup
 

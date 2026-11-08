@@ -168,6 +168,7 @@ const en = {
   validationHomeworkQuestions: 'Pick at least one question in every round.',
   validationHomeworkDays: 'Set a first and a last day, at most {days} days apart.',
   validationHomeworkGoal: 'The answers per day of every round must be a whole number, 1 or more.',
+  validationStudents: 'Pick at least one student, or tick Everyone.',
 
   editorTitle: 'Questions',
   newQuestion: 'New question',
@@ -406,6 +407,7 @@ const es: Record<keyof typeof en, string> = {
   validationHomeworkQuestions: 'Elige al menos una pregunta en cada tanda.',
   validationHomeworkDays: 'Define un primer y un último día, con {days} días como máximo entre ellos.',
   validationHomeworkGoal: 'Las respuestas por día de cada tanda deben ser un número entero, 1 o más.',
+  validationStudents: 'Elige al menos un estudiante, o marca Todos.',
 
   editorTitle: 'Preguntas',
   newQuestion: 'Nueva pregunta',

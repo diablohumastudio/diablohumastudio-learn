@@ -12,7 +12,15 @@ import {
   querySlug,
 } from '../../data/learn';
 import type { LearnCourse, PracticeScope } from '../../data/learn';
-import { dayKey, dayText, findRound, isHomeworkOpen, questionsInScope, questionsWithIds } from '../../data/practice';
+import {
+  dayKey,
+  dayText,
+  findRound,
+  isHomeworkFor,
+  isHomeworkOpen,
+  questionsInScope,
+  questionsWithIds,
+} from '../../data/practice';
 import type { Homework, RoundOfHomework } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
@@ -127,6 +135,11 @@ function HomeworkArea({ user, course, homeworkId, roundId }: HomeworkAreaProps) 
         if (isCurrent) setLoad({ status: 'loaded', homework });
       })
       .catch((error) => {
+        // The rules refuse a homework that is not for this student: to them it does not exist.
+        if (isPermissionDenied(error)) {
+          if (isCurrent) setLoad({ status: 'loaded', homework: null });
+          return;
+        }
         console.error('Could not load the homework', error);
         if (isCurrent) setLoad({ status: 'failed' });
       });
@@ -152,7 +165,7 @@ function HomeworkArea({ user, course, homeworkId, roundId }: HomeworkAreaProps) 
   const { homework } = load;
   const round = homework ? findRound(homework, roundId) : undefined;
   // A round the teacher removed leaves old links behind: they are as stale as a deleted homework's.
-  if (!homework || !round || homework.courseSlug !== course.slug) {
+  if (!homework || !round || homework.courseSlug !== course.slug || !isHomeworkFor(homework, user.uid)) {
     return <CourseNotice course={course} message={t.homeworkNotFound} />;
   }
   if (!isHomeworkOpen(homework, dayKey(new Date()))) {

@@ -10,6 +10,8 @@
    To the teacher a day is worth one point with both goals met, half a point with one of them
    and nothing with neither, however much was practiced; a period is graded by the sum. */
 
+import { isAssignedTo } from '../course/assignment';
+
 export const DAILY_QUESTIONS_GOAL: number = 30;
 export const RUN_LENGTH: number = 10;
 export const RUN_CORRECT_GOAL: number = 7;
@@ -62,9 +64,20 @@ export type HomeworkSettings = {
   /** Student-local days ('YYYY-MM-DD'), both included. */
   firstDay: string;
   lastDay: string;
+  /** The accounts it is for; empty for everybody enrolled in the course (`Assignment`, docs/courses.md). */
+  assignedUids: string[];
 };
 
-export type Homework = HomeworkSettings & { id: string };
+export type Homework = HomeworkSettings & {
+  id: string;
+  /** Stored beside `assignedUids` so a student's query can ask for it by equality (`Assignment`). */
+  forEveryone: boolean;
+};
+
+/** Whether a homework is for this account: for everybody, or listed. */
+export function isHomeworkFor(homework: Homework, uid: string): boolean {
+  return isAssignedTo(homework, uid);
+}
 
 /** A round together with its homework: what the play screen is given. */
 export type RoundOfHomework = { homework: Homework; round: HomeworkRound };

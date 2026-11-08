@@ -2,11 +2,16 @@ import { useEffect, useState } from 'react';
 import type { CourseMember } from '../../data/course/types';
 import { subscribeMembers } from './members';
 
-/** Teacher only: the members of a course, live; null until they arrive. */
+/** Teacher only: the members of a course, live; null until they arrive. An empty course slug
+    (an exam saved before exams had a course) has no members. */
 export function useCourseMembers(courseSlug: string): CourseMember[] | null {
   const [members, setMembers] = useState<CourseMember[] | null>(null);
 
   useEffect(() => {
+    if (courseSlug === '') {
+      setMembers([]);
+      return undefined;
+    }
     setMembers(null);
     return subscribeMembers(courseSlug, setMembers, (error) => {
       // Refused until firebase/firestore.rules names the collection: then nobody is enrolled.

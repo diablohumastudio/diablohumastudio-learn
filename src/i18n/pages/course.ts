@@ -40,6 +40,12 @@ const en = {
   colGrantedBy: 'Enrolled by',
   grantedByEnrollAll: 'enroll all',
   onlyEnrolledHint: 'Only the students enrolled in a course are listed. Enroll them from the Enrollment page of the teacher menu.',
+
+  studentsLabel: 'Students',
+  everyoneLabel: 'Everyone enrolled in the course',
+  searchStudents: 'Search by name or email',
+  assignedCount: '{count} students selected',
+  pickerNoMembers: 'Nobody is enrolled in this course yet. Enroll them from the Enrollment page.',
 } as const;
 
 const es: Record<keyof typeof en, string> = {
@@ -84,6 +90,12 @@ const es: Record<keyof typeof en, string> = {
   colGrantedBy: 'Inscrito por',
   grantedByEnrollAll: 'inscripción general',
   onlyEnrolledHint: 'Solo se listan los estudiantes inscritos en un curso. Inscríbelos desde Inscripciones, en el menú docente.',
+
+  studentsLabel: 'Estudiantes',
+  everyoneLabel: 'Todos los inscritos en el curso',
+  searchStudents: 'Buscar por nombre o correo',
+  assignedCount: '{count} estudiantes seleccionados',
+  pickerNoMembers: 'Todavía no hay nadie inscrito en este curso. Inscríbelos desde Inscripciones.',
 };
 
 export const courseDict = { en, es };

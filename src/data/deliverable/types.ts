@@ -1,3 +1,4 @@
+import { isAssignedTo } from '../course/assignment';
 import { SUBMIT_GRACE_MS } from '../exam/types';
 
 /* A deliverable is a homework or an exam the student hands in as something other than multiple
@@ -70,14 +71,14 @@ export type DeliverableSettings = {
   durationMinutes: number;
   /** Homework role: the close Open will fix, chosen in the form; null until chosen. */
   deadlineMs: number | null;
-  /** The accounts it is for; empty for everybody enrolled in the course. */
+  /** The accounts it is for; empty for everybody enrolled in the course (`Assignment`). */
   assignedUids: string[];
 };
 
 export type Deliverable = DeliverableSettings & {
   id: string;
   status: DeliverableStatus;
-  /** Stored beside `assignedUids` so a student's query can ask for it by equality. */
+  /** Stored beside `assignedUids` so a student's query can ask for it by equality (`Assignment`). */
   forEveryone: boolean;
   createdAtMs: number | null;
   openedAtMs: number | null;
@@ -214,9 +215,9 @@ export function isValidSubmissionUrl(kind: DeliverableKind, value: string): bool
   return value === '';
 }
 
-/** Whether a deliverable is for this account: for everybody, or listed. */
+/** Whether a deliverable is for this account: for everybody, or listed (docs/courses.md). */
 export function isDeliverableFor(deliverable: Deliverable, uid: string): boolean {
-  return deliverable.forEveryone || deliverable.assignedUids.includes(uid);
+  return isAssignedTo(deliverable, uid);
 }
 
 export function hasContent(submission: Submission): boolean {

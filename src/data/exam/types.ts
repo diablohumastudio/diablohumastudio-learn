@@ -1,4 +1,5 @@
 import type { Dictionary } from '../../i18n/useT';
+import { isAssignedTo } from '../course/assignment';
 
 /* Shared by the browser and the exam API routes, so it holds no Firebase types:
    every moment is a number of milliseconds since the epoch. See docs/exam.md. */
@@ -25,11 +26,15 @@ export type ExamSettings = {
   questionIds: string[];
   maxQuestions: number;
   durationMinutes: number;
+  /** The accounts it is for; empty for everybody enrolled in the course (`Assignment`, docs/courses.md). */
+  assignedUids: string[];
 };
 
 export type Exam = ExamSettings & {
   id: string;
   status: ExamStatus;
+  /** Stored beside `assignedUids` so a student's query can ask for it by equality (`Assignment`). */
+  forEveryone: boolean;
   createdAtMs: number | null;
   openedAtMs: number | null;
   /** Fixed when the teacher opens the exam; "Close early" moves it to that moment. */
@@ -84,6 +89,8 @@ export type ExamGrade = {
 export type ExamApiErrorCode =
   | 'unauthenticated'
   | 'notTeacher'
+  /** Not enrolled in the exam's course, or not among the students it is for. */
+  | 'notEnrolled'
   | 'badRequest'
   | 'notFound'
   | 'notDraft'
@@ -104,6 +111,11 @@ export type StartExamResponse = {
 
 export function questionsPerStudent(exam: Exam): number {
   return exam.paperSize === null ? exam.maxQuestions : Math.min(exam.maxQuestions, exam.paperSize);
+}
+
+/** Whether an exam is for this account: for everybody, or listed. */
+export function isExamFor(exam: Exam, uid: string): boolean {
+  return isAssignedTo(exam, uid);
 }
 
 export function isExamRunning(exam: Exam, nowMs: number): boolean {

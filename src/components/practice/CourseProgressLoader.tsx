@@ -5,7 +5,7 @@ import type { DayProgress, Homework, PracticeQuestion } from '../../data/practic
 import { isFirebaseConfigured } from '../../lib/firebase';
 import { useMembership } from '../course/useMembership';
 import type { ClassAnswers, CourseProgressData } from './CourseProgressContext';
-import { fetchCourseHomeworks } from './homeworks';
+import { fetchStudentHomeworks } from './homeworks';
 import { fetchStudentDays, fetchStudentQuestions } from './progress';
 import type { QuestionStats } from './progress';
 import { useQuestionBank } from './questions';
@@ -23,8 +23,8 @@ type StudentRecords = {
 
 /* The rules refuse `homeworks` until firebase/firestore.rules is republished with that block.
    The daily homework must load anyway, so a failure here only means "no homeworks". */
-function fetchHomeworksOrNone(courseSlug: string): Promise<Homework[]> {
-  return fetchCourseHomeworks(courseSlug).catch((error): Homework[] => {
+function fetchHomeworksOrNone(courseSlug: string, uid: string): Promise<Homework[]> {
+  return fetchStudentHomeworks(courseSlug, uid).catch((error): Homework[] => {
     console.warn('Could not load the homeworks', error);
     return [];
   });
@@ -72,7 +72,7 @@ function SignedInLoader({ uid, course, onLoaded }: CourseProgressLoaderProps & {
 
   useEffect(() => {
     let isCurrent = true;
-    Promise.all([fetchStudentQuestions(uid), fetchStudentDays(uid), fetchHomeworksOrNone(course.slug)])
+    Promise.all([fetchStudentQuestions(uid), fetchStudentDays(uid), fetchHomeworksOrNone(course.slug, uid)])
       .then(([questionStats, days, homeworks]) => {
         if (isCurrent) setRecords({ questionStats, days, homeworks });
       })

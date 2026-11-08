@@ -5,7 +5,6 @@ import {
   deleteField,
   doc,
   getDoc,
-  getDocs,
   onSnapshot,
   query,
   serverTimestamp,
@@ -13,6 +12,7 @@ import {
   where,
 } from 'firebase/firestore';
 import type { DocumentData, Unsubscribe } from 'firebase/firestore';
+import { assignmentOf, storedAssignment } from '../../data/course/assignment';
 import {
   DEFAULT_HOMEWORK_DAILY_GOAL,
   HOMEWORKS_COLLECTION,
@@ -22,9 +22,10 @@ import {
 } from '../../data/practice';
 import type { Homework, HomeworkRound, HomeworkSettings } from '../../data/practice';
 import { getFirestoreDb } from '../../lib/firebase';
+import { fetchAssignedTo } from '../course/assignedQuery';
 
 /* Firestore layout (rules in firebase/firestore.rules):
-   homeworks/{homeworkId}   a specific homework: any signed-in user reads it, only teachers write it.
+   homeworks/{homeworkId}   a specific homework: the students it is for read it, only teachers write it.
    Its answers are counted with the student, one doc per round and day:
    students/{uid}/days/hw-{homeworkId}-{roundId}_{day} (progress.ts). */
 
@@ -54,6 +55,7 @@ function toHomework(id: string, data: DocumentData): Homework {
     rounds: toRounds(data),
     firstDay: isDayKey(data.firstDay) ? data.firstDay : '',
     lastDay: isDayKey(data.lastDay) ? data.lastDay : '',
+    ...assignmentOf(data),
   };
 }
 
@@ -74,11 +76,18 @@ export function subscribeAllHomeworks(
   );
 }
 
-export async function fetchCourseHomeworks(courseSlug: string): Promise<Homework[]> {
-  const snapshot = await getDocs(
-    query(collection(getFirestoreDb(), HOMEWORKS_COLLECTION), where('courseSlug', '==', courseSlug))
-  );
-  return snapshot.docs.map((homeworkDoc) => toHomework(homeworkDoc.id, homeworkDoc.data())).sort(newestFirst);
+/** The homeworks of a course that are for this student, whatever their dates: the rules only let
+    a student read what is for them, so the query names the course and splits in two
+    (`fetchAssignedTo`). */
+export async function fetchStudentHomeworks(courseSlug: string, uid: string): Promise<Homework[]> {
+  const ofCourse = query(collection(getFirestoreDb(), HOMEWORKS_COLLECTION), where('courseSlug', '==', courseSlug));
+  const homeworks = await fetchAssignedTo(ofCourse, uid, toHomework);
+  return homeworks.sort(newestFirst);
+}
+
+/** Firestore refuses `undefined`; the form always sends every field. */
+function toStoredSettings(settings: HomeworkSettings): DocumentData {
+  return { ...settings, ...storedAssignment(settings.assignedUids) };
 }
 
 export async function fetchHomework(homeworkId: string): Promise<Homework | null> {
@@ -89,7 +98,7 @@ export async function fetchHomework(homeworkId: string): Promise<Homework | null
 /** Returns the new homework's id: the teacher is taken to its own page. */
 export async function createHomework(settings: HomeworkSettings): Promise<string> {
   const created = await addDoc(collection(getFirestoreDb(), HOMEWORKS_COLLECTION), {
-    ...settings,
+    ...toStoredSettings(settings),
     createdAt: serverTimestamp(),
   });
   return created.id;
@@ -97,7 +106,7 @@ export async function createHomework(settings: HomeworkSettings): Promise<string
 
 export async function updateHomework(homeworkId: string, settings: HomeworkSettings): Promise<void> {
   await updateDoc(doc(getFirestoreDb(), HOMEWORKS_COLLECTION, homeworkId), {
-    ...settings,
+    ...toStoredSettings(settings),
     // Where a homework older than the rounds kept what is now in its round.
     questionIds: deleteField(),
     dailyGoal: deleteField(),

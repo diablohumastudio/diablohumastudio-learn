@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
+import { assignedAccounts } from '../../data/course/assignment';
 import { memberName } from '../../data/course/types';
 import type { CourseMember } from '../../data/course/types';
 import {
@@ -36,6 +37,7 @@ import {
 import { deliverableDict } from '../../i18n/pages/deliverable';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
+import StudentPicker from '../course/StudentPicker';
 import { useCourseMembers } from '../course/useCourseMembers';
 import ConfirmPanel from '../exam/ConfirmPanel';
 import { dateTimeText, dateTimeYearText, dayMonthText, durationText } from '../exam/format';
@@ -240,66 +242,6 @@ function QuestionEditor({ number, question, isOnlyQuestion, onChange, onRemove }
           onChange={(event) => onChange({ ...question, maxChars: event.target.value })}
         />
       </label>
-    </div>
-  );
-}
-
-type StudentPickerProps = {
-  courseSlug: string;
-  everyone: boolean;
-  assignedUids: string[];
-  onChange: (everyone: boolean, assignedUids: string[]) => void;
-};
-
-/** Everybody enrolled, or a tick per enrolled student, found by name or email. */
-function StudentPicker({ courseSlug, everyone, assignedUids, onChange }: StudentPickerProps) {
-  const t = useT(deliverableDict);
-  const members = useCourseMembers(courseSlug);
-  const [search, setSearch] = useState('');
-  const needle = search.trim().toLowerCase();
-  const shown = (members ?? []).filter(
-    (member) => needle === '' || memberName(member).toLowerCase().includes(needle) || member.email.toLowerCase().includes(needle)
-  );
-
-  function toggle(uid: string): void {
-    onChange(false, assignedUids.includes(uid) ? assignedUids.filter((other) => other !== uid) : [...assignedUids, uid]);
-  }
-
-  return (
-    <div className={ui.field}>
-      <span className={ui.label}>{t.studentsLabel}</span>
-      <label className={s.check}>
-        <input type="checkbox" checked={everyone} onChange={(event) => onChange(event.target.checked, assignedUids)} />
-        {t.everyoneLabel}
-      </label>
-      {!everyone && (
-        <>
-          <input
-            className={ui.input}
-            type="search"
-            placeholder={t.searchStudents}
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
-          {members === null ? (
-            <span className={ui.mono}>{t.loading}</span>
-          ) : members.length === 0 ? (
-            <span className={ui.mono}>{t.noMembers}</span>
-          ) : (
-            <ul className={s.studentList}>
-              {shown.map((member) => (
-                <li key={member.uid}>
-                  <label className={s.studentItem}>
-                    <input type="checkbox" checked={assignedUids.includes(member.uid)} onChange={() => toggle(member.uid)} />
-                    {memberName(member)} <span className={s.studentEmail}>{member.email}</span>
-                  </label>
-                </li>
-              ))}
-            </ul>
-          )}
-          <span className={ui.mono}>{t.assignedCount.replace('{count}', String(assignedUids.length))}</span>
-        </>
-      )}
     </div>
   );
 }
@@ -723,11 +665,8 @@ type RosterRow = {
     saved, each with their submission or none, by name. */
 function rosterOf(deliverable: Deliverable, members: readonly CourseMember[] | null, submissions: readonly Submission[]): RosterRow[] {
   const rows: Map<string, RosterRow> = new Map();
-  const memberList = members ?? [];
-  const forUids = deliverable.forEveryone ? memberList.map((member) => member.uid) : deliverable.assignedUids;
-  for (const uid of forUids) {
-    const member = memberList.find((candidate) => candidate.uid === uid);
-    rows.set(uid, { uid, name: member ? memberName(member) : uid, email: member?.email ?? '', submission: null });
+  for (const account of assignedAccounts(deliverable, members ?? [])) {
+    rows.set(account.uid, { uid: account.uid, name: memberName(account), email: account.email, submission: null });
   }
   for (const submission of submissions) {
     const row = rows.get(submission.uid);

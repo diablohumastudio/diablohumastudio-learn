@@ -24,7 +24,9 @@ import type { Homework, HomeworkSettings, HomeworkState, PracticeQuestion, Progr
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import { isFirebaseConfigured } from '../../lib/firebase';
-import { memberUids, useCourseMembers } from '../course/useCourseMembers';
+import { assignedAccounts } from '../../data/course/assignment';
+import StudentPicker from '../course/StudentPicker';
+import { useCourseMembers } from '../course/useCourseMembers';
 import DeliverableSection from '../deliverable/DeliverableSection';
 import ConfirmPanel from '../exam/ConfirmPanel';
 import SignInRedirect from '../learn/SignInRedirect';
@@ -59,6 +61,9 @@ type Draft = {
   rounds: RoundDraft[];
   firstDay: string;
   lastDay: string;
+  /** For everybody enrolled in the course; otherwise `assignedUids` says who. */
+  everyone: boolean;
+  assignedUids: string[];
 };
 
 type DraftValidation = { ok: true; settings: HomeworkSettings } | { ok: false; message: string };
@@ -74,6 +79,8 @@ function draftOf(homework: Homework | null): Draft {
       rounds: [{ id: newRoundId(), questionIds: [], goal: String(DEFAULT_HOMEWORK_DAILY_GOAL) }],
       firstDay: today,
       lastDay: dayKeyAfter(today, DEFAULT_HOMEWORK_DAYS - 1),
+      everyone: true,
+      assignedUids: [],
     };
   }
   return {
@@ -82,6 +89,8 @@ function draftOf(homework: Homework | null): Draft {
     rounds: homework.rounds.map((round) => ({ ...round, goal: String(round.goal) })),
     firstDay: homework.firstDay,
     lastDay: homework.lastDay,
+    everyone: homework.assignedUids.length === 0,
+    assignedUids: homework.assignedUids,
   };
 }
 
@@ -104,9 +113,17 @@ function validateDraft(draft: Draft, t: PracticeTexts): DraftValidation {
   if (rounds.some((round) => !Number.isInteger(round.goal) || round.goal < 1)) {
     return { ok: false, message: t.validationHomeworkGoal };
   }
+  if (!draft.everyone && draft.assignedUids.length === 0) return { ok: false, message: t.validationStudents };
   return {
     ok: true,
-    settings: { title, courseSlug: draft.courseSlug, rounds, firstDay: draft.firstDay, lastDay: draft.lastDay },
+    settings: {
+      title,
+      courseSlug: draft.courseSlug,
+      rounds,
+      firstDay: draft.firstDay,
+      lastDay: draft.lastDay,
+      assignedUids: draft.everyone ? [] : draft.assignedUids,
+    },
   };
 }
 
@@ -311,12 +328,15 @@ function HomeworkForm({ homework, state, onDeleted, onCreated }: HomeworkFormPro
           <select
             className={s.select}
             value={draft.courseSlug}
-            // The questions belong to a course: another course starts every round with none ticked.
+            // The questions and the students belong to a course: another course starts every
+            // round with none ticked and with everybody again.
             onChange={(event) =>
               setDraft({
                 ...draft,
                 courseSlug: event.target.value,
                 rounds: draft.rounds.map((round) => ({ ...round, questionIds: [] })),
+                everyone: true,
+                assignedUids: [],
               })
             }
           >
@@ -327,6 +347,14 @@ function HomeworkForm({ homework, state, onDeleted, onCreated }: HomeworkFormPro
             ))}
           </select>
         </label>
+
+        <StudentPicker
+          key={draft.courseSlug}
+          courseSlug={draft.courseSlug}
+          everyone={draft.everyone}
+          assignedUids={draft.assignedUids}
+          onChange={(everyone, assignedUids) => setDraft({ ...draft, everyone, assignedUids })}
+        />
 
         <div className={ui.field}>
           <span className={ui.label}>{t.colRounds}</span>
@@ -420,16 +448,17 @@ type HomeworkProgressProps = {
 /** What every student did in one homework: the summary to grade it and the grid of its days. */
 function HomeworkProgress({ students, homework }: HomeworkProgressProps) {
   const members = useCourseMembers(homework.courseSlug);
-  // One array per membership list, or the days would be fetched again on every render.
-  const enrolledStudents = useMemo(() => {
+  // The students the homework is for. One array per membership list, or the days would be
+  // fetched again on every render.
+  const assignedStudents = useMemo(() => {
     if (members === null) return [];
-    const enrolled = memberUids(members);
-    return students.filter((student) => enrolled.has(student.uid));
-  }, [members, students]);
-  const daysByStudent = useStudentDays(enrolledStudents);
+    const assigned = new Set(assignedAccounts(homework, members).map((account) => account.uid));
+    return students.filter((student) => assigned.has(student.uid));
+  }, [homework, members, students]);
+  const daysByStudent = useStudentDays(assignedStudents);
   const scope: ProgressScope = { kind: 'homework', homework };
   const days = dayKeysBetween(homework.firstDay, homework.lastDay);
-  const studentsByName = [...enrolledStudents].sort(byDisplayName);
+  const studentsByName = [...assignedStudents].sort(byDisplayName);
 
   return (
     <>

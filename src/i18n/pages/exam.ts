@@ -12,6 +12,7 @@ const en = {
   errorAnotherExamRunning: 'Another exam is still running. Only one can be open at a time.',
   errorNoQuestions: 'There are no active questions in the scope of this exam.',
   errorNotRunning: 'This exam is not running.',
+  errorNotEnrolled: 'This exam is not for your account.',
   errorServerNotConfigured: 'The exam server is not configured: set FIREBASE_SERVICE_ACCOUNT (see docs/exam.md).',
 
   examsTitle: 'Exams',
@@ -88,6 +89,7 @@ const en = {
   confirmCloseButton: 'Yes, close',
   validationTitle: 'Write a title.',
   validationNumbers: 'Questions and minutes must be whole numbers above zero.',
+  validationStudents: 'Pick at least one student, or tick Everyone.',
   colTitle: 'Exam',
   colScope: 'Scope',
   colQuestions: 'Questions',
@@ -105,6 +107,7 @@ const en = {
   colLate: 'Late',
   attemptStarted: 'Started',
   attemptSubmitted: 'Submitted',
+  attemptNotStarted: 'Not started',
   noAttempts: 'No student has started yet.',
   backToAttempts: 'All students',
 } as const;
@@ -123,6 +126,7 @@ const es: Record<keyof typeof en, string> = {
   errorAnotherExamRunning: 'Otro examen sigue en curso. Solo puede haber uno abierto a la vez.',
   errorNoQuestions: 'No hay preguntas activas en el alcance de este examen.',
   errorNotRunning: 'Este examen no está en curso.',
+  errorNotEnrolled: 'Este examen no es para tu cuenta.',
   errorServerNotConfigured:
     'El servidor de exámenes no está configurado: define FIREBASE_SERVICE_ACCOUNT (ver docs/exam.md).',
 
@@ -200,6 +204,7 @@ const es: Record<keyof typeof en, string> = {
   confirmCloseButton: 'Sí, cerrar',
   validationTitle: 'Escribe un título.',
   validationNumbers: 'Preguntas y minutos deben ser números enteros mayores que cero.',
+  validationStudents: 'Elige al menos un estudiante, o marca Todos.',
   colTitle: 'Examen',
   colScope: 'Alcance',
   colQuestions: 'Preguntas',
@@ -217,6 +222,7 @@ const es: Record<keyof typeof en, string> = {
   colLate: 'Retraso',
   attemptStarted: 'Empezado',
   attemptSubmitted: 'Enviado',
+  attemptNotStarted: 'Sin empezar',
   noAttempts: 'Ningún estudiante ha empezado todavía.',
   backToAttempts: 'Todos los estudiantes',
 };

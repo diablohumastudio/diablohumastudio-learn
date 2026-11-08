@@ -1,6 +1,8 @@
 import type { DecodedIdToken } from 'firebase-admin/auth';
-import type { DocumentReference, Firestore } from 'firebase-admin/firestore';
+import type { DocumentReference, DocumentSnapshot, Firestore, Transaction } from 'firebase-admin/firestore';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { assignmentOf, isAssignedTo } from '../data/course/assignment';
+import { COURSES_COLLECTION, MEMBERS_SUBCOLLECTION } from '../data/course/types';
 import {
   ATTEMPTS_SUBCOLLECTION,
   EXAMS_COLLECTION,
@@ -19,6 +21,7 @@ const TEACHERS_COLLECTION: string = 'teachers';
 const STATUS_BY_ERROR: Record<ExamApiErrorCode, number> = {
   unauthenticated: 401,
   notTeacher: 403,
+  notEnrolled: 403,
   badRequest: 400,
   notFound: 404,
   notDraft: 409,
@@ -56,9 +59,27 @@ async function verifiedCaller(req: NextApiRequest): Promise<DecodedIdToken> {
   }
 }
 
+function teacherRef(context: ExamApiContext): DocumentReference {
+  return context.db.collection(TEACHERS_COLLECTION).doc(context.caller.uid);
+}
+
 export async function requireTeacher(context: ExamApiContext): Promise<void> {
-  const teacherDoc = await context.db.collection(TEACHERS_COLLECTION).doc(context.caller.uid).get();
+  const teacherDoc = await teacherRef(context).get();
   if (!teacherDoc.exists) throw new ExamApiError('notTeacher');
+}
+
+/** A student may take only an exam that is for them: enrolled in its course and among the
+    assigned (docs/courses.md). The rules do not cover the API, so the route checks here, inside
+    its transaction. Teachers may take any exam, to try it. */
+export async function requireExaminee(context: ExamApiContext, examDoc: DocumentSnapshot, transaction: Transaction): Promise<void> {
+  const courseSlug: unknown = examDoc.get('courseSlug');
+  if (typeof courseSlug !== 'string' || courseSlug === '') throw new ExamApiError('notEnrolled');
+  const memberRef = context.db.collection(COURSES_COLLECTION).doc(courseSlug).collection(MEMBERS_SUBCOLLECTION).doc(context.caller.uid);
+  const [memberDoc, teacherDoc] = await Promise.all([transaction.get(memberRef), transaction.get(teacherRef(context))]);
+  if (teacherDoc.exists) return;
+  if (!memberDoc.exists || !isAssignedTo(assignmentOf(examDoc.data() ?? {}), context.caller.uid)) {
+    throw new ExamApiError('notEnrolled');
+  }
 }
 
 export function examRef(db: Firestore, examId: string): DocumentReference {

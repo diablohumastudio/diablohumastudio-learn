@@ -25,6 +25,14 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/courses/$(courseSlug)/members/$(request.auth.uid));
     }
 
+    // Whether a homework, an exam or a deliverable is for the caller: a member of its course, and
+    // either it is for everybody or the caller is listed in `assignedUids` (docs/courses.md). A
+    // document saved before those two fields existed is for everybody.
+    function isAssignedTo(data) {
+      return isMember(data.courseSlug)
+        && (data.get('forEveryone', true) == true || request.auth.uid in data.get('assignedUids', []));
+    }
+
     // True from the moment a teacher opens an exam until its clock ends. The exam API writes
     // settings/examLock when it opens or closes one.
     function examRunning() {
@@ -83,18 +91,19 @@ service cloud.firestore {
     }
 
     // Specific homeworks (docs/practice.md): which questions, which days, how many answers a day.
-    // The students enrolled in the course read them (their queries filter by course, which is
-    // what lets the rule be checked); the answers are counted in each student's own subtree.
+    // The students it is for read it (their queries filter by course and by assignment, which
+    // is what lets the rule be checked); the answers are counted in each student's own subtree.
     match /homeworks/{homeworkId} {
-      allow read: if isTeacher() || isMember(resource.data.courseSlug);
+      allow read: if isTeacher() || isAssignedTo(resource.data);
       allow write: if isTeacher();
     }
 
     // Exams. Browsers only ever write drafts; opening, starting, submitting and grading go
-    // through the API routes (src/pages/api/exam), which use the admin SDK and skip these rules.
+    // through the API routes (src/pages/api/exam), which use the admin SDK and skip these rules;
+    // the start route checks the membership and the assignment itself.
     match /exams/{examId} {
-      // A student's list query filters by course and status, so both can be checked here.
-      allow read: if isTeacher() || (isMember(resource.data.courseSlug) && resource.data.status == 'opened');
+      // A student's list queries filter by course, status and assignment, so all can be checked here.
+      allow read: if isTeacher() || (resource.data.status == 'opened' && isAssignedTo(resource.data));
       allow create: if isTeacher() && request.resource.data.status == 'draft';
       allow update: if isTeacher() && resource.data.status == 'draft' && request.resource.data.status == 'draft';
       allow delete: if isTeacher() && resource.data.status == 'draft';
@@ -120,20 +129,14 @@ service cloud.firestore {
     // Deliverables (docs/deliverables.md): homeworks and exams handed in as text written on the
     // platform or as a link. Teachers manage them from the browser; the students it is for read
     // it once opened and write their own submission, which the server stamps.
-    // For everybody enrolled in its course, or for the accounts listed in `assignedUids`.
-    function deliverableIsFor(data) {
-      return isMember(data.courseSlug) && (data.forEveryone == true || request.auth.uid in data.assignedUids);
-    }
-
     function canSubmit(deliverableId) {
       return get(/databases/$(database)/documents/deliverables/$(deliverableId)).data.status == 'opened'
-        && deliverableIsFor(get(/databases/$(database)/documents/deliverables/$(deliverableId)).data);
+        && isAssignedTo(get(/databases/$(database)/documents/deliverables/$(deliverableId)).data);
     }
 
     match /deliverables/{deliverableId} {
-      // A student's list queries filter by course, status and either forEveryone or their own
-      // uid in assignedUids, so the rule can be checked against them.
-      allow read: if isTeacher() || (resource.data.status == 'opened' && deliverableIsFor(resource.data));
+      // A student's list queries filter by course, status and assignment, so all can be checked here.
+      allow read: if isTeacher() || (resource.data.status == 'opened' && isAssignedTo(resource.data));
       allow write: if isTeacher();
 
       // What the student handed in. `savedAt` must be the server's clock, so a save after the

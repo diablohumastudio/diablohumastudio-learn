@@ -48,6 +48,7 @@ export function examErrorText(error: unknown, t: ExamTexts): string {
   if (error.code === 'anotherExamRunning') return t.errorAnotherExamRunning;
   if (error.code === 'noQuestions') return t.errorNoQuestions;
   if (error.code === 'notRunning') return t.errorNotRunning;
+  if (error.code === 'notEnrolled') return t.errorNotEnrolled;
   if (error.code === 'notTeacher') return t.notAuthorized;
   if (error.code === 'serverNotConfigured') return t.errorServerNotConfigured;
   return t.errorGeneric;
