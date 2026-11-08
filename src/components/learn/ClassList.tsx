@@ -5,14 +5,13 @@ import type { LearnCourse } from '../../data/learn';
 import { learnDict } from '../../i18n/learn';
 import { useLocale, useT } from '../../i18n/useT';
 import ClassPracticeLink from '../practice/ClassPracticeLink';
-import CourseHomeworks from '../practice/CourseHomeworks';
 import CourseProgress from '../practice/CourseProgress';
 import { CourseProgressProvider } from '../practice/CourseProgressContext';
 import s from './LearnMenu.module.css';
 import ui from './ui.module.css';
 
 const TeacherLink = dynamic(() => import('./TeacherLink'), { ssr: false });
-// The access card or the deliverable cards: it needs Firebase, so guests never download it.
+// The access card or the Homeworks and Exams cards: they need Firebase, so guests never download them.
 const CourseAccess = dynamic(() => import('../course/CourseAccess'), { ssr: false });
 
 const CLASS_NUMBER_WIDTH: number = 2;
@@ -42,7 +41,6 @@ export default function ClassList({ course }: { course: LearnCourse }) {
           <h1 className={ui.title}>{course.title}</h1>
         </div>
         <CourseProgress course={course} />
-        <CourseHomeworks course={course} />
         <CourseAccess course={course} />
         {groupClassesBySection(course).map((group) => (
           <div key={group.classes[0].slug} className={s.group}>

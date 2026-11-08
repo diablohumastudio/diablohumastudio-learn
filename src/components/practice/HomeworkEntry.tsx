@@ -4,12 +4,10 @@ import type { LearnCourse } from '../../data/learn';
 import {
   RUN_CORRECT_GOAL,
   RUN_LENGTH,
-  dayKey,
   dayKeysBetween,
   dayText,
   isHomeworkDayDone,
   isHomeworkOpen,
-  isHomeworkShown,
   isRoundDone,
   roundDay,
   weekdayInitial,
@@ -17,14 +15,13 @@ import {
 import type { DayProgress, Homework, HomeworkRound } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
-import s from './CourseHomeworks.module.css';
-import { useCourseProgress } from './CourseProgressContext';
+import s from './HomeworkEntry.module.css';
 import HomeworkMeter from './HomeworkMeter';
 
-type HomeworkCardProps = {
+type HomeworkEntryProps = {
   course: LearnCourse;
   homework: Homework;
-  /** The student's days of every specific homework; the card picks its own. */
+  /** The student's days of every specific homework; the entry picks its own. */
   homeworkDays: readonly DayProgress[];
   /** The student's local day (`dayKey`). */
   today: string;
@@ -91,7 +88,10 @@ function RoundRow({ number, round, progress }: RoundRowProps) {
   );
 }
 
-function HomeworkCard({ course, homework, homeworkDays, today }: HomeworkCardProps) {
+/** One specific homework as the student sees it: today's meter while it is open, a mark per day,
+    the days done and the Practice button, or "Finished". Listed on the course page and on the
+    homeworks page (`EntriesCard`). */
+export default function HomeworkEntry({ course, homework, homeworkDays, today }: HomeworkEntryProps) {
   const t = useT(practiceDict);
   const locale = useLocale();
   const days = dayKeysBetween(homework.firstDay, homework.lastDay).map((day) =>
@@ -106,7 +106,7 @@ function HomeworkCard({ course, homework, homeworkDays, today }: HomeworkCardPro
   const roundToPlay = homework.rounds[Math.max(pendingIndex, 0)];
 
   return (
-    <section className={s.card}>
+    <div className={s.entry}>
       <div className={s.heading}>
         <span className={s.eyebrow}>
           {t.specificHomework} · {dayText(homework.firstDay, locale)} – {dayText(homework.lastDay, locale)}
@@ -180,29 +180,6 @@ function HomeworkCard({ course, homework, homeworkDays, today }: HomeworkCardPro
           <span className={s.finished}>{t.homeworkFinished}</span>
         )}
       </div>
-    </section>
-  );
-}
-
-/** One card per specific homework of the course that is open or just finished; nothing for guests. */
-export default function CourseHomeworks({ course }: { course: LearnCourse }) {
-  const progress = useCourseProgress();
-  const today = dayKey(new Date());
-
-  if (!progress) return null;
-  return (
-    <>
-      {progress.homeworks
-        .filter((homework) => isHomeworkShown(homework, today))
-        .map((homework) => (
-          <HomeworkCard
-            key={homework.id}
-            course={course}
-            homework={homework}
-            homeworkDays={progress.homeworkDays}
-            today={today}
-          />
-        ))}
-    </>
+    </div>
   );
 }

@@ -1,0 +1,24 @@
+/* Same family as the homework entry: everything is composed from it. */
+.entry {
+  composes: entry from '../practice/HomeworkEntry.module.css';
+}
+
+.heading {
+  composes: heading from '../practice/HomeworkEntry.module.css';
+}
+
+.eyebrow {
+  composes: eyebrow from '../practice/HomeworkEntry.module.css';
+}
+
+.name {
+  composes: name from '../practice/HomeworkEntry.module.css';
+}
+
+.actions {
+  composes: actions from '../practice/HomeworkEntry.module.css';
+}
+
+.open {
+  composes: practice from '../practice/HomeworkEntry.module.css';
+}

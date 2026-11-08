@@ -26,8 +26,6 @@ export const MAX_GRID_DAYS: number = 92;
 
 export const HOMEWORKS_COLLECTION: string = 'homeworks';
 export const DEFAULT_HOMEWORK_DAILY_GOAL: number = 50;
-/** A finished homework stays on the course page this long, so students see how it ended. */
-export const HOMEWORK_SHOWN_AFTER_DAYS: number = 7;
 
 /** The only round of a homework saved before rounds existed has no id: the days its students
     already filled carry no round, and keep counting for it. */
@@ -344,11 +342,6 @@ export type HomeworkState = 'upcoming' | 'open' | 'finished';
 export function homeworkState(homework: Homework, today: string): HomeworkState {
   if (isHomeworkOpen(homework, today)) return 'open';
   return today < homework.firstDay ? 'upcoming' : 'finished';
-}
-
-/** From its first day until a few days after the last one. */
-export function isHomeworkShown(homework: Homework, today: string): boolean {
-  return homework.firstDay <= today && today <= dayKeyAfter(homework.lastDay, HOMEWORK_SHOWN_AFTER_DAYS);
 }
 
 /** The run keeps only the last RUN_LENGTH results, oldest first. */

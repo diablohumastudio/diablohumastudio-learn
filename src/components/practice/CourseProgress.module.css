@@ -155,7 +155,7 @@
   text-decoration: none;
 }
 
-.exams {
+.history {
   composes: btn from '../learn/ui.module.css';
   text-decoration: none;
 }

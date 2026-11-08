@@ -14,9 +14,10 @@ Teaching platform of DiabloHumaStudio, served at `learn.diablohumastudio.com`: c
 |---|---|
 | `/` | redirects to `/courses` |
 | `/courses` | course menu |
-| `/course/<course>` | class menu of a course; for an enrolled student the homework and deliverable cards, for one who is not the card to request access |
+| `/course/<course>` | class menu of a course; for an enrolled student the daily homework card and the Homeworks and Exams cards with what is open right now, for one who is not the card to request access |
 | `/course/<course>/class/<class>` | slide deck (`?s=<n>` slide, `&p=<n>` step) |
 | `/course/<course>/exams`, `/course/<course>/exams/<id>` | exam list of a course, exam room |
+| `/course/<course>/homeworks` | every homework of the signed-in student in the course, specific and deliverable: the open ones, then the finished ones |
 | `/course/<course>/history` | the signed-in student's own history in the course, in five sections: daily practice, multiple option exams, multiple option specific homeworks, deliverable exams, deliverable homeworks |
 | `/course/<course>/deliverable/<id>` | where a student hands a deliverable in: text written on the platform, or a link |
 | `/practice/play?course=<slug>[&class=<slug>]` | timed practice |

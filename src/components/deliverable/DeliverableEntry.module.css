@@ -1,0 +1,46 @@
+.entry {
+  composes: entry from '../practice/HomeworkEntry.module.css';
+}
+
+.heading {
+  composes: heading from '../practice/HomeworkEntry.module.css';
+}
+
+.eyebrow {
+  composes: eyebrow from '../practice/HomeworkEntry.module.css';
+}
+
+.name {
+  composes: name from '../practice/HomeworkEntry.module.css';
+}
+
+.state {
+  composes: mono from '../learn/ui.module.css';
+}
+
+.running {
+  composes: state;
+  color: var(--teal);
+}
+
+.late {
+  composes: state;
+  color: var(--red);
+}
+
+.score {
+  composes: state;
+  color: var(--teal);
+}
+
+.actions {
+  composes: actions from '../practice/HomeworkEntry.module.css';
+}
+
+.open {
+  composes: practice from '../practice/HomeworkEntry.module.css';
+}
+
+.finished {
+  composes: finished from '../practice/HomeworkEntry.module.css';
+}

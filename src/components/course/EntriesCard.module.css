@@ -1,0 +1,44 @@
+/* Same family as the daily homework card: the frame, title and section label are composed from it. */
+.card {
+  composes: card from '../practice/CourseProgress.module.css';
+}
+
+.title {
+  composes: title from '../practice/CourseProgress.module.css';
+}
+
+.section {
+  composes: section from '../practice/CourseProgress.module.css';
+}
+
+.sectionLabel {
+  composes: sectionLabel from '../practice/CourseProgress.module.css';
+}
+
+.empty {
+  composes: mono from '../learn/ui.module.css';
+}
+
+.entries {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* One entry under another, split by a line. */
+.entry + .entry {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.actions {
+  composes: actions from '../practice/CourseProgress.module.css';
+}
+
+.all {
+  composes: btn from '../learn/ui.module.css';
+  text-decoration: none;
+}

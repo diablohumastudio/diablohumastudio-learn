@@ -26,8 +26,6 @@ export const SAVE_GRACE_MS: number = SUBMIT_GRACE_MS;
 export const AUTOSAVE_MS: number = 60_000;
 /** A failed save is tried again this often while the page stays open. */
 export const SAVE_RETRY_MS: number = 5000;
-/** A closed deliverable stays on the course page this long, so students see how it ended. */
-export const SHOWN_AFTER_CLOSE_MS: number = 7 * 24 * 60 * 60 * 1000;
 /** The maximum of a link deliverable, which has no questions to add up. */
 export const DEFAULT_MAX_SCORE: number = 10;
 export const DEFAULT_QUESTION_POINTS: number = 1;
@@ -212,12 +210,6 @@ export function isDeliverableRunning(deliverable: Deliverable, nowMs: number): b
 
 export function isDeliverableOver(deliverable: Deliverable, nowMs: number): boolean {
   return deliverable.status === 'opened' && deliverable.closesAtMs !== null && nowMs >= deliverable.closesAtMs;
-}
-
-/** From its opening until a few days after its close. */
-export function isDeliverableShown(deliverable: Deliverable, nowMs: number): boolean {
-  if (deliverable.status !== 'opened' || deliverable.closesAtMs === null) return false;
-  return nowMs <= deliverable.closesAtMs + SHOWN_AFTER_CLOSE_MS;
 }
 
 /** A save stamped by the server after the close and its grace. */

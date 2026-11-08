@@ -1,6 +1,9 @@
-/* Same family as the daily homework card: everything shared is composed from it. */
-.card {
-  composes: card from './CourseProgress.module.css';
+/* Same family as the daily homework card: everything shared is composed from it. The entry
+   has no frame of its own: `EntriesCard` lists several, split by lines. */
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .heading {

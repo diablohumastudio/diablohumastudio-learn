@@ -56,7 +56,6 @@ export {
   isHomeworkDayDone,
   isHomeworkFor,
   isHomeworkOpen,
-  isHomeworkShown,
   isRoundDone,
   monthKeyOf,
   monthKeysBetween,

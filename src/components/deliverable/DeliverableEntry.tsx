@@ -1,29 +1,27 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { isDeliverableRunning, isDeliverableShown, isSavedLate, lateBySeconds } from '../../data/deliverable/types';
+import { isDeliverableRunning, isSavedLate, lateBySeconds } from '../../data/deliverable/types';
 import type { Deliverable, Review, Submission } from '../../data/deliverable/types';
 import { deliverablePath } from '../../data/learn';
 import type { LearnCourse } from '../../data/learn';
 import { deliverableDict } from '../../i18n/pages/deliverable';
 import { useLocale, useT } from '../../i18n/useT';
-import { isFirebaseConfigured } from '../../lib/firebase';
 import { dateTimeText, durationText } from '../exam/format';
-import { useAuthUser } from '../learn/useAuthUser';
-import s from './CourseDeliverables.module.css';
-import { fetchReview, fetchSubmission, subscribeStudentDeliverables } from './deliverables';
+import s from './DeliverableEntry.module.css';
+import { fetchReview, fetchSubmission } from './deliverables';
 import { roleText } from './format';
-import { useNowMs } from './useNowMs';
 
-const STATE_TICK_MS: number = 1000;
-
-type DeliverableCardProps = {
+type DeliverableEntryProps = {
   course: LearnCourse;
   deliverable: Deliverable;
   uid: string;
   nowMs: number;
 };
 
-function DeliverableCard({ course, deliverable, uid, nowMs }: DeliverableCardProps) {
+/** One deliverable as the student sees it: its close, whether they saved and when, their score
+    once reviewed, and the way to its page. Listed on the course page and on the homeworks page
+    (`EntriesCard`). */
+export default function DeliverableEntry({ course, deliverable, uid, nowMs }: DeliverableEntryProps) {
   const t = useT(deliverableDict);
   const locale = useLocale();
   const running = isDeliverableRunning(deliverable, nowMs);
@@ -50,7 +48,7 @@ function DeliverableCard({ course, deliverable, uid, nowMs }: DeliverableCardPro
   const late = submission ? isSavedLate(submission, deliverable) : false;
 
   return (
-    <section className={s.card}>
+    <div className={s.entry}>
       <div className={s.heading}>
         <span className={s.eyebrow}>
           {roleText(deliverable.role, t)} · {running ? t.closesAt : t.closedAt} {dateTimeText(deliverable.closesAtMs, locale)}
@@ -81,37 +79,6 @@ function DeliverableCard({ course, deliverable, uid, nowMs }: DeliverableCardPro
         </Link>
         {!running && <span className={s.finished}>{t.stateFinished}</span>}
       </div>
-    </section>
+    </div>
   );
-}
-
-function SignedInDeliverables({ course, uid }: { course: LearnCourse; uid: string }) {
-  const nowMs = useNowMs(STATE_TICK_MS);
-  const [deliverables, setDeliverables] = useState<Deliverable[]>([]);
-
-  useEffect(
-    () =>
-      subscribeStudentDeliverables(course.slug, uid, setDeliverables, (error) =>
-        // The rules refuse `deliverables` until firebase/firestore.rules is republished: no cards, nothing else.
-        console.warn('Could not load the deliverables', error)
-      ),
-    [course.slug, uid]
-  );
-
-  return (
-    <>
-      {deliverables
-        .filter((deliverable) => isDeliverableShown(deliverable, nowMs))
-        .map((deliverable) => (
-          <DeliverableCard key={deliverable.id} course={course} deliverable={deliverable} uid={uid} nowMs={nowMs} />
-        ))}
-    </>
-  );
-}
-
-/** One card per opened deliverable of the course, until a few days after its close; nothing for guests. */
-export default function CourseDeliverables({ course }: { course: LearnCourse }) {
-  const auth = useAuthUser();
-  if (!isFirebaseConfigured() || auth.status !== 'signedIn') return null;
-  return <SignedInDeliverables course={course} uid={auth.user.uid} />;
 }
