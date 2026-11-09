@@ -89,8 +89,8 @@ function RoundRow({ number, round, progress }: RoundRowProps) {
 }
 
 /** One specific homework as the student sees it: today's meter while it is open, a mark per day,
-    the days done and the Practice button, or "Finished". Listed on the course page and on the
-    homeworks page (`EntriesCard`). */
+    the days done and the Practice button, or "Finished". An entry of the course page's Homeworks
+    card while it is open (`EntriesCard`), and the whole of its own page, `/course/<course>/homeworks/<id>`. */
 export default function HomeworkEntry({ course, homework, homeworkDays, today }: HomeworkEntryProps) {
   const t = useT(practiceDict);
   const locale = useLocale();

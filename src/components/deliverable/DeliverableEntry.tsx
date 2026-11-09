@@ -19,8 +19,8 @@ type DeliverableEntryProps = {
 };
 
 /** One deliverable as the student sees it: its close, whether they saved and when, their score
-    once reviewed, and the way to its page. Listed on the course page and on the homeworks page
-    (`EntriesCard`). */
+    once reviewed, and the way to its page. An entry of the course page's Homeworks or Exams card
+    while it runs (`EntriesCard`). */
 export default function DeliverableEntry({ course, deliverable, uid, nowMs }: DeliverableEntryProps) {
   const t = useT(deliverableDict);
   const locale = useLocale();

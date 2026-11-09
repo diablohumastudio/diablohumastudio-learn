@@ -68,6 +68,7 @@ export {
   roundScore,
   runCorrectCount,
   scopeDayScore,
+  startedHomeworks,
   summarizePeriod,
   weekDayKeys,
   weekdayInitial,

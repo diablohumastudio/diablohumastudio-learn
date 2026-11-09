@@ -38,8 +38,8 @@ None of it is a verdict. The page tells students it records "advanced typing tel
 | Teacher | `DeliverableManager.tsx` | Draft form, opened view with the submissions table, one submission with its review form |
 | Teacher lists | `DeliverableSection.tsx` | The "Deliverable homeworks" / "Deliverable exams" section with its New button, under the multiple option list of `HomeworkManager` and `ExamManager` |
 | Student | `DeliverableApp.tsx` | The deliverable's page: form, autosave, close, late note, review; enrolled students only |
-| Course page | `DeliverableEntry.tsx` | One deliverable as the student sees it (close, saved state, score, Open): an entry of the course page's Homeworks or Exams card while it runs, and of the homeworks page afterwards (`src/components/course/entries.tsx`, [courses.md](courses.md)) |
-| Exams list | `src/components/exam/ExamList.tsx` | Adds the opened deliverable exams of the course |
+| Course page | `DeliverableEntry.tsx` | One deliverable as the student sees it (close, saved state, score, Open): an entry of the course page's Homeworks or Exams card while it runs (`src/components/course/entries.tsx`, [courses.md](courses.md)) |
+| Exams and homeworks lists | `src/components/exam/ExamList.tsx`, `src/components/practice/HomeworkList.tsx` | Each adds the opened deliverables of its role as rows (`course/ItemList.tsx`) after the multiple option ones |
 | History and review | `StudentDeliverables.tsx`, `src/components/exam/StudentExams.tsx`, `StudentHistory.tsx`, `StudentReview.tsx` | The five sections of the student's history and of the teacher's student page: daily practice, multiple option exams, multiple option specific homeworks, deliverable exams, deliverable homeworks |
 | Routes | `src/pages/course/[curso]/deliverable/[deliverableId].tsx`, `teacher/deliverable/[deliverableId]/index.tsx`, `[uid].tsx` | `next/dynamic` + `ssr: false`; the student page carries the `<noscript>` notice |
 | Scripts | `deliverables/scripts/export-submissions.js`, `import-reviews.js` | On-demand grading, below |

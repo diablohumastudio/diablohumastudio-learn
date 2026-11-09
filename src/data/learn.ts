@@ -141,9 +141,14 @@ export function courseExamsPath(course: LearnCourse): string {
   return `${coursePath(course)}/exams`;
 }
 
-/** Every homework of the student in a course, specific and deliverable, open and finished. */
+/** Every homework of the student in a course, specific and deliverable, open and finished, as rows. */
 export function courseHomeworksPath(course: LearnCourse): string {
   return `${coursePath(course)}/homeworks`;
+}
+
+/** One specific homework of the student, with its meter and its days: what its row opens. */
+export function homeworkPath(course: LearnCourse, homeworkId: string): string {
+  return `${courseHomeworksPath(course)}/${homeworkId}`;
 }
 
 /** The signed-in student's own history in a course: grade by month, day by day and by question. */

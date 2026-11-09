@@ -336,6 +336,11 @@ export function isHomeworkOpen(homework: Homework, today: string): boolean {
   return homework.firstDay <= today && today <= homework.lastDay;
 }
 
+/** The homeworks a student already sees, open or finished: an upcoming one stays unseen until its first day. */
+export function startedHomeworks(homeworks: readonly Homework[], today: string): Homework[] {
+  return homeworks.filter((homework) => homework.firstDay <= today);
+}
+
 /** Where a homework stands today: not started, being played, or over. */
 export type HomeworkState = 'upcoming' | 'open' | 'finished';
 

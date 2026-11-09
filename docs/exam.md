@@ -23,7 +23,7 @@
 | Browser data | `src/components/exam/exams.ts` | Firestore reads, draft writes, `callExamApi()` with the ID token |
 | Answer storage | `src/components/exam/examStorage.ts` | Answers in `localStorage` until the server confirms |
 | Paper | `src/data/exam/paper.ts` | Pure functions that turn bank questions into a paper and a student's draw: used by `open`, `start` and the teacher's preview |
-| Student | `src/components/exam/ExamList.tsx`, `ExamApp.tsx`, `ExamTaker.tsx` | List, exam room (start, resume, submit and retry, result), the one-page taker |
+| Student | `src/components/exam/ExamList.tsx`, `ExamApp.tsx`, `ExamTaker.tsx` | List (the rows of `course/ItemList.tsx` behind the gate of `course/EnrolledOnly.tsx`, both shared with the homeworks page), exam room (start, resume, submit and retry, result), the one-page taker |
 | Teacher | `src/components/exam/ExamManager.tsx` | Drafts, open, close early, live attempts, replay |
 | Shared | `AttemptReplay.tsx`, `ConfirmPanel.tsx`, `format.ts` | Replay of an attempt, inline confirmation, countdown and error texts |
 | Routes | `src/pages/course/[curso]/exams/index.tsx`, `course/[curso]/exams/[examId].tsx`, `teacher/exam/index.tsx`, `teacher/exam/[examId]/index.tsx`, `teacher/exam/[examId]/[uid].tsx` (the same page: `ExamManager` reads the exam id, or `new`, and the attempt's uid from the route) | `next/dynamic` + `ssr: false` like practice; the exam room shows "not found" when the exam does not belong to the course in the URL |

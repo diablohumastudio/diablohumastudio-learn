@@ -3,16 +3,16 @@ import type { Deliverable, DeliverableRole } from '../../data/deliverable/types'
 import { isExamRunning } from '../../data/exam/types';
 import type { Exam } from '../../data/exam/types';
 import type { LearnCourse } from '../../data/learn';
-import { isHomeworkOpen } from '../../data/practice';
+import { isHomeworkOpen, startedHomeworks } from '../../data/practice';
 import type { DayProgress, Homework } from '../../data/practice';
 import DeliverableEntry from '../deliverable/DeliverableEntry';
 import ExamEntry from '../exam/ExamEntry';
 import HomeworkEntry from '../practice/HomeworkEntry';
 import type { CardEntry } from './EntriesCard';
 
-/** A homework or an exam as the course page and the homeworks page list them (`EntriesCard`). */
+/** A homework or an exam as the course page's cards list them (`EntriesCard`). */
 export type TimedEntry = CardEntry & {
-  /** When it closes or closed: the open ones are listed by it ascending, the finished ones descending. */
+  /** When it closes: the open ones are listed by it, the closest to its end first. */
   endsAtMs: number;
   isOpen: boolean;
 };
@@ -24,21 +24,19 @@ function dayEndMs(day: string): number {
   return new Date(`${day}${DAY_END_TIME}`).getTime();
 }
 
-/** The specific homeworks already started, open or finished; an upcoming one stays unseen until its first day. */
+/** The specific homeworks already started, open or finished. */
 export function homeworkEntries(
   course: LearnCourse,
   homeworks: readonly Homework[],
   homeworkDays: readonly DayProgress[],
   today: string
 ): TimedEntry[] {
-  return homeworks
-    .filter((homework) => homework.firstDay <= today)
-    .map((homework) => ({
-      key: `homework-${homework.id}`,
-      endsAtMs: dayEndMs(homework.lastDay),
-      isOpen: isHomeworkOpen(homework, today),
-      content: <HomeworkEntry course={course} homework={homework} homeworkDays={homeworkDays} today={today} />,
-    }));
+  return startedHomeworks(homeworks, today).map((homework) => ({
+    key: `homework-${homework.id}`,
+    endsAtMs: dayEndMs(homework.lastDay),
+    isOpen: isHomeworkOpen(homework, today),
+    content: <HomeworkEntry course={course} homework={homework} homeworkDays={homeworkDays} today={today} />,
+  }));
 }
 
 /** The student's opened deliverables of one role. */
@@ -72,9 +70,4 @@ export function examEntries(course: LearnCourse, exams: readonly Exam[], nowMs: 
 /** What is open, the closest to its end first. */
 export function openEntries(entries: readonly TimedEntry[]): TimedEntry[] {
   return entries.filter((entry) => entry.isOpen).sort((a, b) => a.endsAtMs - b.endsAtMs);
-}
-
-/** What is over, the most recent first. */
-export function finishedEntries(entries: readonly TimedEntry[]): TimedEntry[] {
-  return entries.filter((entry) => !entry.isOpen).sort((a, b) => b.endsAtMs - a.endsAtMs);
 }

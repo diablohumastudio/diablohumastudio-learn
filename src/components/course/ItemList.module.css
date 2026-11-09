@@ -1,0 +1,24 @@
+/* The rows of a course's exams and homeworks lists: the items of the Learn menus, each with its
+   state at the right. */
+.list {
+  composes: list from '../learn/LearnMenu.module.css';
+}
+
+.item {
+  composes: item from '../learn/LearnMenu.module.css';
+}
+
+.state {
+  composes: mono from '../learn/ui.module.css';
+  margin-left: auto;
+  text-align: right;
+}
+
+.running {
+  composes: state;
+  color: var(--teal);
+}
+
+.finished {
+  composes: state;
+}

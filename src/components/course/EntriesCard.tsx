@@ -14,9 +14,7 @@ type EntriesCardProps = {
   title: string;
   /** Beside the title while the card is closed, such as how many entries are open. */
   summary?: string;
-  /** The course page's cards start closed; the homeworks page's start open. */
-  defaultOpen?: boolean;
-  /** Over the entries, when the card lists one state of several ("Open homeworks"). */
+  /** Over the entries ("Open homeworks"). */
   sectionLabel?: string;
   emptyText: string;
   /** Null while they load. */
@@ -26,22 +24,13 @@ type EntriesCardProps = {
   allText?: string;
 };
 
-/** A card of the course page or the homeworks page: its entries one under the other, split by
-    lines, and the way to everything when the card shows only what is open. */
-export default function EntriesCard({
-  title,
-  summary,
-  defaultOpen = true,
-  sectionLabel,
-  emptyText,
-  entries,
-  allHref,
-  allText,
-}: EntriesCardProps) {
+/** A card of the course page, closed to its title like the rest: its open entries one under the
+    other, split by lines, and the way to everything. */
+export default function EntriesCard({ title, summary, sectionLabel, emptyText, entries, allHref, allText }: EntriesCardProps) {
   const t = useT(learnDict);
 
   return (
-    <CollapsibleCard title={title} summary={summary} defaultOpen={defaultOpen}>
+    <CollapsibleCard title={title} summary={summary}>
       <div className={s.section}>
         {sectionLabel && <span className={s.sectionLabel}>{sectionLabel}</span>}
         {entries === null ? (
