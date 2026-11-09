@@ -41,29 +41,32 @@ export default function ClassList({ course }: { course: LearnCourse }) {
           <span className={ui.eyebrow}>{t.classesEyebrow}</span>
           <h1 className={ui.title}>{course.title}</h1>
         </div>
-        <CourseProgress course={course} />
-        <CourseAccess course={course} />
-        <CollapsibleCard title={t.classPresentations}>
-          {groupClassesBySection(course).map((group) => (
-            <div key={group.classes[0].slug} className={s.group}>
-              {group.section && <span className={s.groupLabel}>{group.section}</span>}
-              <nav className={s.list}>
-                {group.classes.map((learnClass) => (
-                  <div key={learnClass.slug} className={s.row}>
-                    <Link href={classPath(course, learnClass)} className={s.rowItem}>
-                      <span className={s.itemIndex}>
-                        {String(course.classes.indexOf(learnClass) + 1).padStart(CLASS_NUMBER_WIDTH, '0')}
-                      </span>
-                      {learnClass.title[locale]}
-                      <span className={s.itemArrow}>→</span>
-                    </Link>
-                    <ClassPracticeLink course={course} learnClass={learnClass} />
-                  </div>
-                ))}
-              </nav>
-            </div>
-          ))}
-        </CollapsibleCard>
+        {/* The four cards stack as close as the items of a menu: closed, they read as one. */}
+        <div className={s.list}>
+          <CourseProgress course={course} />
+          <CourseAccess course={course} />
+          <CollapsibleCard title={t.classPresentations}>
+            {groupClassesBySection(course).map((group) => (
+              <div key={group.classes[0].slug} className={s.group}>
+                {group.section && <span className={s.groupLabel}>{group.section}</span>}
+                <nav className={s.list}>
+                  {group.classes.map((learnClass) => (
+                    <div key={learnClass.slug} className={s.row}>
+                      <Link href={classPath(course, learnClass)} className={s.rowItem}>
+                        <span className={s.itemIndex}>
+                          {String(course.classes.indexOf(learnClass) + 1).padStart(CLASS_NUMBER_WIDTH, '0')}
+                        </span>
+                        {learnClass.title[locale]}
+                        <span className={s.itemArrow}>→</span>
+                      </Link>
+                      <ClassPracticeLink course={course} learnClass={learnClass} />
+                    </div>
+                  ))}
+                </nav>
+              </div>
+            ))}
+          </CollapsibleCard>
+        </div>
         <div className={s.actions}>
           <TeacherLink className={s.secondaryAction} />
         </div>

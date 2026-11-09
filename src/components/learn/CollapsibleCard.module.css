@@ -5,15 +5,20 @@
   padding: 0;
 }
 
-/* The whole title row is the button: closed, the card is this row alone. */
+/* The whole title row is the button. Closed, the card is this row alone, and it measures the same
+   as an item of the teacher menu (`.item` in LearnMenu.module.css): same padding, text size and
+   line height, so the course page reads as a menu. */
 .header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
-  padding: 20px 24px;
+  padding: 16px 18px;
   font: inherit;
-  color: inherit;
+  font-weight: 600;
+  font-size: calc(16px + var(--text-delta, 0px));
+  line-height: 1.3;
+  color: var(--ink);
   text-align: left;
   background: none;
   border: 0;
@@ -21,11 +26,11 @@
 }
 
 .header:hover .title {
-  color: #f7b45a;
+  color: var(--amber);
 }
 
 .title {
-  composes: eyebrow from './ui.module.css';
+  color: var(--ink);
 }
 
 .summary {
@@ -43,5 +48,5 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 0 24px 20px;
+  padding: 0 18px 18px;
 }
