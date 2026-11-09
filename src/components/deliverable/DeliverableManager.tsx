@@ -57,6 +57,7 @@ import {
   closeDeliverableNow,
   createDeliverable,
   deleteDeliverable,
+  isPermissionDenied,
   openDeliverable,
   saveReview,
   setDeliverableClose,
@@ -312,7 +313,7 @@ function DraftForm({ deliverable, role, onDeleted, onCreated }: DraftFormProps) 
       else setNotice(t.savedNotice);
     } catch (error) {
       console.error('Deliverable action failed', error);
-      setMessage(t.errorGeneric);
+      setMessage(isPermissionDenied(error) ? t.permissionDenied : t.errorGeneric);
     } finally {
       setBusy(false);
       setConfirming(null);
@@ -822,6 +823,8 @@ type OpenedDeliverableProps = {
   reviewUid: string | null;
   onOpenSubmission: (uid: string) => void;
   onCloseSubmission: () => void;
+  /** After the deliverable is deleted: back to its list. */
+  onDeleted: () => void;
 };
 
 /** One line of the submissions table: a student the deliverable is for, with their submission if any. */
@@ -847,7 +850,7 @@ function rosterOf(deliverable: Deliverable, members: readonly CourseMember[] | n
   return Array.from(rows.values()).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
 }
 
-function OpenedDeliverable({ deliverable, reviewUid, onOpenSubmission, onCloseSubmission }: OpenedDeliverableProps) {
+function OpenedDeliverable({ deliverable, reviewUid, onOpenSubmission, onCloseSubmission, onDeleted }: OpenedDeliverableProps) {
   const t = useT(deliverableDict);
   const locale = useLocale();
   const nowMs = useNowMs(STATUS_TICK_MS);
@@ -858,7 +861,7 @@ function OpenedDeliverable({ deliverable, reviewUid, onOpenSubmission, onCloseSu
   const [submissionsLoaded, setSubmissionsLoaded] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [closeValue, setCloseValue] = useState(() => toDateTimeLocal(deliverable.closesAtMs ?? Date.now()));
-  const [confirmingClose, setConfirmingClose] = useState(false);
+  const [confirming, setConfirming] = useState<'close' | 'delete' | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const reviewedSubmission = submissions.find((submission) => submission.uid === reviewUid);
@@ -886,17 +889,19 @@ function OpenedDeliverable({ deliverable, reviewUid, onOpenSubmission, onCloseSu
     };
   }, [deliverable.id]);
 
-  async function runClose(action: () => Promise<void>) {
+  /** `after` leaves this screen once the action is done; without it the screen stays and follows the deliverable. */
+  async function run(action: () => Promise<void>, after: (() => void) | null) {
     setBusy(true);
     setMessage(null);
     try {
       await action();
+      if (after) after();
     } catch (error) {
-      console.error('Could not change the close', error);
-      setMessage(t.errorGeneric);
+      console.error('Deliverable action failed', error);
+      setMessage(isPermissionDenied(error) ? t.permissionDenied : t.errorGeneric);
     } finally {
       setBusy(false);
-      setConfirmingClose(false);
+      setConfirming(null);
     }
   }
 
@@ -906,7 +911,7 @@ function OpenedDeliverable({ deliverable, reviewUid, onOpenSubmission, onCloseSu
       setMessage(t.validationDeadline);
       return;
     }
-    void runClose(() => setDeliverableClose(deliverable.id, closesAtMs));
+    void run(() => setDeliverableClose(deliverable.id, closesAtMs), null);
   }
 
   // A uid in the route that no submission matches: the student never saved, or the id is wrong.
@@ -961,15 +966,25 @@ function OpenedDeliverable({ deliverable, reviewUid, onOpenSubmission, onCloseSu
       </div>
 
       {message && <p className={ui.error}>{message}</p>}
-      {confirmingClose ? (
+      {confirming === 'close' && (
         <ConfirmPanel
           message={t.confirmClose}
           confirmLabel={t.confirmCloseButton}
           busy={busy}
-          onConfirm={() => void runClose(() => closeDeliverableNow(deliverable.id))}
-          onCancel={() => setConfirmingClose(false)}
+          onConfirm={() => void run(() => closeDeliverableNow(deliverable.id), null)}
+          onCancel={() => setConfirming(null)}
         />
-      ) : (
+      )}
+      {confirming === 'delete' && (
+        <ConfirmPanel
+          message={t.confirmDelete}
+          confirmLabel={t.confirmDeleteButton}
+          busy={busy}
+          onConfirm={() => void run(() => deleteDeliverable(deliverable.id), onDeleted)}
+          onCancel={() => setConfirming(null)}
+        />
+      )}
+      {confirming === null && (
         <div className={s.closeForm}>
           <label className={ui.field}>
             <span className={ui.label}>{t.changeClose}</span>
@@ -984,10 +999,13 @@ function OpenedDeliverable({ deliverable, reviewUid, onOpenSubmission, onCloseSu
             {t.saveClose}
           </button>
           {running && (
-            <button type="button" className={s.secondary} onClick={() => setConfirmingClose(true)} disabled={busy}>
+            <button type="button" className={s.secondary} onClick={() => setConfirming('close')} disabled={busy}>
               {t.closeNow}
             </button>
           )}
+          <button type="button" className={s.delete} onClick={() => setConfirming('delete')} disabled={busy}>
+            {t.deleteDeliverable}
+          </button>
         </div>
       )}
 
@@ -1139,6 +1157,7 @@ function Deliverables() {
           reviewUid={reviewUid}
           onOpenSubmission={(uid) => void router.push(teacherSubmissionPath(shown.id, uid))}
           onCloseSubmission={() => void router.push(teacherDeliverablePath(shown.id))}
+          onDeleted={goToList}
         />
       ) : (
         <DraftForm

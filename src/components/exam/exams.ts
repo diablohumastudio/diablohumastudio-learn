@@ -215,6 +215,13 @@ export function closeExam(examId: string): Promise<unknown> {
   return callExamApi('close', { examId });
 }
 
+/** An exam in any state, with its paper, attempts and grades: the server deletes what browsers
+    may not touch, and releases the practice lock if the exam was running. Drafts have nothing
+    underneath: `deleteDraft` removes them from the browser. */
+export function deleteExam(examId: string): Promise<unknown> {
+  return callExamApi('delete', { examId });
+}
+
 export function startExam(examId: string): Promise<StartExamResponse> {
   return callExamApi<StartExamResponse>('start', { examId });
 }

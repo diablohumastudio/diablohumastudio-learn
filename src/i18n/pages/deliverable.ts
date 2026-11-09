@@ -5,6 +5,8 @@ const en = {
   notConfigured: 'Firebase is not configured: set the NEXT_PUBLIC_FIREBASE_* variables (see docs/practice.md).',
   notAuthorized: 'This account is not registered as a teacher.',
   errorGeneric: 'Something went wrong. Try again.',
+  permissionDenied:
+    'Firestore refused the change. Publish firebase/firestore.rules in the Firebase console: the rules in the repository are newer than the published ones.',
 
   deliverable: 'Deliverable',
   roleHomework: 'Deliverable homework',
@@ -67,7 +69,7 @@ const en = {
   saving: 'Saving…',
   savedNotice: 'Saved.',
   deleteDeliverable: 'Delete',
-  confirmDelete: 'Delete this deliverable? What the students saved will no longer be shown.',
+  confirmDelete: 'Delete this deliverable? What the students saved and their reviews are deleted with it.',
   confirmDeleteButton: 'Yes, delete',
   open: 'Open',
   confirmOpenExam: 'Open now? The clock starts for everyone and the deliverable appears to the students it is for.',
@@ -149,6 +151,8 @@ const es: Record<keyof typeof en, string> = {
   notConfigured: 'Firebase no está configurado: define las variables NEXT_PUBLIC_FIREBASE_* (ver docs/practice.md).',
   notAuthorized: 'Esta cuenta no está registrada como docente.',
   errorGeneric: 'Algo salió mal. Intenta de nuevo.',
+  permissionDenied:
+    'Firestore rechazó el cambio. Publica firebase/firestore.rules en la consola de Firebase: las reglas del repositorio son más nuevas que las publicadas.',
 
   deliverable: 'Entrega',
   roleHomework: 'Deber de entrega',
@@ -211,7 +215,7 @@ const es: Record<keyof typeof en, string> = {
   saving: 'Guardando…',
   savedNotice: 'Guardado.',
   deleteDeliverable: 'Eliminar',
-  confirmDelete: '¿Eliminar esta entrega? Lo que los estudiantes guardaron dejará de mostrarse.',
+  confirmDelete: '¿Eliminar esta entrega? Lo que los estudiantes guardaron y sus revisiones se borran con ella.',
   confirmDeleteButton: 'Sí, eliminar',
   open: 'Abrir',
   confirmOpenExam: '¿Abrir ahora? El reloj empieza para todos y la entrega aparece a los estudiantes a quienes va dirigida.',

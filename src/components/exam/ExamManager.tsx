@@ -36,6 +36,7 @@ import {
   closeExam,
   createDraft,
   deleteDraft,
+  deleteExam,
   openExam,
   subscribeAllExams,
   subscribeAttempts,
@@ -333,9 +334,11 @@ type OpenedExamProps = {
   replayUid: string | null;
   onOpenReplay: (uid: string) => void;
   onCloseReplay: () => void;
+  /** After the exam is deleted: back to the list. */
+  onDeleted: () => void;
 };
 
-function OpenedExam({ exam, replayUid, onOpenReplay, onCloseReplay }: OpenedExamProps) {
+function OpenedExam({ exam, replayUid, onOpenReplay, onCloseReplay, onDeleted }: OpenedExamProps) {
   const t = useT(examDict);
   const locale = useLocale();
   const course = findCourse(exam.courseSlug ?? undefined);
@@ -344,7 +347,7 @@ function OpenedExam({ exam, replayUid, onOpenReplay, onCloseReplay }: OpenedExam
   const [attempts, setAttempts] = useState<ExamAttempt[]>([]);
   const [attemptsLoaded, setAttemptsLoaded] = useState(false);
   const [grades, setGrades] = useState<ExamGrade[]>([]);
-  const [confirmingClose, setConfirmingClose] = useState(false);
+  const [confirming, setConfirming] = useState<'close' | 'delete' | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const replayAttempt = attempts.find((attempt) => attempt.uid === replayUid);
@@ -370,17 +373,19 @@ function OpenedExam({ exam, replayUid, onOpenReplay, onCloseReplay }: OpenedExam
     };
   }, [exam.id]);
 
-  async function close() {
+  /** `after` leaves this screen once the action is done; without it the screen stays and follows the exam. */
+  async function run(action: () => Promise<unknown>, after: (() => void) | null) {
     setBusy(true);
     setMessage(null);
     try {
-      await closeExam(exam.id);
+      await action();
+      if (after) after();
     } catch (error) {
-      console.error('Could not close the exam', error);
+      console.error('Exam action failed', error);
       setMessage(examErrorText(error, t));
     } finally {
       setBusy(false);
-      setConfirmingClose(false);
+      setConfirming(null);
     }
   }
 
@@ -451,20 +456,36 @@ function OpenedExam({ exam, replayUid, onOpenReplay, onCloseReplay }: OpenedExam
       </div>
 
       {message && <p className={ui.error}>{message}</p>}
-      {running &&
-        (confirmingClose ? (
-          <ConfirmPanel
-            message={t.confirmClose}
-            confirmLabel={t.confirmCloseButton}
-            busy={busy}
-            onConfirm={() => void close()}
-            onCancel={() => setConfirmingClose(false)}
-          />
-        ) : (
-          <button type="button" className={s.secondary} onClick={() => setConfirmingClose(true)}>
-            {t.closeEarly}
+      {confirming === 'close' && (
+        <ConfirmPanel
+          message={t.confirmClose}
+          confirmLabel={t.confirmCloseButton}
+          busy={busy}
+          onConfirm={() => void run(() => closeExam(exam.id), null)}
+          onCancel={() => setConfirming(null)}
+        />
+      )}
+      {confirming === 'delete' && (
+        <ConfirmPanel
+          message={t.confirmDeleteExam}
+          confirmLabel={t.confirmDeleteButton}
+          busy={busy}
+          onConfirm={() => void run(() => deleteExam(exam.id), onDeleted)}
+          onCancel={() => setConfirming(null)}
+        />
+      )}
+      {confirming === null && (
+        <div className={s.actions}>
+          {running && (
+            <button type="button" className={s.secondary} onClick={() => setConfirming('close')} disabled={busy}>
+              {t.closeEarly}
+            </button>
+          )}
+          <button type="button" className={s.ghost} onClick={() => setConfirming('delete')} disabled={busy}>
+            {t.deleteExam}
           </button>
-        ))}
+        </div>
+      )}
 
       <div className={s.card}>
         {attempts.length === 0 && notStarted.length === 0 ? (
@@ -590,6 +611,7 @@ function Exams() {
             replayUid={replayUid}
             onOpenReplay={(uid) => void router.push(teacherAttemptPath(shownExam.id, uid))}
             onCloseReplay={() => void router.push(teacherExamPath(shownExam.id))}
+            onDeleted={goToList}
           />
         ) : (
           <DraftForm

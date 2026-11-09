@@ -24,7 +24,7 @@
 | Answer storage | `src/components/exam/examStorage.ts` | Answers in `localStorage` until the server confirms |
 | Paper | `src/data/exam/paper.ts` | Pure functions that turn bank questions into a paper and a student's draw: used by `open`, `start` and the teacher's preview |
 | Student | `src/components/exam/ExamList.tsx`, `ExamApp.tsx`, `ExamTaker.tsx` | List (the rows of `course/ItemList.tsx` behind the gate of `course/EnrolledOnly.tsx`, both shared with the homeworks page), exam room (start, resume, submit and retry, result), the one-page taker |
-| Teacher | `src/components/exam/ExamManager.tsx` | Drafts, open, close early, live attempts, replay |
+| Teacher | `src/components/exam/ExamManager.tsx` | Drafts, open, close early, delete, live attempts, replay |
 | Shared | `AttemptReplay.tsx`, `ConfirmPanel.tsx`, `format.ts` | Replay of an attempt, inline confirmation, countdown and error texts |
 | Routes | `src/pages/course/[curso]/exams/index.tsx`, `course/[curso]/exams/[examId].tsx`, `teacher/exam/index.tsx`, `teacher/exam/[examId]/index.tsx`, `teacher/exam/[examId]/[uid].tsx` (the same page: `ExamManager` reads the exam id, or `new`, and the attempt's uid from the route) | `next/dynamic` + `ssr: false` like practice; the exam room shows "not found" when the exam does not belong to the course in the URL |
 | Rules | `firebase/firestore.rules` | What browsers may read; they write drafts only |
@@ -40,6 +40,7 @@ All are `POST /api/exam/<action>` with `Authorization: Bearer <Firebase ID token
 |---|---|---|
 | `open` | teacher | Reads both banks, keeps the active questions among the exam's `questionIds`, builds the **paper** (per question: one random correct answer and three random wrong ones, the same four for every student) with the answer key, sets `closesAt = now + minutes`, writes the practice lock. Answers without an id get one and are saved back to the bank. Refuses when another exam is running or the scope is empty. |
 | `close` | teacher | Moves `closesAt` (exam and lock) to now. |
+| `delete` | teacher | Deletes the exam in any state with its paper, attempts and grades (`recursiveDelete`), which no browser may touch; a running one releases the practice lock on its way out. Drafts have nothing underneath and the browser deletes them itself. |
 | `start` | student | In a transaction: returns the existing attempt, or draws `min(maxQuestions, paper size)` random questions, shuffles their options and saves the attempt. Never includes which option is correct. Returns `closesAtMs` and `serverNowMs`. Idempotent, so a reload gets the same draw. |
 | `submit` | student | In a transaction: keeps only answers to the attempt's questions with options that were shown, grades against the paper, writes the attempt and the grade. A second call changes nothing. |
 
@@ -89,7 +90,7 @@ Questions written for exams live in a second bank, `examQuestions/{id}`, with th
 
 The attempt stores the **texts** next to the ids, so a replay stays exact after the bank is edited. Option ids come from the bank (`id` on every entry of `correct[]` / `incorrect[]`): opaque, assigned by the editor on save or by `open`, kept when the text is edited. A JSON import that leaves them out gets new ones.
 
-Rules in short: teachers read everything except `private`; a student enrolled in the course ([courses.md](courses.md)) reads the opened exams that are for them (`subscribeStudentExams` filters by course and status and splits in two over `forEveryone` and `assignedUids`, so the rule can be checked), their own attempt and, **once `closesAt` has passed**, their own grade, which is how the result releases itself without any scheduler. Browsers can only create, edit and delete drafts. The rules do not cover the API routes, so `start` checks by itself that the caller is a member of the exam's course and among the students it is for (`requireExaminee`; teachers may start any exam, to try it) and answers `notEnrolled` otherwise.
+Rules in short: teachers read everything except `private`; a student enrolled in the course ([courses.md](courses.md)) reads the opened exams that are for them (`subscribeStudentExams` filters by course and status and splits in two over `forEveryone` and `assignedUids`, so the rule can be checked), their own attempt and, **once `closesAt` has passed**, their own grade, which is how the result releases itself without any scheduler. Browsers can only create, edit and delete drafts; an opened exam, running or finished, is deleted through the `delete` route, from the **Delete exam** button of its teacher page. The rules do not cover the API routes, so `start` checks by itself that the caller is a member of the exam's course and among the students it is for (`requireExaminee`; teachers may start any exam, to try it) and answers `notEnrolled` otherwise.
 
 ## Practice is paused during an exam (on purpose)
 

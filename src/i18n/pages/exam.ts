@@ -79,6 +79,9 @@ const en = {
   deleteDraft: 'Delete draft',
   confirmDelete: 'Delete this draft?',
   confirmDeleteButton: 'Yes, delete',
+  deleteExam: 'Delete exam',
+  confirmDeleteExam:
+    'Delete this exam? The attempts and grades of every student are deleted with it; if it is running, practice resumes.',
   open: 'Open exam',
   confirmOpen:
     'Open now? The clock starts for everyone, and practice is paused for every student until the exam ends. The settings cannot be changed afterwards.',
@@ -194,6 +197,9 @@ const es: Record<keyof typeof en, string> = {
   deleteDraft: 'Eliminar borrador',
   confirmDelete: '¿Eliminar este borrador?',
   confirmDeleteButton: 'Sí, eliminar',
+  deleteExam: 'Eliminar examen',
+  confirmDeleteExam:
+    '¿Eliminar este examen? Se borran con él los intentos y las notas de todos los estudiantes; si está en curso, la práctica se reanuda.',
   open: 'Abrir examen',
   confirmOpen:
     '¿Abrir ahora? El reloj empieza para todos y la práctica se pausa para todos los estudiantes hasta que termine el examen. Después no se puede cambiar la configuración.',

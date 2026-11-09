@@ -5,12 +5,14 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
   onSnapshot,
   query,
   serverTimestamp,
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore';
 import type { DocumentData, Unsubscribe } from 'firebase/firestore';
 import { assignmentOf, storedAssignment } from '../../data/course/assignment';
@@ -273,8 +275,28 @@ export async function updateDeliverable(deliverableId: string, settings: Deliver
   await updateDoc(deliverableRef(deliverableId), toStoredSettings(settings));
 }
 
-/** The submissions already saved stay in the subcollection; nothing shows them any more. */
+/** Whether Firestore refused a write: the published rules are older than the repository's, or the
+    caller is not who the rules expect. */
+export function isPermissionDenied(error: unknown): boolean {
+  return typeof error === 'object' && error !== null && (error as { code?: unknown }).code === 'permission-denied';
+}
+
+/** The deliverable with every submission and review under it: nothing of it is left behind. The
+    students' documents go first, in one batch, and the deliverable itself only once the server
+    accepted them: the SDK applies a write locally before the server answers, so deleting the
+    document first would make it vanish from every list and come back if the rules refused the
+    rest. The rules let a teacher delete a submission for this alone. */
 export async function deleteDeliverable(deliverableId: string): Promise<void> {
+  const [submissions, reviews] = await Promise.all([
+    getDocs(collection(deliverableRef(deliverableId), SUBMISSIONS_SUBCOLLECTION)),
+    getDocs(collection(deliverableRef(deliverableId), REVIEWS_SUBCOLLECTION)),
+  ]);
+  const students = [...submissions.docs, ...reviews.docs];
+  if (students.length > 0) {
+    const batch = writeBatch(getFirestoreDb());
+    for (const item of students) batch.delete(item.ref);
+    await batch.commit();
+  }
   await deleteDoc(deliverableRef(deliverableId));
 }
 

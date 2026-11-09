@@ -141,6 +141,7 @@ service cloud.firestore {
 
       // What the student handed in. `savedAt` must be the server's clock, so a save after the
       // close shows as late however the device clock was set; `firstSavedAt` never changes.
+      // Only a teacher deletes one, and the browser does so only with the whole deliverable.
       match /submissions/{uid} {
         allow read: if isOwner(uid) || isTeacher();
         allow create: if isOwner(uid)
@@ -151,7 +152,7 @@ service cloud.firestore {
           && canSubmit(deliverableId)
           && request.resource.data.savedAt == request.time
           && request.resource.data.firstSavedAt == resource.data.firstSavedAt;
-        allow delete: if false;
+        allow delete: if isTeacher();
       }
 
       // Score and comment, written by a teacher; the student reads their own as soon as it exists.
