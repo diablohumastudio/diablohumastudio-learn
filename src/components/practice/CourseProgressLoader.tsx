@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
+import { courseTopics } from '../../data/learn';
 import type { LearnCourse } from '../../data/learn';
 import { questionsInScope } from '../../data/practice';
 import type { DayProgress, Homework, PracticeQuestion } from '../../data/practice';
 import { isFirebaseConfigured } from '../../lib/firebase';
 import { useMembership } from '../course/useMembership';
-import type { ClassAnswers, CourseProgressData } from './CourseProgressContext';
+import type { CourseProgressData, TopicAnswers } from './CourseProgressContext';
 import { fetchStudentHomeworks } from './homeworks';
 import { fetchStudentDays, fetchStudentQuestions } from './progress';
 import type { QuestionStats } from './progress';
@@ -30,19 +31,19 @@ function fetchHomeworksOrNone(courseSlug: string, uid: string): Promise<Homework
   });
 }
 
-function answersOfClass(
+function answersOfTopic(
   questions: readonly PracticeQuestion[],
   course: LearnCourse,
-  classSlug: string,
+  topicSlug: string,
   statsById: ReadonlyMap<string, QuestionStats>
-): ClassAnswers {
-  // Retired questions still count: their answers were given in this class.
-  const classQuestions = questionsInScope(questions, { courseSlug: course.slug, classSlug });
-  const classStats = classQuestions.map((question) => statsById.get(question.id));
+): TopicAnswers {
+  // Retired questions still count: their answers were given on this topic.
+  const topicQuestions = questionsInScope(questions, { courseSlug: course.slug, classSlug: topicSlug });
+  const topicStats = topicQuestions.map((question) => statsById.get(question.id));
   return {
-    answered: classStats.reduce((sum, stats) => sum + (stats?.attempts ?? 0), 0),
-    correct: classStats.reduce((sum, stats) => sum + (stats?.correct ?? 0), 0),
-    questionCount: classQuestions.filter((question) => !question.retired).length,
+    answered: topicStats.reduce((sum, stats) => sum + (stats?.attempts ?? 0), 0),
+    correct: topicStats.reduce((sum, stats) => sum + (stats?.correct ?? 0), 0),
+    questionCount: topicQuestions.filter((question) => !question.retired).length,
   };
 }
 
@@ -52,14 +53,14 @@ function toCourseProgress(
   records: StudentRecords
 ): CourseProgressData {
   const statsById = new Map(records.questionStats.map((stats) => [stats.questionId, stats]));
-  const answersByClass: Record<string, ClassAnswers> = {};
-  for (const learnClass of course.classes) {
-    answersByClass[learnClass.slug] = answersOfClass(questions, course, learnClass.slug, statsById);
+  const answersByTopic: Record<string, TopicAnswers> = {};
+  for (const topic of courseTopics(course)) {
+    answersByTopic[topic.slug] = answersOfTopic(questions, course, topic.slug, statsById);
   }
   return {
     // A homework's day carries no course, so this keeps the daily homework only.
     days: records.days.filter((day) => day.courseSlug === course.slug),
-    answersByClass,
+    answersByTopic,
     homeworks: records.homeworks,
     homeworkDays: records.days.filter((day) => day.homeworkId !== undefined),
     questionStats: records.questionStats,

@@ -59,12 +59,25 @@ export default function ClassList({ course }: { course: LearnCourse }) {
                         {learnClass.title[locale]}
                         <span className={s.itemArrow}>→</span>
                       </Link>
-                      <ClassPracticeLink course={course} learnClass={learnClass} />
+                      <ClassPracticeLink course={course} topic={learnClass} />
                     </div>
                   ))}
                 </nav>
               </div>
             ))}
+            {course.readings.length > 0 && (
+              <div className={s.group}>
+                <span className={s.groupLabel}>{t.readings}</span>
+                <div className={s.list}>
+                  {course.readings.map((reading) => (
+                    <div key={reading.slug} className={s.row}>
+                      <span className={s.rowText}>{reading.title[locale]}</span>
+                      <ClassPracticeLink course={course} topic={reading} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </CollapsibleCard>
         </div>
         <div className={s.actions}>

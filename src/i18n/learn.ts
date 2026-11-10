@@ -40,6 +40,7 @@ const en = {
   openExam: 'Open exam',
   openCount: '{count} open',
   classPresentations: 'Class presentations',
+  readings: 'Readings',
   teacherArea: 'Teacher',
   loading: 'Loading…',
 
@@ -132,6 +133,7 @@ const es: Record<keyof typeof en, string> = {
   openExam: 'Abrir examen',
   openCount: '{count} abiertos',
   classPresentations: 'Presentaciones de las clases',
+  readings: 'Lecturas',
   teacherArea: 'Docente',
   loading: 'Cargando…',
 

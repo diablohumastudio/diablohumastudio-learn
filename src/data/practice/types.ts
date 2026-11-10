@@ -24,7 +24,8 @@ export type PracticeAnswer = Dictionary<string> & { id?: string; level?: Distrac
 export type PracticeQuestion = {
   /** Stable and never reused: every student's stats are keyed by it (e.g. 'wu-wo-001'). */
   id: string;
-  /** Class slug from src/data/learn.ts, so results can be grouped by class. */
+  /** Slug of a class or of a reading from src/data/learn.ts (`courseTopics`): what the question
+      is about, and the only thing that ties it to a course. */
   topic?: string;
   /** Slides of that class the question is about: keys of the deck dictionary's `labels`
       (`classSlides` in src/data/learn.ts). Optional, so untagged questions still work by class. */

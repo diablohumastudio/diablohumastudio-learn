@@ -6,7 +6,7 @@
 
 | Piece | Files | Role |
 |---|---|---|
-| Question model | `src/data/practice/types.ts`, `src/data/practice/index.ts` | Types, choice drawing, id numbering, class titles and `questionsInScope()` from the Learn registry |
+| Question model | `src/data/practice/types.ts`, `src/data/practice/index.ts` | Types, choice drawing, id numbering, topic titles and `questionsInScope()` from the Learn registry |
 | Homework model | `src/data/practice/homework.ts` | The goals (`DAILY_QUESTIONS_GOAL`, `RUN_LENGTH`, `RUN_CORRECT_GOAL`), day keys, the run and `isDayDone()`; the `Homework` type of a specific homework, its rounds (`HomeworkRound`, `isRoundDone()`, `isHomeworkDayDone()`) and `isHomeworkOpen()` |
 | Specific homeworks | `src/components/practice/homeworks.ts`, `HomeworkManager.tsx`, `HomeworkEntry.tsx`, `HomeworkList.tsx`, `HomeworkPage.tsx` | Firestore reads/writes of `homeworks/{id}`, the teacher pages at `/teacher/homeworks` (list) and `/teacher/homeworks/<id>` (one homework; `new` for one not saved yet), one homework as the student sees it (an entry of the course page's Homeworks card, and the whole of `/course/<course>/homeworks/<id>`) and the homeworks page at `/course/<course>/homeworks`, a row per homework like the exams list ([courses.md](courses.md)) |
 | Question selection | `src/data/practice/selection.ts`, `src/components/practice/QuestionPicker.tsx` | Which questions an exam draws from: a list of ids, ticked one by one or all at once after filtering by class or slide (`docs/exam.md`) |
@@ -28,7 +28,7 @@
 | Rules | `firebase/firestore.rules` | Source of truth for the Firestore security rules |
 | Texts | `src/i18n/pages/practice.ts` | UI strings in both languages |
 
-Practice never mixes courses and has no home of its own: it starts from the course page (`/course/<course>`), whose Daily practice card practices the whole course and whose class rows, in the Class presentations card, each carry a practice button. The **scope** lives in the query string of the play page: `?course=<slug>` is one course and `?course=<slug>&class=<slug>` one class. Without a known course the page goes back to `/courses`, and `/practice` itself redirects there (`next.config.js`). While playing, the header dropdown (`PlayScopeSelect`) switches between the classes of that course; **Stop** is a link back to the course page. The whole bank is loaded once and filtered in the browser (`questionsInScope`): at this size the reads are free.
+Practice never mixes courses and has no home of its own: it starts from the course page (`/course/<course>`), whose Daily practice card practices the whole course and whose class rows, in the Class presentations card, each carry a practice button. The **scope** lives in the query string of the play page: `?course=<slug>` is one course and `?course=<slug>&class=<slug>` one class, or one reading: readings are topics like the classes ([learn-courses-and-slides.md](learn-courses-and-slides.md), Adding a reading), each with its row and its practice button in a Readings group under the classes, and `class` carries the slug of either. Without a known course the page goes back to `/courses`, and `/practice` itself redirects there (`next.config.js`). While playing, the header dropdown (`PlayScopeSelect`) switches between the classes and the readings of that course; **Stop** is a link back to the course page. The whole bank is loaded once and filtered in the browser (`questionsInScope`): at this size the reads are free.
 
 A page that needs an account never shows the form inline: it renders `SignInRedirect`, which sends a guest to `/sign-in?next=<this page>`, the same URL the header's Sign in link uses, and signing in returns them.
 
@@ -74,8 +74,8 @@ Besides the daily homework, a teacher can set a **specific homework**: questions
 
 ```
 id            permanent, never reused or renumbered (e.g. 'wu-wo-014')
-topic         class slug from src/data/learn.ts (optional)
-slides        [slide id, …] of that class (optional): keys of the deck dictionary's `labels`
+topic         slug of a class or of a reading from src/data/learn.ts (optional); one per question
+slides        [slide id, …] of that class (optional): keys of the deck dictionary's `labels`; a reading has none
 prompt        { es, en }
 correct       [{ id?, es, en }, …]          at least 1; one is shown per display
 incorrect     [{ id?, es, en, level }, …]   at least 3; three are shown per display
@@ -87,12 +87,13 @@ Rules of thumb:
 
 - `level` rates every wrong answer against the correct one: 5 almost correct, 3 plausible, 1 discardable (the scale, its rules and the review cycle are in [questions/README.md](../questions/README.md)). The editor and Import JSON require it on every wrong answer; a bank document without it is still read, so questions saved before levels existed keep working until they are rated. The hard practice mode will draw from it (`TODO.md`).
 
-- Ids are how stats are keyed. A new question gets the next number for its class automatically: `wu-wo-` for `wwise-unreal` / `wwise-objects`, from the initials of the course and class slugs; `q-` when it has no class. The first questions predate the class part (`wu-001`…) and keep their ids. The prefix is only a label: a question moved to another class keeps its id. Never reuse an id.
+- Ids are how stats are keyed. A new question gets the next number for its topic automatically: `wu-wo-` for `wwise-unreal` / `wwise-objects`, from the initials of the course and topic slugs (`wu-lg-` for the reading `lectura-git`); `q-` when it has no topic. The first questions predate the class part (`wu-001`…) and keep their ids. The prefix is only a label: a question moved to another class or reading keeps its id. Never reuse an id.
 - Do not delete questions: **retire** them. Deleting one leaves its stats showing as "Question no longer in the bank".
 - `es` is the source language, like the presentations. Product names stay in English.
 - The more wrong answers a question has, the more different it looks each time. Add many.
 - With several correct answers, write the explanation so it covers all of them.
-- `slides` says which slides a question is about. Pick them in the editor (the checkboxes appear once a class is chosen) or write them in the JSON, e.g. `"slides": ["flujo", "sonido"]`. Untagged questions still belong to their class; the tag only lets the exam picker filter by slide and tick all its questions at once.
+- `topic` is what ties a question to a course: the course is the one whose classes or readings hold that slug (`courseOfTopic`). A question without topic, or with a slug the registry does not know, belongs to no course and is never practiced.
+- `slides` says which slides a question is about. Pick them in the editor (the checkboxes appear once a class is chosen; a reading has no slides) or write them in the JSON, e.g. `"slides": ["flujo", "sonido"]`. Untagged questions still belong to their class; the tag only lets the exam picker filter by slide and tick all its questions at once.
 - The **Exam only** checkbox stores the question in the teacher-only bank `examQuestions`: never practiced, only picked into exams (`docs/exam.md`).
 - Every answer carries an opaque `id`, which is what an exam attempt records as the option a student picked (`docs/exam.md`). The editor assigns it on save and keeps it when the text changes; practice ignores it.
 

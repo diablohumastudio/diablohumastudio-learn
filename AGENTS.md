@@ -14,13 +14,13 @@ Teaching platform of DiabloHumaStudio, served at `learn.diablohumastudio.com`: c
 |---|---|
 | `/` | redirects to `/courses` |
 | `/courses` | course menu |
-| `/course/<course>` | class menu of a course; four cards closed to their title: Daily practice, Homeworks and Exams (what is open right now) and Class presentations with the class rows; for a student who is not enrolled, the card to request access |
+| `/course/<course>` | class menu of a course; four cards closed to their title: Daily practice, Homeworks and Exams (what is open right now) and Class presentations with the class rows and, under them, the reading rows; for a student who is not enrolled, the card to request access |
 | `/course/<course>/class/<class>` | slide deck (`?s=<n>` slide, `&p=<n>` step) |
 | `/course/<course>/exams`, `/course/<course>/exams/<id>` | exam list of a course, exam room |
 | `/course/<course>/homeworks`, `/course/<course>/homeworks/<id>` | the homeworks of the signed-in student in the course as rows, like the exams list: the specific ones with their days, then the deliverable ones; one specific homework with its meter, its days and the Practice button |
 | `/course/<course>/history` | the signed-in student's own history in the course, in five sections: daily practice, multiple option exams, multiple option specific homeworks, deliverable exams, deliverable homeworks |
 | `/course/<course>/deliverable/<id>` | where a student hands a deliverable in: text written on the platform, or a link |
-| `/practice/play?course=<slug>[&class=<slug>]` | timed practice |
+| `/practice/play?course=<slug>[&class=<slug>]` | timed practice of a course, or of one class or one reading of it |
 | `/sign-in`, `/teacher/*` | account, teacher tools |
 | `/teacher/exam`, `/teacher/exam/<id>`, `/teacher/exam/<id>/<uid>` | exam list (multiple option and deliverable exams, each with its New button); one exam by id (`new` for a draft not saved yet); the replay of one student's attempt |
 | `/teacher/homeworks`, `/teacher/homeworks/<id>` | homework list (multiple option and deliverable homeworks, each with its New button); one homework by id (`new` for one not saved yet) |

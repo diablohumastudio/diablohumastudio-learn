@@ -6,13 +6,13 @@ The platform serves class presentations. It is unlisted (`noindex, nofollow`, ne
 
 | Piece | Files | Role |
 |---|---|---|
-| Registry | `src/data/learn.ts` | Single source of truth: courses → classes → presentation component |
+| Registry | `src/data/learn.ts` | Single source of truth: courses → classes → presentation component, and courses → readings |
 | Presentations | `src/presentations/<course-slug>/<class-slug>.tsx` | One React component per class, built with `Deck`/`Slide` |
 | Deck engine | `src/components/learn/Deck.tsx` + `Deck.module.css` | Slide state, keyboard navigation, playhead/counter, `?s=` URL sync |
 | Deck layout | `src/components/learn/LearnLayout.tsx` | Full-height shell for the decks; puts the course/class dropdowns and the Practice link in the header; `F` toggles full screen |
 | Page layout | `src/components/learn/LearnPageLayout.tsx` | Scrolling column for the menus, practice, teacher and sign-in pages |
 | Header | `src/components/learn/LearnHeader.tsx`, `AccountMenu.tsx`, `ConfigDialog.tsx`, `TeacherLink.tsx`, `useFullscreen.ts` | Shared by both layouts: `LEARN` links to `/courses`; the account name (or Guest user) opens a menu with Teacher (teachers only), language, full screen, Config (language, practice time per question and text size, from 4px smaller to 4px larger, applied to the pages but not to the decks) and sign in / sign out |
-| Menus | `src/components/learn/CourseList.tsx`, `ClassList.tsx` | `/courses` is a course dropdown with a Go to course link; `/course/<course-slug>` shows four cards closed to their title, Daily practice, Homeworks, Exams and Class presentations, the last one with a row per class with its slides link and its practice button (`CollapsibleCard`; see [practice.md](practice.md) and [courses.md](courses.md)) |
+| Menus | `src/components/learn/CourseList.tsx`, `ClassList.tsx` | `/courses` is a course dropdown with a Go to course link; `/course/<course-slug>` shows four cards closed to their title, Daily practice, Homeworks, Exams and Class presentations, the last one with a row per class with its slides link and its practice button and, under the classes, a Readings group with a row per reading and its practice button (`CollapsibleCard`; see [practice.md](practice.md) and [courses.md](courses.md)) |
 | Routes | `src/pages/index.tsx` (redirects to `/courses`), `src/pages/courses.tsx`, `src/pages/course/[curso]/index.tsx` and `src/pages/course/[curso]/class/[clase].tsx` | `/courses` is the course menu; `/course/<course-slug>` is the class menu of a course; the dynamic route renders the selected class |
 
 URLs look like `/course/<course-slug>/class/<class-slug>` (e.g. `/course/wwise-unreal/class/el-editor-wwise`). The current slide is kept in the `?s=<n>` query param (and the current step of a stepped slide in `&p=<n>`), so browser back/forward walk through visited slides and steps, and a link can point to an exact slide or step.
@@ -97,10 +97,30 @@ Notes:
 - **Append new classes at the end of the array**: the array order is the teaching order shown in the class menu, and `←` on a class's first slide and `→` on its last slide step into the neighbouring class.
 - Optional `section: 'Intro'` groups the class with its neighbours: consecutive classes sharing a `section` become an `<optgroup>` in the class dropdown, and the section name is shown at the top of every slide's left rail. Classes without a section render as today. Keep sectioned classes contiguous in the array — the grouping is by adjacency, so a gap starts a second group with the same name.
 
+## Adding a reading
+
+A **reading** is a theory text the students get outside the platform (a PDF, a handout). The registry only knows its name, so that questions can be about it: a reading has no deck, no page and no link. Classes and readings together are the **topics** of a course (`courseTopics`, `findTopic`), and a question's `topic` is the slug of one of them (see [practice.md](practice.md)).
+
+Append an entry to the course's `readings` array in `src/data/learn.ts`:
+
+```ts
+readings: [
+  { slug: 'lectura-git', title: { es: 'Git', en: 'Git' } },
+],
+```
+
+That is all: the question editor's Topic dropdown, the question picker (a Readings group in its filter), the practice scope dropdown and the course page (a Readings group under the classes, a row per reading with its practice button and no number or link) are generated from the registry. The class numbering, the class dropdown of the decks and the ← → neighbours never count readings.
+
+Notes:
+
+- **A reading's slug must not repeat any class or reading slug, of any course**: the slug is how a question finds its course. The prefix `lectura-` keeps the readings apart from the classes.
+- **Never rename a slug once questions point at it**: they would belong to no course and never be practiced. The title is free to change.
+- The slug's initials number the reading's questions, like a class's: `wu-lg-001` for `wwise-unreal` / `lectura-git`. Check that the initials do not repeat those of another topic of the course.
+
 ## Adding a course
 
 1. Create the folder `src/presentations/<course-slug>/`.
-2. Add an entry to `LEARN_COURSES` in `src/data/learn.ts` with `slug`, `title` and a `classes` array (at least one class).
+2. Add an entry to `LEARN_COURSES` in `src/data/learn.ts` with `slug`, `title`, a `classes` array (at least one class) and a `readings` array (empty when the course has none).
 
 The course menu and the course dropdown are generated from `LEARN_COURSES`; switching course in the dropdown navigates to that course's latest class.
 

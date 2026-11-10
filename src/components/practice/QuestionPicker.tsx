@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { LEARN_COURSES, findCourse } from '../../data/learn';
+import { LEARN_COURSES, courseTopics, findCourse } from '../../data/learn';
 import { questionTopicTitle, questionsWithIds } from '../../data/practice';
 import type { PracticeQuestion } from '../../data/practice';
 import { practiceDict } from '../../i18n/pages/practice';
@@ -26,6 +26,7 @@ type GroupFilter =
   | { kind: 'class'; classSlug: string }
   | { kind: 'classNoSlide'; classSlug: string }
   | { kind: 'slide'; classSlug: string; slideId: string }
+  | { kind: 'reading'; readingSlug: string }
   | { kind: 'examOnly' };
 
 /** Narrows the list by whether a question is ticked: the way to review what an exam holds. */
@@ -38,6 +39,7 @@ const EXAM_ONLY_FILTER_VALUE: string = 'examOnly';
 const CLASS_FILTER_PREFIX: string = 'class:';
 const CLASS_NO_SLIDE_FILTER_PREFIX: string = 'classNoSlide:';
 const SLIDE_FILTER_PREFIX: string = 'slide:';
+const READING_FILTER_PREFIX: string = 'reading:';
 /** Slugs and slide ids never hold a slash. */
 const SLIDE_FILTER_SEPARATOR: string = '/';
 /* Native options ignore CSS padding and collapse plain spaces, so the slides are
@@ -53,6 +55,9 @@ function filterOfValue(value: string): GroupFilter {
   if (value.startsWith(SLIDE_FILTER_PREFIX)) {
     const [classSlug, slideId] = value.slice(SLIDE_FILTER_PREFIX.length).split(SLIDE_FILTER_SEPARATOR);
     return { kind: 'slide', classSlug, slideId };
+  }
+  if (value.startsWith(READING_FILTER_PREFIX)) {
+    return { kind: 'reading', readingSlug: value.slice(READING_FILTER_PREFIX.length) };
   }
   return value === EXAM_ONLY_FILTER_VALUE ? { kind: 'examOnly' } : { kind: 'course' };
 }
@@ -70,6 +75,7 @@ function isInGroup(question: PracticeQuestion, filter: GroupFilter): boolean {
   if (filter.kind === 'course') return true;
   if (filter.kind === 'courseNoSlide') return hasNoSlide(question);
   if (filter.kind === 'examOnly') return Boolean(question.examOnly);
+  if (filter.kind === 'reading') return question.topic === filter.readingSlug;
   if (question.topic !== filter.classSlug) return false;
   if (filter.kind === 'class') return true;
   return filter.kind === 'classNoSlide' ? hasNoSlide(question) : Boolean(question.slides?.includes(filter.slideId));
@@ -90,12 +96,12 @@ export default function QuestionPicker({
   const [tickFilter, setTickFilter] = useState<TickFilter>('all');
   const selectAllRef = useRef<HTMLInputElement>(null);
   const course = findCourse(courseSlug);
-  const classSlugs = course?.classes.map((learnClass) => learnClass.slug) ?? [];
-  const slidesByClass = useClassSlides(classSlugs);
+  const topicSlugs = course ? courseTopics(course).map((topic) => topic.slug) : [];
+  const slidesByClass = useClassSlides(topicSlugs);
 
-  // Exam-only questions may have no class, so they are offered in every course.
+  // Exam-only questions may have no topic, so they are offered in every course.
   const courseQuestions = questions.filter(
-    (question) => question.examOnly || (question.topic !== undefined && classSlugs.includes(question.topic))
+    (question) => question.examOnly || (question.topic !== undefined && topicSlugs.includes(question.topic))
   );
   const hasExamOnly = courseQuestions.some((question) => question.examOnly);
   const tickFilterTexts: Record<TickFilter, string> = {
@@ -182,6 +188,15 @@ export default function QuestionPicker({
                 ))}
               </optgroup>
             ))}
+            {course && course.readings.length > 0 && (
+              <optgroup label={t.topicGroupReadings}>
+                {course.readings.map((reading) => (
+                  <option key={reading.slug} value={`${READING_FILTER_PREFIX}${reading.slug}`}>
+                    {reading.title[locale]}
+                  </option>
+                ))}
+              </optgroup>
+            )}
             {hasExamOnly && <option value={EXAM_ONLY_FILTER_VALUE}>{t.examOnlyTag}</option>}
           </select>
           <select
@@ -242,7 +257,7 @@ export default function QuestionPicker({
                   {question.prompt[locale]}
                   <span className={ui.mono}>
                     {' '}
-                    · {question.examOnly ? t.examOnlyTag : questionTopicTitle(question, locale) ?? t.noClass}
+                    · {question.examOnly ? t.examOnlyTag : questionTopicTitle(question, locale) ?? t.noTopic}
                   </span>
                 </span>
               </label>

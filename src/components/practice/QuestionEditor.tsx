@@ -20,6 +20,7 @@ import s from './QuestionEditor.module.css';
 import SignInRedirect from '../learn/SignInRedirect';
 import { isPermissionDenied } from './progress';
 import { parseImportList, saveQuestions, toExportJson, useExamOnlyBank, useQuestionBank } from './questions';
+import TopicOptions from './TopicOptions';
 import ui from '../learn/ui.module.css';
 import { useAuthUser } from '../learn/useAuthUser';
 import { useClassSlides } from '../learn/useClassSlides';
@@ -303,21 +304,15 @@ function QuestionForm({ bank, editing, onDone, onEditedImport }: QuestionFormPro
         </label>
 
         <label className={ui.field}>
-          <span className={ui.label}>{t.classLabel}</span>
+          <span className={ui.label}>{t.topicLabel}</span>
           <select
             className={s.select}
             value={draft.topic}
-            // Slide ids belong to a class: another class starts without any.
+            // Slide ids belong to a class: another topic starts without any.
             onChange={(event) => setDraft({ ...draft, topic: event.target.value, slides: [] })}
           >
-            <option value="">{t.noClass}</option>
-            {LEARN_COURSES.map((course) =>
-              course.classes.map((learnClass) => (
-                <option key={learnClass.slug} value={learnClass.slug}>
-                  {course.title} · {learnClass.title[locale]}
-                </option>
-              ))
-            )}
+            <option value="">{t.noTopic}</option>
+            <TopicOptions courses={LEARN_COURSES} />
           </select>
         </label>
 

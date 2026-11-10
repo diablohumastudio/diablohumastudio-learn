@@ -8,7 +8,7 @@ The map of everything the platform stores, read as if it were a relational datab
 |---|---|---|
 | **Firestore** | Everything below: questions, progress, homeworks, exams, deliverables, memberships, roles | Firebase console; collection names in `src/data/*/types.ts` |
 | **Firebase Auth** | The accounts: `uid`, `displayName`, `email`, sign-in method. There is no users table in Firestore; the `uid` is the key everything else hangs from | Firebase console → Authentication |
-| **Code** | The courses, their classes and the slides of each class: `LEARN_COURSES` in `src/data/learn.ts`. A course or class slug stored in Firestore is a foreign key into this list | Git |
+| **Code** | The courses, their classes, the slides of each class and their readings: `LEARN_COURSES` in `src/data/learn.ts`. A course, class or reading slug stored in Firestore is a foreign key into this list | Git |
 
 ## Reading Firestore as tables
 
@@ -24,6 +24,7 @@ The map of everything the platform stores, read as if it were a relational datab
 ```
 Firebase Auth                 users: uid, displayName, email
 Code (src/data/learn.ts)      LEARN_COURSES: course.slug → classes[].slug → slide ids
+                                             course.slug → readings[].slug
 
 teachers/{uid}                                         role: exists = is a teacher
 settings/examLock                                      one document: the exam running right now
@@ -180,9 +181,9 @@ Every arrow is a stored string (or list of strings) that names a key somewhere e
 | `courses/{c}/members/{uid}` | key `uid` | Auth user | |
 | `courses/{c}/members/{uid}` | `grantedBy` | `teachers/{uid}`, or the literal `enroll-all` | |
 | `courses/{c}/requests/{uid}` | keys | course (code), Auth user | Deleted when accepted or rejected |
-| `questions/{id}` | `topic` | `LEARN_COURSES[].classes[].slug` (code) | **The only link between a question and a course**: the course is found through the class. A question without `topic`, or with a slug no class has, belongs to no course and is never drawn into practice (`questionsInScope`); its id starts with `q-` |
-| `questions/{id}` | `slides[]` | slide ids of that class's deck (code) | Keys of the deck dictionary's `labels` |
-| `questions/{id}` | id prefix | course and class initials | A label only: a question moved to another class keeps its id |
+| `questions/{id}` | `topic` | `LEARN_COURSES[].classes[].slug` or `LEARN_COURSES[].readings[].slug` (code): a topic, `courseTopics` | **The only link between a question and a course**: the course is found through the class or the reading. One topic per question. A question without `topic`, or with a slug no class and no reading has, belongs to no course and is never drawn into practice (`questionsInScope`); a question without `topic` gets an id that starts with `q-` |
+| `questions/{id}` | `slides[]` | slide ids of that class's deck (code) | Keys of the deck dictionary's `labels`. Empty when the topic is a reading: readings have no slides |
+| `questions/{id}` | id prefix | course and topic initials | A label only: a question moved to another class or reading keeps its id |
 | `students/{uid}` | key | Auth user | |
 | `students/{uid}/questions/{q}` | key `q` | `questions/{q}` or `examQuestions/{q}` | A retired question still resolves; a deleted one shows as "no longer in the bank" |
 | `students/{uid}/days/…` | `courseSlug` | course (code) | Daily homework rows |
@@ -214,7 +215,9 @@ erDiagram
   COURSE_CODE ||--o{ MEMBER : courseSlug
   COURSE_CODE ||--o{ REQUEST : courseSlug
   COURSE_CODE ||--o{ CLASS_CODE : classes
+  COURSE_CODE ||--o{ READING_CODE : readings
   CLASS_CODE ||--o{ QUESTION : topic
+  READING_CODE ||--o{ QUESTION : topic
   CLASS_CODE ||--o{ SLIDE_CODE : labels
   SLIDE_CODE }o--o{ QUESTION : slides
   STUDENT ||--o{ STUDENT_QUESTION : uid
@@ -241,4 +244,4 @@ erDiagram
   TEACHER ||--o{ MEMBER : grantedBy
 ```
 
-`COURSE_CODE`, `CLASS_CODE` and `SLIDE_CODE` live in `src/data/learn.ts`, not in Firestore; `AUTH_USER` lives in Firebase Auth.
+`COURSE_CODE`, `CLASS_CODE`, `READING_CODE` and `SLIDE_CODE` live in `src/data/learn.ts`, not in Firestore; `AUTH_USER` lives in Firebase Auth.

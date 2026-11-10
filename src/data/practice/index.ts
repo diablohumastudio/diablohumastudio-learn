@@ -1,5 +1,5 @@
 import type { Locale } from '../../i18n/locales';
-import { LEARN_COURSES } from '../learn';
+import { LEARN_COURSES, findTopic } from '../learn';
 import type { LearnCourse, PracticeScope } from '../learn';
 import type { PracticeQuestion } from './types';
 
@@ -83,9 +83,10 @@ const NO_COURSE_ID_PREFIX: string = 'q';
 const EXAM_ONLY_ID_PREFIX: string = 'x-';
 const ID_NUMBER_WIDTH: number = 3;
 
+/** The course whose classes or readings include `topic`: the only link between a question and a course. */
 export function courseOfTopic(topic: string | undefined): LearnCourse | undefined {
   if (!topic) return undefined;
-  return LEARN_COURSES.find((course) => course.classes.some((candidate) => candidate.slug === topic));
+  return LEARN_COURSES.find((course) => findTopic(course, topic) !== undefined);
 }
 
 export function questionsInScope(questions: readonly PracticeQuestion[], scope: PracticeScope): PracticeQuestion[] {
@@ -96,12 +97,12 @@ export function questionsInScope(questions: readonly PracticeQuestion[], scope: 
   return [...questions];
 }
 
-/** Title of the class a question belongs to, from the Learn registry. */
+/** Title of the class or reading a question is about, from the Learn registry. */
 export function questionTopicTitle(question: PracticeQuestion, locale: Locale): string | undefined {
   if (!question.topic) return undefined;
   const course = courseOfTopic(question.topic);
-  const learnClass = course?.classes.find((candidate) => candidate.slug === question.topic);
-  return learnClass ? learnClass.title[locale] : question.topic;
+  const learnTopic = course ? findTopic(course, question.topic) : undefined;
+  return learnTopic ? learnTopic.title[locale] : question.topic;
 }
 
 /** 'wwise-unreal' → 'wu', 'wwise-objects' → 'wo'. */
@@ -112,14 +113,14 @@ function slugInitials(slug: string): string {
     .join('');
 }
 
-/** 'wu-wo-': course and class initials, so every class numbers its own questions. */
+/** 'wu-wo-': course and topic initials, so every class and every reading numbers its own questions. */
 function questionIdPrefix(topic: string | undefined): string {
   const course = courseOfTopic(topic);
   if (!course || !topic) return `${NO_COURSE_ID_PREFIX}-`;
   return `${slugInitials(course.slug)}-${slugInitials(topic)}-`;
 }
 
-/** Next free id for the class of `topic` (e.g. 'wu-wo-014'); ids are never reused. */
+/** Next free id for the class or reading of `topic` (e.g. 'wu-wo-014'); ids are never reused. */
 export function nextQuestionId(
   questions: readonly PracticeQuestion[],
   topic: string | undefined,

@@ -51,10 +51,21 @@ export type LearnClassGroup = {
   classes: LearnClass[];
 };
 
+/** What a question is about: a class or a reading of a course. Its slug is the question's `topic`. */
+export type LearnTopic = {
+  slug: string;
+  title: Dictionary<string>;
+};
+
+/** A theory reading of a course: a topic with a title only, without deck, page or link. */
+export type LearnReading = LearnTopic;
+
 export type LearnCourse = {
   slug: string;
   title: string;
   classes: LearnClass[];
+  /** Their slugs share the questions' `topic` with the classes: no slug may repeat across both. */
+  readings: LearnReading[];
 };
 
 function labelsOf(deckDict: Dictionary<{ labels: SlideLabels }>): Dictionary<SlideLabels> {
@@ -123,12 +134,18 @@ export const LEARN_COURSES: LearnCourse[] = [
           import('../presentations/wwise-unreal/work-units-y-vcs.dict').then((deck) => labelsOf(deck.workUnitsDict)),
       },
     ],
+    readings: [
+      { slug: 'lectura-git', title: { es: 'Git', en: 'Git' } },
+      { slug: 'lectura-work-units', title: { es: 'Work Units', en: 'Work Units' } },
+      { slug: 'lectura-game-syncs', title: { es: 'Game Syncs', en: 'Game Syncs' } },
+    ],
   },
 ];
 
-/** One course or one class of it. Practice always has a course; only an exam may cover everything. */
+/** One course or one topic of it. Practice always has a course; only an exam may cover everything. */
 export type PracticeScope = {
   courseSlug?: string;
+  /** The slug of a class or of a reading: it keeps the name of the `class` query parameter. */
   classSlug?: string;
 };
 
@@ -168,6 +185,15 @@ export function findClass(course: LearnCourse, slug: string | undefined): LearnC
   return course.classes.find((learnClass) => learnClass.slug === slug);
 }
 
+/** Everything a question of the course can be about: its classes in teaching order, then its readings. */
+export function courseTopics(course: LearnCourse): LearnTopic[] {
+  return [...course.classes, ...course.readings];
+}
+
+export function findTopic(course: LearnCourse, slug: string | undefined): LearnTopic | undefined {
+  return courseTopics(course).find((topic) => topic.slug === slug);
+}
+
 function labelText(label: string | readonly string[]): string {
   return typeof label === 'string' ? label : label[0];
 }
@@ -199,8 +225,8 @@ export function groupClassesBySection(course: LearnCourse): LearnClassGroup[] {
 export function practiceScope(courseSlug: string | undefined, classSlug: string | undefined): PracticeScope {
   const course = findCourse(courseSlug);
   if (!course) return {};
-  const learnClass = findClass(course, classSlug);
-  return learnClass ? { courseSlug: course.slug, classSlug: learnClass.slug } : { courseSlug: course.slug };
+  const topic = findTopic(course, classSlug);
+  return topic ? { courseSlug: course.slug, classSlug: topic.slug } : { courseSlug: course.slug };
 }
 
 function scopeQuery(scope: PracticeScope): string {

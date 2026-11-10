@@ -5,18 +5,19 @@ import type { LearnCourse } from '../../data/learn';
 import type { DayProgress, Homework } from '../../data/practice';
 import type { QuestionStats } from './progress';
 
-export type ClassAnswers = {
-  /** Every answer the student gave to the questions of the class, and how many were right. */
+export type TopicAnswers = {
+  /** Every answer the student gave to the questions of the class or reading, and how many were right. */
   answered: number;
   correct: number;
-  /** Active questions of the class: without any there is nothing to practice. */
+  /** Active questions of the topic: without any there is nothing to practice. */
   questionCount: number;
 };
 
 export type CourseProgressData = {
   /** Days of this course's daily homework only. */
   days: DayProgress[];
-  answersByClass: Record<string, ClassAnswers>;
+  /** Keyed by the slug of each class and each reading of the course. */
+  answersByTopic: Record<string, TopicAnswers>;
   /** The specific homeworks of this course, whatever their dates. */
   homeworks: Homework[];
   /** The student's days of every specific homework: each card picks its own by `homeworkId`. */

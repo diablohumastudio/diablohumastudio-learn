@@ -1,12 +1,12 @@
 import { useRouter } from 'next/router';
-import { findCourse, practicePlayPath, querySlug } from '../../data/learn';
+import { findCourse, findTopic, practicePlayPath, querySlug } from '../../data/learn';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
 import h from '../learn/LearnHeader.module.css';
 
 const WHOLE_COURSE_VALUE: string = '';
 
-/** Header control of the play screen: switches class without leaving it, never the course. */
+/** Header control of the play screen: switches class or reading without leaving it, never the course. */
 export default function PlayScopeSelect() {
   const t = useT(practiceDict);
   const locale = useLocale();
@@ -16,9 +16,9 @@ export default function PlayScopeSelect() {
   if (!router.isReady) return null;
   const course = findCourse(querySlug(router.query.course));
   if (!course) return null;
-  // A homework has its own questions: switching class here would silently leave it.
+  // A homework has its own questions: switching topic here would silently leave it.
   if (querySlug(router.query.homework)) return null;
-  const activeClassSlug = course.classes.find((learnClass) => learnClass.slug === querySlug(router.query.class))?.slug;
+  const activeTopicSlug = findTopic(course, querySlug(router.query.class))?.slug;
 
   return (
     <label className={h.selectGroup}>
@@ -26,10 +26,10 @@ export default function PlayScopeSelect() {
       <select
         className={h.select}
         aria-label={t.scopeLabel}
-        value={activeClassSlug ?? WHOLE_COURSE_VALUE}
+        value={activeTopicSlug ?? WHOLE_COURSE_VALUE}
         onChange={(event) => {
-          const classSlug = event.target.value === WHOLE_COURSE_VALUE ? undefined : event.target.value;
-          router.push(practicePlayPath({ courseSlug: course.slug, classSlug }));
+          const topicSlug = event.target.value === WHOLE_COURSE_VALUE ? undefined : event.target.value;
+          router.push(practicePlayPath({ courseSlug: course.slug, classSlug: topicSlug }));
           event.target.blur();
         }}
       >
@@ -41,6 +41,15 @@ export default function PlayScopeSelect() {
             {learnClass.title[locale]}
           </option>
         ))}
+        {course.readings.length > 0 && (
+          <optgroup label={t.topicGroupReadings}>
+            {course.readings.map((reading) => (
+              <option key={reading.slug} value={reading.slug}>
+                {reading.title[locale]}
+              </option>
+            ))}
+          </optgroup>
+        )}
       </select>
     </label>
   );

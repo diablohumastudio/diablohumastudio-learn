@@ -55,6 +55,21 @@
   min-width: 0;
 }
 
+/* A reading row: the box of a class row without its link, since a reading has no page to open. */
+.rowText {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  padding: 16px 18px;
+  font-size: calc(16px + var(--text-delta, 0px));
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
 @media (max-width: 560px) {
   .row {
     flex-direction: column;
