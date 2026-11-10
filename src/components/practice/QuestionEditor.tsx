@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { LEARN_COURSES, TEACHER_PATH } from '../../data/learn';
+import type { LearnCourse } from '../../data/learn';
 import {
   DISTRACTOR_LEVELS,
   MIN_CORRECT_ANSWERS,
@@ -10,6 +11,8 @@ import {
 } from '../../data/practice';
 import type { DistractorLevel, PracticeAnswer, PracticeQuestion } from '../../data/practice';
 import type { ImportedQuestion } from '../../data/practice/parse';
+import { PROPOSAL_SOURCE_LOCALE } from '../../data/practice/proposal';
+import type { ProposalContent } from '../../data/practice/proposal';
 import { LOCALES } from '../../i18n/locales';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
@@ -38,7 +41,17 @@ type Draft = {
   retired: boolean;
 };
 
-type Validation = { ok: true; value: Omit<PracticeQuestion, 'id'> } | { ok: false; message: string };
+type Validation<T> = { ok: true; value: T } | { ok: false; message: string };
+
+/** A bank question as the form hands it over: the id is assigned, or kept, by whoever saves it. */
+type QuestionContent = Omit<PracticeQuestion, 'id'>;
+
+type DraftTexts = {
+  prompt: Dictionary<string>;
+  correct: PracticeAnswer[];
+  incorrect: PracticeAnswer[];
+  explanation: Dictionary<string>;
+};
 
 function emptyText(): Dictionary<string> {
   return { en: '', es: '' };
@@ -109,11 +122,47 @@ function isBlank(text: Dictionary<string>): boolean {
   return LOCALES.every((locale) => text[locale] === '');
 }
 
-function validateDraft(draft: Draft, t: Texts): Validation {
-  const prompt = trimmed(draft.prompt);
-  const correct = draft.correct.map(trimmedAnswer).filter((text) => !isBlank(text));
-  const incorrect = draft.incorrect.map(trimmedAnswer).filter((text) => !isBlank(text));
-  const explanation = trimmed(draft.explanation);
+/** The texts of a draft as they would be saved: trimmed, and without the answer rows left empty. */
+function textsOfDraft(draft: Draft): DraftTexts {
+  return {
+    prompt: trimmed(draft.prompt),
+    correct: draft.correct.map(trimmedAnswer).filter((text) => !isBlank(text)),
+    incorrect: draft.incorrect.map(trimmedAnswer).filter((text) => !isBlank(text)),
+    explanation: trimmed(draft.explanation),
+  };
+}
+
+function hasSourceText(text: Dictionary<string>): boolean {
+  return text[PROPOSAL_SOURCE_LOCALE] !== '';
+}
+
+/** A proposal asks for less than the bank: the source language only, and no levels. A teacher
+    completes the rest before accepting it, under the bank's own validation. */
+function validateProposalDraft(draft: Draft, t: Texts): Validation<ProposalContent> {
+  const { prompt, correct, incorrect, explanation } = textsOfDraft(draft);
+
+  if (!hasSourceText(prompt)) return { ok: false, message: t.validationProposalPrompt };
+  if (![...correct, ...incorrect].every(hasSourceText)) return { ok: false, message: t.validationProposalAnswers };
+  if (correct.length < MIN_CORRECT_ANSWERS) return { ok: false, message: t.validationCorrect };
+  if (incorrect.length < MIN_INCORRECT_ANSWERS) return { ok: false, message: t.validationIncorrect };
+  if (!isBlank(explanation) && !hasSourceText(explanation)) {
+    return { ok: false, message: t.validationProposalExplanation };
+  }
+
+  return {
+    ok: true,
+    value: {
+      ...(draft.topic ? { topic: draft.topic } : {}),
+      prompt,
+      correct,
+      incorrect,
+      ...(isBlank(explanation) ? {} : { explanation }),
+    },
+  };
+}
+
+function validateDraft(draft: Draft, t: Texts): Validation<QuestionContent> {
+  const { prompt, correct, incorrect, explanation } = textsOfDraft(draft);
 
   if (!isComplete(prompt)) return { ok: false, message: t.validationPrompt };
   if (![...correct, ...incorrect].every(isComplete)) return { ok: false, message: t.validationAnswers };
@@ -228,16 +277,25 @@ function AnswerList({ label, items, minimum, withLevels = false, onChange }: Ans
   );
 }
 
+/** What the form is for: it decides the validation, the fields shown and what its button does. */
+export type QuestionFormMode =
+  /** A teacher creating or editing a question of the bank; `bank` gives a new one its id. */
+  | { kind: 'bank'; bank: readonly PracticeQuestion[]; onSaved: () => void }
+  /** Editing a question of an import that is still under review: the button hands the result
+      back instead of writing it to the bank. */
+  | { kind: 'import'; onEdited: (value: QuestionContent) => void }
+  /** A student proposing a question for a course: the relaxed validation, the topics of that
+      course only, and neither slides nor the bank's own switches. */
+  | { kind: 'proposal'; course: LearnCourse; onPropose: (content: ProposalContent) => Promise<void> };
+
 type QuestionFormProps = {
-  bank: PracticeQuestion[];
+  mode: QuestionFormMode;
   editing: PracticeQuestion | null;
-  onDone: () => void;
-  /** Editing a question of an import that is still under review: saving hands the result back
-      instead of writing it to the bank. */
-  onEditedImport?: (value: Omit<PracticeQuestion, 'id'>) => void;
+  /** Leaves the form without saving. */
+  onBack: () => void;
 };
 
-function QuestionForm({ bank, editing, onDone, onEditedImport }: QuestionFormProps) {
+export function QuestionForm({ mode, editing, onBack }: QuestionFormProps) {
   const t = useT(practiceDict);
   const locale = useLocale();
   const [draft, setDraft] = useState<Draft>(() => (editing ? draftFromQuestion(editing) : emptyDraft()));
@@ -245,7 +303,11 @@ function QuestionForm({ bank, editing, onDone, onEditedImport }: QuestionFormPro
   const [message, setMessage] = useState<string | null>(null);
   // A question never changes bank: its id says which one it is in, and stats and exams point at the id.
   const [examOnly, setExamOnly] = useState(editing?.examOnly ?? false);
-  const classSlides = useClassSlides(draft.topic ? [draft.topic] : [])[draft.topic] ?? [];
+  const isProposal = mode.kind === 'proposal';
+  // A proposal is not tagged with slides: the teacher tags the question when accepting it.
+  const slideTopics = draft.topic && !isProposal ? [draft.topic] : [];
+  const classSlides = useClassSlides(slideTopics)[draft.topic] ?? [];
+  const topicCourses = mode.kind === 'proposal' ? [mode.course] : LEARN_COURSES;
 
   function toggleSlide(slideId: string) {
     const slides = draft.slides.includes(slideId)
@@ -254,54 +316,106 @@ function QuestionForm({ bank, editing, onDone, onEditedImport }: QuestionFormPro
     setDraft({ ...draft, slides });
   }
 
-  async function save() {
+  /** Runs a write with the button busy. A refusal stays on the form as a message; when the
+      write goes through, whoever opened the form closes it. */
+  async function runWrite(write: () => Promise<void>, deniedMessage: string) {
+    setSaving(true);
+    setMessage(null);
+    try {
+      await write();
+    } catch (error) {
+      console.error('Could not save the question', error);
+      setMessage(isPermissionDenied(error) ? deniedMessage : t.errorGeneric);
+      setSaving(false);
+    }
+  }
+
+  function saveToBank(bank: readonly PracticeQuestion[], onSaved: () => void) {
     const validation = validateDraft(draft, t);
     if (validation.ok === false) {
       setMessage(validation.message);
       return;
     }
-    if (onEditedImport) {
-      onEditedImport(validation.value);
+    const id = editing ? editing.id : nextQuestionId(bank, validation.value.topic, examOnly);
+    void runWrite(async () => {
+      await saveQuestions([{ id, ...validation.value, examOnly }]);
+      onSaved();
+    }, t.notAuthorized);
+  }
+
+  function applyToImport(onEdited: (value: QuestionContent) => void) {
+    const validation = validateDraft(draft, t);
+    if (validation.ok === false) {
+      setMessage(validation.message);
       return;
     }
-    const id = editing ? editing.id : nextQuestionId(bank, validation.value.topic, examOnly);
-    setSaving(true);
-    setMessage(null);
-    try {
-      await saveQuestions([{ id, ...validation.value, examOnly }]);
-      onDone();
-    } catch (error) {
-      console.error('Could not save the question', error);
-      setMessage(isPermissionDenied(error) ? t.notAuthorized : t.errorGeneric);
-      setSaving(false);
+    onEdited(validation.value);
+  }
+
+  function sendProposal(onPropose: (content: ProposalContent) => Promise<void>) {
+    const validation = validateProposalDraft(draft, t);
+    if (validation.ok === false) {
+      setMessage(validation.message);
+      return;
     }
+    void runWrite(() => onPropose(validation.value), t.proposalNotAllowed);
+  }
+
+  function submit() {
+    if (mode.kind === 'bank') saveToBank(mode.bank, mode.onSaved);
+    else if (mode.kind === 'import') applyToImport(mode.onEdited);
+    else sendProposal(mode.onPropose);
+  }
+
+  function backText(): string {
+    if (mode.kind === 'import') return t.backToImport;
+    return mode.kind === 'proposal' ? t.backToProposals : t.backToQuestions;
+  }
+
+  function eyebrowText(): string {
+    if (editing && editing.id !== '') return editing.id;
+    return mode.kind === 'proposal' ? mode.course.title : t.editorTitle;
+  }
+
+  function titleText(): string {
+    if (mode.kind === 'proposal') return t.proposeQuestion;
+    return editing ? t.editQuestion : t.newQuestion;
+  }
+
+  function submitText(): string {
+    if (saving) return t.saving;
+    if (mode.kind === 'import') return t.applyToImport;
+    return mode.kind === 'proposal' ? t.sendProposal : t.save;
   }
 
   return (
     <div className={s.wrap}>
-      <button type="button" className={s.back} onClick={onDone}>
-        ← {onEditedImport ? t.backToImport : t.backToQuestions}
+      <button type="button" className={s.back} onClick={onBack}>
+        ← {backText()}
       </button>
       <div className={s.heading}>
-        <span className={ui.eyebrow}>{editing && editing.id !== '' ? editing.id : t.editorTitle}</span>
-        <h1 className={ui.title}>{editing ? t.editQuestion : t.newQuestion}</h1>
+        <span className={ui.eyebrow}>{eyebrowText()}</span>
+        <h1 className={ui.title}>{titleText()}</h1>
+        {isProposal && <p className={ui.lede}>{t.proposalFormHint}</p>}
       </div>
       <form
         className={s.form}
         onSubmit={(event) => {
           event.preventDefault();
-          void save();
+          submit();
         }}
       >
-        <label className={s.checkbox}>
-          <input
-            type="checkbox"
-            checked={examOnly}
-            disabled={editing !== null}
-            onChange={(event) => setExamOnly(event.target.checked)}
-          />
-          <span>{t.examOnlyLabel}</span>
-        </label>
+        {!isProposal && (
+          <label className={s.checkbox}>
+            <input
+              type="checkbox"
+              checked={examOnly}
+              disabled={editing !== null}
+              onChange={(event) => setExamOnly(event.target.checked)}
+            />
+            <span>{t.examOnlyLabel}</span>
+          </label>
+        )}
 
         <label className={ui.field}>
           <span className={ui.label}>{t.topicLabel}</span>
@@ -312,7 +426,7 @@ function QuestionForm({ bank, editing, onDone, onEditedImport }: QuestionFormPro
             onChange={(event) => setDraft({ ...draft, topic: event.target.value, slides: [] })}
           >
             <option value="">{t.noTopic}</option>
-            <TopicOptions courses={LEARN_COURSES} />
+            <TopicOptions courses={topicCourses} />
           </select>
         </label>
 
@@ -375,7 +489,7 @@ function QuestionForm({ bank, editing, onDone, onEditedImport }: QuestionFormPro
 
         <div className={s.actions}>
           <button type="submit" className={s.save} disabled={saving}>
-            {saving ? t.saving : onEditedImport ? t.applyToImport : t.save}
+            {submitText()}
           </button>
         </div>
       </form>
@@ -471,7 +585,7 @@ function importedAsQuestion(imported: ImportedQuestion, examOnly: boolean): Prac
   return { ...imported, id: imported.id ?? '', examOnly };
 }
 
-function withEditedQuestion(batch: ImportBatch, index: number, value: Omit<PracticeQuestion, 'id'>): ImportBatch {
+function withEditedQuestion(batch: ImportBatch, index: number, value: QuestionContent): ImportBatch {
   const questions = batch.questions.map((question, candidate) =>
     candidate === index ? { ...value, id: question.id } : question
   );
@@ -527,24 +641,28 @@ function Bank() {
     const { batch, index } = screen;
     return (
       <QuestionForm
-        bank={questions}
+        mode={{
+          kind: 'import',
+          onEdited: (value) => setScreen({ kind: 'importReview', batch: withEditedQuestion(batch, index, value) }),
+        }}
         editing={importedAsQuestion(batch.questions[index], batch.examOnly)}
-        onDone={() => setScreen({ kind: 'importReview', batch })}
-        onEditedImport={(value) =>
-          setScreen({ kind: 'importReview', batch: withEditedQuestion(batch, index, value) })
-        }
+        onBack={() => setScreen({ kind: 'importReview', batch })}
       />
     );
   }
   if (screen.kind !== 'list') {
     return (
       <QuestionForm
-        bank={questions}
-        editing={screen.kind === 'edit' ? screen.question : null}
-        onDone={() => {
-          setNotice(t.savedNotice);
-          setScreen({ kind: 'list' });
+        mode={{
+          kind: 'bank',
+          bank: questions,
+          onSaved: () => {
+            setNotice(t.savedNotice);
+            setScreen({ kind: 'list' });
+          },
         }}
+        editing={screen.kind === 'edit' ? screen.question : null}
+        onBack={() => setScreen({ kind: 'list' })}
       />
     );
   }

@@ -1,7 +1,7 @@
 rules_version = '2';
 
-// Practice data (see docs/practice.md), exams (docs/exam.md), deliverables (docs/deliverables.md)
-// and course membership (docs/courses.md).
+// Practice data and question proposals (see docs/practice.md), exams (docs/exam.md),
+// deliverables (docs/deliverables.md) and course membership (docs/courses.md).
 // Paste into Firebase console → Firestore → Rules.
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -77,6 +77,19 @@ service cloud.firestore {
     // The exam API (admin SDK) reads them when it builds the paper.
     match /examQuestions/{questionId} {
       allow read, write: if isTeacher();
+    }
+
+    // Question proposals (docs/practice.md): a student the teacher allowed proposes a question
+    // for a course's bank. They live apart from `questions` because every student downloads that
+    // collection whole and none may write it. A teacher decides: accepting writes the question
+    // into the bank and marks the proposal, rejecting only marks it.
+    match /questionProposals/{proposalId} {
+      // A student's list query filters by `proposedByUid`, which is what lets this be checked.
+      allow read: if isTeacher() || (isSignedIn() && resource.data.proposedByUid == request.auth.uid);
+      allow create: if canProposeIn(request.resource.data.courseSlug)
+        && request.resource.data.proposedByUid == request.auth.uid
+        && request.resource.data.status == 'pending';
+      allow update, delete: if isTeacher();
     }
 
     // Courses (docs/courses.md). The course document itself never exists: only its members and

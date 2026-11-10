@@ -1,0 +1,77 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.primary {
+  composes: btnPrimary from '../learn/ui.module.css';
+}
+
+.card {
+  composes: card from '../learn/ui.module.css';
+  padding: 8px 0;
+}
+
+.tableWrap {
+  composes: tableWrap from '../learn/ui.module.css';
+}
+
+.table {
+  composes: table from '../learn/ui.module.css';
+}
+
+.sent {
+  white-space: nowrap;
+}
+
+.status {
+  composes: mono from '../learn/ui.module.css';
+  display: block;
+  text-transform: uppercase;
+}
+
+.statusPending {
+  composes: status;
+  color: var(--amber);
+}
+
+.statusAccepted {
+  composes: status;
+  color: var(--teal);
+}
+
+.statusRejected {
+  composes: status;
+  color: var(--red);
+}
+
+/* Under the status: the id the question got in the bank, or why it was rejected. */
+.decision {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.empty {
+  composes: mono from '../learn/ui.module.css';
+  padding: 16px 24px;
+}
+
+.loadError {
+  composes: error from '../learn/ui.module.css';
+  padding: 16px 24px;
+}

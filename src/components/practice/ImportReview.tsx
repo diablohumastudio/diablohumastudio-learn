@@ -114,7 +114,7 @@ export default function ImportReview({ imported, bank, examOnly, onEdit, onCance
                 {entry.question.prompt[locale]}
                 <span className={ui.mono}>
                   {' '}
-                  · {questionTopicTitle({ ...entry.question, id: entry.id }, locale) ?? t.noTopic} ·{' '}
+                  · {questionTopicTitle(entry.question, locale) ?? t.noTopic} ·{' '}
                   {entry.question.correct.length} / {entry.question.incorrect.length}
                 </span>
               </span>

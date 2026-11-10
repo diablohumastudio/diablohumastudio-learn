@@ -50,7 +50,8 @@ function answersOfTopic(
 function toCourseProgress(
   course: LearnCourse,
   questions: readonly PracticeQuestion[],
-  records: StudentRecords
+  records: StudentRecords,
+  canProposeQuestions: boolean
 ): CourseProgressData {
   const statsById = new Map(records.questionStats.map((stats) => [stats.questionId, stats]));
   const answersByTopic: Record<string, TopicAnswers> = {};
@@ -64,10 +65,16 @@ function toCourseProgress(
     homeworks: records.homeworks,
     homeworkDays: records.days.filter((day) => day.homeworkId !== undefined),
     questionStats: records.questionStats,
+    canProposeQuestions,
   };
 }
 
-function SignedInLoader({ uid, course, onLoaded }: CourseProgressLoaderProps & { uid: string }) {
+type SignedInLoaderProps = CourseProgressLoaderProps & {
+  uid: string;
+  canProposeQuestions: boolean;
+};
+
+function SignedInLoader({ uid, course, canProposeQuestions, onLoaded }: SignedInLoaderProps) {
   const bank = useQuestionBank();
   const [records, setRecords] = useState<StudentRecords | null>(null);
 
@@ -85,8 +92,8 @@ function SignedInLoader({ uid, course, onLoaded }: CourseProgressLoaderProps & {
 
   useEffect(() => {
     if (bank.status !== 'ready' || !records) return;
-    onLoaded(toCourseProgress(course, bank.questions, records));
-  }, [bank, records, course, onLoaded]);
+    onLoaded(toCourseProgress(course, bank.questions, records, canProposeQuestions));
+  }, [bank, records, course, canProposeQuestions, onLoaded]);
 
   return null;
 }
@@ -103,5 +110,12 @@ export default function CourseProgressLoader({ course, onLoaded }: CourseProgres
   }, [isMember, onLoaded]);
 
   if (!isFirebaseConfigured() || !isMember || !membership.user) return null;
-  return <SignedInLoader uid={membership.user.uid} course={course} onLoaded={onLoaded} />;
+  return (
+    <SignedInLoader
+      uid={membership.user.uid}
+      course={course}
+      canProposeQuestions={membership.canProposeQuestions}
+      onLoaded={onLoaded}
+    />
+  );
 }

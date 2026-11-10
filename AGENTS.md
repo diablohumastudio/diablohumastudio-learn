@@ -19,6 +19,7 @@ Teaching platform of DiabloHumaStudio, served at `learn.diablohumastudio.com`: c
 | `/course/<course>/exams`, `/course/<course>/exams/<id>` | exam list of a course, exam room |
 | `/course/<course>/homeworks`, `/course/<course>/homeworks/<id>` | the homeworks of the signed-in student in the course as rows, like the exams list: the specific ones with their days, then the deliverable ones; one specific homework with its meter, its days and the Practice button |
 | `/course/<course>/history` | the signed-in student's own history in the course, in five sections: daily practice, multiple option exams, multiple option specific homeworks, deliverable exams, deliverable homeworks |
+| `/course/<course>/proposals` | the signed-in student's own question proposals for the course's bank, each with what the teacher decided, and the form to send a new one; sending needs the permission a teacher ticks on the Enrollment page |
 | `/course/<course>/deliverable/<id>` | where a student hands a deliverable in: text written on the platform, or a link |
 | `/practice/play?course=<slug>[&class=<slug>]` | timed practice of a course, or of one class or one reading of it |
 | `/sign-in`, `/teacher/*` | account, teacher tools |

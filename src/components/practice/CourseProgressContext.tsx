@@ -24,6 +24,8 @@ export type CourseProgressData = {
   homeworkDays: DayProgress[];
   /** The student's attempts per question, every course included; the history page filters them. */
   questionStats: QuestionStats[];
+  /** The teacher lets this student propose questions for the course's bank (docs/courses.md). */
+  canProposeQuestions: boolean;
 };
 
 // Firebase is browser-only and heavy: the loader renders nothing and fills the context, so

@@ -98,7 +98,7 @@ export function questionsInScope(questions: readonly PracticeQuestion[], scope: 
 }
 
 /** Title of the class or reading a question is about, from the Learn registry. */
-export function questionTopicTitle(question: PracticeQuestion, locale: Locale): string | undefined {
+export function questionTopicTitle(question: Pick<PracticeQuestion, 'topic'>, locale: Locale): string | undefined {
   if (!question.topic) return undefined;
   const course = courseOfTopic(question.topic);
   const learnTopic = course ? findTopic(course, question.topic) : undefined;

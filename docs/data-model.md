@@ -34,6 +34,7 @@ courses/{courseSlug}/requests/{uid}                    access request, deleted w
 
 questions/{questionId}                                 practice bank (also drawn into exams)
 examQuestions/{questionId}                             exam-only bank, same fields, ids x-…
+questionProposals/{id}                                 a question a student proposes for a course's bank
 
 students/{uid}                                         one per account that practiced
   questions/{questionId}                               the account's stats on one question
@@ -90,6 +91,14 @@ The course document `courses/{courseSlug}` never exists: Firestore keeps subcoll
 | `questionId` (`wu-wo-014`, `q-003`; exam-only `x-wu-wo-002`): assigned on save, never reused | `topic?`, `slides[]?`, `prompt {es, en}`, `correct[] {id, es, en}`, `incorrect[] {id, es, en, level}`, `explanation? {es, en}`, `retired`, `updatedAt` | teacher | `questions`: any signed-in account while no exam runs; `examQuestions`: teachers and the server | [practice.md](practice.md), [exam.md](exam.md) |
 
 Two tables with the same columns on purpose: students read the first and must never read the second. A question never moves between them. The ids of its answers (`correct[].id`, `incorrect[].id`) are what exam attempts and grades point at.
+
+### questionProposals/{id}
+
+| Key | Fields | Written by | Read by | Detail |
+|---|---|---|---|---|
+| generated id | `courseSlug`, `topic?`, `prompt {es, en}`, `correct[] {es, en}`, `incorrect[] {es, en, level?}`, `explanation? {es, en}`, `status 'pending' \| 'accepted' \| 'rejected'`, `proposedByUid`, `proposedByName`, `proposedByEmail`, `createdAt`; once decided: `questionId?`, `decidedByUid`, `decidedByName`, `decidedAt`, `reason?` | created by a student whose membership has `canProposeQuestions`; updated and deleted by teachers | its author, teachers | [practice.md](practice.md), Question proposals |
+
+A proposal is not a question: it has no bank id, `en` may be an empty string and the wrong answers may have no level. It stays in this table after it is decided, as the record of who proposed what.
 
 ### students/{uid}
 
@@ -184,6 +193,9 @@ Every arrow is a stored string (or list of strings) that names a key somewhere e
 | `questions/{id}` | `topic` | `LEARN_COURSES[].classes[].slug` or `LEARN_COURSES[].readings[].slug` (code): a topic, `courseTopics` | **The only link between a question and a course**: the course is found through the class or the reading. One topic per question. A question without `topic`, or with a slug no class and no reading has, belongs to no course and is never drawn into practice (`questionsInScope`); a question without `topic` gets an id that starts with `q-` |
 | `questions/{id}` | `slides[]` | slide ids of that class's deck (code) | Keys of the deck dictionary's `labels`. Empty when the topic is a reading: readings have no slides |
 | `questions/{id}` | id prefix | course and topic initials | A label only: a question moved to another class or reading keeps its id |
+| `questionProposals/{id}` | `courseSlug` | course (code) | The course whose bank it is for; the create rule looks the author's membership up with it |
+| `questionProposals/{id}` | `topic` | a class or a reading of that course (code) | Optional |
+| `questionProposals/{id}` | `proposedByUid` | Auth user; `courses/{courseSlug}/members/{uid}` | Must be the caller on create; the student's list query filters by it |
 | `students/{uid}` | key | Auth user | |
 | `students/{uid}/questions/{q}` | key `q` | `questions/{q}` or `examQuestions/{q}` | A retired question still resolves; a deleted one shows as "no longer in the bank" |
 | `students/{uid}/days/…` | `courseSlug` | course (code) | Daily homework rows |
@@ -224,6 +236,8 @@ erDiagram
   STUDENT ||--o{ SESSION : uid
   STUDENT ||--o{ DAY : uid
   QUESTION ||--o{ STUDENT_QUESTION : questionId
+  COURSE_CODE ||--o{ PROPOSAL : courseSlug
+  MEMBER ||--o{ PROPOSAL : "proposedByUid (canProposeQuestions)"
   COURSE_CODE ||--o{ DAY : "courseSlug (daily)"
   HOMEWORK ||--o{ DAY : "homeworkId + roundId"
   COURSE_CODE ||--o{ HOMEWORK : courseSlug

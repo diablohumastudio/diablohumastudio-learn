@@ -173,6 +173,11 @@ export function courseHistoryPath(course: LearnCourse): string {
   return `${coursePath(course)}/history`;
 }
 
+/** The signed-in student's own question proposals for the course's bank, and the form to send one. */
+export function courseProposalsPath(course: LearnCourse): string {
+  return `${coursePath(course)}/proposals`;
+}
+
 export function classPath(course: LearnCourse, learnClass: LearnClass): string {
   return `${coursePath(course)}/class/${learnClass.slug}`;
 }
