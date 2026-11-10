@@ -15,6 +15,15 @@ export type CourseMember = {
   email: string;
   joinedAtMs: number | null;
   grantedBy: string;
+  /** A teacher lets this student propose questions for the course's bank (docs/practice.md).
+      Denied by default: a member document without the field cannot propose. */
+  canProposeQuestions: boolean;
+};
+
+/** What an account's own member document says: whether it is enrolled, and what that allows. */
+export type OwnMembership = {
+  isMember: boolean;
+  canProposeQuestions: boolean;
 };
 
 export type AccessRequest = {

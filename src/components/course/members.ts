@@ -7,6 +7,7 @@ import {
   onSnapshot,
   serverTimestamp,
   setDoc,
+  updateDoc,
   writeBatch,
 } from 'firebase/firestore';
 import type { DocumentData, Timestamp, Unsubscribe } from 'firebase/firestore';
@@ -17,11 +18,12 @@ import {
   REQUESTS_SUBCOLLECTION,
   byMemberName,
 } from '../../data/course/types';
-import type { AccessRequest, CourseMember } from '../../data/course/types';
+import type { AccessRequest, CourseMember, OwnMembership } from '../../data/course/types';
 import { getFirestoreDb } from '../../lib/firebase';
 
 /* Firestore layout (rules in firebase/firestore.rules, model in docs/courses.md):
-   courses/{courseSlug}/members/{uid}    an enrolled student; teachers write, the owner reads
+   courses/{courseSlug}/members/{uid}    an enrolled student, with what the membership allows
+                                         (canProposeQuestions); teachers write, the owner reads
    courses/{courseSlug}/requests/{uid}   a student asking for access; the owner creates, teachers delete
    The course document itself does not exist: Firestore keeps subcollections without a parent. */
 
@@ -51,7 +53,12 @@ function toMember(uid: string, data: DocumentData): CourseMember {
     email: typeof data.email === 'string' ? data.email : '',
     joinedAtMs: millisOf(data.joinedAt),
     grantedBy: typeof data.grantedBy === 'string' ? data.grantedBy : '',
+    canProposeQuestions: data.canProposeQuestions === true,
   };
+}
+
+function toOwnMembership(memberData: DocumentData | undefined): OwnMembership {
+  return { isMember: memberData !== undefined, canProposeQuestions: memberData?.canProposeQuestions === true };
 }
 
 function toRequest(uid: string, data: DocumentData): AccessRequest {
@@ -67,14 +74,15 @@ export function identityOf(user: User): AccountIdentity {
   return { uid: user.uid, displayName: user.displayName ?? '', email: user.email ?? '' };
 }
 
-/** Whether this account is enrolled: its own member document, which the rules let it read. */
+/** Whether this account is enrolled and what its membership allows: its own member document,
+    which the rules let it read. */
 export function subscribeMembership(
   courseSlug: string,
   uid: string,
-  onChange: (isMember: boolean) => void,
+  onChange: (membership: OwnMembership) => void,
   onError: (error: unknown) => void
 ): Unsubscribe {
-  return onSnapshot(memberRef(courseSlug, uid), (snapshot) => onChange(snapshot.exists()), onError);
+  return onSnapshot(memberRef(courseSlug, uid), (snapshot) => onChange(toOwnMembership(snapshot.data())), onError);
 }
 
 /** Whether this account has asked for access and nobody has answered yet. */
@@ -142,6 +150,13 @@ export async function addMember(courseSlug: string, account: AccountIdentity, gr
 
 export async function removeMember(courseSlug: string, uid: string): Promise<void> {
   await deleteDoc(memberRef(courseSlug, uid));
+}
+
+/** Teacher only: lets an enrolled student propose questions for the course, or stops it.
+    Enrolling writes the member document whole, so a student removed and enrolled again starts
+    without the permission. */
+export async function setCanProposeQuestions(courseSlug: string, uid: string, canPropose: boolean): Promise<void> {
+  await updateDoc(memberRef(courseSlug, uid), { canProposeQuestions: canPropose });
 }
 
 /** Rejecting is deleting the request: the student may ask again. */

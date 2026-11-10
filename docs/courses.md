@@ -5,7 +5,7 @@ Signing in creates an **account**, not a place in a course. A course has **membe
 ## What the teacher and the student see
 
 1. A student signs in and opens `/course/<course>`. Not enrolled: the card "Access to the course" with **Request access**. After pressing it: "Your request was sent". Practice, the exams list, an exam room, a deliverable and the history of that course answer "Your account is not enrolled in this course" with the way back to the course page, whatever the link used.
-2. The teacher opens `/teacher/enrollment`, picks the course and sees **Pending requests** (Accept enrolls the account and closes the request; Reject only closes it, so the student may ask again), **Enrolled students** (with Remove, which keeps their saved work and hides the course from them) and **Enroll a registered account**: a dropdown of every account that signed in at least once and is not enrolled here, and the button **Enroll all registered accounts**, with confirmation. That button is the migration of a course whose every account belongs to it: press it once for `wwise-unreal` and nobody has to ask.
+2. The teacher opens `/teacher/enrollment`, picks the course and sees **Pending requests** (Accept enrolls the account and closes the request; Reject only closes it, so the student may ask again), **Enrolled students** (with a **Proposes questions** tick per student, off by default, which lets that student propose questions for the course's bank, [practice.md](practice.md); and Remove, which keeps their saved work and hides the course from them) and **Enroll a registered account**: a dropdown of every account that signed in at least once and is not enrolled here, and the button **Enroll all registered accounts**, with confirmation. That button is the migration of a course whose every account belongs to it: press it once for `wwise-unreal` and nobody has to ask.
 3. Once enrolled, the student's course page shows four cards, each closed to its title row until the student opens it (`CollapsibleCard`): **Daily practice** with their progress, **Homeworks**, **Exams**, and **Class presentations** with the class rows. Homeworks and Exams say beside their title how many entries are open and list what is open right now, one entry per item split by lines (a specific homework with its meter and days, a running multiple option exam, a deliverable with its saved state), and a button to everything, **Show all homeworks** (`/course/<course>/homeworks`) and **Show all exams** (`/course/<course>/exams`): two lists of the same shape, a row per homework or exam, open and finished, with its state at the right, and a row opens the item's own page (a specific homework has one, `/course/<course>/homeworks/<id>`, with its meter and days). A finished homework or exam leaves the course page at once; it stays on those lists and in the history.
 
 Teachers are members of every course: `useMembership` says so without reading anything, and the rules let them through everywhere. Teachers are not tied to courses yet; `TODO.md` holds the plan for a teacher menu per course.
@@ -14,9 +14,9 @@ Teachers are members of every course: `useMembership` says so without reading an
 
 | Piece | Files | Role |
 |---|---|---|
-| Model | `src/data/course/types.ts` | Collection names, `CourseMember`, `AccessRequest`, `MembershipStatus` |
-| Browser data | `src/components/course/members.ts` | Firestore reads and writes: membership and own request (student), members and requests (teacher), enroll, remove, reject, enroll all |
-| Membership hook | `src/components/course/useMembership.ts` | `useMembership(courseSlug)`: loading, signed out, member, requested or not a member; a teacher is a member |
+| Model | `src/data/course/types.ts` | Collection names, `CourseMember`, `OwnMembership`, `AccessRequest`, `MembershipStatus` |
+| Browser data | `src/components/course/members.ts` | Firestore reads and writes: membership and own request (student), members and requests (teacher), enroll, remove, reject, enroll all, `setCanProposeQuestions` |
+| Membership hook | `src/components/course/useMembership.ts` | `useMembership(courseSlug)`: loading, signed out, member, requested or not a member, and `canProposeQuestions`; a teacher is a member |
 | Members hook | `src/components/course/useCourseMembers.ts` | Teacher only: the members of a course, live, and their uids as a set |
 | Student | `CourseAccess.tsx`, `CourseAccessCard.tsx`, `NotEnrolledNotice.tsx` | The dynamic part of the course page (the access card, or the two cards below) and the notice the gated pages show |
 | Course page cards | `EnrolledCards.tsx`, `HomeworksCard.tsx`, `ExamsCard.tsx`, `EntriesCard.tsx`, `entries.tsx` | The Homeworks and Exams cards of a member: the open specific homeworks (`practice/HomeworkEntry.tsx`), multiple option exams (`exam/ExamEntry.tsx`) and deliverables (`deliverable/DeliverableEntry.tsx`) as entries split by lines, with the Show all button, inside `learn/CollapsibleCard.tsx`, the frame every card of the page closes to (closed, it measures the same as an item of the teacher menu); `ItemList.tsx` and `EnrolledOnly.tsx` are the rows and the membership gate shared by the homeworks page (`practice/HomeworkList.tsx`, with `practice/HomeworkPage.tsx` for one homework) and the exams page (`exam/ExamList.tsx`) |
@@ -24,7 +24,7 @@ Teachers are members of every course: `useMembership` says so without reading an
 | Gates | `CourseProgressLoader.tsx`, `PracticeApp.tsx`, `ExamApp.tsx`, `DeliverableApp.tsx`, `StudentHistory.tsx`; `EnrolledOnly.tsx` for `ExamList.tsx`, `HomeworkList.tsx` and `HomeworkPage.tsx` | Each checks the membership before loading or showing anything |
 | Teacher lists | `TeacherBoard.tsx` (`CoursePeriod` with `membersOnly`), `StudentReview.tsx`, `HomeworkManager.tsx` | The board and a homework's progress count the enrolled students of the course; the review lists the accounts enrolled in at least one course |
 | Assignment | `src/data/course/assignment.ts`, `src/components/course/assignedQuery.ts`, `StudentPicker.tsx` | Who a homework, an exam or a deliverable is for (below): the two stored fields and their helpers, the two-query read a student's list needs, and the teacher's picker |
-| Rules | `firebase/firestore.rules` | `isMember()`, `isAssignedTo()`, the `courses` block, and the reads of homeworks, exams and deliverables |
+| Rules | `firebase/firestore.rules` | `isMember()`, `canProposeIn()`, `isAssignedTo()`, the `courses` block, and the reads of homeworks, exams and deliverables |
 | Migration | `firebase/scripts/add-assignment-fields.js` | One-off: gives the documents saved before the assignment fields existed their `forEveryone` and `assignedUids` |
 | Texts | `src/i18n/pages/course.ts` | UI strings in both languages, the picker's included |
 
@@ -35,6 +35,7 @@ The course page keeps Firebase out of the guest's download, as before: `ClassLis
 ```
 courses/{courseSlug}/members/{uid}
   displayName, email, joinedAt, grantedBy     grantedBy: the teacher's uid, or 'enroll-all'
+  canProposeQuestions?                        true: the student may propose questions; missing = false
 
 courses/{courseSlug}/requests/{uid}
   displayName, email, requestedAt
@@ -43,6 +44,15 @@ courses/{courseSlug}/requests/{uid}
 The course document itself never exists: Firestore keeps subcollections without a parent, and the courses are the entries of `LEARN_COURSES` in `src/data/learn.ts`.
 
 Rules in short: `isMember(courseSlug)` is `exists(courses/<course>/members/<uid>)`. A student reads only their own member and request documents and creates their own request; teachers read and write both. `homeworks`, `exams` (once opened) and `deliverables` (once opened) are read by the students they are for, `isAssignedTo(resource.data)`: a member of the course who is among the assigned (below); a submission can only be created or updated by someone the deliverable is for ([deliverables.md](deliverables.md)). The question bank stays readable by every signed-in account (its questions are not tied to one course); practice is gated in the page.
+
+## Permissions of a membership
+
+The member document also says what its student may do beyond the default. Today there is one permission, `canProposeQuestions`: the student may send question proposals for the course's bank ([practice.md](practice.md)). It is **denied by default**: a member document without the field cannot propose, and only a teacher writes member documents, so no student can grant it to themselves.
+
+- The teacher ticks **Proposes questions** on the student's row of the Enrollment page (`setCanProposeQuestions`, an update of that one field).
+- The student's pages read it from their own member document (`useMembership(courseSlug).canProposeQuestions`); for a teacher it is false, since teachers write the bank from the editor.
+- The rules check it with `canProposeIn(courseSlug)`: a member of the course whose member document has `canProposeQuestions == true`.
+- Enrolling writes the member document whole (`addMember`, `enrollAll`), so a student who is removed and enrolled again starts without the permission.
 
 ## Who a homework, an exam or a deliverable is for
 
@@ -67,3 +77,4 @@ What the assignment changes:
 - Student account, not enrolled: `http://localhost:3000/course/wwise-unreal` shows the access card; Request access; `/practice/play?course=wwise-unreal`, `/course/wwise-unreal/exams`, `/course/wwise-unreal/homeworks` and `/course/wwise-unreal/history` show the not-enrolled notice.
 - Teacher: `http://localhost:3000/teacher/enrollment` lists the request; Accept. The student's course page now shows the Daily practice, Homeworks and Exams cards (reload). Remove the student: the access card is back.
 - Teacher: `http://localhost:3000/teacher/students-practice-info` and `/teacher/student` list only the enrolled accounts.
+- Teacher: `http://localhost:3000/teacher/enrollment`, tick **Proposes questions** on one student: the tick stays after a reload, and that student's member document in the Firebase console has `canProposeQuestions: true`.

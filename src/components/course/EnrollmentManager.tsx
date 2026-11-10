@@ -16,7 +16,14 @@ import { CourseSelect } from '../practice/PeriodControls';
 import { byDisplayName, fetchAllStudents } from '../practice/progress';
 import type { StudentStats } from '../practice/progress';
 import s from './EnrollmentManager.module.css';
-import { addMember, deleteRequest, enrollAll, removeMember, subscribeRequests } from './members';
+import {
+  addMember,
+  deleteRequest,
+  enrollAll,
+  removeMember,
+  setCanProposeQuestions,
+  subscribeRequests,
+} from './members';
 import type { AccountIdentity } from './members';
 import { memberUids, useCourseMembers } from './useCourseMembers';
 
@@ -185,6 +192,7 @@ function Enrollment() {
                     <th>{t.colStudent}</th>
                     <th>{t.colSince}</th>
                     <th>{t.colGrantedBy}</th>
+                    <th>{t.colCanPropose}</th>
                     <th />
                   </tr>
                 </thead>
@@ -198,6 +206,18 @@ function Enrollment() {
                       <td>{dateTimeYearText(member.joinedAtMs, locale)}</td>
                       <td className={ui.mono}>
                         {member.grantedBy === 'enroll-all' ? t.grantedByEnrollAll : member.grantedBy === teacherUid ? '✓' : member.grantedBy}
+                      </td>
+                      <td>
+                        <input
+                          type="checkbox"
+                          className={s.checkbox}
+                          checked={member.canProposeQuestions}
+                          disabled={busy}
+                          aria-label={`${t.colCanPropose}: ${memberName(member)}`}
+                          onChange={(event) =>
+                            void run(() => setCanProposeQuestions(courseSlug, member.uid, event.target.checked))
+                          }
+                        />
                       </td>
                       <td>
                         <div className={s.rowActions}>

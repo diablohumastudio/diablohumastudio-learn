@@ -25,6 +25,14 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/courses/$(courseSlug)/members/$(request.auth.uid));
     }
 
+    // May propose questions for a course's bank (docs/practice.md): enrolled, and a teacher
+    // ticked "Proposes questions" on the membership. Denied by default: a member document
+    // without the field cannot propose.
+    function canProposeIn(courseSlug) {
+      return isMember(courseSlug)
+        && get(/databases/$(database)/documents/courses/$(courseSlug)/members/$(request.auth.uid)).data.get('canProposeQuestions', false) == true;
+    }
+
     // Whether a homework, an exam or a deliverable is for the caller: a member of its course, and
     // either it is for everybody or the caller is listed in `assignedUids` (docs/courses.md). A
     // document saved before those two fields existed is for everybody.
@@ -74,7 +82,8 @@ service cloud.firestore {
     // Courses (docs/courses.md). The course document itself never exists: only its members and
     // the requests for access hang under it.
     match /courses/{courseSlug} {
-      // Enrolled students. A teacher enrolls; a student reads only their own membership.
+      // Enrolled students. A teacher enrolls and sets what the membership allows
+      // (`canProposeQuestions`); a student reads only their own membership.
       match /members/{uid} {
         allow read: if isOwner(uid) || isTeacher();
         allow write: if isTeacher();

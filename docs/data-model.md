@@ -29,7 +29,7 @@ Code (src/data/learn.ts)      LEARN_COURSES: course.slug → classes[].slug → 
 teachers/{uid}                                         role: exists = is a teacher
 settings/examLock                                      one document: the exam running right now
 
-courses/{courseSlug}/members/{uid}                     enrollment
+courses/{courseSlug}/members/{uid}                     enrollment, and what it allows
 courses/{courseSlug}/requests/{uid}                    access request, deleted when answered
 
 questions/{questionId}                                 practice bank (also drawn into exams)
@@ -73,9 +73,9 @@ Field lists are the current ones; `?` marks optional fields. "Written by" says w
 
 | Key | Fields | Written by | Read by | Detail |
 |---|---|---|---|---|
-| (`courseSlug` from code, `uid` from Auth) | `displayName`, `email`, `joinedAt`, `grantedBy` | teacher | its owner, teachers | [courses.md](courses.md) |
+| (`courseSlug` from code, `uid` from Auth) | `displayName`, `email`, `joinedAt`, `grantedBy`, `canProposeQuestions?` | teacher | its owner, teachers | [courses.md](courses.md) |
 
-The course document `courses/{courseSlug}` never exists: Firestore keeps subcollections without a parent, and the course itself is the entry in `LEARN_COURSES`.
+The course document `courses/{courseSlug}` never exists: Firestore keeps subcollections without a parent, and the course itself is the entry in `LEARN_COURSES`. `canProposeQuestions` is a permission of the membership, false when missing: the student may propose questions for the course's bank. The rules read it (`canProposeIn`), so it is the one field of this table another table's writes depend on.
 
 ### courses/{courseSlug}/requests/{uid}
 

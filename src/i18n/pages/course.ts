@@ -38,6 +38,7 @@ const en = {
   colRequestedAt: 'Requested',
   colSince: 'Since',
   colGrantedBy: 'Enrolled by',
+  colCanPropose: 'Proposes questions',
   grantedByEnrollAll: 'enroll all',
   onlyEnrolledHint: 'Only the students enrolled in a course are listed. Enroll them from the Enrollment page of the teacher menu.',
 
@@ -88,6 +89,7 @@ const es: Record<keyof typeof en, string> = {
   colRequestedAt: 'Solicitado',
   colSince: 'Desde',
   colGrantedBy: 'Inscrito por',
+  colCanPropose: 'Propone preguntas',
   grantedByEnrollAll: 'inscripción general',
   onlyEnrolledHint: 'Solo se listan los estudiantes inscritos en un curso. Inscríbelos desde Inscripciones, en el menú docente.',
 
