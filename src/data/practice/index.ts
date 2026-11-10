@@ -3,7 +3,7 @@ import { LEARN_COURSES, findTopic } from '../learn';
 import type { LearnCourse, PracticeScope } from '../learn';
 import type { PracticeQuestion } from './types';
 
-export type { DistractorLevel, PracticeAnswer, PracticeQuestion, ShuffledChoice } from './types';
+export type { DistractorLevel, PracticeAnswer, PracticeQuestion, QuestionAuthorship, ShuffledChoice } from './types';
 export {
   DISTRACTOR_LEVELS,
   EXAM_QUESTIONS_COLLECTION,
@@ -11,6 +11,7 @@ export {
   MIN_CORRECT_ANSWERS,
   MIN_INCORRECT_ANSWERS,
   SHOWN_INCORRECT_ANSWERS,
+  authorshipOf,
   drawChoices,
   newAnswerId,
   shuffledCycle,

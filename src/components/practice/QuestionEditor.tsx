@@ -1,3 +1,4 @@
+import type { User } from 'firebase/auth';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { LEARN_COURSES, TEACHER_PATH } from '../../data/learn';
@@ -6,13 +7,20 @@ import {
   DISTRACTOR_LEVELS,
   MIN_CORRECT_ANSWERS,
   MIN_INCORRECT_ANSWERS,
+  authorshipOf,
   nextQuestionId,
   questionTopicTitle,
 } from '../../data/practice';
 import type { DistractorLevel, PracticeAnswer, PracticeQuestion } from '../../data/practice';
 import type { ImportedQuestion } from '../../data/practice/parse';
-import { PROPOSAL_SOURCE_LOCALE } from '../../data/practice/proposal';
-import type { ProposalContent } from '../../data/practice/proposal';
+import {
+  PROPOSAL_SOURCE_LOCALE,
+  acceptedQuestion,
+  proposalAsQuestion,
+  proposalText,
+  proposerName,
+} from '../../data/practice/proposal';
+import type { ProposalContent, ProposalDecider, QuestionProposal } from '../../data/practice/proposal';
 import { LOCALES } from '../../i18n/locales';
 import { practiceDict } from '../../i18n/pages/practice';
 import { useLocale, useT } from '../../i18n/useT';
@@ -22,6 +30,7 @@ import ImportReview from './ImportReview';
 import s from './QuestionEditor.module.css';
 import SignInRedirect from '../learn/SignInRedirect';
 import { isPermissionDenied } from './progress';
+import { acceptProposal, deciderOf, rejectProposal, usePendingProposals } from './proposals';
 import { parseImportList, saveQuestions, toExportJson, useExamOnlyBank, useQuestionBank } from './questions';
 import TopicOptions from './TopicOptions';
 import ui from '../learn/ui.module.css';
@@ -286,7 +295,53 @@ export type QuestionFormMode =
   | { kind: 'import'; onEdited: (value: QuestionContent) => void }
   /** A student proposing a question for a course: the relaxed validation, the topics of that
       course only, and neither slides nor the bank's own switches. */
-  | { kind: 'proposal'; course: LearnCourse; onPropose: (content: ProposalContent) => Promise<void> };
+  | { kind: 'proposal'; course: LearnCourse; onPropose: (content: ProposalContent) => Promise<void> }
+  /** A teacher deciding on a student's proposal: the bank's own validation and two buttons.
+      Accepting goes to the practice bank, never to the exam-only one: a student wrote it. */
+  | {
+      kind: 'review';
+      proposerName: string;
+      onAccept: (value: QuestionContent) => Promise<void>;
+      onReject: (reason: string) => Promise<void>;
+    };
+
+type RejectPanelProps = {
+  busy: boolean;
+  onConfirm: (reason: string) => void;
+  onCancel: () => void;
+};
+
+/** Rejecting asks for a reason, which the student reads; left empty, it rejects without one. */
+function RejectPanel({ busy, onConfirm, onCancel }: RejectPanelProps) {
+  const t = useT(practiceDict);
+  const [reason, setReason] = useState('');
+
+  return (
+    <div className={s.rejectPanel}>
+      <label className={ui.field}>
+        <span className={ui.label}>{t.rejectReasonLabel}</span>
+        <input
+          className={ui.input}
+          type="text"
+          value={reason}
+          onChange={(event) => setReason(event.target.value)}
+          // The panel sits inside the form: Enter here must not accept the proposal.
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') event.preventDefault();
+          }}
+        />
+      </label>
+      <div className={s.actions}>
+        <button type="button" className={s.secondary} onClick={onCancel} disabled={busy}>
+          {t.cancelReject}
+        </button>
+        <button type="button" className={s.reject} onClick={() => onConfirm(reason.trim())} disabled={busy}>
+          {busy ? t.saving : t.confirmRejectProposal}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 type QuestionFormProps = {
   mode: QuestionFormMode;
@@ -303,7 +358,11 @@ export function QuestionForm({ mode, editing, onBack }: QuestionFormProps) {
   const [message, setMessage] = useState<string | null>(null);
   // A question never changes bank: its id says which one it is in, and stats and exams point at the id.
   const [examOnly, setExamOnly] = useState(editing?.examOnly ?? false);
+  const [isRejecting, setIsRejecting] = useState(false);
   const isProposal = mode.kind === 'proposal';
+  const reviewMode = mode.kind === 'review' ? mode : null;
+  // Exam only and Retired are decisions about a question of the bank, not about a proposal.
+  const hasBankSwitches = mode.kind === 'bank' || mode.kind === 'import';
   // A proposal is not tagged with slides: the teacher tags the question when accepting it.
   const slideTopics = draft.topic && !isProposal ? [draft.topic] : [];
   const classSlides = useClassSlides(slideTopics)[draft.topic] ?? [];
@@ -330,6 +389,12 @@ export function QuestionForm({ mode, editing, onBack }: QuestionFormProps) {
     }
   }
 
+  /* A save replaces the whole document, and the form does not show who proposed and who
+     accepted the question it edits: they are carried over, or the edit would erase them. */
+  function withKeptAuthorship(value: QuestionContent): QuestionContent {
+    return editing ? { ...value, ...authorshipOf(editing) } : value;
+  }
+
   function saveToBank(bank: readonly PracticeQuestion[], onSaved: () => void) {
     const validation = validateDraft(draft, t);
     if (validation.ok === false) {
@@ -338,7 +403,7 @@ export function QuestionForm({ mode, editing, onBack }: QuestionFormProps) {
     }
     const id = editing ? editing.id : nextQuestionId(bank, validation.value.topic, examOnly);
     void runWrite(async () => {
-      await saveQuestions([{ id, ...validation.value, examOnly }]);
+      await saveQuestions([{ id, ...withKeptAuthorship(validation.value), examOnly }]);
       onSaved();
     }, t.notAuthorized);
   }
@@ -349,7 +414,20 @@ export function QuestionForm({ mode, editing, onBack }: QuestionFormProps) {
       setMessage(validation.message);
       return;
     }
-    onEdited(validation.value);
+    onEdited(withKeptAuthorship(validation.value));
+  }
+
+  function acceptReviewed(onAccept: (value: QuestionContent) => Promise<void>) {
+    const validation = validateDraft(draft, t);
+    if (validation.ok === false) {
+      setMessage(validation.message);
+      return;
+    }
+    void runWrite(() => onAccept(validation.value), t.notAuthorized);
+  }
+
+  function rejectReviewed(onReject: (reason: string) => Promise<void>, reason: string) {
+    void runWrite(() => onReject(reason), t.notAuthorized);
   }
 
   function sendProposal(onPropose: (content: ProposalContent) => Promise<void>) {
@@ -362,9 +440,12 @@ export function QuestionForm({ mode, editing, onBack }: QuestionFormProps) {
   }
 
   function submit() {
+    // Enter in a field must not accept a proposal the teacher is about to reject.
+    if (isRejecting) return;
     if (mode.kind === 'bank') saveToBank(mode.bank, mode.onSaved);
     else if (mode.kind === 'import') applyToImport(mode.onEdited);
-    else sendProposal(mode.onPropose);
+    else if (mode.kind === 'proposal') sendProposal(mode.onPropose);
+    else acceptReviewed(mode.onAccept);
   }
 
   function backText(): string {
@@ -373,18 +454,26 @@ export function QuestionForm({ mode, editing, onBack }: QuestionFormProps) {
   }
 
   function eyebrowText(): string {
+    if (mode.kind === 'review') return t.proposalFrom.replace('{name}', mode.proposerName);
     if (editing && editing.id !== '') return editing.id;
     return mode.kind === 'proposal' ? mode.course.title : t.editorTitle;
   }
 
   function titleText(): string {
+    if (mode.kind === 'review') return t.reviewProposal;
     if (mode.kind === 'proposal') return t.proposeQuestion;
     return editing ? t.editQuestion : t.newQuestion;
+  }
+
+  function hintText(): string | null {
+    if (mode.kind === 'review') return t.reviewProposalHint;
+    return mode.kind === 'proposal' ? t.proposalFormHint : null;
   }
 
   function submitText(): string {
     if (saving) return t.saving;
     if (mode.kind === 'import') return t.applyToImport;
+    if (mode.kind === 'review') return t.acceptProposal;
     return mode.kind === 'proposal' ? t.sendProposal : t.save;
   }
 
@@ -396,7 +485,7 @@ export function QuestionForm({ mode, editing, onBack }: QuestionFormProps) {
       <div className={s.heading}>
         <span className={ui.eyebrow}>{eyebrowText()}</span>
         <h1 className={ui.title}>{titleText()}</h1>
-        {isProposal && <p className={ui.lede}>{t.proposalFormHint}</p>}
+        {hintText() && <p className={ui.lede}>{hintText()}</p>}
       </div>
       <form
         className={s.form}
@@ -405,7 +494,7 @@ export function QuestionForm({ mode, editing, onBack }: QuestionFormProps) {
           submit();
         }}
       >
-        {!isProposal && (
+        {hasBankSwitches && (
           <label className={s.checkbox}>
             <input
               type="checkbox"
@@ -474,7 +563,7 @@ export function QuestionForm({ mode, editing, onBack }: QuestionFormProps) {
           />
         </div>
 
-        {editing && (
+        {editing && hasBankSwitches && (
           <label className={s.checkbox}>
             <input
               type="checkbox"
@@ -487,11 +576,24 @@ export function QuestionForm({ mode, editing, onBack }: QuestionFormProps) {
 
         {message && <p className={ui.error}>{message}</p>}
 
-        <div className={s.actions}>
-          <button type="submit" className={s.save} disabled={saving}>
-            {submitText()}
-          </button>
-        </div>
+        {reviewMode && isRejecting ? (
+          <RejectPanel
+            busy={saving}
+            onConfirm={(reason) => rejectReviewed(reviewMode.onReject, reason)}
+            onCancel={() => setIsRejecting(false)}
+          />
+        ) : (
+          <div className={s.actions}>
+            {reviewMode && (
+              <button type="button" className={s.reject} disabled={saving} onClick={() => setIsRejecting(true)}>
+                {t.rejectProposal}
+              </button>
+            )}
+            <button type="submit" className={s.save} disabled={saving}>
+              {submitText()}
+            </button>
+          </div>
+        )}
       </form>
     </div>
   );
@@ -573,10 +675,14 @@ function downloadQuestions(questions: readonly PracticeQuestion[], fileName: str
   URL.revokeObjectURL(url);
 }
 
+/** In the Id column of a proposal nobody decided yet: it gets its id when it is accepted. */
+const NO_ID_MARK: string = '—';
+
 type Screen =
   | { kind: 'list' }
   | { kind: 'new' }
   | { kind: 'edit'; question: PracticeQuestion }
+  | { kind: 'review'; proposal: QuestionProposal }
   | { kind: 'importReview'; batch: ImportBatch }
   | { kind: 'importEdit'; batch: ImportBatch; index: number };
 
@@ -592,11 +698,12 @@ function withEditedQuestion(batch: ImportBatch, index: number, value: QuestionCo
   return { ...batch, questions };
 }
 
-function Bank() {
+function Bank({ teacher }: { teacher: ProposalDecider }) {
   const t = useT(practiceDict);
   const locale = useLocale();
   const bank = useQuestionBank();
   const examOnlyBank = useExamOnlyBank();
+  const pendingProposals = usePendingProposals();
   const [screen, setScreen] = useState<Screen>({ kind: 'list' });
   const [importing, setImporting] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -620,6 +727,37 @@ function Bank() {
   // the practice bank must stay editable meanwhile.
   const isExamOnlyBankMissing = examOnlyBank.status === 'error';
   const questions = [...bank.questions, ...(examOnlyBank.status === 'ready' ? examOnlyBank.questions : [])];
+  // The proposals arrive on their own: the bank is shown meanwhile, and their rows join it.
+  const proposals = pendingProposals.status === 'ready' ? pendingProposals.proposals : [];
+
+  async function acceptReviewedProposal(proposal: QuestionProposal, value: QuestionContent): Promise<void> {
+    const questionId = nextQuestionId(questions, value.topic, false);
+    await acceptProposal(proposal.id, acceptedQuestion(proposal, value, questionId, teacher, Date.now()), teacher);
+    setNotice(t.proposalAcceptedNotice.replace('{id}', questionId));
+    setScreen({ kind: 'list' });
+  }
+
+  async function rejectReviewedProposal(proposal: QuestionProposal, reason: string): Promise<void> {
+    await rejectProposal(proposal.id, teacher, reason);
+    setNotice(t.proposalRejectedNotice);
+    setScreen({ kind: 'list' });
+  }
+
+  if (screen.kind === 'review') {
+    const { proposal } = screen;
+    return (
+      <QuestionForm
+        mode={{
+          kind: 'review',
+          proposerName: proposerName(proposal),
+          onAccept: (value) => acceptReviewedProposal(proposal, value),
+          onReject: (reason) => rejectReviewedProposal(proposal, reason),
+        }}
+        editing={proposalAsQuestion(proposal)}
+        onBack={() => setScreen({ kind: 'list' })}
+      />
+    );
+  }
   if (screen.kind === 'importReview') {
     const { batch } = screen;
     return (
@@ -703,11 +841,12 @@ function Bank() {
         {notice && <span className={ui.notice}>{notice}</span>}
       </div>
       {isExamOnlyBankMissing && <p className={ui.error}>{t.examOnlyBankMissing}</p>}
+      {pendingProposals.status === 'error' && <p className={ui.error}>{t.proposalsRulesMissing}</p>}
       {importing && (
         <ImportPanel onReview={(batch) => setScreen({ kind: 'importReview', batch })} />
       )}
       <div className={s.card}>
-        {questions.length === 0 ? (
+        {questions.length === 0 && proposals.length === 0 ? (
           <p className={s.empty}>{t.noQuestions}</p>
         ) : (
           <div className={s.tableWrap}>
@@ -719,9 +858,24 @@ function Bank() {
                   <th>{t.colTopic}</th>
                   <th className={ui.num}>{t.colAnswers}</th>
                   <th>{t.colStatus}</th>
+                  <th>{t.colProposedBy}</th>
+                  <th>{t.colAcceptedBy}</th>
                 </tr>
               </thead>
               <tbody>
+                {proposals.map((proposal) => (
+                  <tr key={proposal.id} className={s.row} onClick={() => setScreen({ kind: 'review', proposal })}>
+                    <td className={s.id}>{NO_ID_MARK}</td>
+                    <td>{proposalText(proposal.prompt, locale)}</td>
+                    <td>{questionTopicTitle(proposal, locale) ?? ''}</td>
+                    <td className={ui.num} title={t.answersSummary}>
+                      {proposal.correct.length} / {proposal.incorrect.length}
+                    </td>
+                    <td className={s.statusPending}>{t.statusPending}</td>
+                    <td>{proposerName(proposal)}</td>
+                    <td />
+                  </tr>
+                ))}
                 {questions.map((question) => (
                   <tr
                     key={question.id}
@@ -738,6 +892,8 @@ function Bank() {
                       {question.retired ? t.statusRetired : t.statusActive}
                       {question.examOnly && ` · ${t.examOnlyTag}`}
                     </td>
+                    <td>{question.proposedByName ?? ''}</td>
+                    <td>{question.acceptedByName ?? ''}</td>
                   </tr>
                 ))}
               </tbody>
@@ -749,18 +905,18 @@ function Bank() {
   );
 }
 
-function TeacherGate({ uid }: { uid: string }) {
+function TeacherGate({ user }: { user: User }) {
   const t = useT(practiceDict);
   const [allowed, setAllowed] = useState<boolean | null>(null);
 
   useEffect(() => {
-    isTeacher(uid)
+    isTeacher(user.uid)
       .then(setAllowed)
       .catch((error) => {
         console.error('Could not check the teacher role', error);
         setAllowed(false);
       });
-  }, [uid]);
+  }, [user.uid]);
 
   if (allowed === null) {
     return (
@@ -776,7 +932,7 @@ function TeacherGate({ uid }: { uid: string }) {
       </div>
     );
   }
-  return <Bank />;
+  return <Bank teacher={deciderOf(user)} />;
 }
 
 export default function QuestionEditor() {
@@ -800,5 +956,5 @@ export default function QuestionEditor() {
   if (auth.status === 'signedOut') {
     return <SignInRedirect />;
   }
-  return <TeacherGate uid={auth.user.uid} />;
+  return <TeacherGate user={auth.user} />;
 }

@@ -21,7 +21,19 @@ export const MAX_DISTRACTOR_LEVEL: number = 5;
     Only wrong answers carry a level. */
 export type PracticeAnswer = Dictionary<string> & { id?: string; level?: DistractorLevel };
 
-export type PracticeQuestion = {
+/** Who proposed a question and which teacher accepted it into the bank (docs/practice.md).
+    Only the questions that came from a student's proposal carry these: the ones a teacher wrote
+    have none. Stored in the question itself, so they travel with every save, export and import. */
+export type QuestionAuthorship = {
+  proposedByUid?: string;
+  proposedByName?: string;
+  acceptedByUid?: string;
+  acceptedByName?: string;
+  /** Milliseconds since the epoch: a plain number, so it survives an export to JSON. */
+  acceptedAtMs?: number;
+};
+
+export type PracticeQuestion = QuestionAuthorship & {
   /** Stable and never reused: every student's stats are keyed by it (e.g. 'wu-wo-001'). */
   id: string;
   /** Slug of a class or of a reading from src/data/learn.ts (`courseTopics`): what the question
@@ -42,6 +54,18 @@ export type PracticeQuestion = {
       never practiced and only enters an exam when picked by id (docs/exam.md). */
   examOnly?: boolean;
 };
+
+/** The authorship of a question with only the fields it has, ready to spread into a document
+    or into the question an edit or an import replaces it with. */
+export function authorshipOf(question: QuestionAuthorship): QuestionAuthorship {
+  return {
+    ...(question.proposedByUid ? { proposedByUid: question.proposedByUid } : {}),
+    ...(question.proposedByName ? { proposedByName: question.proposedByName } : {}),
+    ...(question.acceptedByUid ? { acceptedByUid: question.acceptedByUid } : {}),
+    ...(question.acceptedByName ? { acceptedByName: question.acceptedByName } : {}),
+    ...(question.acceptedAtMs !== undefined ? { acceptedAtMs: question.acceptedAtMs } : {}),
+  };
+}
 
 export type ShuffledChoice = {
   isCorrect: boolean;

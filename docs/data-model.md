@@ -88,7 +88,7 @@ The course document `courses/{courseSlug}` never exists: Firestore keeps subcoll
 
 | Key | Fields | Written by | Read by | Detail |
 |---|---|---|---|---|
-| `questionId` (`wu-wo-014`, `q-003`; exam-only `x-wu-wo-002`): assigned on save, never reused | `topic?`, `slides[]?`, `prompt {es, en}`, `correct[] {id, es, en}`, `incorrect[] {id, es, en, level}`, `explanation? {es, en}`, `retired`, `updatedAt` | teacher | `questions`: any signed-in account while no exam runs; `examQuestions`: teachers and the server | [practice.md](practice.md), [exam.md](exam.md) |
+| `questionId` (`wu-wo-014`, `q-003`; exam-only `x-wu-wo-002`): assigned on save, never reused | `topic?`, `slides[]?`, `prompt {es, en}`, `correct[] {id, es, en}`, `incorrect[] {id, es, en, level}`, `explanation? {es, en}`, `retired`, `updatedAt`; only when it came from a proposal: `proposedByUid?`, `proposedByName?`, `acceptedByUid?`, `acceptedByName?`, `acceptedAtMs?` | teacher | `questions`: any signed-in account while no exam runs; `examQuestions`: teachers and the server | [practice.md](practice.md), [exam.md](exam.md) |
 
 Two tables with the same columns on purpose: students read the first and must never read the second. A question never moves between them. The ids of its answers (`correct[].id`, `incorrect[].id`) are what exam attempts and grades point at.
 
@@ -196,6 +196,10 @@ Every arrow is a stored string (or list of strings) that names a key somewhere e
 | `questionProposals/{id}` | `courseSlug` | course (code) | The course whose bank it is for; the create rule looks the author's membership up with it |
 | `questionProposals/{id}` | `topic` | a class or a reading of that course (code) | Optional |
 | `questionProposals/{id}` | `proposedByUid` | Auth user; `courses/{courseSlug}/members/{uid}` | Must be the caller on create; the student's list query filters by it |
+| `questionProposals/{id}` | `questionId` | `questions/{id}` | Only once accepted: the question it became, written in the same batch |
+| `questionProposals/{id}` | `decidedByUid` | `teachers/{uid}` | Whoever accepted or rejected it |
+| `questions/{id}` | `proposedByUid` | Auth user | The student whose proposal it was; the name is copied beside it, the email is not |
+| `questions/{id}` | `acceptedByUid` | `teachers/{uid}` | The teacher who accepted the proposal |
 | `students/{uid}` | key | Auth user | |
 | `students/{uid}/questions/{q}` | key `q` | `questions/{q}` or `examQuestions/{q}` | A retired question still resolves; a deleted one shows as "no longer in the bank" |
 | `students/{uid}/days/…` | `courseSlug` | course (code) | Daily homework rows |
@@ -238,6 +242,8 @@ erDiagram
   QUESTION ||--o{ STUDENT_QUESTION : questionId
   COURSE_CODE ||--o{ PROPOSAL : courseSlug
   MEMBER ||--o{ PROPOSAL : "proposedByUid (canProposeQuestions)"
+  PROPOSAL |o--o| QUESTION : "questionId (accepted)"
+  TEACHER ||--o{ PROPOSAL : decidedByUid
   COURSE_CODE ||--o{ DAY : "courseSlug (daily)"
   HOMEWORK ||--o{ DAY : "homeworkId + roundId"
   COURSE_CODE ||--o{ HOMEWORK : courseSlug

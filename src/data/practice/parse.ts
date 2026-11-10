@@ -1,7 +1,13 @@
 import { LOCALES } from '../../i18n/locales';
 import type { Dictionary } from '../../i18n/useT';
-import { MAX_DISTRACTOR_LEVEL, MIN_CORRECT_ANSWERS, MIN_DISTRACTOR_LEVEL, MIN_INCORRECT_ANSWERS } from './types';
-import type { DistractorLevel, PracticeAnswer, PracticeQuestion } from './types';
+import {
+  MAX_DISTRACTOR_LEVEL,
+  MIN_CORRECT_ANSWERS,
+  MIN_DISTRACTOR_LEVEL,
+  MIN_INCORRECT_ANSWERS,
+  authorshipOf,
+} from './types';
+import type { DistractorLevel, PracticeAnswer, PracticeQuestion, QuestionAuthorship } from './types';
 
 /* Kept free of Firebase and of the Learn registry: the exam API routes parse the bank
    on the server with the same code the browser uses. */
@@ -74,6 +80,23 @@ function parseAnswerList(
   return value.map((item, index) => parseAnswer(item, `${field}[${index}]`, kind, requireLevels));
 }
 
+function parseName(value: unknown): string | undefined {
+  return typeof value === 'string' && value !== '' ? value : undefined;
+}
+
+/* Authorship is a record, not content: a field of the wrong type is dropped instead of making
+   the whole question unreadable. */
+function parseAuthorship(data: Record<string, unknown>): QuestionAuthorship {
+  return authorshipOf({
+    proposedByUid: parseName(data.proposedByUid),
+    proposedByName: parseName(data.proposedByName),
+    acceptedByUid: parseName(data.acceptedByUid),
+    acceptedByName: parseName(data.acceptedByName),
+    acceptedAtMs:
+      typeof data.acceptedAtMs === 'number' && Number.isFinite(data.acceptedAtMs) ? data.acceptedAtMs : undefined,
+  });
+}
+
 /** Validates any raw shape (a Firestore doc or pasted JSON) into a question, or throws. */
 export function parseQuestion(id: string, data: unknown, options: ParseOptions = {}): PracticeQuestion {
   if (!isRecord(data)) throw new Error(`${id}: expected an object`);
@@ -86,6 +109,7 @@ export function parseQuestion(id: string, data: unknown, options: ParseOptions =
     correct: parseAnswerList(data.correct, `${id}.correct`, MIN_CORRECT_ANSWERS, 'correct', requireLevels),
     incorrect: parseAnswerList(data.incorrect, `${id}.incorrect`, MIN_INCORRECT_ANSWERS, 'incorrect', requireLevels),
     retired: Boolean(data.retired),
+    ...parseAuthorship(data),
   };
   if (topic) question.topic = topic;
   if (data.slides !== undefined) {

@@ -50,6 +50,12 @@
   opacity: 0.45;
 }
 
+/* A proposal nobody decided yet: its status calls for the teacher's attention. */
+.statusPending {
+  color: var(--amber);
+  font-weight: 600;
+}
+
 .id {
   composes: mono from '../learn/ui.module.css';
   color: var(--amber);
@@ -203,6 +209,26 @@
 .actions {
   display: flex;
   justify-content: flex-end;
+  gap: 12px;
+}
+
+.reject {
+  composes: btn from '../learn/ui.module.css';
+}
+
+.reject:hover:enabled {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+/* The reason for rejecting a proposal, in place of the Accept and Reject buttons. */
+.rejectPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px 16px;
 }
 
 .save {

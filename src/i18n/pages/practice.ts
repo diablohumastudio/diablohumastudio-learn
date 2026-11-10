@@ -259,6 +259,21 @@ const en = {
   validationProposalPrompt: 'Write the question in Spanish.',
   validationProposalAnswers: 'Every answer needs its text in Spanish.',
   validationProposalExplanation: 'The explanation needs its text in Spanish, or leave it empty.',
+
+  statusPending: 'pending',
+  colProposedBy: 'Proposed by',
+  colAcceptedBy: 'Accepted by',
+  reviewProposal: 'Review proposal',
+  proposalFrom: 'Proposal by {name}',
+  reviewProposalHint: 'Complete what is missing (English, levels, slides) and accept it, or reject it. Accepting adds it to the practice bank with the next id of its topic.',
+  acceptProposal: 'Accept',
+  rejectProposal: 'Reject',
+  rejectReasonLabel: 'Reason (optional; the student reads it)',
+  confirmRejectProposal: 'Reject the proposal',
+  cancelReject: 'Cancel',
+  proposalAcceptedNotice: 'Accepted as {id}.',
+  proposalRejectedNotice: 'Proposal rejected.',
+  proposalsRulesMissing: 'The question proposals could not be loaded. Publish firebase/firestore.rules in the Firebase console: it names the new questionProposals collection.',
 } as const;
 
 const es: Record<keyof typeof en, string> = {
@@ -522,6 +537,21 @@ const es: Record<keyof typeof en, string> = {
   validationProposalPrompt: 'Escribe la pregunta en español.',
   validationProposalAnswers: 'Cada respuesta necesita su texto en español.',
   validationProposalExplanation: 'La explicación necesita su texto en español, o déjala vacía.',
+
+  statusPending: 'pendiente',
+  colProposedBy: 'Propuso',
+  colAcceptedBy: 'Aceptó',
+  reviewProposal: 'Revisar propuesta',
+  proposalFrom: 'Propuesta de {name}',
+  reviewProposalHint: 'Completa lo que falte (inglés, niveles, diapositivas) y acéptala, o recházala. Al aceptarla entra al banco de práctica con el siguiente id de su tema.',
+  acceptProposal: 'Aceptar',
+  rejectProposal: 'Rechazar',
+  rejectReasonLabel: 'Motivo (opcional; el estudiante lo lee)',
+  confirmRejectProposal: 'Rechazar la propuesta',
+  cancelReject: 'Cancelar',
+  proposalAcceptedNotice: 'Aceptada como {id}.',
+  proposalRejectedNotice: 'Propuesta rechazada.',
+  proposalsRulesMissing: 'No se pudieron cargar las propuestas de preguntas. Publica firebase/firestore.rules en la consola de Firebase: ahí se nombra la colección nueva questionProposals.',
 };
 
 export const practiceDict = { en, es };

@@ -1,8 +1,14 @@
 import { LOCALES } from '../../i18n/locales';
 import type { Locale } from '../../i18n/locales';
 import type { Dictionary } from '../../i18n/useT';
-import { MAX_DISTRACTOR_LEVEL, MIN_CORRECT_ANSWERS, MIN_DISTRACTOR_LEVEL, MIN_INCORRECT_ANSWERS } from './types';
-import type { DistractorLevel, PracticeAnswer } from './types';
+import {
+  MAX_DISTRACTOR_LEVEL,
+  MIN_CORRECT_ANSWERS,
+  MIN_DISTRACTOR_LEVEL,
+  MIN_INCORRECT_ANSWERS,
+  authorshipOf,
+} from './types';
+import type { DistractorLevel, PracticeAnswer, PracticeQuestion } from './types';
 
 /* A question proposed by a student for a course's bank (docs/practice.md). Proposals live apart
    from `questions`: every student downloads that collection whole on each session and none may
@@ -51,6 +57,54 @@ export type QuestionProposal = ProposalContent & {
   /** Only when rejected, and optional even then. */
   reason?: string;
 };
+
+/** The teacher who accepts or rejects a proposal, with the name the lists show for them. */
+export type ProposalDecider = {
+  uid: string;
+  name: string;
+};
+
+/** The name the lists show for whoever sent a proposal: the email only when the account has no name. */
+export function proposerName(proposal: QuestionProposal): string {
+  return proposal.proposedByName || proposal.proposedByEmail;
+}
+
+/** A proposal in the shape the form edits: an empty id means "none yet", as with a question
+    of an import. */
+export function proposalAsQuestion(proposal: QuestionProposal): PracticeQuestion {
+  return {
+    id: '',
+    ...(proposal.topic ? { topic: proposal.topic } : {}),
+    prompt: proposal.prompt,
+    correct: proposal.correct,
+    incorrect: proposal.incorrect,
+    ...(proposal.explanation ? { explanation: proposal.explanation } : {}),
+    retired: false,
+  };
+}
+
+/** The bank question an accepted proposal becomes: the content the teacher completed, under the
+    id it gets, signed with who proposed it and who accepted it. The proposer's email stays in
+    the proposal: every student downloads the bank. */
+export function acceptedQuestion(
+  proposal: QuestionProposal,
+  content: Omit<PracticeQuestion, 'id'>,
+  questionId: string,
+  teacher: ProposalDecider,
+  acceptedAtMs: number
+): PracticeQuestion {
+  return {
+    ...content,
+    id: questionId,
+    ...authorshipOf({
+      proposedByUid: proposal.proposedByUid,
+      proposedByName: proposal.proposedByName,
+      acceptedByUid: teacher.uid,
+      acceptedByName: teacher.name,
+      acceptedAtMs,
+    }),
+  };
+}
 
 export function isProposalStatus(value: unknown): value is ProposalStatus {
   return PROPOSAL_STATUSES.some((status) => status === value);

@@ -1,9 +1,10 @@
 import { collection, doc, onSnapshot, serverTimestamp, writeBatch } from 'firebase/firestore';
-import type { DocumentData } from 'firebase/firestore';
+import type { DocumentData, WriteBatch } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { EXAM_QUESTIONS_COLLECTION, QUESTIONS_COLLECTION, newAnswerId } from '../../data/practice';
 import type { PracticeAnswer, PracticeQuestion } from '../../data/practice';
 import { parseQuestion } from '../../data/practice/parse';
+import { authorshipOf } from '../../data/practice/types';
 import { getFirestoreDb } from '../../lib/firebase';
 
 /* Firestore layout (rules in firebase/firestore.rules):
@@ -34,6 +35,7 @@ function toDocument(question: PracticeQuestion): DocumentData {
     incorrect: question.incorrect.map(withId),
     ...(question.explanation ? { explanation: question.explanation } : {}),
     retired: question.retired,
+    ...authorshipOf(question),
     updatedAt: serverTimestamp(),
   };
 }
@@ -93,8 +95,16 @@ export function toExportJson(questions: readonly PracticeQuestion[]): string {
     incorrect: question.incorrect,
     ...(question.explanation ? { explanation: question.explanation } : {}),
     retired: question.retired,
+    ...authorshipOf(question),
   }));
   return JSON.stringify(exported, null, 2);
+}
+
+/** Adds the write of one question to a batch: it creates or fully replaces the question with
+    that id, in the bank `examOnly` names. For a write that must land together with another one. */
+export function setQuestionInBatch(batch: WriteBatch, question: PracticeQuestion): void {
+  const collectionName = question.examOnly ? EXAM_QUESTIONS_COLLECTION : QUESTIONS_COLLECTION;
+  batch.set(doc(getFirestoreDb(), collectionName, question.id), toDocument(question));
 }
 
 /** Teacher only. Creates or fully replaces the question with that id, in the bank `examOnly` names. */
@@ -102,10 +112,7 @@ export async function saveQuestions(questions: readonly PracticeQuestion[]): Pro
   const db = getFirestoreDb();
   for (let start = 0; start < questions.length; start += MAX_BATCH_WRITES) {
     const batch = writeBatch(db);
-    for (const question of questions.slice(start, start + MAX_BATCH_WRITES)) {
-      const collectionName = question.examOnly ? EXAM_QUESTIONS_COLLECTION : QUESTIONS_COLLECTION;
-      batch.set(doc(db, collectionName, question.id), toDocument(question));
-    }
+    for (const question of questions.slice(start, start + MAX_BATCH_WRITES)) setQuestionInBatch(batch, question);
     await batch.commit();
   }
 }

@@ -1,15 +1,34 @@
 import type { User } from 'firebase/auth';
-import { addDoc, collection, onSnapshot, query, serverTimestamp, where } from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  doc,
+  onSnapshot,
+  query,
+  serverTimestamp,
+  updateDoc,
+  where,
+  writeBatch,
+} from 'firebase/firestore';
 import type { CollectionReference, DocumentData, QuerySnapshot, Timestamp, Unsubscribe } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import { memberName } from '../../data/course/types';
+import type { PracticeQuestion } from '../../data/practice';
 import {
   QUESTION_PROPOSALS_COLLECTION,
   byNewestProposal,
   isProposalStatus,
   parseProposalContent,
 } from '../../data/practice/proposal';
-import type { ProposalContent, ProposalStatus, QuestionProposal } from '../../data/practice/proposal';
+import type {
+  ProposalContent,
+  ProposalDecider,
+  ProposalStatus,
+  QuestionProposal,
+} from '../../data/practice/proposal';
 import { getFirestoreDb } from '../../lib/firebase';
 import { identityOf } from '../course/members';
+import { setQuestionInBatch } from './questions';
 
 /* Firestore layout (rules in firebase/firestore.rules, model in docs/practice.md):
    questionProposals/{id}   a question a student proposes for a course's bank; created by a student
@@ -17,6 +36,13 @@ import { identityOf } from '../course/members';
                             its author and by teachers, decided by a teacher */
 
 const PENDING_STATUS: ProposalStatus = 'pending';
+const ACCEPTED_STATUS: ProposalStatus = 'accepted';
+const REJECTED_STATUS: ProposalStatus = 'rejected';
+
+export type PendingProposals =
+  | { status: 'loading' }
+  | { status: 'ready'; proposals: QuestionProposal[] }
+  | { status: 'error' };
 
 function proposalsCollection(): CollectionReference {
   return collection(getFirestoreDb(), QUESTION_PROPOSALS_COLLECTION);
@@ -103,4 +129,61 @@ export function subscribeOwnProposals(
     (snapshot) => onProposals(toProposals(snapshot).filter((proposal) => proposal.courseSlug === courseSlug)),
     onError
   );
+}
+
+/** Teacher only (the rules refuse this query to a student): the proposals nobody has decided
+    yet, of every course, newest first, live. */
+export function usePendingProposals(): PendingProposals {
+  const [pending, setPending] = useState<PendingProposals>({ status: 'loading' });
+
+  useEffect(() => {
+    const undecided = query(proposalsCollection(), where('status', '==', PENDING_STATUS));
+    return onSnapshot(
+      undecided,
+      (snapshot) => setPending({ status: 'ready', proposals: toProposals(snapshot) }),
+      (error) => {
+        // Refused until firebase/firestore.rules names the collection.
+        console.warn('Could not load the pending proposals', error);
+        setPending({ status: 'error' });
+      }
+    );
+  }, []);
+
+  return pending;
+}
+
+/** The signed-in teacher as the one who decides on a proposal. */
+export function deciderOf(user: User): ProposalDecider {
+  return { uid: user.uid, name: memberName(identityOf(user)) };
+}
+
+function decisionFields(teacher: ProposalDecider): DocumentData {
+  return { decidedByUid: teacher.uid, decidedByName: teacher.name, decidedAt: serverTimestamp() };
+}
+
+/** Teacher only. Writes the question into its bank and marks the proposal accepted with the id
+    the question got, in one batch: both happen or neither. */
+export async function acceptProposal(
+  proposalId: string,
+  question: PracticeQuestion,
+  teacher: ProposalDecider
+): Promise<void> {
+  const batch = writeBatch(getFirestoreDb());
+  setQuestionInBatch(batch, question);
+  batch.update(doc(proposalsCollection(), proposalId), {
+    status: ACCEPTED_STATUS,
+    questionId: question.id,
+    ...decisionFields(teacher),
+  });
+  await batch.commit();
+}
+
+/** Teacher only. The proposal stays, marked rejected, with the reason when the teacher gave one:
+    its author reads both on their proposals page. */
+export async function rejectProposal(proposalId: string, teacher: ProposalDecider, reason: string): Promise<void> {
+  await updateDoc(doc(proposalsCollection(), proposalId), {
+    status: REJECTED_STATUS,
+    ...decisionFields(teacher),
+    ...(reason ? { reason } : {}),
+  });
 }

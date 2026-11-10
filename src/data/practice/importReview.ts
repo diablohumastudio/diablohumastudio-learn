@@ -2,6 +2,7 @@ import { LOCALES } from '../../i18n/locales';
 import type { Dictionary } from '../../i18n/useT';
 import { nextQuestionId } from './index';
 import type { ImportedQuestion } from './parse';
+import { authorshipOf } from './types';
 import type { PracticeAnswer, PracticeQuestion } from './types';
 
 /* What an import would do to the bank, question by question, before anything is written.
@@ -67,6 +68,12 @@ export function changedFieldsOf(imported: ImportedQuestion, existing: PracticeQu
   return fields;
 }
 
+/* An import replaces the whole document, and a file written by hand does not say who proposed
+   or accepted the question it replaces: what the bank knows is kept unless the file says otherwise. */
+function withBankAuthorship(imported: ImportedQuestion, existing: PracticeQuestion): ImportedQuestion {
+  return { ...imported, ...authorshipOf(existing), ...authorshipOf(imported) };
+}
+
 /** One entry per question of the file, in the file's order. `bank` holds both banks, so an id is
     never given twice; `examOnly` says which bank the import goes to. */
 export function reviewImport(
@@ -90,7 +97,12 @@ export function reviewImport(
     const existing = bankById.get(question.id);
     if (!existing) return { status: 'new', id: question.id, question, changedFields: [] };
     const changedFields = changedFieldsOf(question, existing);
-    return { status: changedFields.length > 0 ? 'changed' : 'identical', id: question.id, question, changedFields };
+    return {
+      status: changedFields.length > 0 ? 'changed' : 'identical',
+      id: question.id,
+      question: withBankAuthorship(question, existing),
+      changedFields,
+    };
   });
 }
 
