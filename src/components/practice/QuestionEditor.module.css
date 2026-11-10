@@ -25,48 +25,6 @@
   composes: btn from '../learn/ui.module.css';
 }
 
-.card {
-  composes: card from '../learn/ui.module.css';
-  padding: 8px 0;
-}
-
-.tableWrap {
-  composes: tableWrap from '../learn/ui.module.css';
-}
-
-.table {
-  composes: table from '../learn/ui.module.css';
-}
-
-.row {
-  cursor: pointer;
-}
-
-.row:hover td {
-  background: var(--panel-2);
-}
-
-.rowRetired td {
-  opacity: 0.45;
-}
-
-/* A proposal nobody decided yet: its status calls for the teacher's attention. */
-.statusPending {
-  color: var(--amber);
-  font-weight: 600;
-}
-
-.id {
-  composes: mono from '../learn/ui.module.css';
-  color: var(--amber);
-  white-space: nowrap;
-}
-
-.empty {
-  composes: mono from '../learn/ui.module.css';
-  padding: 16px 24px;
-}
-
 .back {
   composes: btnGhost from '../learn/ui.module.css';
   align-self: flex-start;

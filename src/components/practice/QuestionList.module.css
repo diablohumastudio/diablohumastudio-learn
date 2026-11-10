@@ -1,0 +1,130 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* One line of filters on a wide window; they wrap, each keeping its label above it. */
+.filters {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+}
+
+.filterField {
+  composes: field from '../learn/ui.module.css';
+  min-width: 140px;
+}
+
+.select {
+  composes: input from '../learn/ui.module.css';
+  font-size: calc(14px + var(--text-delta, 0px));
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+/* The least and the most wrong answers, side by side under one label. */
+.rangeField {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.rangeField > legend {
+  padding: 0 0 6px;
+}
+
+.limit {
+  composes: input from '../learn/ui.module.css';
+  font-size: calc(14px + var(--text-delta, 0px));
+  padding: 8px 10px;
+  width: 6.5em;
+}
+
+.clear {
+  composes: btnGhost from '../learn/ui.module.css';
+  padding: 8px 12px;
+  font-size: calc(13px + var(--text-delta, 0px));
+}
+
+.count {
+  composes: mono from '../learn/ui.module.css';
+}
+
+.card {
+  composes: card from '../learn/ui.module.css';
+  padding: 8px 0;
+}
+
+.tableWrap {
+  composes: tableWrap from '../learn/ui.module.css';
+}
+
+.table {
+  composes: table from '../learn/ui.module.css';
+}
+
+/* A header is a button with the look of the header's own text, plus the arrow of its order. */
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sortButton:hover,
+.sortButton:focus-visible {
+  color: var(--ink);
+}
+
+.sortButton:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.sortArrow {
+  color: var(--amber);
+  font-size: 0.8em;
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row:hover td {
+  background: var(--panel-2);
+}
+
+.rowRetired td {
+  opacity: 0.45;
+}
+
+.id {
+  composes: mono from '../learn/ui.module.css';
+  color: var(--amber);
+  white-space: nowrap;
+}
+
+/* A proposal nobody decided yet: its status calls for the teacher's attention. */
+.statusPending {
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.empty {
+  composes: mono from '../learn/ui.module.css';
+  padding: 16px 24px;
+}

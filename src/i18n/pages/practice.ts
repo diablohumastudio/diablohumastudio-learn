@@ -274,6 +274,16 @@ const en = {
   proposalAcceptedNotice: 'Accepted as {id}.',
   proposalRejectedNotice: 'Proposal rejected.',
   proposalsRulesMissing: 'The question proposals could not be loaded. Publish firebase/firestore.rules in the Firebase console: it names the new questionProposals collection.',
+
+  filterAllStatuses: 'All',
+  filterAllTopics: 'All',
+  filterAllNames: 'All',
+  filterIncorrect: 'Wrong answers',
+  filterMin: 'min',
+  filterMax: 'max',
+  clearFilters: 'Clear filters',
+  listCount: '{shown} of {total}',
+  listNoMatches: 'No question matches the filters.',
 } as const;
 
 const es: Record<keyof typeof en, string> = {
@@ -552,6 +562,16 @@ const es: Record<keyof typeof en, string> = {
   proposalAcceptedNotice: 'Aceptada como {id}.',
   proposalRejectedNotice: 'Propuesta rechazada.',
   proposalsRulesMissing: 'No se pudieron cargar las propuestas de preguntas. Publica firebase/firestore.rules en la consola de Firebase: ahí se nombra la colección nueva questionProposals.',
+
+  filterAllStatuses: 'Todas',
+  filterAllTopics: 'Todos',
+  filterAllNames: 'Todos',
+  filterIncorrect: 'Respuestas incorrectas',
+  filterMin: 'mín',
+  filterMax: 'máx',
+  clearFilters: 'Quitar filtros',
+  listCount: '{shown} de {total}',
+  listNoMatches: 'Ninguna pregunta coincide con los filtros.',
 };
 
 export const practiceDict = { en, es };

@@ -9,7 +9,6 @@ import {
   MIN_INCORRECT_ANSWERS,
   authorshipOf,
   nextQuestionId,
-  questionTopicTitle,
 } from '../../data/practice';
 import type { DistractorLevel, PracticeAnswer, PracticeQuestion } from '../../data/practice';
 import type { ImportedQuestion } from '../../data/practice/parse';
@@ -17,7 +16,6 @@ import {
   PROPOSAL_SOURCE_LOCALE,
   acceptedQuestion,
   proposalAsQuestion,
-  proposalText,
   proposerName,
 } from '../../data/practice/proposal';
 import type { ProposalContent, ProposalDecider, QuestionProposal } from '../../data/practice/proposal';
@@ -31,6 +29,9 @@ import s from './QuestionEditor.module.css';
 import SignInRedirect from '../learn/SignInRedirect';
 import { isPermissionDenied } from './progress';
 import { acceptProposal, deciderOf, rejectProposal, usePendingProposals } from './proposals';
+import QuestionList from './QuestionList';
+import { INITIAL_LIST_VIEW } from './questionListFilters';
+import type { ListView } from './questionListFilters';
 import { parseImportList, saveQuestions, toExportJson, useExamOnlyBank, useQuestionBank } from './questions';
 import TopicOptions from './TopicOptions';
 import ui from '../learn/ui.module.css';
@@ -675,9 +676,6 @@ function downloadQuestions(questions: readonly PracticeQuestion[], fileName: str
   URL.revokeObjectURL(url);
 }
 
-/** In the Id column of a proposal nobody decided yet: it gets its id when it is accepted. */
-const NO_ID_MARK: string = '—';
-
 type Screen =
   | { kind: 'list' }
   | { kind: 'new' }
@@ -700,11 +698,13 @@ function withEditedQuestion(batch: ImportBatch, index: number, value: QuestionCo
 
 function Bank({ teacher }: { teacher: ProposalDecider }) {
   const t = useT(practiceDict);
-  const locale = useLocale();
   const bank = useQuestionBank();
   const examOnlyBank = useExamOnlyBank();
   const pendingProposals = usePendingProposals();
   const [screen, setScreen] = useState<Screen>({ kind: 'list' });
+  // Kept here and not in the list, which leaves the screen while a form is open: coming back
+  // from a question finds the same filters and the same order.
+  const [listView, setListView] = useState<ListView>(INITIAL_LIST_VIEW);
   const [importing, setImporting] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -845,62 +845,14 @@ function Bank({ teacher }: { teacher: ProposalDecider }) {
       {importing && (
         <ImportPanel onReview={(batch) => setScreen({ kind: 'importReview', batch })} />
       )}
-      <div className={s.card}>
-        {questions.length === 0 && proposals.length === 0 ? (
-          <p className={s.empty}>{t.noQuestions}</p>
-        ) : (
-          <div className={s.tableWrap}>
-            <table className={s.table}>
-              <thead>
-                <tr>
-                  <th>{t.colId}</th>
-                  <th>{t.colQuestion}</th>
-                  <th>{t.colTopic}</th>
-                  <th className={ui.num}>{t.colAnswers}</th>
-                  <th>{t.colStatus}</th>
-                  <th>{t.colProposedBy}</th>
-                  <th>{t.colAcceptedBy}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {proposals.map((proposal) => (
-                  <tr key={proposal.id} className={s.row} onClick={() => setScreen({ kind: 'review', proposal })}>
-                    <td className={s.id}>{NO_ID_MARK}</td>
-                    <td>{proposalText(proposal.prompt, locale)}</td>
-                    <td>{questionTopicTitle(proposal, locale) ?? ''}</td>
-                    <td className={ui.num} title={t.answersSummary}>
-                      {proposal.correct.length} / {proposal.incorrect.length}
-                    </td>
-                    <td className={s.statusPending}>{t.statusPending}</td>
-                    <td>{proposerName(proposal)}</td>
-                    <td />
-                  </tr>
-                ))}
-                {questions.map((question) => (
-                  <tr
-                    key={question.id}
-                    className={question.retired ? `${s.row} ${s.rowRetired}` : s.row}
-                    onClick={() => setScreen({ kind: 'edit', question })}
-                  >
-                    <td className={s.id}>{question.id}</td>
-                    <td>{question.prompt[locale]}</td>
-                    <td>{questionTopicTitle(question, locale) ?? ''}</td>
-                    <td className={ui.num} title={t.answersSummary}>
-                      {question.correct.length} / {question.incorrect.length}
-                    </td>
-                    <td>
-                      {question.retired ? t.statusRetired : t.statusActive}
-                      {question.examOnly && ` · ${t.examOnlyTag}`}
-                    </td>
-                    <td>{question.proposedByName ?? ''}</td>
-                    <td>{question.acceptedByName ?? ''}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      <QuestionList
+        questions={questions}
+        pendingProposals={proposals}
+        view={listView}
+        onViewChange={setListView}
+        onOpenQuestion={(question) => setScreen({ kind: 'edit', question })}
+        onOpenProposal={(proposal) => setScreen({ kind: 'review', proposal })}
+      />
     </div>
   );
 }
