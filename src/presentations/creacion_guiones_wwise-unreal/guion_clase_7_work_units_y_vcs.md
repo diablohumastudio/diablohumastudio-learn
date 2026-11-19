@@ -2,7 +2,7 @@
 
 Formato, proceso, convenciones y reglas de revisión: `../screenplay_creation_guide.md`. Estado del proyecto y archivos de las demás clases: `handoff.md`.
 
-Estado: borrador escrito junto con las diapositivas (`../wwise-unreal/work-units-y-vcs.tsx`) a partir de `Clases/Clase07/Contenido.md` del material docente; revisado por el verificador de pedagogía y corregido; pendiente de revisión del docente (2026-10-16).
+Estado: borrador escrito junto con las diapositivas (`../wwise-unreal/work-units-y-vcs.tsx`) a partir de `Teoria/WorkUnits/ContenidoWorkUnits.md` del material docente (entonces `Clases/Clase07/Contenido.md`); revisado por el verificador de pedagogía y corregido; pendiente de revisión del docente (2026-10-16).
 
 ## Clase 7 · Work Units y control de versiones
 
