@@ -1,0 +1,33 @@
+Ahora veamos las piezas del computador análogas a la biblioteca. Tú y tus compañeros son los núcleos de la CPU.
+
+<break time="2s" />
+
+Los datos tienen que llegar a la CPU para que corra un programa o se use un archivo.
+
+<break time="2s" />
+
+Los libros abiertos son la caché: una memoria dentro del chip del procesador, con lo que se usa en este instante.
+
+<break time="2s" />
+
+Las mesas son la memoria RAM. Es más grande que la caché, pero más lenta, y más lejos. La conexión suele ser con pistas más cortas en la mainboard.
+
+<break time="2s" />
+
+Las estanterías son el disco duro. Guarda de todo permanentemente, pero es el más lento de los tres, y su comunicación es más lenta porque también está más lejos. La conexión suele ser mediante cables o pistas largas en la mainboard.
+
+<break time="2s" />
+
+Cuando un programa dice «cargando», son datos copiándose del disco a la RAM.
+
+<break time="2s" />
+
+Ahora veamos qué es un programa.
+
+<break time="2s" />
+
+Un programa es código escrito por un programador que se convierte en instrucciones que ejecuta el procesador.
+
+<break time="2s" />
+
+Word, un juego y Excel son ejemplos de programas.

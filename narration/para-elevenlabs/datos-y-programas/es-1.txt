@@ -1,0 +1,37 @@
+Bienvenido a la clase Intro a Wwise. Avanza con la flecha derecha o la barra espaciadora. Retrocede con la flecha izquierda.
+
+<break time="2s" />
+
+Veremos dos ideas que te servirán como bases teóricas: los datos dentro del computador y qué es un programa.
+
+<break time="2s" />
+
+Ahora veamos los datos dentro del computador.
+
+<break time="2s" />
+
+Un dato es cualquier información guardada: un texto, una imagen, un sonido.
+
+<break time="2s" />
+
+Ahora entendamos los datos dentro de un computador a través de esta analogía con una biblioteca.
+
+<break time="2s" />
+
+Tú y tres compañeros trabajan en algunos proyectos. Para trabajar en cualquier proyecto, los libros de ese tema tienen que llegar a sus manos.
+
+<break time="2s" />
+
+Leen los libros abiertos de la materia en que trabajan ahora mismo. Caben muy pocos, pero leerlos es instantáneo.
+
+<break time="2s" />
+
+En las mesas de los lados hay libros cerrados de los proyectos en que trabajan. Cabe un poco más de libros, y alcanzar uno es rápido.
+
+<break time="2s" />
+
+En las estanterías cabe de todo, pero buscar un libro ahí es lento: hay que levantarse.
+
+<break time="2s" />
+
+La regla: cuanto más cerca de las manos, más rápido, pero menos cabe.

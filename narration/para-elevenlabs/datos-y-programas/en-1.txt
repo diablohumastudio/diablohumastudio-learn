@@ -1,0 +1,37 @@
+Welcome to the Intro to Wwise class. Move forward with the right arrow or the space bar. Go back with the left arrow.
+
+<break time="2s" />
+
+We will look at two ideas that will serve you as a theory basis: the data inside the computer and what a program is.
+
+<break time="2s" />
+
+Now let's look at the data inside the computer.
+
+<break time="2s" />
+
+Data is any stored information: a text, an image, a sound.
+
+<break time="2s" />
+
+Now let's understand the data inside a computer through this analogy with a library.
+
+<break time="2s" />
+
+You and three classmates are working on a few projects. To work on any project, the books on that subject have to reach your hands.
+
+<break time="2s" />
+
+You read the open books of the subject you are working on right now. Very few fit, but reading them is instant.
+
+<break time="2s" />
+
+On the side tables there are closed books for the projects you are working on. A few more books fit, and reaching one is fast.
+
+<break time="2s" />
+
+On the shelves everything fits, but finding a book there is slow: you have to get up.
+
+<break time="2s" />
+
+The rule: the closer to your hands, the faster, but the less fits.

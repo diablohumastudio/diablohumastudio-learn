@@ -1,0 +1,45 @@
+We can classify languages into four levels of abstraction.
+
+<break time="2s" />
+
+Abstract means that it hides details: the higher up, the less detail you write yourself.
+
+<break time="2s" />
+
+Machine code is electrical signals with two states inside the processor. It reads them as data or as instructions.
+
+<break time="2s" />
+
+Above it, assembly: the same instructions with short words instead of ones and zeros. It is very hard to read.
+
+<break time="2s" />
+
+Higher up, the languages that have control over the hardware, the physical parts, and over memory. They are usually compiled programs.
+
+<break time="2s" />
+
+At the top, the languages that read almost like English and where, almost always, memory manages itself.
+
+<break time="2s" />
+
+Wherever you write, everything ends up as ones and zeros. The top is easier for you. The bottom, in general, runs faster.
+
+<break time="2s" />
+
+That is why engines are written in C++: a game needs processing speed.
+
+<break time="2s" />
+
+And the code that engines run is written in languages with a high level of abstraction: developers need development speed.
+
+<break time="2s" />
+
+Configuring Wwise and the Blueprints of Unreal Engine can be considered work at a high level of abstraction.
+
+<break time="2s" />
+
+To sum up: Data travels from the disk to the RAM and from there to the processor's cache: the closer, the faster.
+
+<break time="2s" />
+
+A program is code written by a programmer that is converted into instructions that the processor runs.

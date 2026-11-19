@@ -1,0 +1,12 @@
+{
+  "model": "eleven_multilingual_v2",
+  "outputFormat": "mp3_44100_128",
+  "voices": {
+    "es": { "id": "dQ0C8BEdKF2odmELvNee", "name": "David - Clear, Warm and Patient" },
+    "en": { "id": "dQ0C8BEdKF2odmELvNee", "name": "David - Clear, Warm and Patient" }
+  },
+  "say": {
+    "rate": 165,
+    "voices": { "es": "Paulina", "en": "Samantha" }
+  }
+}

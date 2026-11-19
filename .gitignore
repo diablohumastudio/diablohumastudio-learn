@@ -41,3 +41,6 @@ questions/exports/
 
 # Deliverable exports made by deliverables/scripts: they hold student work and names.
 deliverables/exports/
+
+# Narration audio made on the ElevenLabs website, before it is cut into steps: it stays downloadable there.
+narration/para-elevenlabs/**/*.mp3

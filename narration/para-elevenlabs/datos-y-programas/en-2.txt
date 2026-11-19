@@ -1,0 +1,33 @@
+Now let's see the parts of the computer that match the library. You and your classmates are the cores of the CPU.
+
+<break time="2s" />
+
+Data has to reach the CPU for a program to run or a file to be used.
+
+<break time="2s" />
+
+The open books are the cache: a memory inside the processor chip, holding what is being used at this instant.
+
+<break time="2s" />
+
+The tables are the RAM. It is bigger than the cache, but slower, and farther away. The connection usually runs through shorter traces on the mainboard.
+
+<break time="2s" />
+
+The shelves are the hard disk. It stores everything permanently, but it is the slowest of the three, and its communication is slower because it is also farther away. The connection usually runs through cables or long traces on the mainboard.
+
+<break time="2s" />
+
+When a program says “loading”, that is data being copied from the disk to the RAM.
+
+<break time="2s" />
+
+Now let's see what a program is.
+
+<break time="2s" />
+
+A program is code written by a programmer that is converted into instructions that the processor runs.
+
+<break time="2s" />
+
+Word, a game and Excel are examples of programs.

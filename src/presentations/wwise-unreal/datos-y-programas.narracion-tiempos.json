@@ -1,0 +1,468 @@
+{
+  "es": {
+    "intro": {
+      "duration": 8.15,
+      "marks": {
+        "0": 2.61,
+        "1": 8.15
+      },
+      "version": "fc5dc95c"
+    },
+    "ideas": {
+      "duration": 6.92,
+      "marks": {
+        "0": 3.16,
+        "1": 5.41
+      },
+      "version": "5eb11581"
+    },
+    "datos": {
+      "duration": 2.58,
+      "marks": {
+        "0": 2.58
+      },
+      "version": "48c26d1f"
+    },
+    "dato": {
+      "duration": 5.47,
+      "marks": {
+        "0": 2.56,
+        "1": 3.66,
+        "2": 4.62
+      },
+      "version": "087f92a8"
+    },
+    "biblioteca": {
+      "duration": 5.41,
+      "marks": {
+        "0": 4.36,
+        "1": 5.41,
+        "2": 6.01
+      },
+      "version": "e19c91a5"
+    },
+    "personas": {
+      "duration": 8.27,
+      "marks": {
+        "0": 3.15,
+        "1": 8.27
+      },
+      "version": "715edcfb"
+    },
+    "librosAbiertos": {
+      "duration": 6.96,
+      "marks": {
+        "0": 3.53,
+        "1": 6.96
+      },
+      "version": "1d782dbf"
+    },
+    "mesas": {
+      "duration": 7.99,
+      "marks": {
+        "0": 1.34,
+        "1": 7.99
+      },
+      "version": "39df3959"
+    },
+    "estanterias": {
+      "duration": 5.94,
+      "marks": {
+        "0": 1.3,
+        "1": 5.94
+      },
+      "version": "3e73df17"
+    },
+    "regla": {
+      "duration": 5.1,
+      "marks": {
+        "0": 0.7,
+        "1": 2.76,
+        "2": 3.8
+      },
+      "version": "09a50f4e"
+    },
+    "computador": {
+      "duration": 7.03,
+      "marks": {
+        "0": 5.39
+      },
+      "version": "f513eb55"
+    },
+    "llegarCpu": {
+      "duration": 4.96,
+      "marks": {},
+      "version": "08a55907"
+    },
+    "cache": {
+      "duration": 7.01,
+      "marks": {
+        "0": 2.02,
+        "1": 5.05,
+        "2": 7.01
+      },
+      "version": "5c5817d9"
+    },
+    "ram": {
+      "duration": 9.55,
+      "marks": {
+        "0": 2.01,
+        "1": 6.12
+      },
+      "version": "2da54e86"
+    },
+    "disco": {
+      "duration": 15.01,
+      "marks": {
+        "0": 2.28,
+        "1": 4.78,
+        "2": 10.76,
+        "3": 15.01
+      },
+      "version": "92479e02"
+    },
+    "cargando": {
+      "duration": 4.96,
+      "marks": {
+        "0": 2.21
+      },
+      "version": "2a913b84"
+    },
+    "programa": {
+      "duration": 2.29,
+      "marks": {
+        "0": 2.29
+      },
+      "version": "441d5948"
+    },
+    "codigo": {
+      "duration": 6.3,
+      "marks": {
+        "0": 2.87,
+        "1": 3.81,
+        "2": 6.3
+      },
+      "version": "a74a203a"
+    },
+    "ejemplos": {
+      "duration": 3.89,
+      "marks": {},
+      "version": "7f4904d7"
+    },
+    "lenguajes": {
+      "duration": 4.21,
+      "marks": {
+        "0": 2.28
+      },
+      "version": "c0eae579"
+    },
+    "abstraccion": {
+      "duration": 6,
+      "marks": {
+        "0": 2.75
+      },
+      "version": "a2494d33"
+    },
+    "codigoMaquina": {
+      "duration": 7.64,
+      "marks": {
+        "0": 1.13
+      },
+      "version": "530fe304"
+    },
+    "ensamblador": {
+      "duration": 7.77,
+      "marks": {
+        "0": 1.62
+      },
+      "version": "5ca15a9e"
+    },
+    "compilados": {
+      "duration": 8.12,
+      "marks": {
+        "0": 0.67
+      },
+      "version": "6acd288b"
+    },
+    "altoNivel": {
+      "duration": 6.03,
+      "marks": {
+        "0": 0.54
+      },
+      "version": "5c669f76"
+    },
+    "cpuLee": {
+      "duration": 8.76,
+      "marks": {
+        "0": 3.81
+      },
+      "version": "9bc8f63f"
+    },
+    "motores": {
+      "duration": 6.68,
+      "marks": {
+        "0": 3.41
+      },
+      "version": "219d3320"
+    },
+    "desarrollo": {
+      "duration": 8.38,
+      "marks": {
+        "0": 4.9
+      },
+      "version": "b3979883"
+    },
+    "wwise": {
+      "duration": 6.2,
+      "marks": {
+        "0": 2.93
+      },
+      "version": "a251fdf2"
+    },
+    "cierre": {
+      "duration": 8.03,
+      "marks": {
+        "0": 0.78
+      },
+      "version": "ab51fc51"
+    },
+    "cierrePrograma": {
+      "duration": 6.02,
+      "marks": {},
+      "version": "83e3b7fd"
+    }
+  },
+  "en": {
+    "intro": {
+      "duration": 7.13,
+      "marks": {
+        "0": 2.09,
+        "1": 7.13
+      },
+      "version": "9c7b630e"
+    },
+    "ideas": {
+      "duration": 6.62,
+      "marks": {
+        "0": 3.36,
+        "1": 5.12
+      },
+      "version": "8d6a5d3b"
+    },
+    "datos": {
+      "duration": 2.33,
+      "marks": {
+        "0": 2.33
+      },
+      "version": "fae6923c"
+    },
+    "dato": {
+      "duration": 4.49,
+      "marks": {
+        "0": 2.17,
+        "1": 3.07,
+        "2": 3.84
+      },
+      "version": "98af6514"
+    },
+    "biblioteca": {
+      "duration": 4.43,
+      "marks": {
+        "0": 3.68,
+        "1": 4.43,
+        "2": 5.03
+      },
+      "version": "62615574"
+    },
+    "personas": {
+      "duration": 7.25,
+      "marks": {
+        "0": 3.03,
+        "1": 7.25
+      },
+      "version": "3fba21ae"
+    },
+    "librosAbiertos": {
+      "duration": 6.28,
+      "marks": {
+        "0": 3.13,
+        "1": 6.28
+      },
+      "version": "df558323"
+    },
+    "mesas": {
+      "duration": 6.67,
+      "marks": {
+        "0": 0.93,
+        "1": 6.67
+      },
+      "version": "3c979d10"
+    },
+    "estanterias": {
+      "duration": 4.85,
+      "marks": {
+        "0": 0.92,
+        "1": 4.85
+      },
+      "version": "ffb7d6b1"
+    },
+    "regla": {
+      "duration": 4.45,
+      "marks": {
+        "0": 0.57,
+        "1": 2.23,
+        "2": 3.02
+      },
+      "version": "e196609a"
+    },
+    "computador": {
+      "duration": 6.37,
+      "marks": {
+        "0": 4.97
+      },
+      "version": "4e2b3838"
+    },
+    "llegarCpu": {
+      "duration": 4.82,
+      "marks": {},
+      "version": "f8a109d3"
+    },
+    "cache": {
+      "duration": 6.67,
+      "marks": {
+        "0": 1.73,
+        "1": 4.04,
+        "2": 6.67
+      },
+      "version": "cee67cd8"
+    },
+    "ram": {
+      "duration": 9.07,
+      "marks": {
+        "0": 1.53,
+        "1": 5.33
+      },
+      "version": "79a175fb"
+    },
+    "disco": {
+      "duration": 13.75,
+      "marks": {
+        "0": 1.66,
+        "1": 3.81,
+        "2": 9.5,
+        "3": 13.75
+      },
+      "version": "3b3c6a33"
+    },
+    "cargando": {
+      "duration": 4.95,
+      "marks": {
+        "0": 1.78
+      },
+      "version": "f703256d"
+    },
+    "programa": {
+      "duration": 1.98,
+      "marks": {
+        "0": 1.98
+      },
+      "version": "860fe8cf"
+    },
+    "codigo": {
+      "duration": 5.84,
+      "marks": {
+        "0": 2.41,
+        "1": 3.42,
+        "2": 5.84
+      },
+      "version": "0826e3de"
+    },
+    "ejemplos": {
+      "duration": 3.67,
+      "marks": {},
+      "version": "ae009e70"
+    },
+    "lenguajes": {
+      "duration": 3.52,
+      "marks": {
+        "0": 1.58
+      },
+      "version": "c80e27cc"
+    },
+    "abstraccion": {
+      "duration": 5.49,
+      "marks": {
+        "0": 2.49
+      },
+      "version": "50fcb9db"
+    },
+    "codigoMaquina": {
+      "duration": 7.15,
+      "marks": {
+        "0": 0.84
+      },
+      "version": "3023d94c"
+    },
+    "ensamblador": {
+      "duration": 7.48,
+      "marks": {
+        "0": 1.58
+      },
+      "version": "00f9b7a2"
+    },
+    "compilados": {
+      "duration": 8.21,
+      "marks": {
+        "0": 0.74
+      },
+      "version": "3debee84"
+    },
+    "altoNivel": {
+      "duration": 6.79,
+      "marks": {
+        "0": 0.79
+      },
+      "version": "5ce2a28e"
+    },
+    "cpuLee": {
+      "duration": 8.14,
+      "marks": {
+        "0": 3.57
+      },
+      "version": "046fad4c"
+    },
+    "motores": {
+      "duration": 4.85,
+      "marks": {
+        "0": 2.82
+      },
+      "version": "a89df542"
+    },
+    "desarrollo": {
+      "duration": 7.08,
+      "marks": {
+        "0": 4.56
+      },
+      "version": "9b2decd9"
+    },
+    "wwise": {
+      "duration": 5.9,
+      "marks": {
+        "0": 3.07
+      },
+      "version": "eb5fc0be"
+    },
+    "cierre": {
+      "duration": 7.47,
+      "marks": {
+        "0": 0.68
+      },
+      "version": "68117c41"
+    },
+    "cierrePrograma": {
+      "duration": 5.84,
+      "marks": {},
+      "version": "a2dc0ebc"
+    }
+  }
+}

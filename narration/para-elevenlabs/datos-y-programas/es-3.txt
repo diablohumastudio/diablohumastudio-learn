@@ -1,0 +1,45 @@
+A los lenguajes los podemos clasificar en cuatro niveles de abstracción.
+
+<break time="2s" />
+
+Abstracto quiere decir que esconde detalles: cuanto más arriba, menos detalle escribes tú.
+
+<break time="2s" />
+
+El código máquina son señales eléctricas de dos estados dentro del procesador. Los interpreta como datos o instrucciones.
+
+<break time="2s" />
+
+Encima, el ensamblador: las mismas instrucciones con palabras cortas en vez de unos y ceros. Cuesta mucho leerlo.
+
+<break time="2s" />
+
+Más arriba, los lenguajes que tienen control sobre el hardware, las piezas físicas, y la memoria. Por lo general son programas compilados.
+
+<break time="2s" />
+
+Arriba, los lenguajes que se leen casi como inglés y, casi siempre, la memoria se maneja sola.
+
+<break time="2s" />
+
+Escribas donde escribas, todo termina en unos y ceros. Arriba es más fácil para ti. Abajo, por lo general, corre más rápido.
+
+<break time="2s" />
+
+Por eso los motores están escritos en C++: un juego necesita velocidad de procesamiento.
+
+<break time="2s" />
+
+Y el código que los motores corren está escrito en lenguajes de alto nivel de abstracción: los desarrolladores necesitan velocidad de desarrollo.
+
+<break time="2s" />
+
+Configurar Wwise y los Blueprints de Unreal Engine puede considerarse un trabajo de alto nivel de abstracción.
+
+<break time="2s" />
+
+Como resumen: Los datos viajan del disco a la RAM y de ahí a la caché del procesador: cuanto más cerca, más rápido.
+
+<break time="2s" />
+
+Un programa es código escrito por un programador que se convierte en instrucciones que ejecuta el procesador.
