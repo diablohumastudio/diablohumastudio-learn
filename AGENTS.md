@@ -53,9 +53,13 @@ Every route is built from the constants and helpers in `src/data/learn.ts` (`COU
 - The site auto-deploys from `main` on Vercel (project `diablohumastudio-learn`), but `vercel.json` skips the build unless the pushed commit's message contains `[deploy]`. Deployments are per push, so the marker goes on the last commit of the batch (e.g. `feat(Slides): ... [deploy]`). Pushes without it cost nothing on Vercel.
 - The Firebase keys live in the Vercel project's environment variables and in the git-ignored `.env.local` (see [docs/practice.md](docs/practice.md) and [docs/exam.md](docs/exam.md)). `firebase/firestore.rules` is published by pasting it into the Firebase console.
 
+## Pending tasks
+
+- Pending tasks live in ClickUp, not in Markdown files: the list of the space "Diablohumastudio-learn", declared in `.claude/clickup-lists.json`. The rules are in the global `AGENTS.md`, section "Pending tasks in ClickUp", and the procedure in the global skill `clickup-todo`. [TODO.md](TODO.md) only points there; do not add items to it.
+
 ## Importing questions
 
-- Before preparing or importing a question file, remind the user of the open item in [TODO.md](TODO.md) about answer ids ("Importador: conservar los ids de las respuestas al reemplazar"): replacing a question from a file without answer ids gives its answers new ids, which breaks the link with exam attempts already saved. Drop this note once that item is ticked.
+- Before preparing or importing a question file, remind the user of the open ClickUp task about answer ids ("Importador: conservar los ids de las respuestas al reemplazar", in the list of the platform, space Diablohumastudio-learn): replacing a question from a file without answer ids gives its answers new ids, which breaks the link with exam attempts already saved. Drop this note once that task is closed.
 
 ## Required reading
 

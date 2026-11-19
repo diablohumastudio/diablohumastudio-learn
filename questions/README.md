@@ -14,7 +14,7 @@ Todo lo pertinente al banco de preguntas de práctica y examen vive en esta carp
 
 - **La fuente de verdad es el banco en Firestore** (`questions` y `examQuestions`). El Markdown de revisión es un documento de trabajo: se genera desde el banco y se devuelve al banco con los scripts. No se edita el banco con JSON escritos a mano.
 - **Fuera del banco no se mantiene nada.** Los archivos de `reviews/` son de trabajo: un JSON mientras se escribe un set nuevo, un Markdown mientras se revisa una ronda. Se commitean para ver los diffs entre pasos y pueden borrarse cuando lo que dicen ya está en el banco.
-- **Los ids de las respuestas se conservan.** Los exámenes guardan «en la pregunta X eligió la opción con id tal». Todo archivo de importación se construye desde un Export reciente, nunca desde cero (ver el pendiente del importador en [TODO.md](../TODO.md)).
+- **Los ids de las respuestas se conservan.** Los exámenes guardan «en la pregunta X eligió la opción con id tal». Todo archivo de importación se construye desde un Export reciente, nunca desde cero (ver el pendiente «Importador: conservar los ids de las respuestas al reemplazar» en ClickUp, lista de la plataforma).
 - **Nada se escribe sin revisión.** Import JSON muestra qué haría cada pregunta (nueva, reemplaza con cambios, idéntica) antes de escribir.
 - **Español es el idioma fuente.** Los nombres de producto y de objetos de Wwise van en inglés y con el nombre oficial de la versión del curso (Wwise 2025.1).
 
@@ -134,4 +134,4 @@ Decisiones tomadas el 2026-10-13: nivel por distractor con la escala de arriba; 
 
 Hecho el 2026-10-15: el banco guarda `level` en cada incorrecta; el editor lo exige al guardar (selector 1, 3, 5) e Import JSON lo exige en cada incorrecta del archivo; un cambio solo de niveles cuenta como cambio y se escribe. Las preguntas que todavía no lo tienen se leen igual hasta que se califiquen: la primera importación de `all_questions_2026_oct_13.md` las cubre todas.
 
-Pendiente: el modo en el jugador, los deberes y los exámenes, y que el banco guarde el estado de revisión para que el Markdown sea solo una vista regenerable. El diseño está en `TODO.md`: «Estado de revisión y versión de las preguntas» e «Historial de versiones de contenido».
+Pendiente: el modo en el jugador, los deberes y los exámenes, y que el banco guarde el estado de revisión para que el Markdown sea solo una vista regenerable. El diseño está en [docs/practice.md](../docs/practice.md), sección «Planned: review state and version of the questions».
