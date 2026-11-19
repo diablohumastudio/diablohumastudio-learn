@@ -9,6 +9,7 @@ The platform serves class presentations. It is unlisted (`noindex, nofollow`, ne
 | Registry | `src/data/learn.ts` | Single source of truth: courses → classes → presentation component, and courses → readings |
 | Presentations | `src/presentations/<course-slug>/<class-slug>.tsx` | One React component per class, built with `Deck`/`Slide` |
 | Deck engine | `src/components/learn/Deck.tsx` + `Deck.module.css` | Slide state, keyboard navigation, playhead/counter, `?s=` URL sync |
+| Narration | `src/components/learn/narration.ts`, `narration/` | The voice of a deck: reads each step's text and timings for `Deck`; `narration/scripts/generate-narration.js` generates the audio (see Narration below) |
 | Deck layout | `src/components/learn/LearnLayout.tsx` | Full-height shell for the decks; puts the course/class dropdowns and the Practice link in the header; `F` toggles full screen |
 | Page layout | `src/components/learn/LearnPageLayout.tsx` | Scrolling column for the menus, practice, teacher and sign-in pages |
 | Header | `src/components/learn/LearnHeader.tsx`, `AccountMenu.tsx`, `ConfigDialog.tsx`, `TeacherLink.tsx`, `useFullscreen.ts` | Shared by both layouts: `LEARN` links to `/courses`; the account name (or Guest user) opens a menu with Teacher (teachers only), language, full screen, Config (language, practice time per question and text size, from 4px smaller to 4px larger, applied to the pages but not to the decks) and sign in / sign out |
@@ -177,8 +178,54 @@ Gotchas:
 - Do not set `font-family` on SVG text — the stylesheet handles it (mono by default, `s.svgSans` for body font).
 - Use theme tokens (`var(--amber)`, `var(--panel)`, `var(--line)`…) from `src/components/learn/theme.module.css` in any new module CSS instead of hard-coding hex values. Inside SVG attributes, hex values matching the theme are fine (that is what the existing slides do).
 
+## Narration
+
+A deck can speak: every step has a text, a voice file and the moment each of its animations enters. A deck without narration behaves as before.
+
+| Piece | File | Role |
+|---|---|---|
+| Text | `src/presentations/<course>/<class>.narracion.json` | `{ es: { <stepId>: text }, en: { … } }`. The source of what is said and read. A mark `[n]` in the text is the point where turn `n` of the step enters |
+| Voices | `narration/voices.json` | ElevenLabs model and voice per language, and the macOS `say` voices used as a free draft |
+| Generator | `narration/scripts/generate-narration.js` | Writes one mp3 per step, the per-letter alignment and the timings file |
+| Audio | `public/assets/presentations/<course>/narracion/<class>/<lang>/<stepId>.mp3` | Generated |
+| Alignment | `narration/alignments/<course>/<class>/<lang>/<stepId>.json` | Generated: the time of every letter, kept so that moving a mark costs nothing |
+| Timings | `src/presentations/<course>/<class>.narracion-tiempos.json` | Generated: per step, its duration and the second of each mark. The only generated file the deck imports |
+
+Wiring a deck:
+
+- Give every `Slide` its `stepId`: the key of its label in the dictionary's `labels`, or an array with one key per step (`stepId={['ideas', 'datos']}`).
+- Build the narration of the current language with `buildNarration(texts[locale], timings[locale], audioBase)` and pass it to `<Deck narration={…}>`.
+- Delay every animation of a step by its turn: `animationDelay: var(--turn-<n>, <silent delay>)`. While a step sounds, `Deck` sets `--turn-<n>` on the slide to the second of mark `[n]`; without voice the fallback applies, so the deck keeps its own pace. `datos-y-programas.tsx` does it with its `turno(n)` helper.
+
+What the viewer gets:
+
+- With the voice on (the `voice` button or `V`; on by default, remembered in `localStorage`), a step sounds every time it starts, also when reached with the arrows.
+- `▶` (or `P`) plays the class from the current step: when a step's voice ends, the deck moves to the next one. Moving by hand stops it; the step reached still sounds.
+- `↻` (or `R`) repeats the current step: voice and animations.
+- The notes panel shows the text of the current step above the notes.
+- A browser does not play sound before the first click or key press on a page: after opening a deck by its URL or reloading it, the voice button shows a dashed border until then.
+
+Generating the voice, from the repo root:
+
+```sh
+node narration/scripts/generate-narration.js <course> <class> [--lang es|en] [--only step1,step2] [--provider elevenlabs|say|web] [--dry-run]
+node narration/scripts/generate-narration.js <course> <class> [--lang es|en] --web-script
+```
+
+- ElevenLabs (`ELEVENLABS_API_KEY` in `.env.local`) bills per character, not per request, so one file per step costs the same as one file for the class. Only the steps whose spoken text, voice or model changed are requested; `--dry-run` tells the cost without calling.
+- Moving a `[n]` mark does not change the spoken text: run the generator again and the timings are recomputed from the saved alignment, at no cost.
+- `--provider say` uses the macOS system voice (needs `ffmpeg`): free, for trying the steps and the marks before paying for the final voice. Its marks are approximate.
+- A free ElevenLabs account cannot use voices of the Voice Library through the API (error 402), only the premade ones. `--provider web` is the way around it: the audio is made by hand on the ElevenLabs website and the generator only cuts it into steps, at no cost.
+  - `--web-script` writes the text to paste there, `narration/para-elevenlabs/<class>/<lang>-<n>.txt`, in parts, with `<break time="2s" />` between steps. It never rewrites an existing script, because the audio is cut with it.
+  - Generate each part with the model Eleven Multilingual v2, which honours the break tag, and save it next to its text as `<lang>-<n>.mp3`. Those files are not in Git (`.gitignore`): they stay in the history of the ElevenLabs account, to download again if a part has to be cut again.
+  - The steps are split at those long pauses. A part that comes without them is split at the sentence pauses that best fit the length of each step, and the generator says so: listen to that part.
+  - The website gives no time per letter, so the marks are estimated: the spoken time is shared among the letters, and each pause of the audio is anchored to the nearest punctuation mark. A mark that sits at a comma or a full stop lands on its pause; one in the middle of a phrase can be off by a few tenths of a second.
+  - If the narration of a step changes after recording, the generator stops and names the step: the audio of that part has to be made again.
+- Two marks are never closer than 0.6 s, so two animations do not enter at once.
+
 ## Navigation reference
 
+- `V` turns the voice of a narrated deck on or off, `P` plays or pauses the class and `R` repeats the current step.
 - Keyboard: `←` `→` / space / PageUp / PageDown to move (through the steps of a stepped slide first), Home / End to jump to first/last slide.
 - `F` toggles full screen while a deck is open (Esc exits); the account menu has the same action.
 - `N` toggles the notes panel (also the `notes` button in the footer).

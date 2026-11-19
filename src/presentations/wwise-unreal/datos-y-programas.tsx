@@ -1,8 +1,13 @@
 import type { CSSProperties, ReactNode } from 'react';
 import Deck, { Slide, useSlideStep } from '../../components/learn/Deck';
 import s from '../../components/learn/Deck.module.css';
-import { useT } from '../../i18n/useT';
+import { buildNarration } from '../../components/learn/narration';
+import type { DeckNarration } from '../../components/learn/narration';
+import { useLocale, useT } from '../../i18n/useT';
+import type { Locale } from '../../i18n/locales';
 import { datosYProgramasDict } from './datos-y-programas.dict';
+import narracion from './datos-y-programas.narracion.json';
+import tiempos from './datos-y-programas.narracion-tiempos.json';
 import type { BibliotecaTexts, CierreTexts, DatoTexts, DatosYProgramasTexts, LenguajesTexts, ProgramaTexts } from './datos-y-programas.dict';
 
 const AMBAR: string = '#f2a33c';
@@ -10,17 +15,20 @@ const TEAL: string = '#63b6a4';
 const FONDO: string = '#1d2026';
 const FONDO_PROTAGONISTA: string = '#232730';
 const ASSETS_BASE: string = '/assets/presentations/wwise-unreal/';
+const NARRACION_AUDIO_BASE: string = `${ASSETS_BASE}narracion/datos-y-programas/`;
 /* Cada diapositiva con pasos avanza un paso (un clic) por párrafo de la narración
    del guion (`creacion_guiones_wwise-unreal/guion_clase_1_datos_y_programas.md`).
    Dentro de un paso, las acciones entre corchetes entran de una en una, por
-   turnos de 0,6 s, nunca a la vez: así cada paso es corto y se sincroniza con
-   la voz. */
+   turnos, nunca a la vez. Con voz, el turno n entra cuando la voz llega a la
+   marca `[n]` del paso en `datos-y-programas.narracion.json`: `Deck` pone ese
+   segundo en `--turn-n`. Sin voz, o si el turno no tiene marca, cada turno
+   espera 0,6 s más que el anterior. */
 const SEGUNDOS_POR_TURNO: number = 0.6;
 
 type Textos = DatosYProgramasTexts;
 
 function turno(numero: number): CSSProperties {
-  return { animationDelay: `${(numero * SEGUNDOS_POR_TURNO).toFixed(1)}s` };
+  return { animationDelay: `var(--turn-${numero}, ${(numero * SEGUNDOS_POR_TURNO).toFixed(1)}s)` };
 }
 
 /* ---------- Pasos y turnos ---------- */
@@ -95,7 +103,7 @@ function CajaIdea({ x, y, width, height, numero, texto, resaltada, fontSize }: {
    `oculto` reserva su lugar en el paso en que todavía no se muestra. */
 function EsquemaIdeas({ t, actual, entraGrande = false, oculto = false }: { t: Textos; actual?: number; entraGrande?: boolean; oculto?: boolean }) {
   const estiloEntrada: CSSProperties | undefined = entraGrande
-    ? ({ '--morph-from': 'translate(0px, 86px) scale(4.4)', transformOrigin: '0 0', animationDuration: '0.9s' } as CSSProperties)
+    ? ({ ...turno(0), '--morph-from': 'translate(0px, 86px) scale(4.4)', transformOrigin: '0 0', animationDuration: '0.9s' } as CSSProperties)
     : undefined;
   return (
     <svg className={`${s.minimap} ${entraGrande ? s.morphGlide : ''} ${oculto ? s.oculto : ''}`} style={estiloEntrada} viewBox="0 0 234 36" aria-hidden="true">
@@ -697,7 +705,7 @@ function FiguraLenguajes({ r, actual }: { r: LenguajesTexts; actual: number }) {
           const entrando: boolean = actual === P.lenguajes;
           return (
             <Pulsa key={titulo} paso={pasoDelNivel(index)} actual={actual}>
-              <g className={entrando ? s.morphIn : undefined} style={entrando ? { animationDelay: `${(index * 0.15).toFixed(2)}s` } : undefined}>
+              <g className={entrando ? s.morphIn : undefined} style={entrando ? { animationDelay: `calc(var(--turn-0, 0s) + ${(index * 0.15).toFixed(2)}s)` } : undefined}>
                 {esMaquina ? (
                   <rect x={NIVEL_X} y={y} width={NIVEL_ANCHO} height={NIVEL_ALTO} rx="8" fill={FONDO_PROTAGONISTA} stroke={AMBAR} strokeWidth="2" />
                 ) : (
@@ -786,10 +794,12 @@ function ContenidoCierre({ r }: { r: CierreTexts }) {
 export default function DatosYProgramas() {
   const t = useT(datosYProgramasDict);
   const l = t.labels;
+  const locale: Locale = useLocale();
+  const narration: DeckNarration = buildNarration(narracion[locale], tiempos[locale], `${NARRACION_AUDIO_BASE}${locale}/`);
 
   return (
-    <Deck name={t.name} context={t.context}>
-      <Slide z="▶" label={l.intro} backgroundImage={`${ASSETS_BASE}ComputerCover.jpg`}>
+    <Deck name={t.name} context={t.context} narration={narration}>
+      <Slide z="▶" stepId="intro" label={l.intro} backgroundImage={`${ASSETS_BASE}ComputerCover.jpg`}>
         <div className={s.eyebrow}>{t.cover.eyebrow}</div>
         <div className={s.morphIn} style={turno(0)}>
           <h1 className={s.morphGlide} style={estiloEscalaHtml(0)}>
@@ -803,11 +813,11 @@ export default function DatosYProgramas() {
         </div>
       </Slide>
 
-      <Slide z="0" label={[l.ideas, l.datos]}>
+      <Slide z="0" stepId={['ideas', 'datos']} label={[l.ideas, l.datos]}>
         <ContenidoIdeas t={t} />
       </Slide>
 
-      <Slide z="1" label={l.dato}>
+      <Slide z="1" stepId="dato" label={l.dato}>
         <EsquemaIdeas t={t} actual={0} />
         <h2>{t.dato.title}</h2>
         <FiguraDato r={t.dato} />
@@ -815,6 +825,7 @@ export default function DatosYProgramas() {
 
       <Slide
         z="="
+        stepId={['biblioteca', 'personas', 'librosAbiertos', 'mesas', 'estanterias', 'regla', 'computador', 'llegarCpu', 'cache', 'ram', 'disco', 'cargando']}
         label={[l.biblioteca, l.personas, l.librosAbiertos, l.mesas, l.estanterias, l.regla, l.computador, l.llegarCpu, l.cache, l.ram, l.disco, l.cargando]}
         notes={t.biblioteca.notes}
       >
@@ -822,18 +833,19 @@ export default function DatosYProgramas() {
         <ContenidoBiblioteca r={t.biblioteca} />
       </Slide>
 
-      <Slide z="2" label={[l.programa, l.codigo, l.ejemplos]} notes={t.programa.notes}>
+      <Slide z="2" stepId={['programa', 'codigo', 'ejemplos']} label={[l.programa, l.codigo, l.ejemplos]} notes={t.programa.notes}>
         <ContenidoPrograma t={t} />
       </Slide>
 
       <Slide
         z="="
+        stepId={['lenguajes', 'abstraccion', 'codigoMaquina', 'ensamblador', 'compilados', 'altoNivel', 'cpuLee', 'motores', 'desarrollo', 'wwise']}
         label={[l.lenguajes, l.abstraccion, l.codigoMaquina, l.ensamblador, l.compilados, l.altoNivel, l.cpuLee, l.motores, l.desarrollo, l.wwise]}
       >
         <ContenidoLenguajes t={t} />
       </Slide>
 
-      <Slide z="↺" label={[l.cierre, l.cierrePrograma]}>
+      <Slide z="↺" stepId={['cierre', 'cierrePrograma']} label={[l.cierre, l.cierrePrograma]}>
         <ContenidoCierre r={t.cierre} />
       </Slide>
     </Deck>
