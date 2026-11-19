@@ -3,16 +3,18 @@ import Deck, { Slide, useSlideStep } from '../../components/learn/Deck';
 import s from '../../components/learn/Deck.module.css';
 import { useT } from '../../i18n/useT';
 import { datosYProgramasDict } from './datos-y-programas.dict';
-import type { BibliotecaTexts, DatoTexts, DatosYProgramasTexts, LenguajesTexts, ProgramaTexts } from './datos-y-programas.dict';
+import type { BibliotecaTexts, CierreTexts, DatoTexts, DatosYProgramasTexts, LenguajesTexts, ProgramaTexts } from './datos-y-programas.dict';
 
 const AMBAR: string = '#f2a33c';
 const TEAL: string = '#63b6a4';
 const FONDO: string = '#1d2026';
 const FONDO_PROTAGONISTA: string = '#232730';
 const ASSETS_BASE: string = '/assets/presentations/wwise-unreal/';
-/* Las entradas de cada diapositiva se escalonan en el orden de la narración del
-   guion (`creacion_guiones_wwise-unreal/guion_clase_1_datos_y_programas.md`),
-   un turno por acción entre corchetes. */
+/* Cada diapositiva con pasos avanza un paso (un clic) por párrafo de la narración
+   del guion (`creacion_guiones_wwise-unreal/guion_clase_1_datos_y_programas.md`).
+   Dentro de un paso, las acciones entre corchetes entran de una en una, por
+   turnos de 0,6 s, nunca a la vez: así cada paso es corto y se sincroniza con
+   la voz. */
 const SEGUNDOS_POR_TURNO: number = 0.6;
 
 type Textos = DatosYProgramasTexts;
@@ -21,12 +23,15 @@ function turno(numero: number): CSSProperties {
   return { animationDelay: `${(numero * SEGUNDOS_POR_TURNO).toFixed(1)}s` };
 }
 
-/* ---------- Entradas escalonadas ---------- */
+/* ---------- Pasos y turnos ---------- */
 
-/* Aparece en su turno. Con `activo` en falso dibuja el grupo tal cual: para los
-   pasos de una diapositiva que ya mostró el elemento en un paso anterior. */
-function Entra({ turnoNumero, activo = true, children }: { turnoNumero: number; activo?: boolean; children: ReactNode }) {
-  if (!activo) return <g>{children}</g>;
+/* Un elemento pertenece a un paso: antes de ese paso no se dibuja, en ese paso
+   entra en su turno y después queda quieto. `actual` es el paso en pantalla. */
+type EnPaso = { paso: number; actual: number; turnoNumero?: number; children: ReactNode };
+
+function Entra({ paso, actual, turnoNumero = 0, children }: EnPaso) {
+  if (actual < paso) return null;
+  if (actual > paso) return <g>{children}</g>;
   return (
     <g className={s.morphIn} style={turno(turnoNumero)}>
       {children}
@@ -34,9 +39,9 @@ function Entra({ turnoNumero, activo = true, children }: { turnoNumero: number; 
   );
 }
 
-/* Resalta un grupo ya visible: pulsa en su turno. */
-function Pulsa({ turnoNumero, activo = true, children }: { turnoNumero: number; activo?: boolean; children: ReactNode }) {
-  if (!activo) return <g>{children}</g>;
+/* Resalta un elemento ya visible: pulsa en su turno, solo en su paso. */
+function Pulsa({ paso, actual, turnoNumero = 0, children }: EnPaso) {
+  if (actual !== paso) return <g>{children}</g>;
   return (
     <g className={s.morphPulse} style={turno(turnoNumero)}>
       {children}
@@ -44,36 +49,18 @@ function Pulsa({ turnoNumero, activo = true, children }: { turnoNumero: number; 
   );
 }
 
-function EntraYPulsa({ turnoNumero, children }: { turnoNumero: number; children: ReactNode }) {
+function EntraYPulsa({ paso, actual, turnoNumero = 0, children }: EnPaso) {
   return (
-    <Pulsa turnoNumero={turnoNumero}>
-      <Entra turnoNumero={turnoNumero}>{children}</Entra>
+    <Pulsa paso={paso} actual={actual} turnoNumero={turnoNumero}>
+      <Entra paso={paso} actual={actual} turnoNumero={turnoNumero}>
+        {children}
+      </Entra>
     </Pulsa>
   );
 }
 
-/* Entrada por escala: crece desde su centro mientras aparece. */
-function EntraPorEscala({ turnoNumero, children }: { turnoNumero: number; children: ReactNode }) {
-  const estilo = { ...turno(turnoNumero), '--morph-from': 'scale(0.7)', transformBox: 'fill-box', transformOrigin: 'center' } as CSSProperties;
-  return (
-    <g className={s.morphGlide} style={estilo}>
-      <Entra turnoNumero={turnoNumero}>{children}</Entra>
-    </g>
-  );
-}
-
-/* Se muestra desde un turno hasta otro: para las fotos que la voz enseña y luego borra. */
-function Temporal({ desde, hasta, children }: { desde: number; hasta: number; children: ReactNode }) {
-  return (
-    <g className={s.morphIn} style={turno(desde)}>
-      <g className={s.morphOut} style={turno(hasta)}>
-        {children}
-      </g>
-    </g>
-  );
-}
-
-/* La misma entrada por escala para un elemento HTML (título, kicker, pista). */
+/* La entrada por escala de un elemento HTML (título, kicker, pista): clases y
+   estilo solo mientras entra. */
 function estiloEscalaHtml(turnoNumero: number): CSSProperties {
   return { ...turno(turnoNumero), '--morph-from': 'scale(0.7)', transformOrigin: 'left center' } as CSSProperties;
 }
@@ -131,7 +118,7 @@ function ContenidoIdeas({ t }: { t: Textos }) {
       <figure className={paso === 1 ? s.oculto : undefined}>
         <svg viewBox="0 0 940 150" role="img" aria-label={t.ideas.aria}>
           {t.ideas.items.map((item, index) => (
-            <Entra key={item} turnoNumero={index} activo={paso === 0}>
+            <Entra key={item} paso={0} actual={paso} turnoNumero={index}>
               <CajaIdea x={50 + index * 440} y={28} width={400} height={90} numero={String(index + 1)} texto={item} resaltada fontSize={14} />
             </Entra>
           ))}
@@ -169,7 +156,7 @@ function FiguraDato({ r }: { r: DatoTexts }) {
             <rect x="321" y={TARJETA_Y + 1} width={TARJETA_ANCHO - 2} height={TARJETA_ALTO - 2} rx="8" />
           </clipPath>
         </defs>
-        <Entra turnoNumero={0}>
+        <Entra paso={0} actual={0} turnoNumero={0}>
           <Tarjeta x={20} rotulo={r.texto}>
             {r.textoLineas.map((linea, index) => (
               <text key={linea} className={s.svgSans} x="40" y={74 + index * 28} fontSize="15" fill="currentColor" opacity=".85">
@@ -178,7 +165,7 @@ function FiguraDato({ r }: { r: DatoTexts }) {
             ))}
           </Tarjeta>
         </Entra>
-        <Entra turnoNumero={1}>
+        <Entra paso={0} actual={0} turnoNumero={1}>
           <Tarjeta x={320} rotulo={r.imagen}>
             <image
               href={`${ASSETS_BASE}ComputerCover.jpg`}
@@ -191,7 +178,7 @@ function FiguraDato({ r }: { r: DatoTexts }) {
             />
           </Tarjeta>
         </Entra>
-        <Entra turnoNumero={2}>
+        <Entra paso={0} actual={0} turnoNumero={2}>
           <Tarjeta x={620} rotulo={r.sonido}>
             {ONDA.map((alto, index) => (
               <rect key={index} x={630 + index * 6} y={TARJETA_Y + TARJETA_ALTO / 2 - alto / 2} width="3" height={alto} rx="1" fill={AMBAR} />
@@ -228,39 +215,21 @@ const CACHES_EN_CPU: { x: number; y: number }[] = [
   { x: 464, y: 323 },
 ];
 
-/* Turnos de la narración de cada paso (guion, s=3). */
-const TURNOS_BIBLIOTECA = {
-  figura: 0,
-  titulo: 1,
-  kicker: 2,
-  personas: 3,
-  kickerResalte: 4,
-  librosAbiertos: 5,
-  leer: 6,
-  mesas: 7,
-  alcanzar: 8,
-  estanterias: 9,
-  levantarse: 10,
-  rotuloLento: 11,
-  rotuloRapido: 12,
-  rotuloInstante: 13,
-};
-
-const TURNOS_COMPUTADOR = {
-  cpu: 0,
-  kicker: 1,
-  cache: 2,
-  leerCache: 3,
-  fotoChipEntra: 4,
-  ram: 5,
-  traer: 6,
-  discos: 7,
-  todosLosDatos: 8,
-  cargar: 9,
-  fotoChipSale: 9,
-  fotoDiscoEntra: 10,
+/* Un paso por párrafo del guion (s=3): seis de biblioteca y seis de computador.
+   El orden es el de `labels` de la diapositiva. */
+const PASOS_BIBLIOTECA = {
+  biblioteca: 0,
+  personas: 1,
+  librosAbiertos: 2,
+  mesas: 3,
+  estanterias: 4,
+  regla: 5,
+  computador: 6,
+  llegarCpu: 7,
+  cache: 8,
+  ram: 9,
+  disco: 10,
   cargando: 11,
-  fotoDiscoSale: 14,
 };
 
 function Imagen({ pieza }: { pieza: Pieza }) {
@@ -278,35 +247,36 @@ function RotuloVelocidad({ x, texto }: { x: number; texto: string }) {
   );
 }
 
-/* Una casilla de la analogía. En el paso 1 la pieza de biblioteca se desvanece
-   y la del computador entra (deslizándose desde `glideFrom` si se indica) en
-   el turno que le toca en la narración. */
+/* Una casilla de la analogía: la pieza de biblioteca hasta `pasoMorph`, donde se
+   desvanece y entra la del computador (deslizándose desde `glideFrom` si se
+   indica); después queda la del computador. */
 function GrupoAnalogia({
-  paso,
-  turnoNumero,
+  actual,
+  pasoMorph,
   glideFrom,
   biblioteca,
   computador,
 }: {
-  paso: number;
-  turnoNumero: number;
+  actual: number;
+  pasoMorph: number;
   glideFrom?: string;
   biblioteca: ReactNode;
   computador: ReactNode;
 }) {
-  if (paso === 0) return <>{biblioteca}</>;
+  if (actual < pasoMorph) return <>{biblioteca}</>;
+  if (actual > pasoMorph) return <>{computador}</>;
   const entrada = (
-    <g className={s.morphIn} style={turno(turnoNumero)}>
+    <g className={s.morphIn} style={turno(0)}>
       {computador}
     </g>
   );
   return (
     <>
-      <g className={s.morphOut} style={turno(turnoNumero)}>
+      <g className={s.morphOut} style={turno(0)}>
         {biblioteca}
       </g>
       {glideFrom ? (
-        <g className={s.morphGlide} style={{ ...turno(turnoNumero), '--morph-from': glideFrom } as CSSProperties}>
+        <g className={s.morphGlide} style={{ ...turno(0), '--morph-from': glideFrom } as CSSProperties}>
           {entrada}
         </g>
       ) : (
@@ -317,7 +287,7 @@ function GrupoAnalogia({
 }
 
 /* Foto del chip de un procesador, con un núcleo y la memoria caché señalados;
-   la voz la enseña un momento y luego la borra. */
+   se muestra en el paso de la caché y se borra al siguiente clic. */
 function FotoChip({ r }: { r: BibliotecaTexts }) {
   return (
     <g>
@@ -342,45 +312,41 @@ function FotoDisco({ r }: { r: BibliotecaTexts }) {
   );
 }
 
-/* Un solo slide con dos pasos: la biblioteca y, al avanzar, el computador. En el
-   paso 0 cada rótulo entra en el turno en que la voz lo nombra; en el paso 1 las
-   piezas cruzan a sus equivalentes en ese mismo orden. */
-function FiguraBiblioteca({ r }: { r: BibliotecaTexts }) {
-  const paso: number = useSlideStep();
+/* La figura de la analogía a lo largo de los doce pasos. */
+function FiguraBiblioteca({ r, actual }: { r: BibliotecaTexts; actual: number }) {
   const b = r.biblioteca;
   const c = r.computador;
-  const tb = TURNOS_BIBLIOTECA;
-  const tc = TURNOS_COMPUTADOR;
-  const enBiblioteca: boolean = paso === 0;
-  const estiloFigura = { ...turno(tb.figura), '--morph-from': 'scale(0.8)', transformBox: 'fill-box', transformOrigin: 'center' } as CSSProperties;
+  const P = PASOS_BIBLIOTECA;
+  const entrando: boolean = actual === P.biblioteca;
+  const estiloFigura = { ...turno(0), '--morph-from': 'scale(0.8)', transformBox: 'fill-box', transformOrigin: 'center' } as CSSProperties;
   return (
     <figure>
-      <svg viewBox="0 0 920 455" role="img" aria-label={r.arias[paso]}>
+      <svg viewBox="0 0 920 455" role="img" aria-label={r.arias[actual < P.computador ? 0 : 1]}>
         <defs>
           <Marcador id="arrD1" color={AMBAR} />
           <Marcador id="arrD1t" color={TEAL} />
         </defs>
 
-        <g className={s.morphGlide} style={estiloFigura}>
-          <g className={s.morphIn} style={turno(tb.figura)}>
+        <g className={entrando ? s.morphGlide : undefined} style={entrando ? estiloFigura : undefined}>
+          <g className={entrando ? s.morphIn : undefined} style={entrando ? turno(0) : undefined}>
             <line x1="460" y1="152" x2="460" y2="172" stroke={TEAL} strokeWidth="2" markerEnd="url(#arrD1t)" />
             <line x1="254" y1="295" x2="350" y2="295" stroke={AMBAR} strokeWidth="2" markerEnd="url(#arrD1)" />
             <line x1="666" y1="295" x2="570" y2="295" stroke={AMBAR} strokeWidth="2" markerEnd="url(#arrD1)" />
 
             <GrupoAnalogia
-              paso={paso}
-              turnoNumero={tc.cpu}
+              actual={actual}
+              pasoMorph={P.computador}
               biblioteca={
                 <>
-                  <Pulsa turnoNumero={tb.librosAbiertos} activo={enBiblioteca}>
-                    <Pulsa turnoNumero={tb.personas} activo={enBiblioteca}>
+                  <Pulsa paso={P.librosAbiertos} actual={actual}>
+                    <Pulsa paso={P.personas} actual={actual}>
                       <Imagen pieza={PIEZAS.mesaCentral} />
                     </Pulsa>
                   </Pulsa>
                   <text x="455" y="430" fontSize="12" fill={AMBAR} textAnchor="end">{b.librosAbiertos}</text>
                   <text x="465" y="430" fontSize="10.5" fill="currentColor" opacity=".6">{b.materiaActual}</text>
-                  <Pulsa turnoNumero={tb.rotuloInstante} activo={enBiblioteca}>
-                    <Entra turnoNumero={tb.leer} activo={enBiblioteca}>
+                  <Pulsa paso={P.regla} actual={actual} turnoNumero={2}>
+                    <Entra paso={P.librosAbiertos} actual={actual} turnoNumero={1}>
                       <text x="460" y="446" fontSize="10.5" fill={AMBAR} textAnchor="middle">{b.leer}</text>
                     </Entra>
                   </Pulsa>
@@ -391,12 +357,12 @@ function FiguraBiblioteca({ r }: { r: BibliotecaTexts }) {
                   <Imagen pieza={PIEZAS.cpu} />
                   <text x="455" y="430" fontSize="12" fill={AMBAR} textAnchor="end">{c.cpu} · {c.cache}</text>
                   <text x="465" y="430" fontSize="10.5" fill="currentColor" opacity=".6">{c.loQueUsas}</text>
-                  <EntraYPulsa turnoNumero={tc.cache}>
+                  <EntraYPulsa paso={P.cache} actual={actual}>
                     {CACHES_EN_CPU.map((cache) => (
                       <rect key={`${cache.x}-${cache.y}`} x={cache.x} y={cache.y} width="44" height="20" rx="4" fill="none" stroke={AMBAR} strokeWidth="2" />
                     ))}
                   </EntraYPulsa>
-                  <Entra turnoNumero={tc.leerCache}>
+                  <Entra paso={P.cache} actual={actual} turnoNumero={1}>
                     <text x="460" y="446" fontSize="10.5" fill={AMBAR} textAnchor="middle">{c.leerCache}</text>
                   </Entra>
                 </>
@@ -404,19 +370,19 @@ function FiguraBiblioteca({ r }: { r: BibliotecaTexts }) {
             />
 
             <GrupoAnalogia
-              paso={paso}
-              turnoNumero={tc.ram}
+              actual={actual}
+              pasoMorph={P.ram}
               glideFrom="translateX(-40px)"
               biblioteca={
                 <>
-                  <Pulsa turnoNumero={tb.mesas} activo={enBiblioteca}>
+                  <Pulsa paso={P.mesas} actual={actual}>
                     <Imagen pieza={PIEZAS.mesaIzquierda} />
                   </Pulsa>
-                  <Entra turnoNumero={tb.mesas} activo={enBiblioteca}>
+                  <Entra paso={P.mesas} actual={actual}>
                     <text x="200" y="430" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2" textAnchor="middle">{b.laMesa}</text>
                   </Entra>
-                  <Pulsa turnoNumero={tb.rotuloRapido} activo={enBiblioteca}>
-                    <Entra turnoNumero={tb.alcanzar} activo={enBiblioteca}>
+                  <Pulsa paso={P.regla} actual={actual} turnoNumero={1}>
+                    <Entra paso={P.mesas} actual={actual} turnoNumero={1}>
                       <RotuloVelocidad x={302} texto={b.alcanzar} />
                     </Entra>
                   </Pulsa>
@@ -426,7 +392,7 @@ function FiguraBiblioteca({ r }: { r: BibliotecaTexts }) {
                 <>
                   <Imagen pieza={PIEZAS.ramIzquierda} />
                   <text x="200" y="430" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2" textAnchor="middle">{c.ram}</text>
-                  <Entra turnoNumero={tc.traer}>
+                  <Entra paso={P.ram} actual={actual} turnoNumero={1}>
                     <RotuloVelocidad x={302} texto={c.traer} />
                   </Entra>
                 </>
@@ -434,19 +400,19 @@ function FiguraBiblioteca({ r }: { r: BibliotecaTexts }) {
             />
 
             <GrupoAnalogia
-              paso={paso}
-              turnoNumero={tc.ram}
+              actual={actual}
+              pasoMorph={P.ram}
               glideFrom="translateX(40px)"
               biblioteca={
                 <>
-                  <Pulsa turnoNumero={tb.mesas} activo={enBiblioteca}>
+                  <Pulsa paso={P.mesas} actual={actual}>
                     <Imagen pieza={PIEZAS.mesaDerecha} />
                   </Pulsa>
-                  <Entra turnoNumero={tb.mesas} activo={enBiblioteca}>
+                  <Entra paso={P.mesas} actual={actual}>
                     <text x="720" y="430" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2" textAnchor="middle">{b.laMesa}</text>
                   </Entra>
-                  <Pulsa turnoNumero={tb.rotuloRapido} activo={enBiblioteca}>
-                    <Entra turnoNumero={tb.alcanzar} activo={enBiblioteca}>
+                  <Pulsa paso={P.regla} actual={actual} turnoNumero={1}>
+                    <Entra paso={P.mesas} actual={actual} turnoNumero={1}>
                       <RotuloVelocidad x={618} texto={b.alcanzar} />
                     </Entra>
                   </Pulsa>
@@ -456,7 +422,7 @@ function FiguraBiblioteca({ r }: { r: BibliotecaTexts }) {
                 <>
                   <Imagen pieza={PIEZAS.ramDerecha} />
                   <text x="720" y="430" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2" textAnchor="middle">{c.ram}</text>
-                  <Entra turnoNumero={tc.traer}>
+                  <Entra paso={P.ram} actual={actual} turnoNumero={1}>
                     <RotuloVelocidad x={618} texto={c.traer} />
                   </Entra>
                 </>
@@ -464,20 +430,20 @@ function FiguraBiblioteca({ r }: { r: BibliotecaTexts }) {
             />
 
             <GrupoAnalogia
-              paso={paso}
-              turnoNumero={tc.discos}
+              actual={actual}
+              pasoMorph={P.disco}
               glideFrom="translateY(-30px)"
               biblioteca={
                 <>
-                  <Pulsa turnoNumero={tb.estanterias} activo={enBiblioteca}>
+                  <Pulsa paso={P.estanterias} actual={actual}>
                     <Imagen pieza={PIEZAS.estanterias} />
                   </Pulsa>
                   <text x="275" y="145" fontSize="12" fill={TEAL}>{b.estanterias}</text>
-                  <Entra turnoNumero={tb.estanterias} activo={enBiblioteca}>
+                  <Entra paso={P.estanterias} actual={actual}>
                     <text x="645" y="145" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="end">{b.todasLasMaterias}</text>
                   </Entra>
-                  <Pulsa turnoNumero={tb.rotuloLento} activo={enBiblioteca}>
-                    <Entra turnoNumero={tb.levantarse} activo={enBiblioteca}>
+                  <Pulsa paso={P.regla} actual={actual} turnoNumero={0}>
+                    <Entra paso={P.estanterias} actual={actual} turnoNumero={1}>
                       <text x="470" y="166" fontSize="10.5" fill={TEAL}>{b.levantarse}</text>
                     </Entra>
                   </Pulsa>
@@ -487,79 +453,78 @@ function FiguraBiblioteca({ r }: { r: BibliotecaTexts }) {
                 <>
                   <Imagen pieza={PIEZAS.discos} />
                   <text x="275" y="145" fontSize="12" fill={TEAL}>{c.discoDuro}</text>
-                  <Entra turnoNumero={tc.todosLosDatos}>
+                  <Entra paso={P.disco} actual={actual} turnoNumero={1}>
                     <text x="645" y="145" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="end">{c.todosLosDatos}</text>
                   </Entra>
-                  <Entra turnoNumero={tc.cargar}>
+                  <Entra paso={P.disco} actual={actual} turnoNumero={2}>
                     <text x="470" y="166" fontSize="10.5" fill={TEAL}>{c.cargar}</text>
                   </Entra>
                 </>
               }
             />
 
-            {paso === 1 && (
-              <>
-                <Entra turnoNumero={tc.cargando}>
-                  <path d="M 292 100 L 212 100 Q 200 100 200 112 L 200 172" fill="none" stroke={AMBAR} strokeWidth="2" markerEnd="url(#arrD1)" />
-                  <text x="246" y="92" fontSize="10.5" fill={AMBAR} textAnchor="middle">{c.cargando}</text>
-                </Entra>
-                <Temporal desde={tc.fotoChipEntra} hasta={tc.fotoChipSale}>
-                  <FotoChip r={r} />
-                </Temporal>
-                <Temporal desde={tc.fotoDiscoEntra} hasta={tc.fotoDiscoSale}>
-                  <FotoDisco r={r} />
-                </Temporal>
-              </>
+            <Entra paso={P.cargando} actual={actual}>
+              <path d="M 292 100 L 212 100 Q 200 100 200 112 L 200 172" fill="none" stroke={AMBAR} strokeWidth="2" markerEnd="url(#arrD1)" />
+              <text x="246" y="92" fontSize="10.5" fill={AMBAR} textAnchor="middle">{c.cargando}</text>
+            </Entra>
+
+            {/* Las fotos viven solo en su paso: el siguiente clic las borra. */}
+            {actual === P.cache && (
+              <Entra paso={P.cache} actual={actual} turnoNumero={2}>
+                <FotoChip r={r} />
+              </Entra>
+            )}
+            {actual === P.disco && (
+              <Entra paso={P.disco} actual={actual} turnoNumero={3}>
+                <FotoDisco r={r} />
+              </Entra>
             )}
           </g>
         </g>
       </svg>
-      <figcaption className={paso === 1 ? s.morphIn : s.oculto} style={turno(tc.cargando)}>
+      <figcaption className={actual < P.cargando ? s.oculto : actual === P.cargando ? s.morphIn : undefined} style={turno(0)}>
         {r.caption}
       </figcaption>
     </figure>
   );
 }
 
-/* Kicker y título entran por escala en el paso 0; en el paso 1 el kicker cambia
-   (crossfade al remontarse con `key`) y el título no se mueve. */
+/* Kicker y título entran por escala en el primer paso; el kicker pulsa en el
+   paso de las personas y cambia (remontado con `key`) al llegar a la CPU. */
 function ContenidoBiblioteca({ r }: { r: BibliotecaTexts }) {
-  const paso: number = useSlideStep();
-  const tb = TURNOS_BIBLIOTECA;
-  const tc = TURNOS_COMPUTADOR;
+  const actual: number = useSlideStep();
+  const P = PASOS_BIBLIOTECA;
+  const entrando: boolean = actual === P.biblioteca;
   return (
     <>
-      {paso === 0 ? (
-        <div className={s.morphPulse} style={{ ...turno(tb.kickerResalte), alignSelf: 'flex-start', transformOrigin: 'left center' }}>
-          <div className={s.morphIn} style={turno(tb.kicker)}>
-            <div className={`${s.eyebrow} ${s.morphGlide}`} style={estiloEscalaHtml(tb.kicker)}>
+      {actual < P.llegarCpu ? (
+        <div className={actual === P.personas ? s.morphPulse : undefined} style={{ ...turno(1), alignSelf: 'flex-start', transformOrigin: 'left center' }}>
+          <div className={entrando ? s.morphIn : undefined} style={turno(2)}>
+            <div className={`${s.eyebrow} ${entrando ? s.morphGlide : ''}`} style={entrando ? estiloEscalaHtml(2) : undefined}>
               {r.eyebrows[0]}
             </div>
           </div>
         </div>
       ) : (
-        <div key="computador" className={`${s.eyebrow} ${s.morphIn}`} style={turno(tc.kicker)}>
+        <div key="computador" className={`${s.eyebrow} ${actual === P.llegarCpu ? s.morphIn : ''}`} style={turno(0)}>
           {r.eyebrows[1]}
         </div>
       )}
-      <div className={s.morphIn} style={turno(tb.titulo)}>
-        <h2 className={s.morphGlide} style={estiloEscalaHtml(tb.titulo)}>
+      <div className={entrando ? s.morphIn : undefined} style={turno(1)}>
+        <h2 className={entrando ? s.morphGlide : undefined} style={entrando ? estiloEscalaHtml(1) : undefined}>
           {r.title}
         </h2>
       </div>
-      <FiguraBiblioteca r={r} />
+      <FiguraBiblioteca r={r} actual={actual} />
     </>
   );
 }
 
 /* ---------- Qué es un programa ---------- */
 
-const TURNOS_PROGRAMA = {
-  codigo: 1,
-  conversor: 2,
-  instrucciones: 3,
-  ejemplos: 4,
-};
+/* Tres pasos: el esquema de ideas se encoge, el camino del código a las
+   instrucciones, y los ejemplos. */
+const PASOS_PROGRAMA = { programa: 0, codigo: 1, ejemplos: 2 };
 
 const EJEMPLOS_Y: number = 300;
 const EJEMPLOS_ALTO: number = 110;
@@ -592,9 +557,15 @@ function IconoPc() {
   );
 }
 
-function FiguraPrograma({ r }: { r: ProgramaTexts }) {
-  const tp = TURNOS_PROGRAMA;
-  const estiloEscala = { ...turno(tp.ejemplos), '--morph-from': 'scale(1.08)', transformBox: 'fill-box', transformOrigin: '50% 0' } as CSSProperties;
+function FiguraPrograma({ r, actual }: { r: ProgramaTexts; actual: number }) {
+  const P = PASOS_PROGRAMA;
+  /* El esquema de arriba está un poco más grande hasta que entran los ejemplos; entonces se encoge. */
+  const estiloEsquema: CSSProperties =
+    actual < P.ejemplos
+      ? { transform: 'scale(1.08)', transformBox: 'fill-box', transformOrigin: '50% 0' }
+      : actual === P.ejemplos
+        ? ({ ...turno(0), '--morph-from': 'scale(1.08)', transformBox: 'fill-box', transformOrigin: '50% 0' } as CSSProperties)
+        : {};
   return (
     <figure>
       <svg viewBox="0 0 900 440" role="img" aria-label={r.aria}>
@@ -602,9 +573,8 @@ function FiguraPrograma({ r }: { r: ProgramaTexts }) {
           <Marcador id="arrDP" color={AMBAR} />
         </defs>
 
-        {/* El esquema de arriba se encoge un poco cuando entran los ejemplos. */}
-        <g className={s.morphGlide} style={estiloEscala}>
-          <Entra turnoNumero={tp.codigo}>
+        <g className={actual === P.ejemplos ? s.morphGlide : undefined} style={estiloEsquema}>
+          <Entra paso={P.codigo} actual={actual} turnoNumero={0}>
             <text x="140" y="30" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.archivo}</text>
             <rect x="40" y="40" width="200" height="120" rx="8" fill={FONDO} stroke="currentColor" strokeOpacity=".35" />
             {r.codigo.map((linea, index) => (
@@ -617,14 +587,14 @@ function FiguraPrograma({ r }: { r: ProgramaTexts }) {
             <line x1="110" y1="186" x2="110" y2="166" stroke={AMBAR} strokeWidth="2" markerEnd="url(#arrDP)" />
           </Entra>
 
-          <EntraYPulsa turnoNumero={tp.conversor}>
+          <EntraYPulsa paso={P.codigo} actual={actual} turnoNumero={1}>
             <line x1="240" y1="100" x2="312" y2="100" stroke={AMBAR} strokeWidth="2" markerEnd="url(#arrDP)" />
             <rect x="320" y="70" width="240" height="60" rx="8" fill={FONDO_PROTAGONISTA} stroke={AMBAR} strokeWidth="2" />
             <text x="440" y="95" fontSize="12" fill={AMBAR} textAnchor="middle">{r.conversor}</text>
             <text x="440" y="114" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.conversorSub}</text>
           </EntraYPulsa>
 
-          <Entra turnoNumero={tp.instrucciones}>
+          <Entra paso={P.codigo} actual={actual} turnoNumero={2}>
             <line x1="560" y1="100" x2="632" y2="100" stroke={AMBAR} strokeWidth="2" markerEnd="url(#arrDP)" />
             <text x="750" y="30" fontSize="10.5" fill="currentColor" opacity=".6" textAnchor="middle">{r.instrucciones}</text>
             <rect x="640" y="40" width="220" height="120" rx="8" fill={FONDO} stroke="currentColor" strokeOpacity=".35" />
@@ -639,7 +609,7 @@ function FiguraPrograma({ r }: { r: ProgramaTexts }) {
           </Entra>
         </g>
 
-        <Entra turnoNumero={tp.ejemplos}>
+        <Entra paso={P.ejemplos} actual={actual}>
           <path d="M 750 246 L 750 262 Q 750 270 742 270 L 226 270 Q 218 270 218 278 L 218 294" fill="none" stroke={AMBAR} strokeWidth="2" markerEnd="url(#arrDP)" />
           <line x1="450" y1="270" x2="450" y2="294" stroke={AMBAR} strokeWidth="2" markerEnd="url(#arrDP)" />
           <line x1="681" y1="270" x2="681" y2="294" stroke={AMBAR} strokeWidth="2" markerEnd="url(#arrDP)" />
@@ -665,31 +635,54 @@ function FiguraPrograma({ r }: { r: ProgramaTexts }) {
   );
 }
 
+function ContenidoPrograma({ t }: { t: Textos }) {
+  const actual: number = useSlideStep();
+  return (
+    <>
+      <EsquemaIdeas t={t} actual={1} entraGrande={actual === PASOS_PROGRAMA.programa} />
+      <h2>{t.programa.title}</h2>
+      <FiguraPrograma r={t.programa} actual={actual} />
+    </>
+  );
+}
+
 /* ---------- Niveles de abstracción ---------- */
+
+/* Diez pasos, uno por párrafo: las cajas, los rótulos de abstracción, una
+   explicación por nivel (de abajo hacia arriba), y los cuatro callouts. */
+const PASOS_LENGUAJES = {
+  lenguajes: 0,
+  abstraccion: 1,
+  codigoMaquina: 2,
+  ensamblador: 3,
+  compilados: 4,
+  altoNivel: 5,
+  cpuLee: 6,
+  motores: 7,
+  desarrollo: 8,
+  wwise: 9,
+};
 
 const NIVEL_X: number = 220;
 const NIVEL_ANCHO: number = 400;
 const NIVEL_ALTO: number = 58;
 const CUADRO_X: number = 640;
 const CUADRO_ANCHO: number = 270;
-const TURNO_CAJAS: number = 0;
-const TURNO_ABSTRACCION: number = 1;
-const TURNO_PRIMERA_EXPLICACION: number = 2;
-/* Cada explicación queda unos seis segundos, lo que tarda la voz en leerla. */
-const TURNOS_POR_EXPLICACION: number = 10;
-const TURNOS_CALLOUTS = { laCpuLee: 3, masRapido: 4, masFacil: 5, tuEscribes: 6 };
 
 function nivelY(index: number): number {
   return 34 + index * 94;
 }
 
-/* La voz explica las cajas de abajo hacia arriba: código máquina primero. */
-function turnoExplicacion(index: number): number {
-  return TURNO_PRIMERA_EXPLICACION + (3 - index) * TURNOS_POR_EXPLICACION;
+/* La voz explica las cajas de abajo hacia arriba: código máquina (índice 3) en
+   el paso `codigoMaquina`, y así hasta la de arriba. */
+function pasoDelNivel(index: number): number {
+  return PASOS_LENGUAJES.codigoMaquina + (3 - index);
 }
 
-function FiguraLenguajes({ r }: { r: LenguajesTexts }) {
-  const tcall = TURNOS_CALLOUTS;
+function FiguraLenguajes({ r, actual }: { r: LenguajesTexts; actual: number }) {
+  const P = PASOS_LENGUAJES;
+  const nivelExplicado: number = 3 - (actual - P.codigoMaquina);
+  const explicando: boolean = actual >= P.codigoMaquina && actual <= P.altoNivel;
   return (
     <figure>
       <svg viewBox="0 0 920 420" role="img" aria-label={r.aria}>
@@ -701,9 +694,10 @@ function FiguraLenguajes({ r }: { r: LenguajesTexts }) {
         {r.niveles.map(({ titulo }, index) => {
           const y: number = nivelY(index);
           const esMaquina: boolean = index === r.niveles.length - 1;
+          const entrando: boolean = actual === P.lenguajes;
           return (
-            <Pulsa key={titulo} turnoNumero={turnoExplicacion(index)}>
-              <g className={s.morphIn} style={{ animationDelay: `${(TURNO_CAJAS * SEGUNDOS_POR_TURNO + index * 0.15).toFixed(2)}s` }}>
+            <Pulsa key={titulo} paso={pasoDelNivel(index)} actual={actual}>
+              <g className={entrando ? s.morphIn : undefined} style={entrando ? { animationDelay: `${(index * 0.15).toFixed(2)}s` } : undefined}>
                 {esMaquina ? (
                   <rect x={NIVEL_X} y={y} width={NIVEL_ANCHO} height={NIVEL_ALTO} rx="8" fill={FONDO_PROTAGONISTA} stroke={AMBAR} strokeWidth="2" />
                 ) : (
@@ -717,39 +711,40 @@ function FiguraLenguajes({ r }: { r: LenguajesTexts }) {
           );
         })}
 
-        <Entra turnoNumero={TURNO_ABSTRACCION}>
-          <text x={NIVEL_X} y="18" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.masCercaHumano}</text>
-          <text x={NIVEL_X} y="398" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.masCercaMaquina}</text>
+        <Entra paso={P.abstraccion} actual={actual}>
           <text x="200" y="67" fontSize="11.5" fill={TEAL} letterSpacing="2" textAnchor="end">{r.masAbstracto}</text>
           <text x="200" y="349" fontSize="11.5" fill={AMBAR} letterSpacing="2" textAnchor="end">{r.menosAbstracto}</text>
         </Entra>
 
-        {r.niveles.map(({ titulo, explicacion }, index) => (
-          <Temporal key={titulo} desde={turnoExplicacion(index)} hasta={turnoExplicacion(index) + TURNOS_POR_EXPLICACION}>
+        {/* El cuadro de explicación cambia de nivel en cada paso y se borra al pasar a la CPU. */}
+        {explicando && (
+          <g key={actual} className={s.morphIn} style={turno(0)}>
             <rect x={CUADRO_X} y="120" width={CUADRO_ANCHO} height="140" rx="8" fill={FONDO} stroke="currentColor" strokeOpacity=".35" />
-            <text x={CUADRO_X + 16} y="146" fontSize="11" fill={AMBAR}>{titulo}</text>
-            {explicacion.map((linea, lineaIndex) => (
+            <text x={CUADRO_X + 16} y="146" fontSize="11" fill={AMBAR}>{r.niveles[nivelExplicado].titulo}</text>
+            {r.niveles[nivelExplicado].explicacion.map((linea, lineaIndex) => (
               <text key={linea} x={CUADRO_X + 16} y={172 + lineaIndex * 18} fontSize="10.5" fill="currentColor" opacity=".8">
                 {linea}
               </text>
             ))}
-          </Temporal>
-        ))}
+          </g>
+        )}
 
-        <Entra turnoNumero={tcall.masFacil}>
-          <text x={NIVEL_X + NIVEL_ANCHO} y="18" fontSize="10.5" fill={TEAL} textAnchor="end">{r.masFacil}</text>
-        </Entra>
-        <Entra turnoNumero={tcall.masRapido}>
+        <EntraYPulsa paso={P.cpuLee} actual={actual}>
+          <text x="780" y="335" fontSize="10.5" fill={AMBAR} textAnchor="middle">{r.laCpuLee}</text>
+          <line x1="700" y1="345" x2="628" y2="345" stroke={AMBAR} strokeWidth="2" markerEnd="url(#arrD7)" />
+        </EntraYPulsa>
+        <Entra paso={P.motores} actual={actual}>
+          <text x={NIVEL_X} y="398" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.masCercaMaquina}</text>
           <text x={NIVEL_X + NIVEL_ANCHO} y="398" fontSize="10.5" fill={AMBAR} textAnchor="end">{r.masRapido}</text>
         </Entra>
-        <EntraYPulsa turnoNumero={tcall.tuEscribes}>
+        <Entra paso={P.desarrollo} actual={actual}>
+          <text x={NIVEL_X} y="18" fontSize="11.5" fill="currentColor" opacity=".65" letterSpacing="2">{r.masCercaHumano}</text>
+          <text x={NIVEL_X + NIVEL_ANCHO} y="18" fontSize="10.5" fill={TEAL} textAnchor="end">{r.masFacil}</text>
+        </Entra>
+        <EntraYPulsa paso={P.wwise} actual={actual}>
           <text x="780" y="50" fontSize="10" fill={TEAL} textAnchor="middle">{r.tuEscribes[0]}</text>
           <text x="780" y="64" fontSize="10" fill={TEAL} textAnchor="middle">{r.tuEscribes[1]}</text>
           <line x1="700" y1="78" x2="628" y2="78" stroke={TEAL} strokeWidth="2" markerEnd="url(#arrD7t)" />
-        </EntraYPulsa>
-        <EntraYPulsa turnoNumero={tcall.laCpuLee}>
-          <text x="780" y="335" fontSize="10.5" fill={AMBAR} textAnchor="middle">{r.laCpuLee}</text>
-          <line x1="700" y1="345" x2="628" y2="345" stroke={AMBAR} strokeWidth="2" markerEnd="url(#arrD7)" />
         </EntraYPulsa>
       </svg>
       <figcaption>{r.caption}</figcaption>
@@ -757,12 +752,44 @@ function FiguraLenguajes({ r }: { r: LenguajesTexts }) {
   );
 }
 
+function ContenidoLenguajes({ t }: { t: Textos }) {
+  const actual: number = useSlideStep();
+  return (
+    <>
+      <EsquemaIdeas t={t} actual={1} />
+      <div className={s.eyebrow}>{t.lenguajes.eyebrow}</div>
+      <h2>{t.lenguajes.title}</h2>
+      <FiguraLenguajes r={t.lenguajes} actual={actual} />
+    </>
+  );
+}
+
+/* ---------- Cierre ---------- */
+
+/* Dos pasos, una frase cada uno. */
+function ContenidoCierre({ r }: { r: CierreTexts }) {
+  const actual: number = useSlideStep();
+  return (
+    <>
+      <h2>{r.title}</h2>
+      {r.ideas.map((idea, index) =>
+        actual >= index ? (
+          <p key={idea.clave} className={`${s.lede} ${actual === index ? s.morphIn : ''}`} style={turno(0)}>
+            <span className={s.accent}>{idea.clave}</span> {idea.texto}
+          </p>
+        ) : null,
+      )}
+    </>
+  );
+}
+
 export default function DatosYProgramas() {
   const t = useT(datosYProgramasDict);
+  const l = t.labels;
 
   return (
     <Deck name={t.name} context={t.context}>
-      <Slide z="▶" label={t.labels.intro} backgroundImage={`${ASSETS_BASE}ComputerCover.jpg`}>
+      <Slide z="▶" label={l.intro} backgroundImage={`${ASSETS_BASE}ComputerCover.jpg`}>
         <div className={s.eyebrow}>{t.cover.eyebrow}</div>
         <div className={s.morphIn} style={turno(0)}>
           <h1 className={s.morphGlide} style={estiloEscalaHtml(0)}>
@@ -776,41 +803,38 @@ export default function DatosYProgramas() {
         </div>
       </Slide>
 
-      <Slide z="0" label={[t.labels.ideas, t.labels.datos]}>
+      <Slide z="0" label={[l.ideas, l.datos]}>
         <ContenidoIdeas t={t} />
       </Slide>
 
-      <Slide z="1" label={t.labels.dato}>
+      <Slide z="1" label={l.dato}>
         <EsquemaIdeas t={t} actual={0} />
         <h2>{t.dato.title}</h2>
         <FiguraDato r={t.dato} />
       </Slide>
 
-      <Slide z="=" label={[t.labels.biblioteca, t.labels.computador]} notes={t.biblioteca.notes}>
+      <Slide
+        z="="
+        label={[l.biblioteca, l.personas, l.librosAbiertos, l.mesas, l.estanterias, l.regla, l.computador, l.llegarCpu, l.cache, l.ram, l.disco, l.cargando]}
+        notes={t.biblioteca.notes}
+      >
         <EsquemaIdeas t={t} actual={0} />
         <ContenidoBiblioteca r={t.biblioteca} />
       </Slide>
 
-      <Slide z="2" label={t.labels.programa} notes={t.programa.notes}>
-        <EsquemaIdeas t={t} actual={1} entraGrande />
-        <h2>{t.programa.title}</h2>
-        <FiguraPrograma r={t.programa} />
+      <Slide z="2" label={[l.programa, l.codigo, l.ejemplos]} notes={t.programa.notes}>
+        <ContenidoPrograma t={t} />
       </Slide>
 
-      <Slide z="=" label={t.labels.lenguajes}>
-        <EsquemaIdeas t={t} actual={1} />
-        <div className={s.eyebrow}>{t.lenguajes.eyebrow}</div>
-        <h2>{t.lenguajes.title}</h2>
-        <FiguraLenguajes r={t.lenguajes} />
+      <Slide
+        z="="
+        label={[l.lenguajes, l.abstraccion, l.codigoMaquina, l.ensamblador, l.compilados, l.altoNivel, l.cpuLee, l.motores, l.desarrollo, l.wwise]}
+      >
+        <ContenidoLenguajes t={t} />
       </Slide>
 
-      <Slide z="↺" label={t.labels.cierre}>
-        <h2>{t.cierre.title}</h2>
-        {t.cierre.ideas.map((idea, index) => (
-          <p key={idea.clave} className={`${s.lede} ${s.morphIn}`} style={turno(index)}>
-            <span className={s.accent}>{idea.clave}</span> {idea.texto}
-          </p>
-        ))}
+      <Slide z="↺" label={[l.cierre, l.cierrePrograma]}>
+        <ContenidoCierre r={t.cierre} />
       </Slide>
     </Deck>
   );

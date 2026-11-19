@@ -109,16 +109,39 @@ export type CierreTexts = {
 export type DatosYProgramasTexts = {
   name: string;
   context: string;
+  /** One key per slide step: the keys are the slide ids questions point at, so they never change. */
   labels: {
     intro: string;
     ideas: string;
     datos: string;
     dato: string;
     biblioteca: string;
+    personas: string;
+    librosAbiertos: string;
+    mesas: string;
+    estanterias: string;
+    regla: string;
     computador: string;
+    llegarCpu: string;
+    cache: string;
+    ram: string;
+    disco: string;
+    cargando: string;
     programa: string;
+    codigo: string;
+    ejemplos: string;
     lenguajes: string;
+    abstraccion: string;
+    codigoMaquina: string;
+    ensamblador: string;
+    compilados: string;
+    altoNivel: string;
+    cpuLee: string;
+    motores: string;
+    desarrollo: string;
+    wwise: string;
     cierre: string;
+    cierrePrograma: string;
   };
   cover: { eyebrow: string; title: ReactNode; hint: string };
   ideas: IdeasTexts;
@@ -138,10 +161,32 @@ const es: DatosYProgramasTexts = {
     datos: 'los datos',
     dato: 'qué es un dato',
     biblioteca: 'biblioteca',
+    personas: 'las personas',
+    librosAbiertos: 'los libros abiertos',
+    mesas: 'las mesas',
+    estanterias: 'las estanterías',
+    regla: 'la regla',
     computador: 'computador',
+    llegarCpu: 'llegar a la CPU',
+    cache: 'la caché',
+    ram: 'la RAM',
+    disco: 'el disco',
+    cargando: 'cargando',
     programa: 'qué es un programa',
+    codigo: 'del código a las instrucciones',
+    ejemplos: 'ejemplos',
     lenguajes: 'lenguajes',
+    abstraccion: 'abstracción',
+    codigoMaquina: 'código máquina',
+    ensamblador: 'ensamblador',
+    compilados: 'C++ y Rust',
+    altoNivel: 'alto nivel',
+    cpuLee: 'la CPU lee abajo',
+    motores: 'los motores',
+    desarrollo: 'el desarrollo',
+    wwise: 'Wwise y Blueprints',
     cierre: 'cierre',
+    cierrePrograma: 'cierre · programa',
   },
   cover: {
     eyebrow: 'Intro a Wwise · Bases Teóricas',
@@ -281,10 +326,32 @@ const en: DatosYProgramasTexts = {
     datos: 'the data',
     dato: 'what data is',
     biblioteca: 'library',
+    personas: 'the people',
+    librosAbiertos: 'the open books',
+    mesas: 'the tables',
+    estanterias: 'the shelves',
+    regla: 'the rule',
     computador: 'computer',
+    llegarCpu: 'reaching the CPU',
+    cache: 'the cache',
+    ram: 'the RAM',
+    disco: 'the disk',
+    cargando: 'loading',
     programa: 'what a program is',
+    codigo: 'from code to instructions',
+    ejemplos: 'examples',
     lenguajes: 'languages',
+    abstraccion: 'abstraction',
+    codigoMaquina: 'machine code',
+    ensamblador: 'assembly',
+    compilados: 'C++ and Rust',
+    altoNivel: 'high level',
+    cpuLee: 'the CPU reads below',
+    motores: 'the engines',
+    desarrollo: 'development',
+    wwise: 'Wwise and Blueprints',
     cierre: 'wrap-up',
+    cierrePrograma: 'wrap-up · program',
   },
   cover: {
     eyebrow: 'Intro to Wwise · Theory Basics',

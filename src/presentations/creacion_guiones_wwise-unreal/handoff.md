@@ -28,7 +28,7 @@ Fuentes por clase: `../wwise-unreal/<slug>.dict.tsx` (objeto `es`) y `../wwise-u
 
 - El docente revisa `guion_clase_2_servidores.md` en VS Code. Después se pasa al formato de estado final: incorporar a «Pantalla» las correcciones de su sección de propuestas, borrar la sección y las marcas PROPUESTA, y escribir las acciones en pantalla de todas sus unidades.
 - El docente revisa la clase 1 implementada en la plataforma y, en el editor de preguntas, pasa wu-002 a `datos-y-programas` (diapositiva `lenguajes`), corrige wu-001 y wu-004 y retira wu-003 y wu-005. Luego revisa `questions/reviews/datos_y_programas_2026_oct_16.md`, genera el archivo de importación con `review-to-import.js` e importa las catorce preguntas nuevas.
-- Las acciones entre corchetes del guion de la clase 1 están implementadas como entradas escalonadas (un turno de 0,6 s por acción, en el orden de la narración); cuando exista audio habrá que sincronizarlas con la voz.
+- En la clase 1 implementada, cada párrafo de la narración es un paso (un clic) de la diapositiva y, dentro del paso, las acciones entre corchetes entran de una en una por turnos de 0,6 s (decisión del docente del 2026-10-16, para poder sincronizar con el audio y que no haya animaciones a la vez). Por eso la analogía tiene doce pasos, programa tres, lenguajes diez y el cierre dos: los encabezados `s=N p=K` del guion ya no coinciden con la plataforma y habría que renumerarlos, una unidad por párrafo, cuando el docente lo apruebe.
 - Más reglas de revisión por venir del docente; incorporarlas a la guía y repasar los guiones existentes con ellas.
 
 ## Siguiente
