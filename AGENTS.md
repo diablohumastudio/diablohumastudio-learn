@@ -55,7 +55,7 @@ Every route is built from the constants and helpers in `src/data/learn.ts` (`COU
 
 ## Pending tasks
 
-- Pending tasks live in ClickUp, not in Markdown files: the list of the space "Diablohumastudio-learn", declared in `.claude/clickup-lists.json`. The rules are in the global `AGENTS.md`, section "Pending tasks in ClickUp", and the procedure in the global skill `clickup-todo`. [TODO.md](TODO.md) only points there; do not add items to it.
+- Pending tasks live in ClickUp, not in Markdown files: the list of the space "Diablohumastudio-learn", declared in `.claude/clickup/lists.json`; the local copy of the tasks and the queue of pending changes sit next to it, outside Git. The rules are in the global `AGENTS.md`, section "Pending tasks in ClickUp", and the procedure in the global skill `clickup-todo`. [TODO.md](TODO.md) only points there; do not add items to it.
 
 ## Importing questions
 

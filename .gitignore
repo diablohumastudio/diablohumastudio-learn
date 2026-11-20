@@ -44,3 +44,7 @@ deliverables/exports/
 
 # Narration audio made on the ElevenLabs website, before it is cut into steps: it stays downloadable there.
 narration/para-elevenlabs/**/*.mp3
+
+# ClickUp: the local copy of the tasks and the queue of pending changes (skill clickup-todo).
+.claude/clickup/tasks.json
+.claude/clickup/queue.jsonl
